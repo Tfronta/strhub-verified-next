@@ -1768,13 +1768,8 @@ def detect(slug: str, ref: str, tree_resp: dict, readme: str, readme_name: str |
         # names a registry knows the tool by.
         "packaging": pkg,
         # The coordinates in the loci files the repository ships, so the
-        # proposal can tell whether a catalog's loci are in STRhub's sample,
-        # and the column format of each shipped file for tools not in STRhub's table.
+        # proposal can tell whether a catalog's loci are in STRhub's sample.
         "shipped_loci": shipped_loci(files, loci_file_paths(tree)),
-        "shipped_loci_formats": {
-            p: fmt for p in loci_file_paths(tree)
-            if files.get(p) and (fmt := __import__("regions_library").detect_format(files[p]))
-        },
         # What is published outside the repository, documented or not: ten of
         # seventeen STR tools are on Bioconda at the exact release, and only
         # two READMEs say so. A fact for the report and for a recipe STRhub

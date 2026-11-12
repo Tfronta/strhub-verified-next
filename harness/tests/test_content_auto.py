@@ -10,8 +10,6 @@ import check_content
 import content_auto as ca
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
-LIB = ROOT / "datasets" / "illumina-bam-hg38" / "regions"
-
 VCF_HEADER = "##fileformat=VCFv4.2\n#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\tNA12878\n"
 
 
@@ -35,22 +33,27 @@ def _gangstr_like(regions):
 PANEL = ROOT / "datasets" / "illumina-bam-hg38" / "loci.bed"
 
 
-def test_reads_regions_from_every_library_layout():
-    # TRGT's layout names the locus inside its fourth column (ID=TH01;MOTIFS=...);
-    # a TRGT run on the HiFi slice once reported its loci by that whole string.
-    for fmt in ("hipstr", "strsearch", "bed4", "trgt"):
-        regs = ca.read_regions(LIB / f"{fmt}.bed")
-        assert len(regs) == 24, fmt
-        assert {r[3] for r in regs} >= {"TH01", "TPOX", "vWA", "FGA"}, fmt
-    # GangSTR's layout carries no names: they come from the panel, by overlap.
-    regs = ca.read_regions(LIB / "gangstr.bed")
+def _nameless(tmp_path):
+    """The panel's loci in a layout that carries no names (chrom start end
+    period motif), written inside each panel window."""
+    bed = tmp_path / "nameless.bed"
+    bed.write_text("".join(f"{c}\t{s + 900}\t{s + 950}\t4\tAATG\n" for c, s, _, _ in ca.read_regions(PANEL)))
+    return bed
+
+
+def test_reads_the_panel_and_names_nameless_regions_from_it(tmp_path):
+    regs = ca.read_regions(PANEL)
+    assert len(regs) == 24
+    assert {r[3] for r in regs} >= {"TH01", "TPOX", "vWA", "FGA"}
+    # A layout without names: they come from the panel, by overlap.
+    regs = ca.read_regions(_nameless(tmp_path))
     assert all(r[3].startswith("chr") for r in regs)
     named = ca.name_regions(regs, PANEL)
     assert {r[3] for r in named} >= {"TH01", "TPOX", "vWA", "FGA"}
 
 
 def test_hipstr_style_vcf_is_recognised_by_id(tmp_path):
-    regions = ca.read_regions(LIB / "hipstr.bed")
+    regions = ca.read_regions(PANEL)
     p = tmp_path / "calls.vcf.gz"
     with gzip.open(p, "wt") as fh:
         fh.write(_hipstr_like(regions))
@@ -63,7 +66,7 @@ def test_hipstr_style_vcf_is_recognised_by_id(tmp_path):
 
 
 def test_gangstr_style_vcf_is_recognised_by_position(tmp_path):
-    regions = ca.name_regions(ca.read_regions(LIB / "gangstr.bed"), PANEL)
+    regions = ca.name_regions(ca.read_regions(_nameless(tmp_path)), PANEL)
     p = tmp_path / "out.vcf"
     p.write_text(_gangstr_like(regions))
     st = ca.analyze_vcf(p, regions)
@@ -72,7 +75,7 @@ def test_gangstr_style_vcf_is_recognised_by_position(tmp_path):
 
 
 def test_uncalled_genotypes_do_not_pass(tmp_path):
-    regions = ca.read_regions(LIB / "hipstr.bed")
+    regions = ca.read_regions(PANEL)
     p = tmp_path / "calls.vcf"
     p.write_text(_hipstr_like(regions, called=False))
     checks = ca.judge(ca.analyze_vcf(p, regions), "vcf", 24)
@@ -80,7 +83,7 @@ def test_uncalled_genotypes_do_not_pass(tmp_path):
 
 
 def test_too_few_of_the_given_loci_do_not_pass(tmp_path):
-    regions = ca.read_regions(LIB / "hipstr.bed")
+    regions = ca.read_regions(PANEL)
     p = tmp_path / "calls.vcf"
     p.write_text(_hipstr_like(regions[:2]))
     checks = ca.judge(ca.analyze_vcf(p, regions), "vcf", 24)
@@ -119,7 +122,8 @@ def test_a_log_file_is_not_genotype_data(tmp_path):
 def test_gate_runs_auto_when_the_manifest_declares_no_columns(tmp_path):
     out = tmp_path / "out"
     out.mkdir()
-    regions = ca.name_regions(ca.read_regions(LIB / "gangstr.bed"), PANEL)
+    nameless = _nameless(tmp_path)
+    regions = ca.name_regions(ca.read_regions(nameless), PANEL)
     (out / "output.vcf").write_text(_gangstr_like(regions))
     mf = tmp_path / "m.yml"
     mf.write_text(
@@ -127,7 +131,7 @@ def test_gate_runs_auto_when_the_manifest_declares_no_columns(tmp_path):
         "environment: {dockerfile: Dockerfile}\nrun: {cmd: x}\n"
         "outputs:\n  - {path: '*.vcf', format: vcf, min_records: 1}\n"
     )
-    r = check_content.check(str(mf), str(out), regions_path=str(LIB / "gangstr.bed"), panel_path=str(PANEL))
+    r = check_content.check(str(mf), str(out), regions_path=str(nameless), panel_path=str(PANEL))
     assert r["applicable"] and r["passed"]
     assert r["outputs"][0]["mode"] == "auto" and r["outputs"][0]["stats"]["distinct_str_loci"] == 24
 
@@ -150,14 +154,15 @@ REAL = pathlib.Path(__file__).resolve().parent.parent / "testdata" / "outputs"
 
 
 def test_real_hipstr_and_gangstr_vcfs_reach_content():
-    """Excerpts of what HipSTR and GangSTR actually wrote for NA12878 with the
-    library regions (generated locally; see testdata/outputs/README.md)."""
+    """Excerpts of what HipSTR and GangSTR actually wrote for NA12878
+    (generated locally; see testdata/outputs/README.md), read against the
+    dataset's panel."""
     if not (REAL / "hipstr.str_calls.vcf").exists():
         return
-    hip = ca.analyze_vcf(REAL / "hipstr.str_calls.vcf", ca.read_regions(LIB / "hipstr.bed"))
+    hip = ca.analyze_vcf(REAL / "hipstr.str_calls.vcf", ca.read_regions(PANEL))
     assert hip["distinct_str_loci"] >= 20 and hip["called_genotypes"] >= 20
     assert all(ca.judge(hip, "vcf", 24).values())
-    gan = ca.analyze_vcf(REAL / "gangstr.output.vcf", ca.name_regions(ca.read_regions(LIB / "gangstr.bed"), PANEL))
+    gan = ca.analyze_vcf(REAL / "gangstr.output.vcf", ca.read_regions(PANEL))
     assert gan["regions_hit"] >= 20 and "TH01" in gan["str_loci"]
     assert all(ca.judge(gan, "vcf", 24).values())
 
