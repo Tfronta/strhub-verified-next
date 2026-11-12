@@ -51,7 +51,7 @@ reports/<slug>.summary.md      the report in prose
 reports/<slug>.badge.json      shields.io badge (not read by the web)
 reports/<slug>.html            static page of the report
 reports/<slug>.pdf             certificate
-reports/<slug>.log-<leg>.txt       output of a leg that ran (build, starts, example, own, external)
+reports/<slug>.log-<leg>.txt       output of a leg that ran (build, example, external)
 reports/<slug>.terminal-<leg>.txt  the same with the exact argv, as record_terminal.sh wrote it
 run_record.json                every stage's command, exit status and log path (not read by the web yet)
 ```

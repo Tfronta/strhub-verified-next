@@ -37,8 +37,6 @@ HARDENING = [
     "--security-opt", "no-new-privileges",
 ]
 IMAGE = "toolimg:ci"
-#: The workflow's `timeout-minutes` on the Starts step.
-STARTS_BACKSTOP_MINUTES = 5
 #: The literal source-installation transcript profile (harness/source_install.py).
 SOURCE_INSTALL_PROFILE = "strhub-source-install/1"
 SOURCE_INSTALL_DOCKERFILE = "source-install.Dockerfile"
@@ -212,35 +210,6 @@ def installs(ctx: Ctx, available_result: StageResult) -> StageResult:
             "docker", "build", "-f", str(docker_dir / docker_file), "-t", ctx.image, str(context)]
     rc = ctx.exe.run(argv, cwd=ctx.root)
     return st.finish(rc, argv, **outputs, **({"environment": "primary"} if rc == 0 else {}))
-
-
-# --- Starts: the installed program answers --help ---------------------------
-
-def starts(ctx: Ctx, installs_result: StageResult) -> StageResult:
-    """Outside the ladder, like the example. Only an explicit starts command
-    runs here: STRhub does not invent a --help invocation, so a plan without
-    one records this stage as not run."""
-    if not installs_result.passed:
-        return StageResult.not_run("starts", "no image was built")
-    cmd = ctx.plan.get("starts_cmd") or ""
-    if not cmd:
-        return StageResult.not_run("starts", "no explicit starts command: STRhub does not invent a --help invocation")
-    log = ctx.work / "log_starts.txt"
-    st = StageResult.start("starts", log)
-    argv = ["bash", ctx.harness("run_container.sh"), f"{ctx.container_prefix}_starts", "2", str(log),
-            *HARDENING, ctx.image, cmd]
-    rc = ctx.exe.run(argv, timeout=STARTS_BACKSTOP_MINUTES * 60, cwd=ctx.root)
-    check = [ctx.python, ctx.harness("check_starts.py"), "--rc", str(rc), "--log", str(log),
-             "--json", ctx.result("starts.json")]
-    check_rc = ctx.exe.run(check, cwd=ctx.root)
-    # The gate is check_starts's judgement of the log (a program that prints
-    # its usage and exits 1 still starts), so the stage's status follows it;
-    # the container's own exit status stays in the record as it was.
-    judged = _load(ctx.result_abs("starts.json")) or {}
-    st.finish(rc, argv, starts_json=ctx.result("starts.json"), check_exit_code=check_rc)
-    if judged.get("applicable"):
-        st.status = "passed" if judged.get("passed") else "failed"
-    return st
 
 
 # --- Run legs ----------------------------------------------------------------

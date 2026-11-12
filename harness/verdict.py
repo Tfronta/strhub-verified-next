@@ -368,13 +368,7 @@ def decide(gates: dict, diagnostics: dict[str, list[dict]] | None = None,
     if v.get("basis") == "strhub":
         v["blockers"] = []
         return v
-    # Whether the installed program starts, when the run did not get to the
-    # end: installed and starting, but nobody could tell how to run it, is a
-    # different finding from a program that does not start at all.
     g = gates or {}
-    if v["code"] in ("undetermined", "fails") and g.get("installs") and not g.get("runs") and "starts" in g:
-        v["reason"] += (" The installed program starts: it answers --help." if g["starts"]
-                        else " The installed program does not start: --help fails.")
     if v["code"] == "undetermined" and g.get("example"):
         v["reason"] += " The repository's own documented example ran and produced its output."
     # No blockers for a fault of ours: every blocker carries an issue to open

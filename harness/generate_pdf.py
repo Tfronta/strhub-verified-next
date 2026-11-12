@@ -78,7 +78,6 @@ _LOGO_PATH = _logo_temp_path()
 GATE_DISPLAY = [
     ("available", "Available",                   "The pinned public source exists"),
     ("installs",  "Installs",                    "The environment builds from source"),
-    ("starts",    "Starts",                      "The installed program answers --help in the built environment"),
     ("runs",      "Runs",                        "Executes end-to-end without crashing"),
     ("io",        "Expected IO",                 "Produces a non-empty file in the declared format"),
     ("content",   "Plausible Output",            "Output structure matches expected genotype-bearing format"),
@@ -534,19 +533,14 @@ def build_body(cfg):
     gdata = []
     stopped_found = False
     for key, gate_name, gate_desc in GATE_DISPLAY:
-        if key == "starts" and key not in gates_dict:
-            continue
         ok = gates_dict.get(key, False)
         if ok:
             st = "pass"
             desc_text = gate_desc
-        elif not stopped_found and key != "starts":
+        elif not stopped_found:
             st = "stopped"
             stopped_found = True
             desc_text = f'{gate_desc} &nbsp; <font color="#ef4444"><b>The run stopped here.</b></font>'
-        elif not ok and key == "starts":
-            st = "stopped"
-            desc_text = gate_desc
         else:
             st = "na"
             desc_text = f'{gate_desc} &nbsp; <font color="#9ca3af"><i>Not attempted, because the run had already stopped.</i></font>'

@@ -21,11 +21,11 @@ def base_plan(**over):
     p = {
         "tool": "x", "ref": SHA, "repo": "https://github.com/o/Tool",
         "procedure_ready": "1", "install_ready": "1", "installation_profile": "",
-        "starts_cmd": "", "example_ready": "0", "example_cmd": "",
+        "example_ready": "0", "example_cmd": "",
         "cmd": "tool --reads /data/in/input.bam --output result.vcf",
-        "dockerdir": "tools/x", "dockerfile": "Dockerfile", "dockerfile_from_repo": "Dockerfile",
-        "timeout": "20", "step_timeout": "23", "manifest": "tools/x/manifest.yml",
-        "mode": "publish", "input_type": "illumina-bam-hg38", "own_ready": "0",
+        "dockerdir": "work/proposal", "dockerfile": "Dockerfile", "dockerfile_from_repo": "Dockerfile",
+        "timeout": "20", "step_timeout": "23", "manifest": "work/proposal/manifest.yml",
+        "mode": "trial", "input_type": "illumina-bam-hg38",
         "external_ready": "1", "dataset_name": "ds", "input_failure": "",
         "supported_loci": "datasets/illumina-bam-hg38/loci.bed",
     }
@@ -96,7 +96,7 @@ def test_a_failed_available_gate_stops_the_ladder_and_says_so(tmp_path):
     fake = Fake(tmp_path, **{"git_ls-remote": 128})
     rec = go(tmp_path, base_plan(), fake)
     assert stage(rec, "available")["status"] == "failed" and stage(rec, "available")["exit_code"] == 128
-    for name in ("installs", "starts", "runs_example", "runs_external", "io_external", "content_external"):
+    for name in ("installs", "runs_example", "runs_external", "io_external", "content_external"):
         assert stage(rec, name)["status"] == "not_run" and stage(rec, name)["reason"]
     assert "docker_build" not in fake.kinds() and not any(k.startswith("run_") for k in fake.kinds())
     assert rec["outcomes"] == {"available": "failure", "installs": "skipped",
@@ -111,18 +111,17 @@ def test_the_order_the_conditions_and_the_commands_are_the_workflows(tmp_path):
     plan = base_plan(example_ready="1", example_cmd="cd . && ./run.sh")
     rec = go(tmp_path, plan, fake)
     assert [s["stage"] for s in rec["stages"]] == [
-        "available", "installs", "starts", "runs_example", "example",
+        "available", "installs", "runs_example", "example",
         "runs_external", "io_external", "content_external",
     ]
-    assert stage(rec, "starts")["status"] == "not_run"       # no --help is invented
-    assert all(s["status"] == "passed" for s in rec["stages"] if s["stage"] != "starts")
+    assert all(s["status"] == "passed" for s in rec["stages"])
     # Installs: the clone at the pinned ref, the path and evidence checks, then ONE build.
     assert fake.kinds()[:9] == ["git_ls-remote", "git_init", "git_fetch", "git_cat-file",
                                 "git_clone", "git_checkout", "git_rev-parse", "git_rev-parse", "_paths"]
     assert fake.kinds()[9] == "fidelity" and fake.kinds().count("docker_build") == 1
     fid = next(c for c in fake.calls if pathlib.Path(c[1]).stem == "fidelity")
     assert fid[2:] == ["--checkout", "work/ctx/Tool", "--review", "work/procedure_review.json",
-                       "--manifest", "tools/x/manifest.yml"]
+                       "--manifest", "work/proposal/manifest.yml"]
     build = next(c for c in fake.calls if c[0] == "bash" and c[1].endswith("record_terminal.sh"))
     assert build[2:] == ["work/log_build.txt", "docker", "build", "-f", "work/ctx/Tool/Dockerfile",
                          "-t", "toolimg:ci", "work/ctx/Tool"]
@@ -130,7 +129,7 @@ def test_the_order_the_conditions_and_the_commands_are_the_workflows(tmp_path):
     assert stage(rec, "installs")["outputs"] == {"source_evidence": "verified", "environment": "primary"}
     # The external leg: provenance first, then one container on the verified mount.
     prov = next(c for c in fake.calls if pathlib.Path(c[1]).stem == "input_provenance")
-    assert prov[2:] == ["--work", "work", "--manifest", "tools/x/manifest.yml", f"--command={plan['cmd']}"]
+    assert prov[2:] == ["--work", "work", "--manifest", "work/proposal/manifest.yml", f"--command={plan['cmd']}"]
     ext = next(c for c in fake.calls if c[0] == "bash" and c[2] == "strhub_external")
     assert ext[3:5] == ["20", "work/log_external.txt"] and ext[5:5 + len(stages.HARDENING)] == stages.HARDENING
     assert ext[-2:] == ["toolimg:ci", plan["cmd"]] and "--entrypoint" not in ext
@@ -252,17 +251,6 @@ def test_report_takes_its_gate_outcomes_and_the_evidence_failure_from_the_record
     assert (c.available, c.installs, c.runs, c.example_runs) == ("skipped",) * 4
 
 
-def test_starts_is_judged_by_its_check_not_by_the_raw_exit_status(tmp_path):
-    def check_starts(argv, log):
-        (tmp_path / "starts.json").write_text(json.dumps({"applicable": True, "passed": True}))
-        return 0
-    fake = Fake(tmp_path, run_starts=1, check_starts=check_starts)
-    rec = go(tmp_path, base_plan(starts_cmd="tool --help"), fake)
-    st = stage(rec, "starts")
-    assert st["status"] == "passed" and st["exit_code"] == 1
-    assert "--entrypoint" not in next(c for c in fake.calls if c[0] == "bash" and c[2] == "strhub_starts")
-
-
 def test_prepare_writes_the_plan_it_printed(tmp_path):
     src = ROOT / "harness" / "testdata" / "fixtures" / "legacy_tools" / "hipstr"
     descriptor = tmp_path / "work" / "proposal"
@@ -306,13 +294,13 @@ def test_the_cli_writes_the_record(tmp_path, monkeypatch):
 
 def test_results_image_and_container_prefix_are_the_contexts(tmp_path):
     fake = Fake(tmp_path)
-    rec = runner.run(base_plan(starts_cmd="tool --help"), pathlib.Path("work"), tmp_path, exe=fake,
+    rec = runner.run(base_plan(), pathlib.Path("work"), tmp_path, exe=fake,
                      python=sys.executable, results=tmp_path / "results", image="strhub-trial:x",
                      container_prefix="trial-x")
     build = next(c for c in fake.calls if c[1].endswith("record_terminal.sh"))
     assert build[build.index("-t") + 1] == "strhub-trial:x"
     names = {c[2] for c in fake.calls if c[0] == "bash" and c[1].endswith("run_container.sh")}
-    assert names == {"trial-x_starts", "trial-x_external"}
+    assert names == {"trial-x_external"}
     assert all(c[-2] == "strhub-trial:x" for c in fake.calls if c[0] == "bash" and c[1].endswith("run_container.sh"))
     io = next(c for c in fake.calls if pathlib.Path(c[1]).stem == "check_io")
     assert io[io.index("--json") + 1] == str(tmp_path / "results" / "io_external.json")

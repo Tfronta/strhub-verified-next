@@ -148,10 +148,8 @@ RECORD_NOTE = (
 
 LABELS.setdefault("example", "Reproduces own example")
 MEANING.setdefault("example", "the README's own command produced its documented output on the repository's own data")
-LABELS.setdefault("starts", "Starts")
-MEANING.setdefault("starts", "the installed program answers --help in the built environment")
-#: Checks outside the ladder, shown after it, in this order, when they ran.
-AUX_GATES = ("starts", "example")
+#: Checks outside the ladder, shown after it, when they ran.
+AUX_GATES = ("example",)
 
 
 def _step1_md(report: dict) -> list[str]:
@@ -935,8 +933,6 @@ def main() -> int:
                     help="outcome of the own-example step (success/failure/skipped)")
     ap.add_argument("--example", default="example.json", help="path to check_example.py output")
     ap.add_argument("--log-example", default="", help="log of the own-example leg")
-    ap.add_argument("--starts", default="starts.json", help="check_starts.py output")
-    ap.add_argument("--log-starts", default="", help="log of the Starts check")
     ap.add_argument("--procedure-review", default="", help="recomputed pre-execution procedure review")
     ap.add_argument("--mounted-inputs", default="", help="verified provenance of the external runtime mount")
     ap.add_argument("--recipe-proposal", default="",
@@ -1043,14 +1039,6 @@ def main() -> int:
             example_detail = json.loads(ep.read_text())
         except Exception:  # noqa: BLE001
             example_detail = {}
-    sp = pathlib.Path(args.starts)
-    if sp.exists():
-        try:
-            starts_detail = json.loads(sp.read_text())
-        except ValueError:
-            starts_detail = {}
-        if starts_detail.get("applicable"):
-            gates["starts"] = bool(starts_detail.get("passed"))
     if example_detail.get("applicable"):
         # The files the example left behind count only if the example's own
         # command exited 0. The capture wrapper copies whatever was created
@@ -1249,7 +1237,7 @@ def main() -> int:
     # The build log rides along with the run logs. A reader told the build failed
     # will want the same thing a reader told a run failed wants: the output.
     for leg, flag in [("own", args.log_own), ("external", args.log_external),
-                      ("example", args.log_example), ("starts", args.log_starts), ("build", args.log_build)]:
+                      ("example", args.log_example), ("build", args.log_build)]:
         if not flag:
             continue
         lp = pathlib.Path(flag)

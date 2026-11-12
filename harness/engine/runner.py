@@ -1,6 +1,6 @@
 """Walk the ladder once, in order, and write the RunRecord.
 
-The order: Available, Installs, Starts, the example leg and its check, the
+The order: Available, Installs, the example leg and its check, the
 external leg and its checks, the matrix. Each stage is conditioned on the
 ones before it the way the workflow's `if:` lines conditioned the steps; a
 stage that does not run is recorded as such, with its reason, never dropped.
@@ -50,7 +50,6 @@ def run(plan: dict, work: pathlib.Path, root: pathlib.Path, exe: Executor | None
 
     av = keep(stages.available(ctx))
     ins = keep(stages.installs(ctx, av))
-    keep(stages.starts(ctx, ins))
     ex = keep(stages.runs_example(ctx, ins))
     keep(stages.check_example(ctx))
     ext = keep(stages.runs_external(ctx, ins))
