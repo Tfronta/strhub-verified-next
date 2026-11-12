@@ -1,6 +1,6 @@
 {
   "schema": "strhub-verified/datasets/1",
-  "description": "Typed reference-dataset library. The verify workflow's external matrix leg looks up a compatible dataset by the manifest's inputs.type. If no entry matches, the external leg is reported N/A (never a failure). Each entry also carries its contract: kit (for FASTQ), chrom_naming and read_length, so a recipe proposed from a repository can be pointed at the right data without asking anyone. Each BAM dataset also carries a regions_library: the same panel loci written in every tool format STRhub knows (harness/build_regions_library.py), so a coordinate-based tool gets its regions file without anyone writing one.",
+  "description": "Typed reference-dataset library. The engine looks up the one dataset registered for the manifest's inputs.type and mounts it read-only at /data/in under its canonical name, verified by hash. If no entry matches, the external leg is reported N/A (never a failure). Each entry also carries its contract: kit (for FASTQ), chrom_naming and read_length. Nothing else is mounted: no reference genome and no regions file.",
   "datasets": {
     "illumina-str-fastq": {
       "dir": "datasets/illumina-str-fastq",
@@ -22,12 +22,6 @@
       "format": "bam",
       "canonical_input": "input.bam",
       "reference": "hg38",
-      "reference_genome": {
-        "assembly": "GRCh38 / hg38",
-        "url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz",
-        "filename": "hg38.fa",
-        "mount_path": "/data/ref/hg38.fa"
-      },
       "name": "1000 Genomes ONT, hg38 CODIS slice (R10 SUP)",
       "source": "https://s3.amazonaws.com/1000g-ont/index.html?prefix=PROCESSED_DATA/ALIGNED_TO_HG38/MINIMAP2_ALIGNED_BAMS/",
       "license": "Open access (1000 Genomes / HPRC). Research use. STRhub is not the data provider.",
@@ -35,48 +29,6 @@
       "notes": "Pre-built CODIS slices in ont_slices/. Default external test: HG00113.codis.bam (~30 MB). See datasets/ont-bam-hg38/SOURCE.txt.",
       "chrom_naming": "chr",
       "supported_loci": "datasets/ont-bam-hg38/loci.bed",
-      "regions_library": {
-        "hipstr": "datasets/ont-bam-hg38/regions/hipstr.bed",
-        "gangstr": "datasets/ont-bam-hg38/regions/gangstr.bed",
-        "strsearch": "datasets/ont-bam-hg38/regions/strsearch.bed",
-        "bed4": "datasets/ont-bam-hg38/regions/bed4.bed",
-        "motif": "datasets/ont-bam-hg38/regions/motif.bed",
-        "eh_catalog": "datasets/ont-bam-hg38/regions/eh_catalog.json",
-        "trgt": "datasets/ont-bam-hg38/regions/trgt.bed"
-      },
-      "read_groups": true,
-      "sample": "HG00113"
-    },
-    "ont-bam-hg38-med": {
-      "dir": "datasets/ont-bam-hg38-med",
-      "data": "ont_slices/HG00113.medical.bam",
-      "bam_index": "ont_slices/HG00113.medical.bam.bai",
-      "format": "bam",
-      "canonical_input": "input.bam",
-      "reference": "hg38",
-      "reference_genome": {
-        "assembly": "GRCh38 / hg38",
-        "url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz",
-        "filename": "hg38.fa",
-        "mount_path": "/data/ref/hg38.fa"
-      },
-      "name": "1000 Genomes ONT, hg38 medical STR slice (R10 SUP)",
-      "source": "https://s3.amazonaws.com/1000g-ont/index.html?prefix=PROCESSED_DATA/ALIGNED_TO_HG38/MINIMAP2_ALIGNED_BAMS/",
-      "license": "Open access (1000 Genomes / HPRC). Research use. STRhub is not the data provider.",
-      "chemistry": "ONT R10, basecalling model SUP",
-      "notes": "±1 kb capture slice of 1000 Genomes ONT HG00113 R10 SUP BAM around the 51 disease-associated STR loci of illumina-bam-hg38-med (~40 MB; full-length ONT reads overlapping each window retained). Every panel locus is overlapped by 12 (SOX3) to 49 primary ONT reads. Male sample: AR, ARX, AFF2, FMR1 and SOX3 are hemizygous. Pick this dataset for medical repeat tools made for Oxford Nanopore (straglr, NanoRepeat, strkit). Execution only, not a clinical validation. See datasets/ont-bam-hg38-med/SOURCE.txt.",
-      "chrom_naming": "chr",
-      "supported_loci": "datasets/ont-bam-hg38-med/loci.bed",
-      "panel_label": "disease-associated STR loci",
-      "regions_library": {
-        "hipstr": "datasets/ont-bam-hg38-med/regions/hipstr.bed",
-        "gangstr": "datasets/ont-bam-hg38-med/regions/gangstr.bed",
-        "strsearch": "datasets/ont-bam-hg38-med/regions/strsearch.bed",
-        "bed4": "datasets/ont-bam-hg38-med/regions/bed4.bed",
-        "motif": "datasets/ont-bam-hg38-med/regions/motif.bed",
-        "eh_catalog": "datasets/ont-bam-hg38-med/regions/eh_catalog.json",
-        "trgt": "datasets/ont-bam-hg38-med/regions/trgt.bed"
-      },
       "read_groups": true,
       "sample": "HG00113"
     },
@@ -87,12 +39,6 @@
       "format": "bam",
       "canonical_input": "input.bam",
       "reference": "hg38",
-      "reference_genome": {
-        "assembly": "GRCh38 / hg38",
-        "url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz",
-        "filename": "hg38.fa",
-        "mount_path": "/data/ref/hg38.fa"
-      },
       "name": "GIAB HG002 PacBio HiFi (Revio), hg38 CODIS slice",
       "source": "https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/data/AshkenazimTrio/HG002_NA24385_son/PacBio_HiFi-Revio_20231031/",
       "license": "Open access (GIAB / NIST). Research and educational use. STRhub is not the data provider.",
@@ -100,48 +46,6 @@
       "notes": "CODIS ±10 kb slice of GIAB's HG002 Revio HiFi BAM (pbmm2, GRCh38 GIABv3), kinetics tags dropped (~19 MB); every panel locus is overlapped by 19 to 73 HiFi reads. Pick this dataset for tools made for PacBio HiFi (TRGT). See datasets/pacbio-hifi-bam-hg38/SOURCE.txt.",
       "chrom_naming": "chr",
       "supported_loci": "datasets/pacbio-hifi-bam-hg38/loci.bed",
-      "regions_library": {
-        "hipstr": "datasets/pacbio-hifi-bam-hg38/regions/hipstr.bed",
-        "gangstr": "datasets/pacbio-hifi-bam-hg38/regions/gangstr.bed",
-        "strsearch": "datasets/pacbio-hifi-bam-hg38/regions/strsearch.bed",
-        "bed4": "datasets/pacbio-hifi-bam-hg38/regions/bed4.bed",
-        "motif": "datasets/pacbio-hifi-bam-hg38/regions/motif.bed",
-        "eh_catalog": "datasets/pacbio-hifi-bam-hg38/regions/eh_catalog.json",
-        "trgt": "datasets/pacbio-hifi-bam-hg38/regions/trgt.bed"
-      },
-      "read_groups": true,
-      "sample": "HG002"
-    },
-    "pacbio-hifi-bam-hg38-med": {
-      "dir": "datasets/pacbio-hifi-bam-hg38-med",
-      "data": "pacbio_slices/HG002.hifi.medical.bam",
-      "bam_index": "pacbio_slices/HG002.hifi.medical.bam.bai",
-      "format": "bam",
-      "canonical_input": "input.bam",
-      "reference": "hg38",
-      "reference_genome": {
-        "assembly": "GRCh38 / hg38",
-        "url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz",
-        "filename": "hg38.fa",
-        "mount_path": "/data/ref/hg38.fa"
-      },
-      "name": "GIAB HG002 PacBio HiFi (Revio), hg38 medical STR slice",
-      "source": "https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/data/AshkenazimTrio/HG002_NA24385_son/PacBio_HiFi-Revio_20231031/",
-      "license": "Open access (GIAB / NIST). Research and educational use. STRhub is not the data provider.",
-      "chemistry": "PacBio Revio HiFi (CCS), ~48x",
-      "notes": "±10 kb slice of GIAB's HG002 Revio HiFi BAM around the 51 disease-associated STR loci of illumina-bam-hg38-med, kinetics tags dropped (~40 MB). Every panel locus is overlapped by 17 (NOTCH2NLC) to 75 primary HiFi reads. Male sample: AR, ARX, AFF2, FMR1 and SOX3 are hemizygous. Pick this dataset for medical repeat tools made for PacBio HiFi (TRGT). Execution only, not a clinical validation. See datasets/pacbio-hifi-bam-hg38-med/SOURCE.txt.",
-      "chrom_naming": "chr",
-      "supported_loci": "datasets/pacbio-hifi-bam-hg38-med/loci.bed",
-      "panel_label": "disease-associated STR loci",
-      "regions_library": {
-        "hipstr": "datasets/pacbio-hifi-bam-hg38-med/regions/hipstr.bed",
-        "gangstr": "datasets/pacbio-hifi-bam-hg38-med/regions/gangstr.bed",
-        "strsearch": "datasets/pacbio-hifi-bam-hg38-med/regions/strsearch.bed",
-        "bed4": "datasets/pacbio-hifi-bam-hg38-med/regions/bed4.bed",
-        "motif": "datasets/pacbio-hifi-bam-hg38-med/regions/motif.bed",
-        "eh_catalog": "datasets/pacbio-hifi-bam-hg38-med/regions/eh_catalog.json",
-        "trgt": "datasets/pacbio-hifi-bam-hg38-med/regions/trgt.bed"
-      },
       "read_groups": true,
       "sample": "HG002"
     },
@@ -151,12 +55,6 @@
       "format": "fastq",
       "canonical_input": "input.fastq",
       "reference": "hg38",
-      "reference_genome": {
-        "assembly": "GRCh38 / hg38",
-        "url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz",
-        "filename": "hg38.fa",
-        "mount_path": "/data/ref/hg38.fa"
-      },
       "name": "1000 Genomes ONT, HG00113 reads over the CODIS panel loci (FASTQ)",
       "source": "https://s3.amazonaws.com/1000g-ont/index.html?prefix=PROCESSED_DATA/ALIGNED_TO_HG38/MINIMAP2_ALIGNED_BAMS/",
       "license": "Open access (1000 Genomes / HPRC). Research use. STRhub is not the data provider.",
@@ -164,15 +62,6 @@
       "notes": "The 864 primary reads of ont_slices/HG00113.codis.bam that cover the 20 panel loci, written back as FASTQ (samtools fastq): 16.5 MB gzipped, staged uncompressed as input.fastq. For a tool that aligns its own reads; the reference is hg38, and aligning to all of it needs more than the run container's 6 GB (NanoRepeat's FASTQ mode stopped there: out of scope, oom). See datasets/ont-fastq/SOURCE.txt.",
       "chrom_naming": "chr",
       "supported_loci": "datasets/ont-fastq/loci.bed",
-      "regions_library": {
-        "hipstr": "datasets/ont-fastq/regions/hipstr.bed",
-        "gangstr": "datasets/ont-fastq/regions/gangstr.bed",
-        "strsearch": "datasets/ont-fastq/regions/strsearch.bed",
-        "bed4": "datasets/ont-fastq/regions/bed4.bed",
-        "motif": "datasets/ont-fastq/regions/motif.bed",
-        "eh_catalog": "datasets/ont-fastq/regions/eh_catalog.json",
-        "trgt": "datasets/ont-fastq/regions/trgt.bed"
-      },
       "sample": "HG00113"
     },
     "illumina-bam-hg38": {
@@ -182,12 +71,6 @@
       "format": "bam",
       "canonical_input": "input.bam",
       "reference": "hg38",
-      "reference_genome": {
-        "assembly": "GRCh38 / hg38",
-        "url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz",
-        "filename": "hg38.fa",
-        "mount_path": "/data/ref/hg38.fa"
-      },
       "supported_loci": "datasets/illumina-bam-hg38/loci.bed",
       "loci_count": 24,
       "min_loci": 5,
@@ -197,50 +80,7 @@
       "sequencer": "Illumina HiSeq 2500 (GIAB 300x)",
       "notes": "GIAB NA12878/HG001 300x, GRCh38, sliced around 24 autosomal forensic STR loci (CODIS 20 + PentaD + PentaE + D6S1043 + SE33), ±1000bp flanking. Pick this dataset for autosomal/CODIS tools. Female sample: no Y markers. Panel (loci.bed) guarantees all 24 loci at >=10x window-wide; observed floor 55x. See datasets/illumina-bam-hg38/SOURCE.txt.",
       "chrom_naming": "chr",
-      "read_length": 148,
-      "regions_library": {
-        "hipstr": "datasets/illumina-bam-hg38/regions/hipstr.bed",
-        "gangstr": "datasets/illumina-bam-hg38/regions/gangstr.bed",
-        "strsearch": "datasets/illumina-bam-hg38/regions/strsearch.bed",
-        "bed4": "datasets/illumina-bam-hg38/regions/bed4.bed",
-        "motif": "datasets/illumina-bam-hg38/regions/motif.bed",
-        "eh_catalog": "datasets/illumina-bam-hg38/regions/eh_catalog.json",
-        "trgt": "datasets/illumina-bam-hg38/regions/trgt.bed"
-      }
-    },
-    "illumina-bam-hg38-med": {
-      "dir": "datasets/illumina-bam-hg38-med",
-      "data": "illumina_slices/NA12878.medical.bam",
-      "bam_index": "illumina_slices/NA12878.medical.bam.bai",
-      "format": "bam",
-      "canonical_input": "input.bam",
-      "reference": "hg38",
-      "reference_genome": {
-        "assembly": "GRCh38 / hg38",
-        "url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz",
-        "filename": "hg38.fa",
-        "mount_path": "/data/ref/hg38.fa"
-      },
-      "supported_loci": "datasets/illumina-bam-hg38-med/loci.bed",
-      "loci_count": 51,
-      "min_loci": 5,
-      "panel_label": "disease-associated STR loci",
-      "name": "Illumina BAM (hg38), NA12878, medical STR slice (female)",
-      "source": "https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/data/NA12878/NIST_NA12878_HG001_HiSeq_300x/",
-      "license": "Open access (GIAB / NIST). Research and educational use. STRhub is not the data provider.",
-      "sequencer": "Illumina HiSeq 2500 (GIAB 300x)",
-      "notes": "GIAB NA12878/HG001 300x, GRCh38, sliced ±1000 bp around 51 disease-associated STR loci: the STRchive loci that at least 3 of 4 medical tool catalogs ship (ExpansionHunter, TRGT, STRipy, str-analysis). Pick this dataset for medical repeat tools; a proposal whose shipped catalog genotypes disease loci is routed here. Panel (loci.bed) guarantees every locus at >=10x window-wide; observed floor 33x (DMPK). Execution only, not a clinical validation. See datasets/illumina-bam-hg38-med/SOURCE.txt and catalog_crosswalk.tsv.",
-      "chrom_naming": "chr",
-      "read_length": 148,
-      "regions_library": {
-        "hipstr": "datasets/illumina-bam-hg38-med/regions/hipstr.bed",
-        "gangstr": "datasets/illumina-bam-hg38-med/regions/gangstr.bed",
-        "strsearch": "datasets/illumina-bam-hg38-med/regions/strsearch.bed",
-        "bed4": "datasets/illumina-bam-hg38-med/regions/bed4.bed",
-        "motif": "datasets/illumina-bam-hg38-med/regions/motif.bed",
-        "eh_catalog": "datasets/illumina-bam-hg38-med/regions/eh_catalog.json",
-        "trgt": "datasets/illumina-bam-hg38-med/regions/trgt.bed"
-      }
+      "read_length": 148
     },
     "illumina-bam-hg38-y": {
       "dir": "datasets/illumina-bam-hg38-y",
@@ -249,12 +89,6 @@
       "format": "bam",
       "canonical_input": "input.bam",
       "reference": "hg38",
-      "reference_genome": {
-        "assembly": "GRCh38 / hg38",
-        "url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz",
-        "filename": "hg38.fa",
-        "mount_path": "/data/ref/hg38.fa"
-      },
       "supported_loci": "datasets/illumina-bam-hg38-y/loci.bed",
       "loci_count": 14,
       "min_loci": 5,
@@ -264,22 +98,7 @@
       "sequencer": "Illumina HiSeq 2500 (GIAB 300x)",
       "notes": "GIAB HG002 300x, GRCh38, sliced around Y-STR forensic loci, ±1000bp flanking. Pick this dataset for Y-chromosome tools. Panel (loci.bed) guarantees 14 loci at >=10x window-wide (DYS19/389I-II/390/391/392/393/438/448/456/458/635 + DYS385b + Y-GATA-H4/A10); typical depth 48-188x. DYS385a is EXCLUDED: the palindromic DYS385a/b pair is collapsed in the GIAB alignment, starving the 'a' copy to ~2-10x over the repeat. Not a slicing artifact — the reads are absent from the source BAM.",
       "chrom_naming": "chr",
-      "read_length": 148,
-      "regions_library": {
-        "hipstr": "datasets/illumina-bam-hg38-y/regions/hipstr.bed",
-        "gangstr": "datasets/illumina-bam-hg38-y/regions/gangstr.bed",
-        "strsearch": "datasets/illumina-bam-hg38-y/regions/strsearch.bed",
-        "bed4": "datasets/illumina-bam-hg38-y/regions/bed4.bed",
-        "motif": "datasets/illumina-bam-hg38-y/regions/motif.bed",
-        "eh_catalog": "datasets/illumina-bam-hg38-y/regions/eh_catalog.json",
-        "trgt": "datasets/illumina-bam-hg38-y/regions/trgt.bed"
-      }
+      "read_length": 148
     }
-  },
-  "regions_formats": {
-    "hipstr": "chrom start end period ref_copies name [motif]  (HipSTR --regions)",
-    "gangstr": "chrom start end period motif  (GangSTR --regions)",
-    "strsearch": "11 columns: Chr Start End Period Reference-allele Marker Official-name Structure Strand 5'flank 3'flank  (STRsearch --ref_bed)",
-    "bed4": "chrom start end name  (any BED-reading tool)"
   }
 }
