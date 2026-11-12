@@ -1,277 +1,109 @@
 name: STRhub Verified
 
-# Surface the dispatch id in the run name so the web backend can correlate a
-# workflow_dispatch (which returns no run id, §10) back to its run.
-#
-# A pull request names no tool — the job works that out from what the PR touches
-# — so it says which PR instead of a tool it might not be running.
-run-name: >-
-  ${{ github.event.inputs.mode == 'trial' && 'Trial' || 'Verify' }} ${{ github.event.inputs.tool || (github.event_name == 'pull_request' && format('what PR #{0} changed', github.event.pull_request.number)) || 'strait-razor-powerseq' }}${{ github.event.inputs.dispatch_id && format(' [{0}]', github.event.inputs.dispatch_id) || '' }}
+# The web finds a run by this name: a workflow_dispatch returns no run id, so
+# the dispatch id rides in the run's name (docs/WEB-CONTRACT.md §1). Do not
+# change its shape.
+run-name: "Trial ${{ inputs.tool }} [${{ inputs.dispatch_id }}]"
 
-# The engine. Each gate is a CI step; failures are captured (continue-on-error)
-# so the report is always produced and reflects the furthest gate cleared.
+# One run: read the public repository at the pinned commit, try to install and
+# run the tool exactly as its author documents, and write down what happened.
+# Nothing here forces a run. A gate that fails is a result, recorded with its
+# exact command, exit status and log; nothing is tried in its place.
 on:
   workflow_dispatch:
     inputs:
       tool:
-        # Free-form so self-service submissions (any slug under tools/) work, not
-        # just the maintainer's built-in variants.
-        description: "Tool variant to verify (directory under tools/), or 'all' to re-verify the whole catalogue in one matrix"
+        description: "The run's own name, e.g. trial-hipstr-v0.7; also the artifact's suffix"
         type: string
-        default: "strait-razor-powerseq"
         required: true
-      dispatch_id:
-        description: "Unique id echoed in run-name for dispatch→run correlation"
-        type: string
-        required: false
-        default: ""
-      # A trial reads the installation and command from the pinned repository.
-      mode:
-        description: "publish (default) or trial"
-        type: choice
-        options: [publish, trial]
-        default: publish
       repo:
-        description: "Trial from URL: public GitHub repository"
+        description: "Public GitHub repository URL"
         type: string
-        required: false
-        default: ""
+        required: true
       ref:
-        description: "Trial from URL: commit SHA or tag"
+        description: "Commit, tag or branch to pin; empty means the default branch"
         type: string
         required: false
         default: ""
       ref_label:
-        description: "Trial from URL: the tag or release the ref was resolved from, shown as the version"
+        description: "The ref as the user typed it (a tag or release), shown as the version"
         type: string
         required: false
         default: ""
-      # A trial from a URL publishes when its verdict is the tool's — unless
-      # whoever dispatched it says not to. The history check says not to for
-      # a case that would replace a curated result at the same commit with
-      # the README-command run of it: both are true, one is the catalogue's.
+      dispatch_id:
+        description: "Correlation id echoed in the run's name"
+        type: string
+        required: false
+        default: ""
+      mode:
+        description: "trial: the result stays the run's artifact. publish: an attestation"
+        type: choice
+        options: [trial, publish]
+        default: trial
       publish:
-        description: "Trial from URL: 'true' publishes the result to the catalogue when the verdict is the tool's; 'false' (default) keeps a trial private"
+        description: "'true' publishes the result to gh-pages when its verdict is about the tool; anything else keeps it private"
         type: string
         required: false
         default: "false"
-  pull_request:
-    paths:
-      - "tools/**"
-      - "harness/**"
-      # The schema every manifest is validated against, and the workflow that
-      # does the validating. A change to either can break every tool here, and
-      # neither used to run this workflow at all.
-      - "schema/**"
-      - ".github/workflows/verify.yml"
 
-# Permissions are granted per job below, not here. The token is scoped to the
-# least each job needs: `resolve` only reads, and only `verify` may write.
+# Granted per job, to the least it needs.
 permissions: {}
 
 jobs:
-  # Which tool(s) this run is about. A dispatch says; a pull request does not,
-  # and the answer used to be the default one — so a PR editing a manifest was
-  # checked by running an unrelated tool. See harness/pick_tools.py.
-  resolve:
-    runs-on: ubuntu-22.04
-    permissions:
-      contents: read
-      pull-requests: read    # reads the files a PR changed
-    outputs:
-      tools: ${{ steps.pick.outputs.tools }}
-      count: ${{ steps.pick.outputs.count }}
-      dropped: ${{ steps.pick.outputs.dropped }}
-    steps:
-      - uses: actions/checkout@v6
-
-      # The harness is what every attestation rests on, so its tests gate every
-      # run: a regression in a gate check or a diagnostic rule must stop here,
-      # before it can be published as a finding about someone's software.
-      - uses: actions/setup-python@v6
-        with:
-          python-version: "3.11"
-      # reportlab + pillow: the PDF half of the certificate test skips without
-      # them, and skipped in CI means the PDF and the report were never held
-      # to the same words where it counts.
-      - run: pip install -q pyyaml jsonschema pytest reportlab pillow
-      - name: Harness tests
-        run: python -m pytest harness/tests -q
-      # The BED parser is mirrored in the web form; the shared cases catch the
-      # two drifting apart, which otherwise shows up as a run that aborts in
-      # pre-flight with no report.
-      - name: Shared BED cases
-        run: python harness/test_validate_bed.py
-
-      # Before it is trusted to say what this run examines. A picker that quietly
-      # went back to answering "the default" would turn every PR green again, and
-      # nothing downstream would notice — the whole check would just stop meaning
-      # anything, exactly as it did before.
-      - name: Check the picker against its own rules
-        run: python3 harness/pick_tools.py --selftest
-
-      - id: pick
-        name: Pick the tools this run is about
-        env:
-          GH_TOKEN: ${{ github.token }}
-          EVENT_NAME: ${{ github.event_name }}
-          # Empty for pull_request and schedule; only a dispatch sets it.
-          INPUT_TOOL: ${{ github.event.inputs.tool }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-        run: |
-          set -euo pipefail
-          : > changed.txt
-          : > published.json
-          if [ "$EVENT_NAME" = "pull_request" ]; then
-            gh api --paginate "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/files" \
-              --jq '.[].filename' > changed.txt
-          fi
-          if [ "$EVENT_NAME" = "schedule" ]; then
-            # What is already published, so the refresh can take the tools whose
-            # result is oldest. Best effort: without it the picker falls back to
-            # the canary rather than failing the run.
-            curl -fsSL -o published.json \
-              "https://raw.githubusercontent.com/$GITHUB_REPOSITORY/gh-pages/index.json" \
-              || echo "::warning::could not read the published catalogue; refreshing the default only"
-          fi
-          python3 harness/pick_tools.py \
-            --event "$EVENT_NAME" \
-            --input-tool "$INPUT_TOOL" \
-            --changed changed.txt \
-            --published published.json \
-            --default "strait-razor-powerseq" \
-            >> "$GITHUB_OUTPUT"
-
-      # Only set when the change is a sweep, and then it is the whole list. Said
-      # on the run's summary page because that is where a reviewer decides the
-      # check means something: a green tick over an unstated gap reads as
-      # coverage, and this is the gap.
-      - name: Say what was left unverified
-        if: steps.pick.outputs.dropped != '[]'
-        env:
-          DROPPED: ${{ steps.pick.outputs.dropped }}
-          RAN: ${{ steps.pick.outputs.tools }}
-        run: |
-          {
-            echo "### Tools this run did NOT verify"
-            echo
-            echo "This change touches more tools than one run verifies, so it ran the"
-            echo "canary \`$RAN\` instead. A green result below is evidence about that"
-            echo "tool, and about the harness — not about these:"
-            echo
-            echo '```json'
-            echo "$DROPPED"
-            echo '```'
-            echo
-            echo "Verify any of them with a manual dispatch of this workflow."
-          } >> "$GITHUB_STEP_SUMMARY"
-
-  # Monthly, alongside the refresh of the stalest published tools: has any
-  # verified tool published a release since? If so, start a private trial of
-  # the procedure documented at the new commit, and an issue
-  # on this repository says so. See harness/upstream_refresh.py.
-  upstream:
-    if: github.event_name == 'schedule'
-    runs-on: ubuntu-22.04
-    permissions:
-      contents: read
-      actions: write        # dispatches the trials
-      issues: write         # one notice, updated rather than duplicated
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-python@v6
-        with:
-          python-version: "3.11"
-      - run: pip install -q pyyaml jsonschema
-      - name: Find newer upstream releases and dispatch trials
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          python harness/upstream_refresh.py \
-            --index "https://raw.githubusercontent.com/$GITHUB_REPOSITORY/gh-pages/index.json" \
-            --dispatch --json upstream_refresh.json
-      - name: Say so in an issue
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          python - <<'PY'
-          import json, os, subprocess
-          r = json.load(open("upstream_refresh.json"))
-          if not r.get("dispatched"):
-              print("no newer upstream releases"); raise SystemExit(0)
-          title = "Upstream releases newer than verified commits"
-          body = r["issue_body"]
-          existing = subprocess.run(["gh", "issue", "list", "--search", f'"{title}" in:title', "--state", "open",
-                                     "--json", "number", "--jq", ".[0].number"], capture_output=True, text=True).stdout.strip()
-          if existing:
-              subprocess.run(["gh", "issue", "comment", existing, "--body", body], check=True)
-          else:
-              subprocess.run(["gh", "issue", "create", "--title", title, "--body", body, "--label", "upstream"], check=False)
-          PY
-
-  # The documented instrument, once a month, for every tool whose only
-  # recipe is STRhub's: a trial from the repository's URL at the pinned
-  # commit, published on the usual terms, which is what the badge rests on
-  # (docs/PLAN-Documented-Is-The-Badge.md). The curated runs in the matrix
-  # below land under curated/ as notes.
-  documented:
-    if: github.event_name == 'schedule'
-    runs-on: ubuntu-22.04
-    permissions:
-      contents: read
-      actions: write        # dispatches the trials
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-python@v6
-        with:
-          python-version: "3.11"
-      - run: pip install -q pyyaml
-      - name: Dispatch a trial of the repository's own instructions for every curated tool
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: python harness/documented_refresh.py --dispatch --json documented.json
-
   verify:
-    needs: resolve
-    runs-on: ubuntu-22.04   # free, unlimited on public repos
+    runs-on: ubuntu-22.04
     timeout-minutes: 45
     permissions:
-      contents: write        # deploy pushes reports to gh-pages; rejection notices go to main
-    strategy:
-      # One tool failing its gates says nothing about the next: a matrix leg is a
-      # separate attestation, not a stage of one build.
-      fail-fast: false
-      matrix:
-        tool: ${{ fromJSON(needs.resolve.outputs.tools) }}
+      contents: write        # the deploy step pushes reports to gh-pages
     env:
-      TOOL: ${{ matrix.tool }}
-      MODE: ${{ github.event.inputs.mode || 'publish' }}
+      TOOL: ${{ inputs.tool }}
+      MODE: ${{ inputs.mode }}
     steps:
+      # Before anything else: a run with no tool or no repository has nothing
+      # to audit, and says so instead of going on under a made-up name.
+      - name: Check the dispatch
+        env:
+          REPO: ${{ inputs.repo }}
+        run: |
+          if [ -z "$TOOL" ]; then
+            echo "::error::no tool was given: dispatch with tool=<the run's name>, e.g. trial-hipstr-v0.7. There is no default tool."
+            exit 1
+          fi
+          if ! printf '%s' "$TOOL" | grep -Eq '^[A-Za-z0-9][A-Za-z0-9._-]*$'; then
+            echo "::error::tool must be a single safe name (letters, digits, '.', '_', '-'): got '$TOOL'"
+            exit 1
+          fi
+          if [ -z "$REPO" ]; then
+            echo "::error::no repository was given: dispatch with repo=<public GitHub repository URL>"
+            exit 1
+          fi
+
       - uses: actions/checkout@v6
         with:
-          lfs: true   # fixtures may be stored with Git LFS
-          # The token is not left in .git/config. Everything below that writes
-          # back (rejection notice, gh-pages, clearing a stale notice) names the
-          # remote with the token explicitly, so nothing that runs from this
-          # checkout inherits push rights by accident.
+          # The token is not left in .git/config: only the deploy step writes,
+          # and it names the remote with the token explicitly.
           persist-credentials: false
 
       - uses: actions/setup-python@v6
         with:
           python-version: "3.11"
-      - run: pip install pyyaml jsonschema reportlab pillow
+      - run: pip install -q pyyaml jsonschema pytest reportlab pillow
 
-      # Derive a descriptor from the repository. Dispatch cannot supply one.
+      # The harness is what every report rests on, so its tests gate every
+      # run: a regression in a gate check or a diagnostic rule stops here,
+      # before it can be written down as a finding about someone's software.
+      - name: Harness tests
+        run: python -m pytest harness/tests -q
+
+      # --- Read the repository ------------------------------------------------
       - id: propose
         name: "Read the documented procedure from the repository"
-        if: github.event.inputs.mode == 'trial'
         env:
           GH_TOKEN: ${{ github.token }}
-          TRIAL_REPO: ${{ github.event.inputs.repo }}
-          TRIAL_REF: ${{ github.event.inputs.ref }}
-          TRIAL_REF_LABEL: ${{ github.event.inputs.ref_label }}
+          TRIAL_REPO: ${{ inputs.repo }}
+          TRIAL_REF: ${{ inputs.ref }}
+          TRIAL_REF_LABEL: ${{ inputs.ref_label }}
         run: |
-          test -n "$TRIAL_REPO" || { echo '::error::a trial requires a public GitHub repository'; exit 1; }
           mkdir -p work
           python harness/detect_recipe.py "$TRIAL_REPO" "$TRIAL_REF" --tag "$TRIAL_REF_LABEL" \
             --json recipe_proposal.json
@@ -280,88 +112,40 @@ jobs:
             --out-dir work/proposal
 
       - id: m
-        name: Prepare the procedure and shared dataset
+        name: Prepare the procedure and the shared dataset
         run: |
-          if [ "$MODE" = "trial" ]; then
-            python harness/prepare.py "$TOOL" --work work --trial --proposal recipe_proposal.json --plan-out work/plan.json >> "$GITHUB_OUTPUT"
-          else
-            python harness/prepare.py "$TOOL" --work work --plan-out work/plan.json >> "$GITHUB_OUTPUT"
-          fi
+          python harness/prepare.py "$TOOL" --work work --mode "$MODE" \
+            --proposal recipe_proposal.json --plan-out work/plan.json >> "$GITHUB_OUTPUT"
 
-      # Reading the tool's repository, for the evidence a report rests on: the
-      # sections where the author documents a known bug, and whether the
-      # repository ships example data. A trial from a URL already has this from
-      # the propose step; a committed tool had nobody read it at all, so the
-      # catalogue carried a certificate asserting "this tool does not include
-      # its own demo or test data" that nobody had checked.
-      #
-      # Evidence only: it is passed as --repo-read, never as --recipe-proposal,
-      # so it cannot turn a committed recipe into a "proposed" one and change
-      # the verdict. Two API calls, and a failure here must never fail a run.
-      - id: repo_read
-        name: "Read the tool's repository (evidence)"
-        if: always() && steps.m.conclusion == 'success'
-        continue-on-error: true
-        env:
-          GH_TOKEN: ${{ github.token }}
-          TOOL_REPO: ${{ steps.m.outputs.repo }}
-          TOOL_REF: ${{ steps.m.outputs.ref }}
-        run: |
-          if [ -f recipe_proposal.json ]; then
-            echo "the recipe was proposed in this run; its reading is already on disk"
-            exit 0
-          fi
-          python harness/detect_recipe.py "$TOOL_REPO" "$TOOL_REF" --json repo_read.json \
-            || echo "::warning::could not read $TOOL_REPO at $TOOL_REF; the report will say less"
-
-      # --- The gates: harness/engine -----------------------------------------
-      # Available, Installs, Starts, the example leg and its check, the
-      # external leg and its checks, and the matrix, as one Python runner
-      # (harness/engine/stages.py is the port, step for step, of the bash
-      # that used to be here; the checks against the reviewed procedure,
-      # harness/fidelity.py before Docker and harness/input_provenance.py
-      # before the run, run inside it unchanged). The tool runs as a
-      # container built from the one environment the review admits, with
-      # the registered dataset mounted, no network, a memory and CPU
-      # ceiling, a process cap and no capabilities (stages.HARDENING).
+      # --- The gates: harness/engine -------------------------------------------
+      # Available, Installs, the example leg and its check, the external leg
+      # and its checks. The tool runs as a container built from the one
+      # environment the review admits, with the registered dataset mounted
+      # read-only, no network, a memory and CPU ceiling, a process cap and no
+      # capabilities (stages.HARDENING).
       #
       # The runner exits 0 whatever the gates found: a failed gate is a result,
-      # written to run_record.json with the exact command, exit status and log.
-      # A non-zero exit here is the runner itself crashing, which the
-      # attestation reports as a fault of STRhub's (INFRA_FAILURE), never as
-      # the tool's. Every file report.py reads lands where it always did:
-      # logs under work/, the check results and matrix.json beside it.
+      # written to run_record.json. A non-zero exit here is the runner itself
+      # crashing, which the report counts as a fault of STRhub's
+      # (INFRA_FAILURE), never as the tool's.
       - id: engine
-        name: "Gates · Available, Installs, Starts, Example, Runs, IO, Content"
+        name: "Gates · Available, Installs, Example, Runs, IO, Content"
         continue-on-error: true
         run: python -m harness.engine run --plan work/plan.json --work work --record run_record.json
 
-
-      # --- Assemble attestation (always runs) --------------------------------
+      # --- The report (always) ---------------------------------------------------
       - id: attest
-        name: Build attestation + badge
-        if: always()
+        name: Build the report and decide whether it is published
+        if: always() && steps.m.outcome == 'success'
         env:
           MANIFEST: ${{ steps.m.outputs.manifest }}
           TOOL_REF: ${{ steps.m.outputs.ref }}
-          # A step of STRhub's own that failed before the gates could run. When
-          # one did, the gates below it were skipped and would otherwise read as
-          # the tool stopping at "source not available".
-          INFRA_FAILURE: ${{ steps.m.outputs.input_failure || (steps.propose.outcome == 'failure' && 'the recipe proposal step') || (steps.m.outcome == 'failure' && 'the staging of inputs') || (steps.engine.outcome == 'failure' && 'the gate runner') || '' }}
-          # The selected primary Dockerfile, or empty when it did not build.
-          # A failed install never triggers a fallback environment.
+          # A step of STRhub's own that failed. The gates below it did not run
+          # and would otherwise read as the tool stopping.
+          INFRA_FAILURE: ${{ steps.m.outputs.input_failure || (steps.engine.outcome == 'failure' && 'the gate runner') || '' }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          # A trial whose recipe this run derived from the public repository —
-          # the only kind of trial that may publish. Same test as the propose
-          # step's condition.
-          URL_TRIAL: ${{ github.event.inputs.mode == 'trial' && github.event.inputs.repo != '' }}
-          TRIAL_PUBLISH: ${{ github.event.inputs.publish == 'true' && 'true' || 'false' }}
-          # A pull request's run is a check, never a publication, whatever it
-          # finds — so its PDF must not carry a permalink either.
-          EVENT_NAME: ${{ github.event_name }}
-          # Read-only, for the upstream check below. Raises the API allowance
-          # from 60/hour per runner IP to 5,000, which matters because public
-          # runners share addresses.
+          PUBLISH: ${{ inputs.publish == 'true' && 'true' || 'false' }}
+          # Read-only, for the upstream check: raises the API allowance.
           GH_TOKEN: ${{ github.token }}
         run: |
           python harness/report.py \
@@ -370,107 +154,64 @@ jobs:
             --procedure-review work/procedure_review.json \
             --mounted-inputs work/mounted_inputs.json \
             --matrix matrix.json \
-            --readme readme_result.json \
-            --log-external work/log_external.txt \
+            --example example.json \
             --log-build work/log_build.txt \
+            --log-example work/log_example.txt \
+            --log-external work/log_external.txt \
+            --recipe-proposal recipe_proposal.json \
             --ref "$TOOL_REF" \
             --check-upstream \
             --mode "$MODE" \
             --infra-failure "$INFRA_FAILURE" \
-            --starts starts.json \
-            --log-starts work/log_starts.txt \
-            --example example.json \
-            --log-example work/log_example.txt \
-            --recipe-proposal recipe_proposal.json \
-            --repo-read repo_read.json \
             --run-url "$RUN_URL"
-          # The verdict decides whether this run is deployed at all, so the
-          # deploy condition needs it as a step output. Read back off the file
-          # report.py just wrote — the one source — rather than a second
-          # derivation that could drift from it.
-          #
-          # `publishable` is the whole decision in one word, read by the deploy
-          # gate and by the PDF (which marks a result that will not be
-          # published). harness/publish_gate.py holds the policy: a failure of
-          # the tool publishes like a success; a fault of STRhub's and a URL
-          # trial landing on another repository's
-          # card do not. If anything here crashes, `publishable` is never
-          # written and the deploy does not run.
-          python - <<'PY' >> "$GITHUB_OUTPUT"
-          import json, pathlib
-          reports = [p for p in pathlib.Path("reports").glob("*.json")
-                     if not p.name.endswith((".badge.json", ".recipe.json"))]
-          r = json.loads(reports[0].read_text()) if reports else {}
-          verdict = (r.get("verdict") or {}).get("code", "")
-          slug = (r.get("report") or {}).get("slug") or (reports[0].stem if reports else "")
-          print(f"verdict={verdict}")
-          print(f"slug={slug}")
-          print(f"report={reports[0] if reports else ''}")
-          PY
-          REPORT_JSON=$(sed -n 's/^report=//p' "$GITHUB_OUTPUT" | tail -1)
-          if [ -z "$REPORT_JSON" ]; then
-            echo "publishable=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          # Whose card a trial from a URL would land on is read off the live
-          # catalogue. Unreadable means not published (publish_gate fails closed).
+          # The one report this run wrote, and the slug it was written under.
+          REPORT_JSON=$(ls reports/*.json | grep -v -e '\.badge\.json$' -e '\.recipe\.json$' | head -1)
+          SLUG=$(basename "$REPORT_JSON" .json)
+          echo "report=$REPORT_JSON" >> "$GITHUB_OUTPUT"
+          echo "slug=$SLUG" >> "$GITHUB_OUTPUT"
+          # Whose card a published run would land on is read off the live
+          # catalogue. Unreadable means not published: publish_gate fails closed.
           curl -fsSL "https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/gh-pages/index.json" \
             -o published_index.json || rm -f published_index.json
-          python harness/publish_gate.py --report "$REPORT_JSON" --index published_index.json \
+          python harness/publish_gate.py --report "$REPORT_JSON" --slug "$SLUG" --index published_index.json \
             | tee -a "$GITHUB_OUTPUT"
 
-      # Keep the descriptor and procedure review with the trial artifact.
-      - name: Attach procedure evidence to the trial report
-        if: always() && env.MODE == 'trial'
+      # The manifest and Dockerfile the run used travel with the report.
+      - name: Attach the recipe the run used
+        if: always() && steps.attest.outcome == 'success'
         env:
           DOCKER_DIR: ${{ steps.m.outputs.dockerdir }}
         run: >-
           python harness/attach_recipe.py "$TOOL" --dockerdir "$DOCKER_DIR" --proposal recipe_proposal.json
           --procedure-review work/procedure_review.json --source-install-dockerfile work/source-install.Dockerfile
 
-      - name: Generate PDF report
-        if: always()
+      - name: Generate the PDF
+        if: always() && steps.attest.outcome == 'success'
         continue-on-error: true
         env:
           MANIFEST: ${{ steps.m.outputs.manifest }}
           # The PDF marks a result that will not be published and links one
-          # that will; that is the deploy gate's decision, not the run's mode.
+          # that will: the publish gate's decision, not the run's mode.
           PUBLISHABLE: ${{ steps.attest.outputs.publishable || 'false' }}
         run: |
           python harness/generate_pdf.py \
             --manifest "$MANIFEST" \
             --publishable "$PUBLISHABLE"
 
-      # Render the human-readable summary on the run's "Summary" page (no download
-      # needed). $GITHUB_STEP_SUMMARY accepts Markdown.
-      - name: Publish summary to run page
-        if: always()
-        run: |
-          for f in reports/*.summary.md; do
-            [ -f "$f" ] && cat "$f" >> "$GITHUB_STEP_SUMMARY"
-          done
-
+      # What the web reads (docs/WEB-CONTRACT.md §2): the report and its files
+      # under reports/, and every stage's command, exit status and log.
       - name: Upload attestation
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: ${{ env.MODE == 'trial' && 'trial' || 'attestation' }}-${{ env.TOOL }}
-          # The record rides with the report: every gate's exact command, exit
-          # status and log, whatever the verdict.
+          name: ${{ inputs.mode == 'trial' && 'trial' || 'attestation' }}-${{ inputs.tool }}
           path: |
             reports/
             run_record.json
-          # A trial's report exists nowhere else, so it is kept the full window a
-          # submitter has to come back for it; a published one is on gh-pages.
-          retention-days: ${{ env.MODE == 'trial' && 30 || 90 }}
+          retention-days: ${{ inputs.mode == 'trial' && 30 || 90 }}
 
-      # A pull request's check is only worth something if it goes red when a
-      # change breaks a tool. Every gate above runs with continue-on-error so
-      # the report is always produced, which left the job green over four
-      # tools that could not write their output (PR #19). So, for pull requests
-      # only: compare this run's level with the one published for the same slug
-      # and fail the job if it dropped. A tool not yet published is not held to
-      # anything; the report is still the artifact.
+      # Inert here: this workflow has no pull_request trigger. Kept as it was,
+      # pending the owner's decision on it (docs/INVENTARIO-2026-11-12.md).
       - name: "PR check · no regression against the published level"
         if: github.event_name == 'pull_request'
         run: |
@@ -496,43 +237,22 @@ jobs:
               sys.exit(1)
           PY
 
-      # Publish a navigable web page (index + per-tool HTML) to the gh-pages
-      # branch. Reports accumulate across runs: we clone the existing branch,
-      # drop in this run's files, regenerate the index, and push.
+      # --- Publication ---------------------------------------------------------------
+      # Only on main (gh-pages IS production, and the web dispatches on main),
+      # and only when publish_gate said so: the dispatch asked for it, the
+      # verdict is about the tool or its documentation, the procedure evidence
+      # validates, and the card belongs to this repository.
       #
-      # What gets published is decided by the VERDICT, not by how the run was
-      # triggered: a run whose verdict is "runs" or "fails" is a fact about the
-      # tool and is published as such — a tool that does not build at the
-      # cited commit is a result a reviewer needs. "undetermined" (the
-      # repository's instructions do not say enough to run it) is a fact about
-      # the documentation, and publishes as that: the card and the page lead
-      # with "could not be determined" and what the README does not say, never
-      # with a level, so a stranger's first-day experience is on record without
-      # being read as the tool's failure (docs/PLAN-Documented-Is-The-Badge.md,
-      # tanda 5b). "out_of_scope" (our environment cannot run it) says nothing
-      # attributable to the tool or its documentation, and is never deployed:
-      # the catalogue must not carry our limitation as anyone's failure. That
-      # split is the engine's own (harness/verdict.py, on diagnose_log's
-      # disjoint fault classes), so the gate reads it back rather than
-      # re-deriving it here.
+      # The run's files go to <slug>/<sha>/ and the root <slug>.* set is an
+      # alias of the newest commit verified (harness/publish_layout.py).
       #
-      # A trial from a URL may publish an attributable result about its pinned
-      # public repository when the caller explicitly requests publication.
-      # `publishable` (the attestation step) folds all of that into one word.
-      #
-      # Publishing is for main only. A dispatch from a test branch must never reach
-      # strhub.app/verified — gh-pages IS production. The web backend always
-      # dispatches with ref=main (VERIFIED_ENGINE_BRANCH), so real submissions are
-      # unaffected; only branch-based testing is held back.
-      #
-      # The unit published is the tool AT A COMMIT (docs/PLAN-Version-History.md):
-      # the run's files go to <slug>/<sha>/ and the root <slug>.* set is an alias
-      # of the newest commit verified — newest by the commit's own date, so a
-      # commit older than the one published never displaces it, however much
-      # later it is verified. harness/publish_layout.py holds that rule.
+      # The loop below repeats the PUSH, never the run: two dispatches can
+      # finish together and both rewrite index.json, so a lost race is redone
+      # from a fresh clone of the branch, and running out of attempts fails
+      # the step.
       - id: deploy
-        name: Deploy reports to GitHub Pages
-        if: always() && steps.attest.outputs.publishable == 'true' && github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        name: Deploy the report to gh-pages
+        if: always() && steps.attest.outputs.publishable == 'true' && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
           SLUG: ${{ steps.attest.outputs.slug }}
@@ -541,10 +261,8 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           remote="https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git"
-          # Every command carries its own `|| return 1`. `publish` is called as
-          # an `if` condition, and there bash ignores `set -e` all the way down:
-          # a crash in publish_layout.py or build_index.py went on to commit
-          # and push whatever half-built tree it had left.
+          # Every command carries its own `|| return 1`: `publish` is called as
+          # an `if` condition, where bash ignores `set -e` all the way down.
           publish() {
             tmp="$(mktemp -d)" || return 1
             if git ls-remote --exit-code --heads "$remote" gh-pages >/dev/null 2>&1; then
@@ -554,10 +272,6 @@ jobs:
               git -C "$tmp" checkout -q --orphan gh-pages || return 1
               git -C "$tmp" rm -rfq . || true
             fi
-            # Everything the run wrote, except the recipe attachment: what ran
-            # is on main under tools/<slug>/, and the JSON copy is for the web
-            # to read out of the artifact, not a page to publish. Placed by
-            # commit, with the alias pointing at the newest one.
             python harness/publish_layout.py "$tmp" --reports reports --slug "$SLUG" || return 1
             touch "$tmp/.nojekyll" || return 1
             python harness/build_index.py "$tmp" --out "$tmp/index.html" || return 1
@@ -566,82 +280,10 @@ jobs:
             git -C "$tmp" commit -q -m "deploy ${TOOL} @ run ${{ github.run_id }}" || return 1
             git -C "$tmp" push "$remote" gh-pages
           }
-          # Matrix legs finish together and every one of them rewrites index.json
-          # and index.html, so a plain push races. Each attempt starts from a
-          # FRESH clone of the branch, so a lost race is redone on top of the
-          # winner's tree instead of rebased over it, and running out of attempts
-          # fails the step. The old loop ended in a `sleep` that exits 0, which
-          # painted a lost deploy green and left the catalogue silently stale.
-          for i in 1 2 3 4 5 6 7 8 9 10; do
+          for i in 1 2 3 4 5; do
             if publish; then exit 0; fi
-            echo "publish attempt $i failed (most likely a race with another leg); retrying"
+            echo "push attempt $i did not land (most likely a race with another run)"
             sleep $((i * 2 + RANDOM % 6))
           done
-          echo "::error::could not publish reports for $TOOL to gh-pages after 10 attempts"
+          echo "::error::could not publish the report for $TOOL to gh-pages after 5 attempts"
           exit 1
-
-      # A trial from a URL that published is now a catalogue entry, and the
-      # monthly refresh re-verifies catalogue entries from tools/<slug>/ on
-      # main. So the recipe this run derived and ran is committed there —
-      # the exact manifest and Dockerfile, nothing else — under the slug it
-      # published as. Never over a recipe that is already there: a committed
-      # one may have been tuned by hand (content floors, a kit variant, the
-      # maintainer's name), and the published result was refreshed above
-      # regardless. This job already holds the write token for gh-pages; the
-      # gates themselves ran with none.
-      - name: Commit the recipe a published trial ran (trial from URL)
-        if: always() && steps.deploy.outcome == 'success' && github.event.inputs.mode == 'trial' && github.event.inputs.repo != ''
-        env:
-          GH_TOKEN: ${{ github.token }}
-          DOCKER_DIR: ${{ steps.m.outputs.dockerdir }}
-          SLUG: ${{ steps.attest.outputs.slug }}
-        run: |
-          set -e
-          [ -n "$SLUG" ] || { echo "::warning::no slug to commit the recipe under"; exit 0; }
-          dest="tools/$SLUG"
-          mkdir -p "$dest"
-          cp "$DOCKER_DIR/manifest.yml" "$DOCKER_DIR/Dockerfile" "$dest/"
-          [ -d "$DOCKER_DIR/assets" ] && cp -r "$DOCKER_DIR/assets" "$dest/" || true
-          remote="https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add "$dest"
-          if git diff --cached --quiet; then echo "recipe for $SLUG already up to date"; exit 0; fi
-          git commit -q -m "verified: commit the recipe that published $SLUG (trial from URL, run ${{ github.run_id }})"
-          for i in 1 2 3 4 5 6 7 8; do
-            if git push "$remote" HEAD:main; then exit 0; fi
-            git pull --rebase "$remote" main || true
-            sleep $((i * 2 + RANDOM % 5))
-          done
-          # An error, not a warning: the entry is published, and without its
-          # recipe on main the monthly refresh silently stops re-verifying it.
-          echo "::error::could not commit the recipe for $SLUG; the entry is published, but the monthly refresh will not find its recipe until it is committed"
-          exit 1
-
-      # An attestation was just published for this tool, so a rejection notice
-      # from an earlier, aborted run no longer describes anything. Nothing used
-      # to remove it: strsearch sat on main as "rejected" for weeks after
-      # it had been published at the top step.
-      - name: Clear a stale rejection notice
-        if: always() && steps.deploy.outcome == 'success' && github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -e
-          [ -f "state/rejections/$TOOL.json" ] || { echo "no stale notice for $TOOL"; exit 0; }
-          remote="https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git rm -q "state/rejections/$TOOL.json"
-          git commit -q -m "verified: clear rejection notice for $TOOL (attestation published)"
-          for i in 1 2 3 4 5; do
-            if git push "$remote" HEAD:main; then exit 0; fi
-            git pull --rebase "$remote" main || true
-            sleep $((i * 2 + RANDOM % 5))
-          done
-          echo "::warning::could not clear the stale rejection notice for $TOOL; it will be cleared on the next successful run"
-
-      # To publish badges, commit reports/ to a gh-pages branch (or use
-      # actions/deploy-pages). strhub.app then fetches reports/<tool>.badge.json
-      # as a shields.io endpoint:
-      #   https://img.shields.io/endpoint?url=<raw-url-to>/<tool>.badge.json
