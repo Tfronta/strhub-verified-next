@@ -4,7 +4,8 @@ The STRhub Verified engine, rebuilt clean from the old `strhub-verified` on
 2026-11-12. This repository starts from only the modules the old engine's
 inventory marked KEEP (`docs/INVENTARIO-2026-11-12.md`), copied as they were
 at commit ca612d9 of the old repository, plus the contract with the web
-(`docs/WEB-CONTRACT.md`). It is not yet pruned; that is the first job.
+(`docs/WEB-CONTRACT.md`). It was then pruned to what the definition below
+needs (branch `prune/clean-engine`).
 
 ## What Verified is
 
@@ -30,6 +31,8 @@ and try again.
 
 ## Layout
 
+- `.github/workflows/verify.yml` — the one workflow: a `workflow_dispatch`
+  that runs the commands below and uploads the artifact the web reads.
 - `harness/engine/` — the gate runner (`python -m harness.engine run`).
 - `harness/*.py` — reading the repository, preparing the plan, checking
   outputs, writing the report, publishing.
@@ -37,3 +40,106 @@ and try again.
   registered public samples the external leg mounts read-only.
 - `docs/` — the rules the engine follows, the contract, the inventory, and
   the old engine's README for reference.
+
+## Cómo correr un trial a mano
+
+Estos son los comandos que ejecuta `.github/workflows/verify.yml`, en el
+mismo orden. Hacen falta Python 3.11 o posterior, git y, para que las
+compuertas Installs y Runs corran de verdad, Docker. Todo se ejecuta desde
+la raíz del repositorio, sobre un checkout limpio (el dataset se verifica
+contra el commit de este repositorio).
+
+```bash
+pip install pyyaml jsonschema pytest reportlab pillow
+```
+
+```bash
+python -m pytest harness/tests -q
+```
+
+El nombre de la corrida, el repositorio público y el commit o tag a fijar
+(los inputs `tool`, `repo`, `ref` y `ref_label` del dispatch):
+
+```bash
+export TOOL=trial-hipstr-v0.7 REPO=https://github.com/tfwillems/HipSTR REF=b2033bfbb5cf55496b776463bdf2993fa763a4be REF_LABEL=v0.7 MODE=trial
+```
+
+1. Leer el repositorio en ese commit y escribir el descriptor de la corrida
+   (`work/proposal/manifest.yml` y `Dockerfile`). `GH_TOKEN` es opcional y
+   solo sube el límite de la API de GitHub.
+
+```bash
+mkdir -p work && python harness/detect_recipe.py "$REPO" "$REF" --tag "$REF_LABEL" --json recipe_proposal.json
+```
+
+```bash
+python harness/propose_manifest.py recipe_proposal.json --slug "$TOOL" --ref-label "$REF_LABEL" --out-dir work/proposal
+```
+
+2. Recalcular la revisión del procedimiento, montar el único dataset
+   registrado y escribir el plan (`work/plan.json`).
+
+```bash
+python harness/prepare.py "$TOOL" --work work --mode "$MODE" --proposal recipe_proposal.json --plan-out work/plan.json
+```
+
+3. Las compuertas: Available, Installs, el ejemplo del README, la corrida
+   sobre el dataset y sus chequeos. Sale con 0 aunque una compuerta falle:
+   el fallo es un resultado y queda en `run_record.json` con el comando
+   exacto, el código de salida y el log.
+
+```bash
+python -m harness.engine run --plan work/plan.json --work work --record run_record.json
+```
+
+4. El reporte (`reports/<slug>.json`, el badge, el resumen, el HTML, los
+   logs y las terminales). `<slug>` es el del reporte (por ejemplo
+   `hipstr`), no el nombre de la corrida.
+
+```bash
+python harness/report.py --manifest work/proposal/manifest.yml --engine-record run_record.json --procedure-review work/procedure_review.json --mounted-inputs work/mounted_inputs.json --matrix matrix.json --example example.json --log-build work/log_build.txt --log-example work/log_example.txt --log-external work/log_external.txt --recipe-proposal recipe_proposal.json --ref "$REF" --check-upstream --mode "$MODE" --infra-failure "" --run-url ""
+```
+
+   En el workflow `--ref` es el `ref` que imprimió `prepare.py` (el del
+   manifest), `--infra-failure` nombra el paso de STRhub que falló cuando
+   hubo uno y `--run-url` es la URL de la corrida.
+
+5. Decidir si se publica. Solo `PUBLISH=true` lo permite, y aun así la
+   compuerta exige un veredicto atribuible y que la tarjeta sea del mismo
+   repositorio. `published_index.json` es el `index.json` de gh-pages; si
+   no se pudo leer, no se publica.
+
+```bash
+PUBLISH=false python harness/publish_gate.py --report reports/hipstr.json --slug hipstr --index published_index.json
+```
+
+6. Adjuntar el manifest y el Dockerfile que usó la corrida, y generar el PDF.
+
+```bash
+python harness/attach_recipe.py "$TOOL" --dockerdir work/proposal --proposal recipe_proposal.json --procedure-review work/procedure_review.json --source-install-dockerfile work/source-install.Dockerfile
+```
+
+```bash
+python harness/generate_pdf.py --manifest work/proposal/manifest.yml --publishable false
+```
+
+7. El artifact que sube el workflow es `reports/` más `run_record.json`,
+   con nombre `trial-<tool>` (o `attestation-<tool>` si `mode` es
+   `publish`). Su forma está en `docs/WEB-CONTRACT.md`.
+
+8. Solo en `main` y solo si la compuerta dijo `publishable=true`, el
+   workflow coloca el reporte en un clon de `gh-pages` y regenera el índice:
+
+```bash
+python harness/publish_layout.py <clon-de-gh-pages> --reports reports --slug hipstr
+```
+
+```bash
+python harness/build_index.py <clon-de-gh-pages> --out <clon-de-gh-pages>/index.html
+```
+
+Los pasos 1 a 7 dejan archivos en la raíz (`work/`, `reports/`,
+`recipe_proposal.json`, `run_record.json`, `matrix.json`, `example.json`,
+`io_external.json`, `content_external.json`); conviene correrlos en un
+clon aparte. `harness/local_trial.py` hace lo mismo en un directorio
+temporal para el desarrollo de la web.

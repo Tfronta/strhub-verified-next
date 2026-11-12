@@ -31,13 +31,17 @@ GitHub App installation (`lib/verified/github.ts::dispatchTrial`). Inputs:
 | `ref` | the commit, tag or branch to pin; empty means the default branch |
 | `ref_label` | optional, the ref as the user typed it, for the page |
 | `dispatch_id` | `tr_<…>`, the web's correlation id |
-| `mode` | `trial` (the web never dispatches a publication) |
-| `publish` | `false` |
+| `mode` | `trial` (the web never dispatches a publication); `publish` only renames the artifact `attestation-<tool>` and stamps the report |
+| `publish` | `false`; only the literal `true` lets a run reach `gh-pages` |
+
+`tool` and `repo` are required and have no default: a dispatch without
+either fails in the workflow's first step and says why. These seven are
+the only inputs; the workflow has no other trigger.
 
 The run is named `Trial <tool> [<dispatch_id>]` (`run-name` in the
-workflow). GitHub returns no run id for a dispatch, so the web finds the
-run by that name (`findRunByDispatchId`). Do not change the shape of the
-run name.
+workflow), whatever the mode. GitHub returns no run id for a dispatch, so
+the web finds the run by that name (`findRunByDispatchId`). Do not change
+the shape of the run name.
 
 ## 2. The trial artifact (engine → web)
 
@@ -55,6 +59,12 @@ reports/<slug>.log-<leg>.txt       output of a leg that ran (build, example, ext
 reports/<slug>.terminal-<leg>.txt  the same with the exact argv, as record_terminal.sh wrote it
 run_record.json                every stage's command, exit status and log path (not read by the web yet)
 ```
+
+The legs are `build` (the `docker build`), `example` (the README's own
+command on the repository's own data) and `external` (the documented
+command on the registered dataset). The stages in `run_record.json` are
+`available`, `installs`, `runs_example`, `example`, `runs_external`,
+`io_external`, `content_external`.
 
 `<slug>` is the report's slug (`report.slug` in the manifest, e.g.
 `hipstr`), which is not the run's `tool` name. The web finds the report
