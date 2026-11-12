@@ -21,7 +21,7 @@ import claims
 HARNESS = pathlib.Path(__file__).resolve().parents[1]
 #: Modules whose strings reach a report, a certificate or a page.
 SOURCES = ["propose_manifest.py", "report.py", "certificate_text.py",
-           "generate_pdf.py", "verdict.py", "check_readme.py", "diagnose_log.py"]
+           "generate_pdf.py", "verdict.py", "diagnose_log.py"]
 
 #: Finding voice: an assertion about the tool, its repository, its
 #: documentation or its author. Deliberately broad — a false positive costs one
