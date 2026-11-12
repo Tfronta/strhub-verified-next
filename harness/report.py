@@ -79,62 +79,6 @@ def _status(flag: str) -> bool:
     return str(flag).lower() in ("pass", "true", "ok", "1", "success")
 
 
-def panel_label(rg: dict) -> str:
-    """What the slice's loci are, in words. Reports written before the medical
-    panel existed carry no label, and every one of them ran on forensic loci."""
-    return rg.get("panel_label") or "forensic STR loci"
-
-
-def outside_note(rg: dict) -> str:
-    """The BED's intervals the slice has no reads for. They do not reject a BED
-    (a tool's shipped catalog may list loci beyond the panel), so the report has
-    to say the tool was not assessed there, in place of any result."""
-    n = rg.get("outside_panel")
-    if not n:
-        return ""
-    return (f" {n} of its intervals {'lies' if n == 1 else 'lie'} outside the slice and "
-            f"{'was' if n == 1 else 'were'} not assessed.")
-
-
-def _panel_label_for(supported_loci: str) -> str | None:
-    """The panel label datasets/index.json gives the dataset whose panel this is."""
-    try:
-        index = json.loads((ROOT / "datasets" / "index.json").read_text())
-    except Exception:  # noqa: BLE001
-        return None
-    for entry in index.get("datasets", {}).values():
-        if entry.get("supported_loci") == supported_loci:
-            return entry.get("panel_label")
-    return None
-
-
-def _regions_note(rg: dict) -> str:
-    """One sentence on where the target regions came from, and that the data is a slice.
-
-    Shared by the markdown and HTML renders so the two cannot drift. Returns "" for
-    tools that take no regions BED (FASTQ-based).
-
-    Never "the tool's author": `provided_by` records that the BED came with the
-    submission, not who wrote it. A verification is the same fact whoever
-    triggered it, so the sentence names the submission and claims nothing
-    about the person behind it.
-    """
-    total = rg.get("panel_size")
-    slice_note = (
-        f" The reference dataset is a slice around {total} {panel_label(rg)}, not a "
-        "whole genome: it carries reads only at those loci."
-        if total else ""
-    )
-    if rg.get("source") == "tool":
-        covered = rg.get("covered_loci")
-        detail = (f", covering {covered} of {total} supported loci"
-                  if covered and total else "")
-        return f"The submission supplied the regions BED{detail}.{outside_note(rg)}{slice_note}"
-    if rg.get("source") == "strhub":
-        return f"STRhub supplied the regions BED.{slice_note}"
-    return ""
-
-
 # One line, on every report: what a result is and is not. Who triggered the
 # run used to get a section of its own; a verification is the same fact
 # whoever asked for it, and the one thing a reader must not infer is that
@@ -290,10 +234,10 @@ def _summary_md(report: dict, slug: str) -> str:
         for note in diagnose_log.external_leg_notes(report.get("diagnostics") or {}):
             lines += ["", note]
 
-        # A failure the author can fix costs nothing to re-run. Saying so here is
-        # what keeps the paid tier from looking like the way out of a dead end.
+        # A failure the author can fix costs nothing to re-run, and the
+        # report says so rather than leaving a dead end.
         fixable = diagnose_log.author_fixable_ids(report.get("diagnostics") or {})
-        if fixable and not (report.get("manual_verification") or {}).get("eligible"):
+        if fixable:
             lines += ["", diagnose_log.configuration_fault_sentence()]
 
     known = report.get("author_known_issues") or []
@@ -351,17 +295,14 @@ def _summary_md(report: dict, slug: str) -> str:
             f"- Top markers by read depth: {top}" if top else "",
         ]
 
-    # Verification matrix (own / external legs), if present.
-    # Legs where fixture_source=="strhub" are omitted: both legs run on the same
-    # STRhub data, so showing them separately would be misleading.
+    # Verification matrix (external and example legs), if present.
     # Which legs reported errors — the matrix flags THAT, the section below says what.
     legs_with_errors = {
         leg for leg, issues in (report.get("diagnostics") or {}).items()
         if any(i.get("severity") == "error" for i in issues)
     }
 
-    datasets = report.get("datasets") or []
-    visible = [leg for leg in datasets if leg.get("fixture_source") != "strhub"]
+    visible = report.get("datasets") or []
     if visible:
         lines += ["", "## Verification matrix", "",
                   "| Leg | Available | Result | Errors reported | Dataset |",
@@ -375,39 +316,6 @@ def _summary_md(report: dict, slug: str) -> str:
                 f"{'yes' if avail else 'N/A'} | {status} | {err} | "
                 f"{leg.get('dataset', leg.get('type', '—'))} |"
             )
-
-    # Who chose the regions, and the fact that the dataset is a slice. A
-    # coordinate-based tool only calls where its BED points, so both are material.
-    rg = report.get("regions") or {}
-    if rg.get("source") in ("tool", "strhub"):
-        note = _regions_note(rg)
-        if note:
-            lines += ["", "## Regions", "", note]
-
-    # Manual verification (level 2), when the automated path structurally cannot
-    # run this tool. Never offered over a run that produced its expected output.
-    mv = report.get("manual_verification") or {}
-    if mv.get("eligible"):
-        lines += ["", "## Manual verification available", "",
-                  mv["reason"],
-                  "",
-                  "This is a limitation of the automated environment, not a fault "
-                  "found in the tool. STRhub can run it by hand and issue a "
-                  "certificate labelled **manual verification**: a separate, paid "
-                  "service, distinct from this automated attestation.",
-                  "",
-                  f"Eligibility reason code: `{mv['reason_code']}` "
-                  f"({mv['basis']}).",
-                  ]
-
-    # README minimum-to-run checklist (advisory).
-    rc = report.get("readme_check")
-    if rc:
-        lines += ["", "## README check (advisory)", "",
-                  f"Score: **{rc.get('score', 0)}/{rc.get('max', 5)}**. Advisory only; "
-                  "does not affect the execution badge.", ""]
-        for name, c in (rc.get("checks") or {}).items():
-            lines.append(f"- {'PASS' if c.get('present') else '—'} {name}")
 
     # Notes from reading the repository. Last before the scope statement, and
     # labelled for what they are: nothing here was established by running the
@@ -599,9 +507,7 @@ def _summary_html(report: dict, slug: str) -> str:
       {'<li>STR loci: ' + esc(", ".join(str_loci)) + '</li>' if str_loci else ''}
     </ul>{depth_table}"""
 
-    # Verification matrix (own / external legs).
-    # Legs where fixture_source=="strhub" are omitted: both legs run on the same
-    # STRhub data, so showing them separately would be misleading.
+    # Verification matrix (external and example legs).
     matrix_block = ""
     # Which legs reported errors — the matrix flags THAT, the section below says what.
     all_diags = report.get("diagnostics") or {}
@@ -610,8 +516,7 @@ def _summary_html(report: dict, slug: str) -> str:
         if any(i.get("severity") == "error" for i in issues)
     }
 
-    datasets = report.get("datasets") or []
-    visible_ds = [leg for leg in datasets if leg.get("fixture_source") != "strhub"]
+    visible_ds = report.get("datasets") or []
     if visible_ds:
         mrows = []
         for leg in visible_ds:
@@ -637,11 +542,6 @@ def _summary_html(report: dict, slug: str) -> str:
             f"<tbody>{''.join(mrows)}</tbody></table>"
         )
 
-    # Who chose the regions + the slice caveat (see _regions_note).
-    regions_note = _regions_note(report.get("regions") or {})
-    regions_block = (
-        f"<h2>Regions</h2><p>{esc(regions_note)}</p>" if regions_note else ""
-    )
     _up_note = upstream.note(report.get("upstream"))
     upstream_li = f"<li>Upstream: {esc(_up_note)}</li>" if _up_note else ""
 
@@ -660,11 +560,10 @@ def _summary_html(report: dict, slug: str) -> str:
             f"<p>{esc(n)}</p>"
             for n in diagnose_log.external_leg_notes(all_diags)
         )
-        mv_eligible = bool((report.get("manual_verification") or {}).get("eligible"))
         fixable = diagnose_log.author_fixable_ids(all_diags)
         free_note = (
             f"<p>{esc(diagnose_log.configuration_fault_sentence())}</p>"
-            if fixable and not mv_eligible else ""
+            if fixable else ""
         )
         errors_block = (
             "<h3>Errors reported during the run</h3>"
@@ -673,37 +572,6 @@ def _summary_html(report: dict, slug: str) -> str:
             "<table><thead><tr><th>What happened</th><th>Times</th>"
             "<th>Affected</th></tr></thead>"
             f"<tbody>{erows}</tbody></table>{notes}{free_note}"
-        )
-
-    # Manual verification (level 2). Only rendered when the engine itself marked
-    # the run eligible, so the offer can never appear on a run that worked.
-    manual_block = ""
-    mv = report.get("manual_verification") or {}
-    if mv.get("eligible"):
-        manual_block = (
-            "<h2>Manual verification available</h2>"
-            f"<div class='scope'><p>{esc(mv['reason'])}</p>"
-            "<p>This is a limitation of the automated environment, not a fault "
-            "found in the tool. STRhub can run it by hand and issue a certificate "
-            "labelled <b>manual verification</b>: a separate, paid service, "
-            "distinct from this automated attestation.</p>"
-            f"<p style='color:#888;font-size:.85rem'>Eligibility reason code: "
-            f"<code>{esc(mv['reason_code'])}</code> ({esc(mv['basis'])}).</p></div>"
-        )
-
-    # README minimum-to-run checklist (advisory).
-    readme_block = ""
-    rc = report.get("readme_check")
-    if rc:
-        items = "".join(
-            f"<li>{'<b>PASS</b>' if c.get('present') else '—'} {esc(name)}</li>"
-            for name, c in (rc.get("checks") or {}).items()
-        )
-        readme_block = (
-            "<h2>README check <span style='font-weight:400;color:#888'>(advisory)</span></h2>"
-            f"<p>Score: <b>{esc(rc.get('score', 0))}/{esc(rc.get('max', 5))}</b>. "
-            "Advisory only; does not affect the execution badge.</p>"
-            f"<ul class='stats'>{items}</ul>"
         )
 
     # What the run rests on, what it needed, what was read rather than run:
@@ -810,9 +678,6 @@ def _summary_html(report: dict, slug: str) -> str:
 </ul>
 {content_block}
 {matrix_block}
-{regions_block}
-{manual_block}
-{readme_block}
 {evidence_block}
 {needed_block}
 {caveats_block}
@@ -888,8 +753,6 @@ def apply_engine_record(args, path: str) -> dict | None:
     args.io = ladder.get("io") or args.io
     args.content = ladder.get("content") or args.content
     args.environment_built = rec.get("environment_built") or ""
-    if not args.supported_loci:
-        args.supported_loci = ladder.get("supported_loci", "")
     if not args.infra_failure.strip() and rec.get("infra_failure"):
         args.infra_failure = rec["infra_failure"]
     return rec
@@ -905,19 +768,15 @@ def main() -> int:
     ap.add_argument("--content", default="content_result.json",
                     help="path to content_result.json")
     ap.add_argument("--matrix", default="matrix.json",
-                    help="path to matrix.json (own/external legs, Fase 3)")
-    ap.add_argument("--readme", default="readme_result.json",
-                    help="path to readme_result.json (advisory, Fase 3)")
-    ap.add_argument("--log-own", default="",
-                    help="path to captured stdout+stderr from own-data run")
+                    help="path to matrix.json (the external and example legs)")
     ap.add_argument("--log-external", default="",
                     help="path to captured stdout+stderr from external-data run")
     ap.add_argument("--log-build", default="",
                     help="path to captured output from the docker build (Installs)")
     ap.add_argument("--engine-record", default="",
                     help="run_record.json from harness/engine: supplies --available, --installs, "
-                         "--runs, --io, --content, --example-runs, --environment-built, "
-                         "--supported-loci and (when empty) --infra-failure from the record")
+                         "--runs, --io, --content, --example-runs, --environment-built "
+                         "and (when empty) --infra-failure from the record")
     ap.add_argument("--environment-built", default="", choices=["", "primary"],
                     help="which Dockerfile produced the image the gates ran on: 'primary' "
                          "(the one the review admits) or empty when nothing built")
@@ -927,8 +786,8 @@ def main() -> int:
     ap.add_argument("--ref", default="")
     ap.add_argument("--run-url", default="")
     ap.add_argument("--infra-failure", default="",
-                    help="a step of STRhub's own (reference genome download, ...) that "
-                         "failed before the gates ran; names it, empty when none did")
+                    help="a step of STRhub's own (reading the repository, staging the dataset, ...) "
+                         "that failed before the gates ran; names it, empty when none did")
     ap.add_argument("--example-runs", default="skipped",
                     help="outcome of the own-example step (success/failure/skipped)")
     ap.add_argument("--example", default="example.json", help="path to check_example.py output")
@@ -946,13 +805,6 @@ def main() -> int:
     ap.add_argument("--mode", default="publish", choices=["publish", "trial"],
                     help="trial: an unpublished rehearsal of a recipe; stamped into the "
                          "report so a trial can never be mistaken for an attestation")
-    ap.add_argument("--regions-source", default="",
-                    help="who supplied the regions BED: tool | strhub | none")
-    ap.add_argument("--regions-validation", default="regions_validation.json",
-                    help="path to validate_bed.py output (panel coverage)")
-    ap.add_argument("--supported-loci", default="",
-                    help="path to the dataset's loci.bed — panel size fallback when "
-                         "no validation ran (STRhub-supplied BEDs skip the pre-flight)")
     args = ap.parse_args()
     if args.engine_record:
         apply_engine_record(args, args.engine_record)
@@ -972,8 +824,7 @@ def main() -> int:
         content_detail = json.loads(cp.read_text())
         content_pass = bool(content_detail.get("passed"))
 
-    # Fase 3: matrix of verification legs (own + external) and the advisory
-    # README check. Both are optional; absence keeps the legacy single-leg shape.
+    # The matrix of verification legs (external and example).
     datasets = []
     mp = pathlib.Path(args.matrix)
     if mp.exists():
@@ -982,45 +833,6 @@ def main() -> int:
             datasets = loaded if isinstance(loaded, list) else loaded.get("legs", [])
         except Exception:  # noqa: BLE001
             datasets = []
-
-    readme_check = None
-    rp = pathlib.Path(args.readme)
-    if rp.exists():
-        try:
-            readme_check = json.loads(rp.read_text())
-        except Exception:  # noqa: BLE001
-            readme_check = None
-
-    # Who defined the regions this run targeted. Material to a reader: it says
-    # whether the author chose the loci (within our panel) or STRhub did. Absent
-    # for tools that take no regions BED (FASTQ-based).
-    regions = None
-    if args.regions_source and args.regions_source != "none":
-        regions = {"source": args.regions_source}
-        vp = pathlib.Path(args.regions_validation)
-        if vp.exists():
-            try:
-                v = json.loads(vp.read_text())
-                regions["covered_loci"] = v.get("covered_count")
-                regions["panel_size"] = v.get("panel_size")
-                if v.get("out_of_panel"):
-                    regions["outside_panel"] = len(v["out_of_panel"])
-            except Exception:  # noqa: BLE001
-                pass
-        # Only the medical panel carries a label; a forensic report stays as it was.
-        label = _panel_label_for(args.supported_loci) if args.supported_loci else None
-        if label:
-            regions["panel_label"] = label
-        # Only author-supplied BEDs are pre-flighted, so a STRhub-supplied one has
-        # no validation file. Count the panel directly — the "this is a slice"
-        # caveat is true either way and the reader needs it either way.
-        if not regions.get("panel_size") and args.supported_loci:
-            sp = ROOT / args.supported_loci
-            if sp.is_file():
-                regions["panel_size"] = sum(
-                    1 for ln in sp.read_text().splitlines()
-                    if ln.strip() and not ln.startswith("#")
-                ) or None
 
     gates = {
         "available": _status(args.available),
@@ -1095,8 +907,6 @@ def main() -> int:
         "content_detail": content_detail,
         "example_detail": example_detail or None,
         "datasets": datasets,
-        "regions": regions,
-        "readme_check": readme_check,
         "scope": SCOPE,
     }
 
@@ -1128,17 +938,10 @@ def main() -> int:
     # line is a checkable fact, and for a reader deciding whether to adopt the
     # tool it is the practical question — what will this cost me to run.
     needed = []
-    if (regions or {}).get("source") == "tool":
-        needed.append(
-            "A regions configuration file, supplied with the submission rather "
-            "than taken from the repository."
-        )
-    if not any(d.get("leg") == "own" and d.get("available") for d in (datasets or [])):
-        # Says what we know, not what we would have to have checked. An absent own
-        # leg means no repository test data was USED; it does not establish that
-        # the repository ships none. STRsearch ships some — for hg19, against an
-        # hg38 dataset — so the stronger sentence would have been false exactly
-        # where it was about to be published.
+    if any(d.get("leg") == "external" and d.get("available") for d in (datasets or [])):
+        # Says what we know, not what we would have to have checked: the
+        # external leg ran on STRhub's sample. It does not establish that the
+        # repository ships no data of its own (STRsearch ships some, for hg19).
         needed.append(
             "Test data: no sample from the repository was used, so a public "
             "reference sample stood in."
@@ -1236,8 +1039,8 @@ def main() -> int:
     terminals = {}
     # The build log rides along with the run logs. A reader told the build failed
     # will want the same thing a reader told a run failed wants: the output.
-    for leg, flag in [("own", args.log_own), ("external", args.log_external),
-                      ("example", args.log_example), ("build", args.log_build)]:
+    for leg, flag in [("external", args.log_external), ("example", args.log_example),
+                      ("build", args.log_build)]:
         if not flag:
             continue
         lp = pathlib.Path(flag)
@@ -1280,8 +1083,7 @@ def main() -> int:
         report["install_detail"] = install_detail
 
     diagnostics = {}
-    for leg, flag in [("own", args.log_own), ("external", args.log_external),
-                      ("example", args.log_example)]:
+    for leg, flag in [("external", args.log_external), ("example", args.log_example)]:
         if not flag:
             continue
         issues = diagnose_log.diagnose_file(flag)
@@ -1289,15 +1091,6 @@ def main() -> int:
             diagnostics[leg] = issues
     if diagnostics:
         report["diagnostics"] = diagnostics
-
-    # Whether this run may be offered the paid, human-run verification (level 2).
-    # Emitted unconditionally — including `eligible: false` — so the web can tell a
-    # report that was checked and did not qualify from an older one that predates
-    # the check. The decision is entirely mechanical (see diagnose_log): a declared
-    # environment ceiling, or one the log proves we hit. Nobody grants it by hand.
-    report["manual_verification"] = diagnose_log.manual_eligibility(
-        diagnostics, gates, m.get("compatibility"),
-    )
 
     # The one sentence for a reader who does not program. Decided from the gates,
     # the diagnostics and, when the recipe was proposed from the repository, the
@@ -1362,7 +1155,7 @@ def main() -> int:
             report["procedure_validation"] = {"schema": authorization.SCHEMA, "valid": False,
                                               "reason": procedure["reason"]}
     report["verdict"] = verdict_lib.decide(
-        gates, diagnostics, report["manual_verification"], proposal, m.get("compatibility"),
+        gates, diagnostics, proposal, m.get("compatibility"),
         strhub_fault=strhub_fault,
         procedure=procedure,
         manifest=m,
@@ -1370,7 +1163,7 @@ def main() -> int:
 
     # Step 1 in the three sentences a maintainer is owed, with the block of
     # docs/GUIA-PASO-1.md that is missing when one is. Derived from the
-    # classifier's blocker, not from check_readme's word search: searching a
+    # classifier's blocker, not from a word search of the README: searching a
     # README for "install" never ran anything (docs/PLAN-Paso-1.md).
     report["step1"] = step1_says(report)
 

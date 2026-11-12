@@ -355,7 +355,6 @@ def build_local_trial(repo_url: str, ref: str, ref_label: str, out_dir: pathlib.
             "--mounted-inputs", str(work_dir / "mounted_inputs.json"),
             "--matrix", str(results_dir / "matrix.json"),
             "--example", str(results_dir / "example.json"),
-            "--regions-validation", str(tmp_path / "no-regions.json"),
             "--log-build", str(log_build),
             "--log-external", str(log_ext),
             "--log-example", str(log_ex),

@@ -235,11 +235,11 @@ def test_report_takes_its_gate_outcomes_and_the_evidence_failure_from_the_record
 
     class Args:
         available = installs = runs = "fail"; io = "io_result.json"; content = "content_result.json"
-        example_runs = "skipped"; environment_built = ""; supported_loci = ""; infra_failure = ""
+        example_runs = "skipped"; environment_built = ""; infra_failure = ""
     a = Args()
     assert report.apply_engine_record(a, str(tmp_path / "run_record.json")) == rec
     assert (a.available, a.installs, a.runs, a.example_runs) == ("success", "failure", "skipped", "skipped")
-    assert (a.io, a.content, a.supported_loci) == ("io_external.json", "content_external.json", "datasets/x/loci.bed")
+    assert (a.io, a.content) == ("io_external.json", "content_external.json")
     assert a.infra_failure == "the upstream procedure evidence check before Docker"
     # The workflow's own reason (a step before the gates) wins over the record's.
     b = Args(); b.infra_failure = "the staging of inputs"

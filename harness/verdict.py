@@ -9,7 +9,7 @@ act on without reading a log:
                  is what failed
   undetermined   STRhub could not work out how to run it, and says what the
                  README did not tell it; a finding about documentation
-  out_of_scope   it needs something the free runner cannot give (GPU, a
+  out_of_scope   it needs something the runner cannot give (GPU, a
                  display, a licence, network at run time, another OS)
 
 The order of the checks IS the policy. A tool that produced its output is
@@ -244,7 +244,7 @@ def _procedure_block(procedure: dict | None, gaps: list) -> dict | None:
 
 
 def _decide(gates: dict, diagnostics: dict[str, list[dict]] | None = None,
-            manual_verification: dict | None = None, recipe_proposal: dict | None = None,
+            recipe_proposal: dict | None = None,
             declared_compatibility: dict | None = None,
             strhub_fault: str | None = None, procedure: dict | None = None,
             manifest: dict | None = None) -> dict:
@@ -265,7 +265,6 @@ def _decide(gates: dict, diagnostics: dict[str, list[dict]] | None = None,
     if gates["runs"] and not (gates["available"] and gates["installs"]):
         return {"code": "undetermined", "title": TITLES["undetermined"], "basis": "strhub",
                 "reason": "The execution gate observations contradict the installation or source availability.", "readme_gaps": []}
-    mv = manual_verification or {}
     proposal = recipe_proposal or {}
     gaps = [g for g in (proposal.get("readme") or {}).get("gaps", []) if g.get("item") != "example_data"]
     ids = _ids(diagnostics)
@@ -318,11 +317,11 @@ def _decide(gates: dict, diagnostics: dict[str, list[dict]] | None = None,
 
     declared = {k for k, v in (declared_compatibility or {}).items() if v}
     incompatible = ids & diagnose_log.HARNESS_INCOMPATIBLE
-    if declared or incompatible or mv.get("reason_code") in diagnose_log.HARNESS_INCOMPATIBLE:
-        what = sorted(declared | incompatible | ({mv["reason_code"]} if mv.get("reason_code") in diagnose_log.HARNESS_INCOMPATIBLE else set()))
+    if declared or incompatible:
+        what = sorted(declared | incompatible)
         return {"code": "out_of_scope", "title": TITLES["out_of_scope"], "basis": "environment",
                 "reason": "The tool needs something the automated runner cannot provide: "
-                          + ", ".join(what) + ". A manual verification can cover it.",
+                          + ", ".join(what) + ".",
                 "readme_gaps": []}
 
     # It was run, and did not produce. If the recipe was auto-proposed and the
@@ -332,8 +331,8 @@ def _decide(gates: dict, diagnostics: dict[str, list[dict]] | None = None,
     if auto and fixable and not gates.get("runs"):
         return {"code": "undetermined", "title": TITLES["undetermined"], "basis": "recipe",
                 "reason": "The proposed way of running this tool did not work ("
-                          + ", ".join(sorted(fixable)) + "). That may be the proposal rather "
-                          "than the tool: a maintainer-supplied command would settle it.",
+                          + ", ".join(sorted(fixable)) + "). That may be STRhub's reading "
+                          "of the README rather than the tool.",
                 "readme_gaps": gaps}
 
     if not gates.get("available"):
@@ -358,12 +357,12 @@ def _decide(gates: dict, diagnostics: dict[str, list[dict]] | None = None,
 
 
 def decide(gates: dict, diagnostics: dict[str, list[dict]] | None = None,
-           manual_verification: dict | None = None, recipe_proposal: dict | None = None,
+           recipe_proposal: dict | None = None,
            declared_compatibility: dict | None = None,
            strhub_fault: str | None = None, procedure: dict | None = None,
            manifest: dict | None = None) -> dict:
     """The verdict, plus the blockers a reader can act on when it is not 'runs'."""
-    v = _decide(gates, diagnostics, manual_verification, recipe_proposal, declared_compatibility,
+    v = _decide(gates, diagnostics, recipe_proposal, declared_compatibility,
                 strhub_fault, procedure, manifest)
     if v.get("basis") == "strhub":
         v["blockers"] = []

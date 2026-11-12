@@ -43,9 +43,8 @@ def test_the_badge_of_an_undetermined_run_says_so_not_the_rung_it_reached(tmp_pa
     res = subprocess.run([sys.executable, str(ROOT / "harness" / "report.py"), "--manifest", str(manifest),
                           "--available", "pass", "--installs", "pass", "--runs", "fail",
                           "--io", str(tmp_path / "no-io.json"), "--content", str(tmp_path / "no-content.json"),
-                          "--matrix", str(tmp_path / "no-matrix.json"), "--readme", str(tmp_path / "no-readme.json"),
+                          "--matrix", str(tmp_path / "no-matrix.json"),
                           "--example", str(tmp_path / "no-example.json"),
-                          "--regions-validation", str(tmp_path / "no-regions.json"),
                           "--recipe-proposal", str(proposal)],
                          cwd=str(ROOT), capture_output=True, text=True, env=env)
     assert res.returncode == 0, res.stderr

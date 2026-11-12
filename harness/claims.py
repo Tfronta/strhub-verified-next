@@ -69,14 +69,6 @@ REGISTER: dict[str, tuple[str, str]] = {
     "a1ac00cc3c30": ("diagnose_log", "log"),  # A COPY/ADD line names a file the build context does not hold. The context is the repository checkout…
     "86baeea971be": ("diagnose_log", "run"),  # At least one cause is STRhub's, not the tool's: the container recipe for a generated environmen
     "fbfdadb79781": ("diagnose_log", "manifest"),  # Every cause identified sits in this run's configuration — the pinned versions, package names or buil
-    "f87ad4ad59ea": ("diagnose_log", "manifest"),  # The tool declares a binary or proprietary output with no text or tabular export, so the IO and 
-    "6759a67a2817": ("diagnose_log", "manifest"),  # The tool declares an interactive or graphical step. The automated runner is headless and cannot
-    "e3a029af91e7": ("diagnose_log", "manifest"),  # The tool declares it fetches data over the network while running. A pinned snapshot cannot reco
-    "4b6b45793ca4": ("diagnose_log", "manifest"),  # The tool declares it needs GPU hardware. Public CI runners are CPU-only.
-    "b1468dcdb3d3": ("diagnose_log", "manifest"),  # The tool declares it needs an OS the automated runner does not provide.
-    "fb768926c8c4": ("diagnose_log", "manifest"),  # The tool declares it needs licensed or restricted reference data that cannot be published in a 
-    "94e9a73cf514": ("diagnose_log", "manifest"),  # The tool needs CUDA hardware. Public CI runners are CPU-only.
-    "3d053d897ca4": ("diagnose_log", "manifest"),  # The tool needs a license or licensed data that cannot be published in a public verification run
     "dc6dbb4a5df8": ("generate_pdf", "tree"),  # Recorded automatically from the tool's public files when this run was configured. Not verified 
     "6b4450723321": ("generate_pdf", "tree"),  # This tool ships no demo or test data of its own. STRhub ran the verification using the public r
     "831100e24df2": ("propose_manifest", "tree"),  # # The repository ships its own Dockerfile (

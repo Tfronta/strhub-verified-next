@@ -123,9 +123,8 @@ def test_the_badge_of_a_curated_run_says_whose_recipe_it_was(tmp_path):
     res = subprocess.run([sys.executable, str(ROOT / "harness" / "report.py"), "--manifest", str(manifest),
                           "--available", "pass", "--installs", "pass", "--runs", "pass",
                           "--io", str(tmp_path / "no-io.json"), "--content", str(tmp_path / "no-content.json"),
-                          "--matrix", str(tmp_path / "no-matrix.json"), "--readme", str(tmp_path / "no-readme.json"),
-                          "--example", str(tmp_path / "no-example.json"),
-                          "--regions-validation", str(tmp_path / "no-regions.json")],
+                          "--matrix", str(tmp_path / "no-matrix.json"),
+                          "--example", str(tmp_path / "no-example.json")],
                          cwd=str(ROOT), capture_output=True, text=True, env=env)
     assert res.returncode == 0, res.stderr
     written = json.loads((ROOT / "reports" / "strspy-ont.json").read_text())

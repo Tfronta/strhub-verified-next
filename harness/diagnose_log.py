@@ -212,8 +212,7 @@ _rule(
     "error", "runtime_network",
     "Network access attempted during the run",
     "The program tried to reach the network while running, with none available. "
-    "A pinned verification cannot record or reproduce what would be fetched; a "
-    "manual verification can cover it.",
+    "A pinned verification cannot record or reproduce what would be fetched.",
 )
 
 _rule(
@@ -222,8 +221,7 @@ _rule(
     "error", "requires_gui",
     "Tool requires a graphical display",
     "The program tried to open a graphical display. The automated runner is "
-    "headless, so an interactive step cannot be executed or evidenced here; a "
-    "manual verification can cover it.",
+    "headless, so an interactive step cannot be executed or evidenced here.",
 )
 
 _rule(
@@ -233,7 +231,7 @@ _rule(
     "error", "requires_gpu",
     "Tool requires a GPU",
     "The program needs CUDA hardware. Public CI runners are CPU-only, so this "
-    "cannot run on the automated path; a manual verification can cover it.",
+    "cannot run on the automated path.",
 )
 
 _rule(
@@ -242,7 +240,7 @@ _rule(
     "error", "requires_license",
     "Tool requires a license or licensed data",
     "The program needs a license or licensed reference data that a public "
-    "verification run cannot hold; a manual verification can cover it.",
+    "verification run cannot hold.",
 )
 
 _rule(
@@ -709,94 +707,6 @@ def fault_of(issue_id: str) -> str | None:
         return "harness"
     return None
 
-# Author-declared incompatibilities (the pre-flight, "trigger A"). Same ceilings,
-# stated up front so a tool that plainly cannot run is not made to burn a CI run
-# to discover it. Keys mirror the manifest's `compatibility` block.
-DECLARED_INCOMPAT = {
-    "requires_gui":
-        "The tool declares an interactive or graphical step. The automated "
-        "runner is headless and cannot execute or evidence it.",
-    "requires_gpu":
-        "The tool declares it needs GPU hardware. Public CI runners are CPU-only.",
-    "requires_runtime_network":
-        "The tool declares it fetches data over the network while running. A "
-        "pinned snapshot cannot record or reproduce what was fetched.",
-    "requires_licensed_reference":
-        "The tool declares it needs licensed or restricted reference data that "
-        "cannot be published in a public verification run.",
-    "requires_unsupported_os":
-        "The tool declares it needs an OS the automated runner does not provide.",
-    "opaque_output_format":
-        "The tool declares a binary or proprietary output with no text or tabular "
-        "export, so the IO and content gates cannot inspect it.",
-}
-
-_DETECTED_REASONS = {
-    "oom": "The run exhausted the CI runner's memory. The automated environment "
-           "has a fixed memory budget the author cannot raise.",
-    "disk_full": "The run filled the CI runner's disk. The automated environment "
-                 "has a fixed disk budget the author cannot raise.",
-    "runtime_network": "The tool reached for the network while running. A pinned "
-                       "snapshot cannot record or reproduce what was fetched.",
-    "requires_gui": "The tool tried to open a graphical display. The automated "
-                    "runner is headless.",
-    "requires_gpu": "The tool needs CUDA hardware. Public CI runners are CPU-only.",
-    "requires_license": "The tool needs a license or licensed data that cannot be "
-                        "published in a public verification run.",
-}
-
-
-def manual_eligibility(diagnostics: dict[str, list[dict]],
-                       gates: dict[str, bool],
-                       declared: dict | None = None) -> dict:
-    """Decide, mechanically, whether this run may be offered manual verification.
-
-    Returns a record that always states the outcome, so a report can distinguish
-    "checked, not eligible" from an older report that never checked at all:
-
-        {"eligible": bool, "basis": "declared"|"detected"|None,
-         "reason_code": str|None, "reason": str|None}
-
-    The order of the checks is the policy:
-
-    1. A run that produced its expected output has nothing to escalate. Level 2
-       cannot be offered over a working free path, whatever the tool declared —
-       this is what stops the paid tier from becoming a queue-jump.
-    2. A declared ceiling (trigger A) qualifies even without a run: a GUI tool
-       should not have to burn CI to be told the runner is headless.
-    3. A detected ceiling (trigger B) qualifies on the evidence of the log.
-    4. Everything else does not. In particular a run that failed only on
-       AUTHOR_FIXABLE errors stays on the free path: those sit in the cited
-       procedure, and a changed repository is verified again at no cost.
-    """
-    none = {"eligible": False, "basis": None, "reason_code": None, "reason": None}
-
-    # 1. The free path delivered: gates through IO cleared, so a file in the
-    #    declared format actually came out. Nothing here needs a human.
-    if gates.get("io") or gates.get("content"):
-        return none
-
-    # 2. Declared (trigger A) — checked before the log so a tool that never got
-    #    to run is still routed correctly.
-    for flag, reason in DECLARED_INCOMPAT.items():
-        if (declared or {}).get(flag):
-            return {"eligible": True, "basis": "declared",
-                    "reason_code": f"declared_incompat:{flag}", "reason": reason}
-
-    # 3. Detected (trigger B) — an environment ceiling the log proves we hit.
-    #    Scanned in HARNESS_INCOMPATIBLE order so the reason is stable across
-    #    runs rather than dependent on which leg happened to log first.
-    hit_ids = {issue["id"] for issues in diagnostics.values() for issue in issues
-               if issue.get("severity") == "error"}
-    for rid in sorted(HARNESS_INCOMPATIBLE & hit_ids):
-        return {"eligible": True, "basis": "detected",
-                "reason_code": f"detected_incompat:{rid}",
-                "reason": _DETECTED_REASONS.get(rid, REVIEW_LABELS.get(rid, rid))}
-
-    # 4. Failed on something that sits in the cited procedure itself.
-    return none
-
-
 def _is_strhub_staged(path: str) -> bool:
     """True for the inputs STRhub puts in the container, not the author.
 
@@ -814,11 +724,9 @@ def _is_strhub_staged(path: str) -> bool:
 def author_fixable_ids(diagnostics: dict[str, list[dict]]) -> list[str]:
     """Error classes in this run that sit in the cited procedure itself.
 
-    The counterpart to `manual_eligibility`: when a run fails on these, the
-    honest answer is that the repository's own steps stopped here and a changed
-    repository is verified again at no cost, and the report should say so
-    plainly rather than leaving a dead end that reads like a reason to pay for
-    help.
+    When a run fails on these, the honest answer is that the repository's own
+    steps stopped here and a changed repository is verified again at no cost,
+    and the report should say so plainly rather than leaving a dead end.
 
     A missing file is the one class that can belong to either side. Everything
     under `/data/in` and `/data/ref` is staged by us under names we choose, so a

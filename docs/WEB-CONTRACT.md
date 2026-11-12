@@ -101,9 +101,12 @@ are for:
   claim was read in the repository, openable at the pinned ref. `claim`
   includes `fallback_environment` (the published image the README names;
   evidence, not a plan B).
-- `upstream`, `procedure_review`, `procedure_validation`, `readme_check`,
+- `upstream`, `procedure_review`, `procedure_validation`,
   `author_known_issues`, `needed_beyond_repo`, `repo_test_data`,
-  `caveats`, `scope`, `recipe`, `certificate`, `manual_verification`
+  `caveats`, `scope`, `recipe`, `certificate`
+- **Never again:** `manual_verification`, `readme_check`, `regions`,
+  `gates.starts`, and the `own` leg in `datasets`, `logs`, `terminals` and
+  `diagnostics` (removed on `prune/clean-engine`).
 
 ## 4. Publication (engine → gh-pages → web)
 

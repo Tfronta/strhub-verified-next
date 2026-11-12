@@ -142,11 +142,9 @@ def report_validation(report: dict) -> Validation:
             or any(not isinstance(rows, list) or any(not isinstance(row, dict) for row in rows)
                    for rows in diagnostics.values())):
         return Validation(False, "The report diagnostics are malformed.")
-    if report.get("manual_verification") is not None and not isinstance(report["manual_verification"], dict):
-        return Validation(False, "The report manual-verification metadata is malformed.")
     # A final label is not a second authorization channel. Recompute it too.
     import verdict
-    expected = verdict.decide(gates, report.get("diagnostics"), report.get("manual_verification"),
+    expected = verdict.decide(gates, report.get("diagnostics"),
                               declared_compatibility=manifest.get("compatibility"),
                               procedure=result.review, manifest=manifest)
     supplied = report.get("verdict") or {}

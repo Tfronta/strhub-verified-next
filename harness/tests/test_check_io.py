@@ -113,9 +113,7 @@ def test_uncalled_vcf_on_slice_is_strhub_limitation_not_runs_or_fails(tmp_path):
             "--io", str(io_json),
             "--content", str(tmp_path / "no-content.json"),
             "--matrix", str(tmp_path / "no-matrix.json"),
-            "--readme", str(tmp_path / "no-readme.json"),
             "--example", str(tmp_path / "no-example.json"),
-            "--regions-validation", str(tmp_path / "no-regions.json"),
             "--mode", "trial",
         ], cwd=str(root), check=True, capture_output=True, text=True)
         report = json.loads(res.stdout)
