@@ -168,8 +168,7 @@ def test_publication_cannot_trust_the_final_label_or_reuse_another_contract(fiel
         report["verdict"]["code"] = "fails"
     else:
         report["gates"]["runs"] = False
-    ok, _ = publish_gate.decide(report, mode="publish", url_trial=False, trial_publish=True,
-                                event_name="workflow_dispatch", index=None)
+    ok, _ = publish_gate.decide(report, slug="example", publish_requested=True, index={"tools": []})
     assert not ok
     site, reports = tmp_path / "site", tmp_path / "reports"
     site.mkdir(); reports.mkdir()
@@ -183,9 +182,9 @@ def test_publication_cannot_trust_the_final_label_or_reuse_another_contract(fiel
 
 def test_valid_private_trial_stays_private_and_a_valid_publication_remains_possible():
     report = bound_report()
-    args = dict(mode="trial", url_trial=True, trial_publish=False, event_name="workflow_dispatch", index={"tools": []})
+    args = dict(slug="example", publish_requested=False, index={"tools": []})
     assert not publish_gate.decide(report, **args)[0]
-    args["trial_publish"] = True
+    args["publish_requested"] = True
     assert publish_gate.decide(report, **args)[0]
 
 

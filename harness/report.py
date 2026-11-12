@@ -1,14 +1,17 @@
-"""Assemble the attestation report + a shields.io endpoint badge.
+"""Assemble the report, a shields.io endpoint badge and the two prose copies.
 
-Gate statuses for available/installs/runs come from the CI steps (passed as
-flags). The io gate detail is read from io_result.json. Output:
-  reports/<tool>.json        - full machine-readable attestation
-  reports/<tool>.badge.json  - shields.io endpoint badge
+The gate outcomes come from the engine's RunRecord (--engine-record); the
+check results from the files the engine wrote beside it. Output:
+  reports/<slug>.json        - the report (docs/WEB-CONTRACT.md §3)
+  reports/<slug>.badge.json  - shields.io endpoint badge
+  reports/<slug>.summary.md  - the report in prose
+  reports/<slug>.html        - static page of the report
+  reports/<slug>.log-<leg>.txt, reports/<slug>.terminal-<leg>.txt
 
 Usage:
-  python harness/report.py --manifest tools/strait-razor-PowerSeqv2.31/manifest.yml \
-      --available pass --installs pass --runs pass --io io_result.json \
-      --ref <sha> --run-url <ci_run_url>
+  python harness/report.py --manifest work/proposal/manifest.yml \
+      --engine-record run_record.json --procedure-review work/procedure_review.json \
+      --recipe-proposal recipe_proposal.json --ref <sha> --mode trial --run-url <ci_run_url>
 """
 from __future__ import annotations
 import argparse
@@ -772,13 +775,8 @@ def main() -> int:
     ap.add_argument("--procedure-review", default="", help="recomputed pre-execution procedure review")
     ap.add_argument("--mounted-inputs", default="", help="verified provenance of the external runtime mount")
     ap.add_argument("--recipe-proposal", default="",
-                    help="detect_recipe.py output when the recipe was proposed from the "
-                         "repository; lets the verdict tell a documentation gap from a failure")
-    ap.add_argument("--repo-read", default="",
-                    help="detect_recipe.py output for a run whose recipe was NOT proposed "
-                         "(a committed tool). Evidence only — what the repository holds and "
-                         "what its README documents — and never treated as a proposed recipe, "
-                         "which would change the verdict")
+                    help="detect_recipe.py output, the reading of the repository this run rests "
+                         "on; lets the verdict tell a documentation gap from a failure")
     ap.add_argument("--mode", default="publish", choices=["publish", "trial"],
                     help="trial: an unpublished rehearsal of a recipe; stamped into the "
                          "report so a trial can never be mistaken for an attestation")
@@ -953,20 +951,7 @@ def main() -> int:
     # exit without doing any work; a report on a run that died in that wrapper
     # said nothing about it, because nobody carried the section out of the
     # README. A reader deciding whether a failure is news needs this first.
-    # Reading the repository is evidence collection, and it is worth doing for
-    # every run — not only for one whose recipe STRhub proposed. A published
-    # tool's recipe is committed, so no proposal exists, and the catalogue
-    # carried none of this: no known-issue section, and a certificate still
-    # claiming the tool ships no test data because nobody had looked. The
-    # verdict keeps reading `proposal` alone, since "the recipe was proposed
-    # from the repository" is what changes a verdict, and reading a repository
-    # is not that.
     evidence = proposal
-    if evidence is None and args.repo_read and pathlib.Path(args.repo_read).exists():
-        try:
-            evidence = json.loads(pathlib.Path(args.repo_read).read_text())
-        except Exception:  # noqa: BLE001
-            evidence = None
     if evidence is not None and evidence.get("known_issues"):
         report["author_known_issues"] = evidence["known_issues"]
     # Every fact the run's configuration rests on, as something a reader can

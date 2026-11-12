@@ -5,20 +5,19 @@ reviewer, a user who cannot get the tool running at home, and the tool's owner
 all came for, and hiding it would make the catalogue a list of green badges.
 What is never published:
 
-  - a pull request's run: it is a check on the engine, not a verification;
-  - a trial handed a recipe by whoever dispatched it: that recipe could be
-    anything, so its result says nothing about the repository;
+  - a run nobody asked to publish: the dispatch says `publish: true` or the
+    result stays the run's artifact (the web always sends `false`);
   - a run whose verdict is not about the tool (out of scope, or STRhub's own
     infrastructure failed: the verdict's basis is "strhub");
-  - a trial from a URL filed under a card that belongs to another repository.
-    The slug comes from the repository's NAME, so `someone/HipSTR` would land
-    on HipSTR's card, and the alias goes to the newest commit date, which the
+  - a run filed under a card that belongs to another repository. The slug
+    comes from the repository's NAME, so `someone/HipSTR` would land on
+    HipSTR's card, and the alias goes to the newest commit date, which the
     committer sets. The requester still gets the full report as the run's
     artifact; only the card is protected.
 
 Pure, so the policy is testable line by line. The workflow calls `main`.
 
-    python harness/publish_gate.py --report reports/x.json --index published_index.json
+    PUBLISH=true python harness/publish_gate.py --report reports/x.json --slug x --index published_index.json
 """
 from __future__ import annotations
 
@@ -65,13 +64,13 @@ def validated_finding(report: dict):
     return checked
 
 
-def decide(report: dict, *, mode: str, url_trial: bool, trial_publish: bool,
-           event_name: str, index: dict | None) -> tuple[bool, str]:
-    """(publishable, why). `why` is one sentence for the run summary."""
+def decide(report: dict, *, slug: str, publish_requested: bool, index: dict | None) -> tuple[bool, str]:
+    """(publishable, why). `why` is one sentence for the run summary. `slug`
+    is the name the report was written under (reports/<slug>.json)."""
     verdict = report.get("verdict") or {}
     code = verdict.get("code", "")
-    if event_name == "pull_request":
-        return False, "a pull request's run is a check, never a publication"
+    if not publish_requested:
+        return False, "the dispatch did not ask for this run to be published"
     if code not in PUBLISHED_VERDICTS:
         return False, f"verdict '{code or 'none'}' is not a finding about the tool"
     if verdict.get("basis") == "strhub":
@@ -79,30 +78,27 @@ def decide(report: dict, *, mode: str, url_trial: bool, trial_publish: bool,
     checked = validated_finding(report)
     if not checked.valid:
         return False, "mandatory procedure evidence rejected: " + checked.reason
-    if mode == "trial":
-        if not url_trial:
-            return False, "a trial handed a recipe never publishes"
-        if not trial_publish:
-            return False, "the dispatch asked for this trial not to be published"
-        slug = (report.get("report") or {}).get("slug", "")
-        repo = (report.get("source") or {}).get("repo", "")
-        if index is None:
-            # Fail closed: without the catalogue we cannot tell whose card this is.
-            return False, "the published catalogue could not be read to check whose card this is"
-        owner = card_owner(index, slug)
-        if owner is not None and normalize_repo(owner) != normalize_repo(repo):
-            return False, (f"the card '{slug}' belongs to {owner}; a trial of {repo} "
-                           "does not publish on it")
+    if not slug:
+        return False, "the report has no slug to file it under"
+    if index is None:
+        # Fail closed: without the catalogue we cannot tell whose card this is.
+        return False, "the published catalogue could not be read to check whose card this is"
+    repo = (report.get("source") or {}).get("repo", "")
+    owner = card_owner(index, slug)
+    if owner is not None and normalize_repo(owner) != normalize_repo(repo):
+        return False, f"the card '{slug}' belongs to {owner}; a run of {repo} does not publish on it"
     return True, "published"
 
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--report", required=True)
+    ap.add_argument("--slug", default="", help="the slug the report was written under (default: the file's stem)")
     ap.add_argument("--index", default="", help="the published index.json, if it could be read")
     args = ap.parse_args(argv)
 
-    report = json.loads(pathlib.Path(args.report).read_text())
+    path = pathlib.Path(args.report)
+    report = json.loads(path.read_text())
     index = None
     ip = pathlib.Path(args.index) if args.index else None
     if ip and ip.is_file():
@@ -110,15 +106,8 @@ def main(argv: list[str] | None = None) -> int:
             index = json.loads(ip.read_text())
         except ValueError:
             index = None
-    env = os.environ
-    ok, why = decide(
-        report,
-        mode=env.get("MODE", "publish"),
-        url_trial=env.get("URL_TRIAL") == "true",
-        trial_publish=env.get("TRIAL_PUBLISH", "true") != "false",
-        event_name=env.get("EVENT_NAME", ""),
-        index=index,
-    )
+    ok, why = decide(report, slug=args.slug or path.stem,
+                     publish_requested=os.environ.get("PUBLISH") == "true", index=index)
     print(f"publishable={'true' if ok else 'false'}")
     print(f"publish_reason={' '.join(why.split())}")
     return 0
