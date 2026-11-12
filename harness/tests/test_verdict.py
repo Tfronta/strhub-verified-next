@@ -1,0 +1,177 @@
+"""The four verdicts, one policy line each."""
+import verdict
+from procedure_context import decide
+
+G_OK = {"available": True, "installs": True, "runs": True, "io": True, "content": True}
+G_INSTALL_FAIL = {"available": True, "installs": False, "runs": False, "io": False, "content": False}
+G_RUN_FAIL = {"available": True, "installs": True, "runs": False, "io": False, "content": False}
+G_NO_OUTPUT = {"available": True, "installs": True, "runs": True, "io": False, "content": False}
+PROPOSAL_OK = {"schema": "strhub-verified/recipe-proposal/1", "readme": {"gaps": [], "sufficient_to_attempt": True}}
+PROPOSAL_GAPS = {"schema": "strhub-verified/recipe-proposal/1",
+                 "readme": {"gaps": [{"item": "command", "text": "no command"}], "sufficient_to_attempt": False}}
+
+
+def test_output_produced_is_runs_whatever_the_log_said():
+    v = decide(G_OK, {"external": [{"id": "cannot_open"}]})
+    assert v["code"] == "runs"
+
+
+def test_example_output_alone_is_not_the_reference_run():
+    # The repository's own example is a separate claim. A file it wrote does
+    # not make the reference-sample run a pass.
+    v = decide({**G_NO_OUTPUT, "example": True})
+    assert v["code"] == "fails"
+    assert "no output" in v["reason"]
+
+
+def test_gpu_in_log_is_out_of_scope():
+    v = decide(G_RUN_FAIL, {"external": [{"id": "requires_gpu"}]})
+    assert v["code"] == "out_of_scope" and "requires_gpu" in v["reason"]
+
+
+def test_declared_incompatibility_is_out_of_scope():
+    v = decide(G_RUN_FAIL, declared_compatibility={"requires_gui": True})
+    assert v["code"] == "out_of_scope"
+
+
+def test_incomplete_proposal_is_undetermined_with_gaps():
+    v = decide(G_INSTALL_FAIL, recipe_proposal=PROPOSAL_GAPS)
+    assert v["code"] == "undetermined"
+    assert v["basis"] == "readme"
+    assert [g["item"] for g in v["readme_gaps"]] == ["command"]
+
+
+def test_auto_recipe_with_fixable_failure_is_undetermined_not_fails():
+    v = decide(G_RUN_FAIL, {"external": [{"id": "bad_option"}]}, recipe_proposal=PROPOSAL_OK)
+    assert v["code"] == "undetermined" and v["basis"] == "recipe"
+
+
+def test_submitted_recipe_with_fixable_failure_is_fails():
+    v = decide(G_RUN_FAIL, {"external": [{"id": "bad_option"}]})
+    assert v["code"] == "fails"
+
+
+def test_install_failure_is_fails_with_the_reason():
+    v = decide(G_INSTALL_FAIL)
+    assert v["code"] == "fails" and "did not build" in v["reason"]
+
+
+def test_ran_but_no_output_is_fails():
+    v = decide(G_NO_OUTPUT)
+    assert v["code"] == "fails" and "no output" in v["reason"]
+
+
+def test_example_data_gap_is_never_a_reason():
+    p = {"schema": "strhub-verified/recipe-proposal/1",
+         "readme": {"gaps": [{"item": "example_data", "text": "none"}], "sufficient_to_attempt": True}}
+    v = decide(G_INSTALL_FAIL, recipe_proposal=p)
+    assert v["code"] == "fails" and v["readme_gaps"] == []
+
+
+def test_proposal_with_known_limitations_is_undetermined():
+    p = {**PROPOSAL_OK, "limitations": ["regions_format_unknown"]}
+    v = decide(G_RUN_FAIL, recipe_proposal=p)
+    assert v["code"] == "undetermined" and "regions" in v["reason"]
+
+
+def test_unproven_region_layout_does_not_ask_the_author_to_patch_the_procedure():
+    p = {**PROPOSAL_OK, "limitations": ["regions_format_unknown"]}
+    v = decide(G_RUN_FAIL, recipe_proposal=p)
+    assert v["basis"] == "strhub" and v["blockers"] == []
+    assert "guessed" in v["reason"]
+
+
+def test_blockers_follow_the_gate_that_failed():
+    assert [b["code"] for b in decide(G_INSTALL_FAIL)["blockers"]] == ["build_failed"]
+    assert [b["code"] for b in decide(G_RUN_FAIL)["blockers"]] == ["run_failed"]
+    assert [b["code"] for b in decide(G_NO_OUTPUT)["blockers"]] == ["no_output"]
+
+
+def test_runs_has_no_blockers():
+    assert decide(G_OK)["blockers"] == []
+
+
+def test_readme_gaps_become_blockers_without_duplicates():
+    v = decide(G_INSTALL_FAIL, recipe_proposal=PROPOSAL_GAPS)
+    assert [b["code"] for b in v["blockers"]] == ["no_command", "build_failed"]
+
+
+
+def test_nothing_executed_is_undetermined_with_an_ask_for_example_data():
+    proposal = {**PROPOSAL_OK, "limitations": ["no_reference_dataset"]}
+    v = decide(G_RUN_FAIL, recipe_proposal=proposal)
+    assert v["code"] == "undetermined" and v["basis"] == "recipe"
+    assert "nothing was executed" in v["reason"]
+    assert v["blockers"][0]["code"] == "no_reference_dataset"
+    assert "self_fix" not in v["blockers"][0] and "self_fix_text" not in v["blockers"][0]
+    assert v["blockers"][0]["ask_owner"]["title"] == "Ship a small example dataset"
+
+
+
+# --- Output counts only from a run that finished ------------------------------
+# str8rzr printed its usage to the redirected output file and exited 1: a
+# non-empty file with a digit in it, so IO passed. That file is the evidence the
+# tool did NOT run, and it was published as "Runs as documented".
+
+G_CRASH_LEFT_A_FILE = {"available": True, "installs": True, "runs": False, "io": True, "content": False}
+
+
+def test_output_left_by_a_crashed_run_is_not_runs():
+    v = decide(G_CRASH_LEFT_A_FILE)
+    assert v["code"] == "fails"
+    assert "exited with an error" in v["reason"]
+
+
+def test_a_crash_does_not_confirm_a_guessed_input_type():
+    proposal = {**PROPOSAL_OK, "limitations": ["input_type_guessed"]}
+    v = decide(G_CRASH_LEFT_A_FILE, recipe_proposal=proposal)
+    assert v["code"] == "undetermined" and v["basis"] == "strhub"
+
+
+# --- A fault of STRhub's is never the tool's ---------------------------------
+
+def test_strhub_fault_is_undetermined_and_asks_nothing_of_the_owner():
+    v = decide(G_INSTALL_FAIL, strhub_fault="the reference genome download")
+    assert v["code"] == "undetermined"
+    assert v["basis"] == "strhub"
+    assert "reference genome download" in v["reason"]
+    assert v["blockers"] == []
+
+
+def test_output_still_wins_over_a_strhub_fault():
+    assert decide(G_OK, strhub_fault="anything")["code"] == "runs"
+
+
+RAISED = {"id": "python_exception",
+          "title": "The tool raised TypeError: only 0-dimensional arrays can be converted to Python scalars"}
+TIMEOUT = {"id": "run_timeout", "title": "The run did not finish within its time limit (20 minutes)"}
+
+
+def test_an_exception_before_a_hang_is_named_not_only_the_time_limit():
+    # NanoRepeat raised a TypeError in each worker process and then waited on
+    # them until the time limit. "Did not finish in time" was all the verdict
+    # said, the one thing its author could not act on.
+    v = decide(G_RUN_FAIL, {"external": [RAISED, TIMEOUT]}, recipe_proposal=PROPOSAL_OK)
+    assert v["code"] == "fails"
+    assert v["reason"].startswith("The tool raised TypeError: only 0-dimensional arrays")
+    assert "time limit" in v["reason"]
+    (b,) = v["blockers"]
+    assert b["code"] == "run_stopped" and "exited with an error" not in b["what"]
+    assert b["ask_owner"]["body"].endswith("The log shows the tool raised TypeError: only 0-dimensional "
+                                           "arrays can be converted to Python scalars.")
+
+
+def test_an_exception_that_ends_the_run_is_named():
+    v = decide(G_RUN_FAIL, {"external": [RAISED]}, recipe_proposal=PROPOSAL_OK)
+    assert v["reason"] == ("The tool raised TypeError: only 0-dimensional arrays can be converted to Python "
+                           "scalars before producing its documented output.")
+    assert v["blockers"][0]["code"] == "run_failed" and "TypeError" in v["blockers"][0]["ask_owner"]["body"]
+
+
+def test_a_run_stopped_at_the_limit_without_an_exception_says_only_that():
+    v = decide(G_RUN_FAIL, {"external": [TIMEOUT]}, recipe_proposal=PROPOSAL_OK)
+    assert v["reason"] == "The tool did not finish within the run's time limit, so it was stopped."
+    assert v["blockers"][0]["code"] == "run_stopped"
+    assert "raised" not in v["blockers"][0]["ask_owner"]["body"]
+    # The table is not edited in place: the next verdict gets the plain text.
+    assert "raised" not in verdict.BLOCKERS["run_failed"]["ask_owner"]["body"]

@@ -1,0 +1,458 @@
+"""What the certificate claims, as text derived from the gates.
+
+Kept apart from the rendering (generate_pdf) on purpose: these sentences are
+the report's claims about somebody's software, and they have to be testable
+without a PDF toolchain — the CI job that gates every run installs no
+renderer. The rendering decides where a sentence sits on the page; this
+decides whether it may be said at all.
+"""
+from __future__ import annotations
+
+import diagnose_log
+
+
+#: Which instrument a run is, and what the badge may rest on
+#: (docs/PLAN-Documented-Is-The-Badge.md). `documented` and `maintainer` may
+#: stand behind the badge; `curated` is a note under the documented result.
+INSTRUMENT_LINE = {
+    "documented": "the repository's own instructions, read off the README and the tree at the pinned commit",
+    "maintainer": "a recipe the tool's maintainer submitted",
+    "curated": "a recipe STRhub wrote by hand, not read off the repository: a note under the documented result, never the badge",
+}
+BADGE_INSTRUMENTS = ("documented", "maintainer")
+
+#: The two chapters of a report, in this order (docs/PLAN-Documented-Is-The-
+#: Badge.md, tanda 5c): first what happens to the tool as it is in its
+#: repository — the label, where it stopped, why, how; then, apart, what
+#: STRhub had to do to run it. The second never changes the label.
+AS_IS_HEADING = "As it is in the repository"
+STRHUB_DID_HEADING = "What STRhub had to do to run this tool"
+STRHUB_DID_LEAD = ("STRhub wrote its own recipe for this tool, an environment and a command of "
+                   "its own rather than the repository's instructions, and ran that. Each item below "
+                   "is something a first-time user following the README would have to work out "
+                   "for themselves, and so a recommendation to the author. This run does not "
+                   "change the tool's label: the label is what happens as it is in the repository.")
+FULL_RUN_HEADING = "This run, in full"
+NOT_DOCUMENTED = "Not verified as documented"
+# Older names, kept for callers.
+CURATED_HEADING = STRHUB_DID_HEADING
+CURATED_LEAD = STRHUB_DID_LEAD
+CURATED_NEEDED = ("A container environment and a command written by STRhub, not taken from the "
+                  "repository's instructions; what they do differently is listed under "
+                  f"\"{STRHUB_DID_HEADING}\".")
+
+#: Where a run that does not run stopped, in the label's words, by the rung
+#: it reached. The rung itself stays in the ladder.
+STOPS_AT = {
+    "none": "source not available",
+    "available": "stops at install",
+    "installs": "stops at run",
+    "runs": "no output",
+    "io": "output not plausible",
+}
+#: The rung reached, for the line under the label. Same words as report.LABELS.
+REACHED = {"none": "not run", "available": "Available", "installs": "Installs",
+           "runs": "Runs", "io": "Runs + Expected IO", "content": "Runs + Plausible output"}
+#: shields.io colour → the hex the HTML copies use.
+COLOR_HEX = {"brightgreen": "#16a34a", "green": "#22a722", "yellow": "#d4a017",
+             "red": "#c33", "lightgrey": "#9ca3af"}
+
+
+#: What a certificate says about itself, in the same words on the cover, in
+#: the executive summary, in the closing sections, and — since the report
+#: carries the block below — on the web page. Policy about STRhub's scope,
+#: not findings about any tool.
+PURPOSE = "Verify that the tool installs, runs end-to-end, and produces structurally valid output."
+EXEC_SCOPE = "Installation, execution, and output structure verification."
+NOT_EVALUATED = ["Genotype accuracy", "Concordance", "Forensic validity", "Regulatory compliance"]
+SCOPE_STATEMENT = ("Independent automated verification of reproducible execution. It confirms "
+                   "the tool installs, runs end-to-end, and produces structurally valid output "
+                   "in a standardized environment.")
+SCOPE_NOT = ("This is not an analytical validation. Genotype accuracy, concordance, forensic "
+             "suitability, and regulatory compliance are out of scope.")
+DISCLAIMER = ("Each result is a dated snapshot, verified on the tool's public repository at a "
+              "pinned commit. STRhub does not store tool source code.")
+OUT_OF_SCOPE = [
+    "Genotype correctness or accuracy",
+    "Concordance against known truth sets",
+    "Sensitivity, specificity, or stutter performance",
+    "Allele calling accuracy or forensic casework suitability",
+    "Regulatory compliance or ISO accreditation",
+    "Multi-laboratory or multi-dataset reproducibility",
+]
+LIMITATIONS = [
+    "Single reference dataset per input type",
+    "Single containerized environment (Docker / ubuntu-22.04)",
+    "No truth-set comparison or ground-truth genotypes",
+    "No accuracy or concordance assessment",
+    "No forensic validation of results",
+    "Short-read limitations apply (very long STR alleles may not span reads)",
+]
+CERTIFICATE_SCHEMA = "strhub-verified/certificate/1"
+
+
+def display_name(m: dict) -> str:
+    """The tool's name as the project writes it: the manifest's when it has a
+    capital; else the repository's segment, which keeps the author's case
+    (.title() made "strspy" into "Strspy")."""
+    raw = m["tool"]["name"]
+    repo_name = (m.get("source", {}).get("repo") or "").rstrip("/").split("/")[-1]
+    if raw != raw.lower():
+        return raw
+    return repo_name if repo_name.lower() == raw.lower() else raw.title()
+
+
+def certificate_for(report: dict, cfg: dict) -> dict:
+    """The certificate's own words, as data in the report: the label and the
+    rung, the executive summary, the closing lists and the conclusion — so
+    the PDF, the copies and the web page print one text, and a test can hold
+    them to it. `cfg` is what conclusion_items_for reads (tool_display, gates,
+    verdict, stats, declared_format, dataset, repo_test_data)."""
+    label, _ = headline(report)
+    level = report.get("level", "none")
+    gates = dict(report.get("gates") or {})
+    n_pass = sum(1 for k in ("available", "installs", "runs", "io", "content") if gates.get(k))
+    verdict = report.get("verdict") or {}
+    return {
+        "schema": CERTIFICATE_SCHEMA,
+        "label": label,
+        "reached": REACHED.get(level, "not run"),
+        "summary": {
+            "purpose": PURPOSE,
+            "result": label,
+            "reached": f"{REACHED.get(level, 'not run')}, {n_pass}/5 gates passed",
+            **({"why": verdict["reason"]} if verdict.get("reason") else {}),
+            "scope": EXEC_SCOPE,
+            "not_evaluated": list(NOT_EVALUATED),
+        },
+        "conclusion": [{"title": t, "body": b} for t, b in conclusion_items_for(cfg)],
+        "out_of_scope": list(OUT_OF_SCOPE),
+        "limitations": list(LIMITATIONS),
+        "scope": {"statement": SCOPE_STATEMENT, "not": SCOPE_NOT, "disclaimer": DISCLAIMER},
+    }
+
+
+def errors_reported(report: dict) -> bool:
+    return any(i.get("severity") == "error"
+               for issues in (report.get("diagnostics") or {}).values() for i in issues)
+
+
+RUNS_FALLBACK = "Runs from its published image; the pinned commit does not build"
+
+#: The four blocks docs/GUIA-PASO-1.md asks for, in its words. A report that
+#: says a block is missing uses the same name the guide gives it, so correcting
+#: the commit is following that list rather than interpreting a paragraph.
+GUIDE = "docs/GUIA-PASO-1.md"
+GUIDE_BLOCKS = {
+    "install": "Installation, copyable",
+    "command": "One command",
+    "input": "The declared input",
+    "output": "The declared output",
+}
+
+#: Which block of the guide a `procedure.blocker` points at, and where the gap
+#: is. `commit` is a finding about the documentation, and the author can close
+#: it. `strhub` is ours: our sample shelf, or our own reader rewriting the
+#: command. A gap of ours is never told as a gap of theirs.
+STEP1_BLOCKERS = {
+    "no_install_procedure":  ("install", "commit"),
+    "published_image":       ("install", "commit"),
+    "no_command":            ("command", "commit"),
+    "synopsis_trimmed":      ("command", "commit"),
+    "output_unnamed":        ("output", "commit"),
+    "input_guessed":         ("input", "commit"),
+    "missing_file":          ("input", "commit"),
+    "flag_injected":         ("command", "strhub"),
+    "flag_dropped":          ("command", "strhub"),
+    "input_swapped":         ("input", "strhub"),
+    "input_not_substituted": ("input", "strhub"),
+    "missing_input":         ("input", "strhub"),
+    "loci_outside_panel":    ("input", "strhub"),
+    "regions_guessed":       ("input", "strhub"),
+    "ssh_rewritten":         ("install", "strhub"),
+}
+
+#: The three sentences of step 1, and the fourth case that is ours. None of
+#: them says the tool does not work: that is not what any of them observed.
+#: docs/PLAN-Paso-1.md fixes this wording; the web carries it in es/en/pt.
+STEP1_RUNS = (
+    "A third party installed the tool with the steps this commit states and ran the command it "
+    "writes, and the output file that command names appeared. This says nothing about genotypes "
+    "or about the forensic panel."
+)
+STEP1_DOES_NOT_RUN = (
+    "That does not mean the tool does not work. It means a third party following the README at "
+    "this commit did not reach the end. Fix the documentation, or the step that broke, and try "
+    "the link again on the new commit."
+)
+STEP1_CANNOT_TELL = (
+    "Nothing was executed. That does not mean the tool does not work: what the guide asks for is "
+    "missing from the README at this commit. Add it and try the link again on the new commit."
+)
+STEP1_OURS = "The limitation is ours. Nothing here is a finding about the tool."
+
+
+def step1_says(report: dict) -> dict:
+    """The step 1 result in the three sentences a maintainer is owed, plus the
+    block of the guide that is missing when one is.
+
+    `code` is `runs`, `does_not_run`, `cannot_tell` or `ours`. The first two
+    are findings about the commit; `cannot_tell` is a finding about its
+    documentation; `ours` is a limitation of STRhub's reference data or of its
+    own reader, and must not be rendered as the tool failing.
+
+    `missing` carries the guide's block keys, not their English names, so the
+    web can say them in es/en/pt without parsing a sentence. `missing_text` is
+    the same list in the words this repository prints.
+    """
+    verdict = report.get("verdict") or {}
+    code = verdict.get("code")
+    review = report.get("procedure_review") or {}
+    blocker = review.get("blocker") or ""
+    # The blocker decides whose the gap is, and the verdict's `basis` only
+    # stands in when the blocker is one this table does not know. They disagree
+    # on purpose for two of them: trimming a usage synopsis, or accepting an
+    # unnamed output, would be STRhub amending the procedure, which is why the
+    # classifier calls the amendment ours. But what the author can act on is
+    # that the commit states no command and names no output, so the reader is
+    # owed the block of the guide, not a sentence about our machinery
+    # (docs/PLAN-Paso-1.md).
+    block, whose = STEP1_BLOCKERS.get(blocker, (None, "")) if blocker in STEP1_BLOCKERS \
+        else (None, "strhub" if verdict.get("basis") == "strhub" else "commit")
+
+    def said(code, headline, body, missing=()):
+        return {"code": code, "headline": headline, "body": body, "missing": list(missing),
+                "missing_text": [GUIDE_BLOCKS[b] for b in missing], "guide": GUIDE}
+
+    if code == "runs":
+        return said("runs", "As documented, it runs.", STEP1_RUNS)
+    if code == "fails":
+        return said("does_not_run", "As documented, it does not run.",
+                    " ".join(x for x in (verdict.get("reason"), STEP1_DOES_NOT_RUN) if x))
+    if code != "undetermined":
+        return said(code or "none", "", "")
+
+    reason = (review.get("reason") if blocker != "ready" else None) or verdict.get("reason") or ""
+    if whose == "strhub":
+        return said("ours", "STRhub could not attempt the documented run.",
+                    " ".join(x for x in (reason, STEP1_OURS) if x))
+    missing = [block] if block else _gap_blocks(verdict.get("readme_gaps") or [])
+    return said("cannot_tell", "As documented, a third party cannot tell how to run it.",
+                " ".join(x for x in (reason, STEP1_CANNOT_TELL) if x), missing)
+
+
+#: The README items check_readme.py already reports, mapped onto the guide's
+#: blocks. Those items are a word search and never decided whether a commit is
+#: runnable; here they only put a name on a gap the classifier already found.
+_GAP_BLOCK = {"install": "install", "install_steps": "install", "command": "command",
+              "usage": "command", "input": "input", "input_type": "input",
+              "output": "output", "output_format": "output"}
+
+
+def _gap_blocks(gaps: list) -> list[str]:
+    out = []
+    for gap in gaps:
+        block = _GAP_BLOCK.get(gap.get("item") or "")
+        if block and block not in out:
+            out.append(block)
+    return out
+
+
+def headline(report: dict) -> tuple[str, str]:
+    """The label, in words, and its shields colour: what the run says about
+    the tool AS IT IS in its repository. The badge, both summaries, the
+    index and the certificate all print this and nothing else as the result;
+    the rung reached is a detail under it.
+
+      Runs as documented                          the documented run produced its output
+      Runs as documented (errors reported)        … and the tool's log reported errors
+      Does not run as documented: stops at run   the documented run did not, and where
+      Could not be determined                     nobody knew how to attempt it (the README)
+      Out of scope                                the free runner cannot provide something
+      Not verified as documented                  the run is of a recipe STRhub wrote
+    """
+    if report.get("record_type") == "editorial_review":
+        return "Evidence insufficient", "lightgrey"
+    if instrument_of_report(report) not in BADGE_INSTRUMENTS:
+        return NOT_DOCUMENTED, "lightgrey"
+    code = (report.get("verdict") or {}).get("code")
+    level = report.get("level", "none")
+    if code == "undetermined":
+        return "Could not be determined", "lightgrey"
+    if code == "out_of_scope":
+        return "Out of scope", "lightgrey"
+    runs = code == "runs" if code else level in ("io", "content")
+    if runs:
+        if errors_reported(report):
+            return "Runs as documented (errors reported)", "yellow"
+        # Content (a file that looks like genotypes) does not strengthen the
+        # colour. Phase 1 claims execution, not analytical validity.
+        return "Runs as documented", "green"
+    return f"Does not run as documented: {STOPS_AT.get(level, 'stops at ' + level)}", "red"
+
+
+def instrument_of(m: dict) -> str:
+    """`documented` | `maintainer` | `curated`, from the manifest's recipe.origin;
+    for a manifest from before that field, derived: proposed if detect_recipe
+    wrote its notes, the maintainer's if the submission says so, curated
+    otherwise — which is every recipe STRhub wrote to fill the catalogue."""
+    origin = (m.get("recipe") or {}).get("origin")
+    if origin == "proposed":
+        return "documented"
+    if origin in ("maintainer", "curated"):
+        return origin
+    if (m.get("caveats") or {}).get("source") == "detect_recipe":
+        return "documented"
+    if (m.get("submission") or {}).get("by") == "maintainer":
+        return "maintainer"
+    return "curated"
+
+
+def instrument_of_report(report: dict) -> str:
+    """The same reading for a published report, which carries `instrument`
+    since this plan and can only be derived before it."""
+    return report.get("instrument") or instrument_of(report)
+
+
+def workaround_lines(report: dict) -> list[str]:
+    """One line per workaround of a curated recipe, for any rendering."""
+    out = []
+    for w in ((report.get("recipe") or {}).get("workarounds") or []):
+        line = f"{w.get('what', '')} Instead of: {w.get('instead_of', '')}"
+        if w.get("why"):
+            line += f" {w['why']}"
+        out.append(line)
+    return out
+
+
+def test_data_item(cfg: dict, ds_name: str) -> tuple[str, str]:
+    """What the run used for input, and — only on evidence — whether the
+    repository ships any of its own.
+
+    "This tool does not include its own demo or test data" was printed for
+    every tool, whatever the repository held. It is false for STRsearch, which
+    ships 35 files including example/test_data/test.bam. Absence of test data
+    is a finding about somebody's work and needs to be established, not
+    assumed: only a run whose recipe was proposed from the repository has read
+    the tree, and only that run may say so.
+    """
+    used = (f"STRhub Verified supplied {ds_name} as the reference input for this "
+            "verification run. Users replicating this result should use the same or "
+            "equivalent publicly available reference material.")
+    td = cfg.get("repo_test_data") or {}
+    if not td.get("known"):
+        return ("Reference input", used)
+    if td.get("present"):
+        n = td.get("count") or 0
+        return ("Repository test data not used",
+                f"The repository ships example data ({n} file(s)), which this run did not "
+                f"use: the gates above ran on STRhub's reference dataset. {used}")
+    return ("No bundled demo data",
+            f"{cfg['tool_name']} ships no test or demo data of its own. {used}")
+
+
+def execution_finding_established(report: dict) -> bool | None:
+    """Presentation status for new reports; historical blocks remain unchanged.
+
+    This is not authorization. The engine/publisher separately revalidate the
+    full evidence; a rendering flag never grants permission to execute.
+    """
+    if "procedure_validation" not in report:
+        return None
+    return bool((report.get("procedure_validation") or {}).get("valid")
+                and (report.get("procedure_review") or {}).get("may_say_runs") is True
+                and (report.get("verdict") or {}).get("code") in ("runs", "fails")
+                and (report.get("verdict") or {}).get("basis") != "strhub")
+
+
+def conclusion_items_for(cfg: dict) -> list[tuple[str, str]]:
+    """The certificate's closing claims, each one derived from a gate.
+
+    This used to be four fixed paragraphs asserting success with the numbers
+    interpolated, so a run that stopped at Installs was certified as "installs
+    and executes without error ... generated a structurally valid output file",
+    with "0 loci" and a read depth of "0 at —" as the only hint that nothing
+    had run. A PDF travels on its own, detached from the page and the log; it
+    may not say the opposite of the report it renders.
+    """
+    if cfg.get("execution_finding_established") is False:
+        items = [("Procedure not established",
+                  "The recorded gate observations do not establish whether the documented procedure succeeded or failed."),
+                 ("Observations retained",
+                  "The supplied run and output observations remain in the report; they do not replace procedure evidence.")]
+        verdict = cfg.get("verdict") or {}
+        if verdict.get("title") and verdict.get("reason"):
+            items.append((f"Verdict: {verdict['title']}", verdict["reason"]))
+        items.append(("Reproducibility not established",
+                      "These observations are insufficient to establish a reproducible documented execution finding."))
+        return items
+    stats = cfg.get("stats") or {}
+    top_loci = stats.get("top_loci_by_depth", [])
+    n_loci = stats.get("distinct_str_loci", 0)
+    max_depth = stats.get("max_sequence_depth", 0)
+    deepest_locus = top_loci[0][0] if top_loci else "—"
+    fmt = (cfg.get("declared_format") or "").strip()
+    fmt_label = f"{fmt} " if fmt and fmt != "—" else ""
+    ds_name = (cfg.get("dataset") or {}).get("name") or "a public reference dataset"
+    where = "a clean ubuntu-22.04 environment at the pinned commit"
+    gates = dict(cfg.get("gates") or {})
+    verdict = cfg.get("verdict") or {}
+
+    if gates.get("runs"):
+        ran = ("Runs end-to-end",
+               f"{cfg['tool_display']} installs and executes without error in {where}.")
+    elif gates.get("installs"):
+        ran = ("Does not run end-to-end",
+               f"{cfg['tool_display']} installs in {where}, but the documented command "
+               "stopped with an error before finishing. The messages it printed are in "
+               "the execution log; Section 4 shows how far it got.")
+    else:
+        ran = ("Does not install",
+               f"The environment for {cfg['tool_display']} could not be built from the "
+               "declared install steps, so nothing further was attempted.")
+
+    if gates.get("content"):
+        produced = ("Produces plausible output",
+                    f"The tool generated a structurally valid {fmt_label}output file with genotype "
+                    f"calls across {n_loci} target forensic STR loci.")
+    elif gates.get("io"):
+        produced = ("Produces output in the declared format",
+                    f"The tool wrote a non-empty {fmt_label}file. Whether its contents look like "
+                    "genotype data was not established at this level.")
+    else:
+        produced = ("No output produced",
+                    "No file in the declared format was written, so nothing could be checked "
+                    "for structure or content. This says the run did not get that far; it is "
+                    "not a finding about the quality of the software.")
+
+    items = [ran, produced]
+    # The one sentence the web leads with, in the certificate too.
+    if verdict.get("title") and verdict.get("reason"):
+        items.append((f"Verdict: {verdict['title']}", verdict["reason"]))
+    items += [
+        test_data_item(cfg, ds_name),
+        ("Reproducibility statement",
+         "The exact command reported in Section 3, executed at the pinned "
+         "commit in the described environment, is sufficient to reproduce "
+         "this verification result independently."),
+    ]
+    return items
+
+
+def install_meaning(faults: list[str]) -> list[tuple[str, str]]:
+    """What a failed build means for each reader, in their own terms.
+
+    Three readers open a certificate — someone about to run the tool, a
+    reviewer holding a manuscript, its maintainer — and each needs one
+    sentence in their own terms. The maintainer's is the fault sentence, which
+    already says whose side the cause is on; the other two claim only what
+    the run established: that a build from source stopped.
+    """
+    run = ("A build from source at this commit fails in a clean environment; the "
+           "cause, as the build log states it, is below.")
+    review = ("Nothing ran, so this says nothing about the software's output. It "
+              "records that this attempt to build it stopped, and whose side the "
+              "cause is on.")
+    return [("If you are trying to run it", run),
+            ("If you are reviewing a paper", review),
+            ("If you maintain it", diagnose_log.install_fault_sentence(faults))]

@@ -1,0 +1,152 @@
+"""The claims register: every sentence the engine asserts about somebody else's
+software, and what each one rests on.
+
+Why this file exists. A report published under STRhub's name says things about
+a stranger's work, and a heuristic that produces a number is not entitled to
+speak in the author's voice. STRhub reported that STRspy's README "suggests
+ont-fastq first" — a keyword count, 7 mentions against 4, about a README that
+documents both inputs and recommends BAM outright. It reached a published page
+and was caught by a reader who happened to know the tool, which is the one
+reader the system is not built for. A second one had been in every certificate
+since June: "This tool does not include its own demo or test data", printed
+whatever the repository held, false for STRsearch and its 35 example files.
+
+What is registered. Every string in the report-generating modules that speaks
+in FINDING voice — that asserts something about the tool, its repository, its
+documentation or its author. Observations about STRhub's own run are not
+findings and are not registered.
+
+What the sources mean:
+
+  tree          the repository's file list, read at the pinned ref
+  readme        text read from the README at the pinned ref
+  log           a line the tool itself printed, captured with its matches
+  manifest      something the submission declared
+  gates         the outcome of this run's own gates
+  run           STRhub's own configuration or choice for this run
+  strhub-table  RETIRED. STRhub's own knowledge (which BED layout a program
+                name maps to), published in the voice of a fact about the tool
+                — "the tool is known to read this format", "the tool needs a
+                regions file in its own format". Nobody read a repository to
+                establish any of it. All five were rewritten to name whose
+                knowledge it is ("STRhub records the hipstr layout for a
+                program of this name") and to attribute the requirement where
+                it belongs: STRhub's reference data covers a panel of loci, so
+                THIS RUN needs a regions file — that is not a property of
+                somebody's software. Once said that way they are observations,
+                not findings, and the register no longer carries them. The
+                source stays refused so the shape cannot come back.
+  policy        a statement about STRhub's scope, not about the tool
+
+How to use it. Change or add a finding sentence and the test fails with its
+fingerprint: register it with the source it rests on. That is the review — a
+sentence nobody can source is a sentence nobody should publish. See
+harness/tests/test_claims_have_evidence.py and
+docs/PLAN-Claims-Need-Evidence.md.
+"""
+from __future__ import annotations
+
+#: fingerprint -> (module, evidence source). The fingerprint is sha256[:12] of
+#: the whitespace-normalised string, so moving code does not invalidate it and
+#: rewording does.
+REGISTER: dict[str, tuple[str, str]] = {
+    "4800fd91183e": ("certificate_text", "tree"),  # The repository ships example data (
+    "3badef4c3d59": ("certificate_text", "tree"),  # ships no test or demo data of its own.
+    # The two sentences of step 1 that speak about somebody's repository. Both
+    # deny the reading they are most likely to get: neither says the tool does
+    # not work, because neither run established that (docs/PLAN-Paso-1.md).
+    "9bb264480cf8": ("certificate_text", "gates"),  # That does not mean the tool does not work. It means a third party following the README at this co
+    "f65b34dd9bd8": ("certificate_text", "readme"),  # Nothing was executed. That does not mean the tool does not work: what the guide asks for is miss
+    "ef1d9f98ef6e": ("verdict", "run"),  # The tool did not finish within the run's time limit, so it was stopped.
+    "bd3265ea8d34": ("verdict", "tree"),  # the loci the documented command genotypes, from a file the repository ships, are not in STRhub's ref
+    "25a65b298a9c": ("verdict", "tree"),  # The loci the documented command genotypes, from a file the repository ships, are not in STRhub's ref
+    "06e75c4bbbd2": ("verdict", "tree"),  # The documented command reads a file that is not in the repository at this commit and that STRhub doe
+    "e48aa747fbd5": ("verdict", "tree"),  # STRhub Verified tried the documented command on a public hg38 sample that covers the forensic STR lo
+    # The one diagnostic sentence that still speaks about the author's side: a
+    # COPY/ADD of a file the checkout does not hold. It rests on the build log
+    # line and on the context being the pinned checkout (tanda 4: every other
+    # diagnostic now states what the log establishes, in STRhub's own voice).
+    "a1ac00cc3c30": ("diagnose_log", "log"),  # A COPY/ADD line names a file the build context does not hold. The context is the repository checkout…
+    "86baeea971be": ("diagnose_log", "run"),  # At least one cause is STRhub's, not the tool's: the container recipe for a generated environmen
+    "fbfdadb79781": ("diagnose_log", "manifest"),  # Every cause identified sits in this run's configuration — the pinned versions, package names or buil
+    "f87ad4ad59ea": ("diagnose_log", "manifest"),  # The tool declares a binary or proprietary output with no text or tabular export, so the IO and 
+    "6759a67a2817": ("diagnose_log", "manifest"),  # The tool declares an interactive or graphical step. The automated runner is headless and cannot
+    "e3a029af91e7": ("diagnose_log", "manifest"),  # The tool declares it fetches data over the network while running. A pinned snapshot cannot reco
+    "4b6b45793ca4": ("diagnose_log", "manifest"),  # The tool declares it needs GPU hardware. Public CI runners are CPU-only.
+    "b1468dcdb3d3": ("diagnose_log", "manifest"),  # The tool declares it needs an OS the automated runner does not provide.
+    "fb768926c8c4": ("diagnose_log", "manifest"),  # The tool declares it needs licensed or restricted reference data that cannot be published in a 
+    "94e9a73cf514": ("diagnose_log", "manifest"),  # The tool needs CUDA hardware. Public CI runners are CPU-only.
+    "3d053d897ca4": ("diagnose_log", "manifest"),  # The tool needs a license or licensed data that cannot be published in a public verification run
+    "dc6dbb4a5df8": ("generate_pdf", "tree"),  # Recorded automatically from the tool's public files when this run was configured. Not verified 
+    "6b4450723321": ("generate_pdf", "tree"),  # This tool ships no demo or test data of its own. STRhub ran the verification using the public r
+    "831100e24df2": ("propose_manifest", "tree"),  # # The repository ships its own Dockerfile (
+    "c3b2bcd382dc": ("propose_manifest", "readme"),  # Planned command, subject to full source citation and procedure review.
+    "70be7a8f1331": ("propose_manifest", "readme"),  # true # no command found in the README; nothing to run
+    "4febb7603b17": ("report", "policy"),  # <br><br> This is <b>not</b> a claim that the genotypes are correct, nor that the tool is fit for cas
+    "82688741465a": ("report", "manifest"),  # A container environment, built from the tool's declared install steps rather than from a recipe
+    "316572e47dc0": ("report", "tree"),  # Recorded automatically from the tool's public files when this run was configured. **Not verifie
+    "0bee1f1f9159": ("report", "run"),  # Test data: no sample from the repository was used, so a public reference sample stood in.
+    "8abb5c27a292": ("report", "policy"),  # This is **not** a claim that the genotypes are correct, nor that the tool is fit for casework o
+    "36231f28bb59": ("report", "readme"),  # What the README does not say:
+    "f48849517921": ("verdict", "readme"),  # No command line invoking the tool was found in the README.
+    "dc452ca7ae85": ("verdict", "tree"),  # No way to install the tool was found: no Dockerfile, environment file, requirements, setup scri
+    "6fbca0b9cb26": ("verdict", "run"),  # STRhub Verified could not run the tool: it holds no public reference sample of the input type t
+    "570d333e2c0e": ("verdict", "gates"),  # STRhub Verified installed the tool from a clean checkout at the pinned commit and ran the comma
+    "e134d3bb2a39": ("verdict", "gates"),  # STRhub Verified ran the tool to completion in a clean environment, but no output file in the do
+    "f3ce2c9fe046": ("verdict", "readme"),  # STRhub could not work out how to install or run this tool from its repository. The README does 
+    "936deb76fffd": ("verdict", "run"),  # STRhub has no reference sample of the kind this tool reads, and the repository ships no example
+    "ae2a210ac6f3": ("verdict", "run"),  # STRhub holds no reference sample of the kind this tool reads and the repository ships no exampl
+    "4b044277e315": ("verdict", "manifest"),  # The tool needs something the automated runner cannot provide:
+    "3855d69d6067": ("verdict", "gates"),  # The tool ran to completion but produced no output file in the documented format.
+    "768d4670e6ef": ("verdict", "gates"),  # The tool was installed but exited with an error when run.
+    # A run stopped at the time limit: the Runs gate, and STRhub's own line in the log.
+    "a6f200a072a9": ("verdict", "gates"),  # The tool was installed, and its run was stopped at the time limit before it produced…
+    "de188bdc8810": ("verdict", "gates"),  # STRhub Verified installed the tool … it had not finished when the run's time limit stopped it.
+    "f84cc76d0787": ("verdict", "readme"),  # no command line invoking the tool was found in the README
+    "e32acfe17c39": ("verdict", "tree"),  # no install method was found in the repository
+    # The author's own words, quoted from their README at the pinned ref: the
+    # framing is ours, the content is theirs, and the line number is the cite.
+    "2c0d4c22bce7": ("report", "readme"),  # ### What the author documents as a known issue
+    "16eb06da646c": ("report", "readme"),  # Quoted from the repository's README at the verified commit…
+    "2621b1db17c8": ("report", "readme"),  # <h3>What the author documents as a known issue</h3>…
+    "ffbc93dd0780": ("generate_pdf", "readme"),  # What the Author Documents as a Known Issue (§9 del PDF)
+    "f991abacda02": ("generate_pdf", "readme"),  # Documented by the author in the official repository. Quoted from the repository's README…
+    # Phase C: the input caveat quotes what the README states, with the line
+    # each statement was read on (read_input_statements). When nothing was
+    # there to read, it says the type was guessed — which the verdict weighs.
+    "cbc9c7684db7": ("propose_manifest", "readme"),  # Input: the README documents {kinds} (line N); this run used…
+    # The documented command names the file and the tree at the pinned ref does not hold it.
+    "99be0d39da1f": ("verdict", "readme"),           # no sentence in the README says what the tool takes as input…
+    # A failed build, in plain words, resting on the Installs gate: the build
+    # STRhub ran from the repository's declared steps stopped.
+    "dbdbe7fb4255": ("report", "gates"),             # STRhub tried to build the tool from its source at the pinned commit, following the build steps…
+    # A curated recipe is STRhub's own configuration, and the sentences say
+    # so: what STRhub had to do to run the tool is STRhub's work, listed as
+    # recommendations, and it never changes the label (tanda 5c).
+    "02784c0c4344": ("certificate_text", "run"),               # A container environment and a command written by STRhub, not taken from the repository's instructions…
+    "6c6a0dea9ce0": ("certificate_text", "run"),               # STRhub wrote its own recipe for this tool — an environment and a command of its own…
+}
+
+#: Phrasings that may never be published, whatever evidence is attached: they
+#: put a preference or an absence in the author's mouth, which no reading of a
+#: repository establishes. The first two are the exact sentences that shipped.
+FORBIDDEN = [
+    (r"the README suggests", "a keyword count is not a reading; say which data this run used"),
+    (r"(?:the|this) tool is known to",
+     "that is STRhub's lookup table speaking; say that STRhub records it"),
+    (r"(?:the|this) tool needs a regions file",
+     "STRhub's reference data needs one; say that this run had to supply it"),
+    (r"(?:this |the )tool does not include its own",
+     "absence needs evidence from the tree; see certificate_text.test_data_item"),
+    (r"the (?:tool|author) prefers", "a preference is the author's to state, not ours to infer"),
+    (r"the README (?:recommends|wants|expects)\b",
+     "quote the line instead, or describe what STRhub did"),
+    (r"is (?:designed|intended) (?:for|to)", "intent cannot be read off a repository"),
+]
+
+#: `strhub-table` is deliberately absent: a claim that rests on nothing but
+#: STRhub's own lookup table is not a finding about anybody's software, and
+#: saying it in finding voice is the exact shape of the error this register
+#: exists for. Reword it as an observation instead — say that STRhub records
+#: something, or that this run needed something.
+VALID_SOURCES = {"tree", "readme", "log", "manifest", "gates", "run", "policy"}

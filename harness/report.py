@@ -1,0 +1,1417 @@
+"""Assemble the attestation report + a shields.io endpoint badge.
+
+Gate statuses for available/installs/runs come from the CI steps (passed as
+flags). The io gate detail is read from io_result.json. Output:
+  reports/<tool>.json        - full machine-readable attestation
+  reports/<tool>.badge.json  - shields.io endpoint badge
+
+Usage:
+  python harness/report.py --manifest tools/strait-razor-PowerSeqv2.31/manifest.yml \
+      --available pass --installs pass --runs pass --io io_result.json \
+      --ref <sha> --run-url <ci_run_url>
+"""
+from __future__ import annotations
+import argparse
+import datetime as dt
+import json
+import pathlib
+import re
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+import _manifest  # noqa: E402
+import diagnose_log  # noqa: E402
+from command_record import presentation as command_presentation  # noqa: E402
+from prepare import unwrap_example  # noqa: E402
+from certificate_text import (  # noqa: E402
+    install_meaning, instrument_of, instrument_of_report, workaround_lines, headline,
+    AS_IS_HEADING, STRHUB_DID_HEADING, STRHUB_DID_LEAD, FULL_RUN_HEADING, COLOR_HEX,
+    certificate_for, display_name, LIMITATIONS, OUT_OF_SCOPE,
+    INSTRUMENT_LINE, BADGE_INSTRUMENTS, CURATED_HEADING, CURATED_LEAD, CURATED_NEEDED,
+    step1_says, execution_finding_established,
+)
+import verdict as verdict_lib  # noqa: E402
+import upstream  # noqa: E402
+
+ROOT = pathlib.Path(__file__).resolve().parent.parent
+SCOPE = ("Assessment of documented execution in the stated environment and "
+         "output format. Concerns reproducible execution only; no claim of "
+         "accuracy, casework fitness, or regulatory validation.")
+
+# Highest gate cleared, in order. The badge reflects the furthest green gate.
+LADDER = ["available", "installs", "runs", "io", "content"]
+LABELS = {"available": "Available", "installs": "Installs",
+          "runs": "Runs", "io": "Runs + Expected IO",
+          "content": "Runs + Plausible output"}
+# One-line plain-language meaning of each level, for the human summary.
+MEANING = {
+    "none": "did not clear the first gate",
+    "available": "the pinned public source exists",
+    "installs": "the environment builds from source",
+    "runs": "it executes end-to-end without crashing",
+    "io": "it produces a non-empty file in the declared format",
+    "content": "its output looks like plausible genotype-bearing data "
+               "(declared columns, DNA sequences, integer read counts, and "
+               "enough recognisable forensic loci)",
+}
+
+
+#: How the summary names each evidence claim. Every kind detect_recipe emits
+#: needs a line here, or the reader gets the raw id ("platform_advice").
+CLAIM_LABELS = {
+    "install_method": "Install method", "published_image": "Published image",
+    "bioconda_package": "Bioconda package", "fallback_environment": "Fallback environment",
+    "run_command": "Run command", "example_data": "Example data", "known_issue": "Known issue",
+    "documented_input": "Documented input", "author_recommendation": "Author's recommendation",
+    "platform_advice": "Platform advice",
+}
+EVIDENCE_LEAD = ("What this run's configuration rests on, each item at the verified commit. "
+                 "Open any of them to check the claim it supports.")
+NEEDED_LEAD = ("The result above describes a run configured as follows. Anyone "
+               "repeating it needs the same things.")
+# Word for word the certificate's sentence (generate_pdf), so the two renderings
+# of one note stay one registered claim.
+CAVEATS_LEAD = ("Recorded automatically from the tool's public files when this run was "
+                "configured. Not verified by execution, and not part of the gates "
+                "above. Useful for what to check by hand.")
+def _status(flag: str) -> bool:
+    # Accept GitHub Actions step outcomes ("success") alongside our own words.
+    return str(flag).lower() in ("pass", "true", "ok", "1", "success")
+
+
+def panel_label(rg: dict) -> str:
+    """What the slice's loci are, in words. Reports written before the medical
+    panel existed carry no label, and every one of them ran on forensic loci."""
+    return rg.get("panel_label") or "forensic STR loci"
+
+
+def outside_note(rg: dict) -> str:
+    """The BED's intervals the slice has no reads for. They do not reject a BED
+    (a tool's shipped catalog may list loci beyond the panel), so the report has
+    to say the tool was not assessed there, in place of any result."""
+    n = rg.get("outside_panel")
+    if not n:
+        return ""
+    return (f" {n} of its intervals {'lies' if n == 1 else 'lie'} outside the slice and "
+            f"{'was' if n == 1 else 'were'} not assessed.")
+
+
+def _panel_label_for(supported_loci: str) -> str | None:
+    """The panel label datasets/index.json gives the dataset whose panel this is."""
+    try:
+        index = json.loads((ROOT / "datasets" / "index.json").read_text())
+    except Exception:  # noqa: BLE001
+        return None
+    for entry in index.get("datasets", {}).values():
+        if entry.get("supported_loci") == supported_loci:
+            return entry.get("panel_label")
+    return None
+
+
+def _regions_note(rg: dict) -> str:
+    """One sentence on where the target regions came from, and that the data is a slice.
+
+    Shared by the markdown and HTML renders so the two cannot drift. Returns "" for
+    tools that take no regions BED (FASTQ-based).
+
+    Never "the tool's author": `provided_by` records that the BED came with the
+    submission, not who wrote it. A verification is the same fact whoever
+    triggered it, so the sentence names the submission and claims nothing
+    about the person behind it.
+    """
+    total = rg.get("panel_size")
+    slice_note = (
+        f" The reference dataset is a slice around {total} {panel_label(rg)}, not a "
+        "whole genome: it carries reads only at those loci."
+        if total else ""
+    )
+    if rg.get("source") == "tool":
+        covered = rg.get("covered_loci")
+        detail = (f", covering {covered} of {total} supported loci"
+                  if covered and total else "")
+        return f"The submission supplied the regions BED{detail}.{outside_note(rg)}{slice_note}"
+    if rg.get("source") == "strhub":
+        return f"STRhub supplied the regions BED.{slice_note}"
+    return ""
+
+
+# One line, on every report: what a result is and is not. Who triggered the
+# run used to get a section of its own; a verification is the same fact
+# whoever asked for it, and the one thing a reader must not infer is that
+# the tool's author stands behind it.
+RECORD_NOTE = (
+    "Verified automatically, in a clean environment, on the tool's public "
+    "source at the pinned commit. This is a record of what happened, not an "
+    "endorsement by the tool's author."
+)
+
+
+LABELS.setdefault("example", "Reproduces own example")
+MEANING.setdefault("example", "the README's own command produced its documented output on the repository's own data")
+LABELS.setdefault("starts", "Starts")
+MEANING.setdefault("starts", "the installed program answers --help in the built environment")
+#: Checks outside the ladder, shown after it, in this order, when they ran.
+AUX_GATES = ("starts", "example")
+
+
+def _step1_md(report: dict) -> list[str]:
+    """Step 1 opens the summary, in its own words. The forensic pipeline is a
+    later section and never changes this sentence (docs/PLAN-Paso-1.md)."""
+    s = report.get("step1") or {}
+    if not s.get("headline"):
+        return []
+    lines = ["", f"**Step 1, the documented run: {s['headline']}** {s['body']}"]
+    if s.get("missing_text"):
+        lines += ["", f"Missing from the commit, by the blocks {s['guide']} asks for:", ""]
+        lines += [f"- {block}" for block in s["missing_text"]]
+    return lines
+
+
+def _verdict_md(report: dict) -> list[str]:
+    v = report.get("verdict")
+    if not v:
+        return []
+    lines = _step1_md(report) + ["", f"**Verdict: {v['title']}.** {v['reason']}"]
+    if v.get("blockers"):
+        lines += ["", "What stopped it, and what its owner can be asked:", ""]
+        for b in v["blockers"]:
+            lines += [f"- {b['what']}",
+                      f"  - The tool's owner: open an issue, \"{b['ask_owner']['title']}\"."]
+    if v.get("readme_gaps"):
+        lines += ["", "What the README does not say:", ""]
+        lines += [f"- {g['text']}" for g in v["readme_gaps"]]
+    return lines
+
+
+def _environment_line(env: dict, code=lambda t: f"`{t}`") -> str:
+    """'ubuntu-22.04 (`Dockerfile`)'. `code` wraps a file name: backticks for
+    markdown, <code> for HTML."""
+    return f"{', '.join(env.get('os', []))} ({code(env['dockerfile'])})"
+
+
+def _install_heading(inst: dict) -> str:
+    # Plain words, not the mechanism: "why the pinned commit did not build"
+    # told a reader who did not know what a pinned commit was that something
+    # with a name they did not know had failed.
+    return "It did not build from source"
+
+
+def _install_lead(inst: dict, env: dict) -> str:
+    tried = ("STRhub tried to build the tool from its source at the pinned commit, "
+             "following the build steps the repository declares, and the build failed.")
+    return f"{tried} Nothing below the Installs gate ran."
+
+
+
+
+def _run_record(m: dict, outcome: str | None = None) -> dict | None:
+    """Record the configured command and, when supplied, the run step outcome.
+
+    Preserve the full wrapper as effective_cmd; cmd/cwd remain compatible
+    with older readers. A command alone never establishes execution.
+    """
+    cmd = (m.get("run") or {}).get("cmd")
+    if not cmd:
+        return None
+    inner, cwd = unwrap_example(cmd)
+    return {"cmd": inner, **({"cwd": cwd} if cwd else {}),
+            **({"effective_cmd": cmd, "step_outcome": outcome} if outcome is not None else {})}
+
+
+def _summary_md(report: dict, slug: str) -> str:
+    """A human-readable attestation summary: what STRhub shows the user."""
+    tool = report["tool"]
+    level = report["level"]
+    gates = report["gates"]
+    mark = {True: "PASS", False: "—"}
+    label, _ = headline(report)
+    curated = instrument_of_report(report) not in BADGE_INSTRUMENTS
+    reached = f"Reached **{LABELS.get(level, 'not run')}**: {MEANING.get(level, '')}."
+    lines = [f"# STRhub Verified: {tool['name']} ({slug})", "", f"**{label}.**"]
+    # Chapter one: the tool as it is in its repository — where it stopped, why,
+    # how. A run of a recipe STRhub wrote has no such chapter: it opens with
+    # what STRhub had to do, and the run itself follows, in full.
+    if curated:
+        lines += ["", f"## {STRHUB_DID_HEADING}", "", STRHUB_DID_LEAD, ""]
+        lines += [f"- {w}" for w in workaround_lines(report)] or ["- (not itemised for this recipe)"]
+        lines += ["", f"With those changes, the run reached **{LABELS.get(level, 'not run')}**: "
+                      f"{MEANING.get(level, '')}.", *_verdict_md(report),
+                  "", f"## {FULL_RUN_HEADING}"]
+    else:
+        lines += ["", f"## {AS_IS_HEADING}", *_verdict_md(report), "", reached]
+    lines += [
+        "",
+        "### Gates",
+        "",
+        "| Gate | Status | Meaning |",
+        "|---|---|---|",
+    ]
+    for g in LADDER:
+        lines.append(f"| {LABELS[g]} | {mark[gates.get(g, False)]} | {MEANING.get(g, '')} |")
+    for g in AUX_GATES:
+        if g in gates:
+            lines.append(f"| {LABELS[g]} | {mark[bool(gates[g])]} | {MEANING[g]} |")
+
+    # Why the build failed, immediately after the ladder that says it did.
+    # Nothing below this point ran, so the reader needs the reason here rather
+    # than at the foot of a report about a run that never happened.
+    inst = report.get("install_detail") or {}
+    if inst.get("diagnostics"):
+        lines += ["", f"### {_install_heading(inst)}", "",
+                  _install_lead(inst, report["environment"]),
+                  "",
+                  "What this means:", ""]
+        lines += [f"- **{who}:** {what}" for who, what in
+                  install_meaning(inst.get("faults") or [])]
+        lines += ["", "What failed:", "",
+                  "| What happened | Times | What the log establishes |",
+                  "|---|---|---|"]
+        for issue in inst["diagnostics"]:
+            fix = issue.get("suggestion", "—").replace("\n", " ")
+            lines.append(f"| {issue['title']} | {issue.get('count', 1)} | {fix} |")
+        build_log = (report.get("logs") or {}).get("build")
+        if build_log:
+            lines += ["", f"Full build output: [`{build_log}`]({build_log})"]
+
+    # The author's own words about their own software, before any of STRhub's
+    # findings: a run that stops where the README says it stops is not news,
+    # and a reader must be able to see that without opening the repository.
+    # Errors the tool itself reported: the "why" of a run that stopped, next
+    # to where it stopped, and a reviewer should not have to open a container
+    # log to find out.
+    errs = diagnose_log.summarize(report.get("diagnostics") or {})
+    if errs:
+        n_items = sum(len(e["items"]) for e in errs) or sum(1 for _ in errs)
+        lines += ["", "### Errors reported during the run", "",
+                  f"The tool reported errors on {n_items} item(s) during the run.",
+                  "This does not assess whether the results produced are correct.",
+                  "", "| What happened | Times | Affected |", "|---|---|---|"]
+        for e in errs:
+            items = ", ".join(e["items"]) if e["items"] else "—"
+            lines.append(f"| {e['title']} | {e['count']} | {items} |")
+        for note in diagnose_log.external_leg_notes(report.get("diagnostics") or {}):
+            lines += ["", note]
+
+        # A failure the author can fix costs nothing to re-run. Saying so here is
+        # what keeps the paid tier from looking like the way out of a dead end.
+        fixable = diagnose_log.author_fixable_ids(report.get("diagnostics") or {})
+        if fixable and not (report.get("manual_verification") or {}).get("eligible"):
+            lines += ["", diagnose_log.configuration_fault_sentence()]
+
+    known = report.get("author_known_issues") or []
+    if known:
+        lines += ["", "### What the author documents as a known issue", "",
+                  "Quoted from the repository's README at the verified commit. "
+                  "STRhub did not establish any of this by running the tool; it is "
+                  "the author's own note about their own software."]
+        for k in known:
+            quote = k["text"] + ("…" if k.get("truncated") else "")
+            lines += ["", f"**{k['heading']}** (README line {k['line']})", "", f"> {quote}"]
+
+    # How: the command the gates ran, and the logs.
+    run = report.get("run") or {}
+    if run.get("cmd"):
+        heading, lead = command_presentation(run)
+        lines += ["", f"### {heading}", "", lead, "", "```", run.get("effective_cmd", run["cmd"]), "```"]
+    for leg, fname in (report.get("logs") or {}).items():
+        lines.append(f"- Log ({leg}): [`{fname}`]({fname})")
+
+    # Then the context: where the run came from, and what else it established.
+    lines += ["", "## Run details", "",
+              f"- Source: `{report['source']['repo']}` @ `{report['source']['ref_resolved']}`",
+              f"- Environment: {_environment_line(report['environment'])}",
+              f"- Generated: {report['generated']}"]
+    up_note = upstream.note(report.get("upstream"))
+    if up_note:
+        lines.append(f"- Upstream: {up_note}")
+    if report.get("ci_run"):
+        lines.append(f"- CI run: {report['ci_run']}")
+
+    # Content highlights (the genotype-plausibility evidence), if available.
+    outs = report.get("content_detail", {}).get("outputs", [])
+    stats = outs[0].get("stats") if outs and isinstance(outs[0], dict) else None
+    if stats:
+        str_loci = stats.get("str_loci", stats.get("loci", []))
+        n_str = stats.get("distinct_str_loci", len(str_loci))
+        n_snp = stats.get("distinct_snp_markers", 0)
+        sample = ", ".join(str_loci[:18]) + (" …" if len(str_loci) > 18 else "")
+        top = ", ".join(f"{l} ({d})" for l, d in stats.get("top_loci_by_depth", [])[:6])
+        markers_line = f"- STR loci detected: **{n_str}**"
+        if n_snp:
+            markers_line += (f"  ·  identity SNPs (rsNNNN): **{n_snp}**  "
+                             f"(total panel markers: {stats.get('distinct_loci', 0)})")
+        lines += [
+            "",
+            "## Output content (plausibility evidence)",
+            "",
+            f"- Sequence records: **{stats.get('rows', 0)}** "
+            f"(malformed: {stats.get('malformed_rows', 0)})",
+            markers_line,
+            f"- Total reads across calls: **{stats.get('total_reads', 0)}** "
+            f"(deepest single sequence: {stats.get('max_sequence_depth', 0)})",
+            f"- STR loci: {sample}" if str_loci else "",
+            f"- Top markers by read depth: {top}" if top else "",
+        ]
+
+    # Verification matrix (own / external legs), if present.
+    # Legs where fixture_source=="strhub" are omitted: both legs run on the same
+    # STRhub data, so showing them separately would be misleading.
+    # Which legs reported errors — the matrix flags THAT, the section below says what.
+    legs_with_errors = {
+        leg for leg, issues in (report.get("diagnostics") or {}).items()
+        if any(i.get("severity") == "error" for i in issues)
+    }
+
+    datasets = report.get("datasets") or []
+    visible = [leg for leg in datasets if leg.get("fixture_source") != "strhub"]
+    if visible:
+        lines += ["", "## Verification matrix", "",
+                  "| Leg | Available | Result | Errors reported | Dataset |",
+                  "|---|---|---|---|---|"]
+        for leg in visible:
+            avail = leg.get("available", True)
+            status = "N/A" if not avail else ("PASS" if leg.get("passed") else "—")
+            err = "yes" if leg.get("leg") in legs_with_errors else "—"
+            lines.append(
+                f"| {leg.get('label', leg.get('leg', '?'))} | "
+                f"{'yes' if avail else 'N/A'} | {status} | {err} | "
+                f"{leg.get('dataset', leg.get('type', '—'))} |"
+            )
+
+    # Who chose the regions, and the fact that the dataset is a slice. A
+    # coordinate-based tool only calls where its BED points, so both are material.
+    rg = report.get("regions") or {}
+    if rg.get("source") in ("tool", "strhub"):
+        note = _regions_note(rg)
+        if note:
+            lines += ["", "## Regions", "", note]
+
+    # Manual verification (level 2), when the automated path structurally cannot
+    # run this tool. Never offered over a run that produced its expected output.
+    mv = report.get("manual_verification") or {}
+    if mv.get("eligible"):
+        lines += ["", "## Manual verification available", "",
+                  mv["reason"],
+                  "",
+                  "This is a limitation of the automated environment, not a fault "
+                  "found in the tool. STRhub can run it by hand and issue a "
+                  "certificate labelled **manual verification**: a separate, paid "
+                  "service, distinct from this automated attestation.",
+                  "",
+                  f"Eligibility reason code: `{mv['reason_code']}` "
+                  f"({mv['basis']}).",
+                  ]
+
+    # README minimum-to-run checklist (advisory).
+    rc = report.get("readme_check")
+    if rc:
+        lines += ["", "## README check (advisory)", "",
+                  f"Score: **{rc.get('score', 0)}/{rc.get('max', 5)}**. Advisory only; "
+                  "does not affect the execution badge.", ""]
+        for name, c in (rc.get("checks") or {}).items():
+            lines.append(f"- {'PASS' if c.get('present') else '—'} {name}")
+
+    # Notes from reading the repository. Last before the scope statement, and
+    # labelled for what they are: nothing here was established by running the
+    # tool, so it must not be read alongside the gates as though it had been.
+    # Before the notes and the scope: what the reader needs to hold the ladder
+    # against. Phrased as requirements, not as a shortfall — every tool needs
+    # something, and the useful question is what.
+    ev = report.get("evidence") or []
+    if ev:
+        lines += ["", "## Evidence", "", EVIDENCE_LEAD]
+        for e in ev:
+            where = f"`{e['path']}`" + (f" line {e['line']}" if e.get("line") else "")
+            # Whole, not clipped: the platform advice is the one line a reader
+            # most needs entire, since the run may have gone against it.
+            txt = f": `{e['text']}`" if e.get("text") and e["kind"] in ("readme", "doc", "wiki") else ""
+            lines.append(f"- {CLAIM_LABELS.get(e['claim'], e['claim'])}: [{where}]({e['url']}){txt}")
+
+    needed = report.get("needed_beyond_repo") or []
+    if needed:
+        lines += ["", "## What this run needed beyond the repository", "", NEEDED_LEAD, ""]
+        for item in needed:
+            lines.append(f"- {item}")
+
+    cav = report.get("caveats") or {}
+    if cav.get("items"):
+        # The model id stays in the JSON for auditing and out of the prose. A
+        # reviewer reading a forensic report has no use for it, and naming it here
+        # invites the impression that the report was written by one, when the gates
+        # above were measured by running the tool. What matters to the reader is
+        # that this was read rather than executed, which the sentence already says.
+        lines += ["", "## Notes from reading the repository", "",
+                  "Recorded automatically from the tool's public files when this run "
+                  "was configured. **Not verified by execution**, and not part of the "
+                  "gates above. Useful for what to check by hand.", ""]
+        for item in cav["items"]:
+            lines.append(f"- {item}")
+
+    lines += ["", "## Out of scope", "", "This report does not evaluate any of the following:", ""]
+    lines += [f"- {i}" for i in OUT_OF_SCOPE]
+    lines += ["", "## Limitations", ""]
+    lines += [f"- {i}" for i in LIMITATIONS]
+    lines += [
+        "",
+        "## Scope (read this)",
+        "",
+        report["scope"],
+        "",
+        "This is **not** a claim that the genotypes are correct, nor that the tool "
+        "is fit for casework or meets any regulatory standard. Concordance against "
+        "known truth is out of scope.",
+        "",
+        RECORD_NOTE,
+        "",
+    ]
+    return "\n".join(l for l in lines if l is not None) + "\n"
+
+
+def _summary_html(report: dict, slug: str) -> str:
+    """A standalone, styled HTML page for one tool — navigable as a web page."""
+    import html as _html
+
+    tool = report["tool"]
+    level = report["level"]
+    gates = report["gates"]
+    label, color = headline(report)
+    badge = COLOR_HEX.get(color, "#c33")
+    curated = instrument_of_report(report) not in BADGE_INSTRUMENTS
+
+    def esc(s):
+        return _html.escape(str(s))
+
+    rows = []
+    for g in LADDER + [a for a in AUX_GATES if a in gates]:
+        ok = gates.get(g, False)
+        chip = ('<span class="ok">PASS</span>' if ok
+                else '<span class="no">—</span>')
+        rows.append(f"<tr><td>{esc(LABELS[g])}</td><td>{chip}</td>"
+                    f"<td>{esc(MEANING.get(g, ''))}</td></tr>")
+
+    # Why the build failed — see the markdown render for why it sits this high.
+    install_block = ""
+    inst = report.get("install_detail") or {}
+    if inst.get("diagnostics"):
+        irows = "".join(
+            f"<tr><td>{esc(i['title'])}</td><td>{esc(i.get('count', 1))}</td>"
+            f"<td>{esc(i.get('suggestion', '—'))}</td></tr>"
+            for i in inst["diagnostics"]
+        )
+        build_log = (report.get("logs") or {}).get("build")
+        log_link = (f'<p><a href="{esc(build_log)}">Full build output</a></p>'
+                    if build_log else "")
+        meaning = "".join(
+            f"<li><b>{esc(who)}:</b> {esc(what)}</li>" for who, what in
+            install_meaning(inst.get("faults") or []))
+        install_block = (
+            f"<h3>{esc(_install_heading(inst))}</h3>"
+            f"<p>{esc(_install_lead(inst, report['environment']))}</p>"
+            f"<p><b>What this means</b></p><ul class='stats'>{meaning}</ul>"
+            "<p><b>What failed</b></p>"
+            "<table><thead><tr><th>What happened</th><th>Times</th>"
+            "<th>What the log establishes</th></tr></thead>"
+            f"<tbody>{irows}</tbody></table>{log_link}"
+        )
+
+    known_block = ""
+    known = report.get("author_known_issues") or []
+    if known:
+        quotes = "".join(
+            f"<p><b>{esc(k['heading'])}</b> (README line {esc(k['line'])})</p>"
+            f"<blockquote>{esc(k['text'])}{'…' if k.get('truncated') else ''}</blockquote>"
+            for k in known)
+        known_block = (
+            "<h3>What the author documents as a known issue</h3>"
+            "<p>Quoted from the repository's README at the verified commit. STRhub did "
+            "not establish any of this by running the tool; it is the author's own note "
+            "about their own software.</p>" + quotes)
+
+    # The verdict the page leads with. A copy that omits it can read as a pass
+    # while the page it mirrors says "Fails".
+    s1 = report.get("step1") or {}
+    step1_block = ""
+    if s1.get("headline"):
+        missing_html = ""
+        if s1.get("missing_text"):
+            mitems = "".join(f"<li>{esc(b)}</li>" for b in s1["missing_text"])
+            missing_html = (f"<p>Missing from the commit, by the blocks "
+                            f"<code>{esc(s1.get('guide', 'docs/GUIA-PASO-1.md'))}</code> asks for:</p>"
+                            f"<ul class='stats'>{mitems}</ul>")
+        step1_block = (f"<p><b>Step 1, the documented run: {esc(s1['headline'])}</b> "
+                       f"{esc(s1.get('body', ''))}</p>{missing_html}")
+    v = report.get("verdict") or {}
+    verdict_block = step1_block + (
+        f"<p><b>Verdict: {esc(v['title'])}.</b> {esc(v['reason'])}</p>"
+        if v.get("title") and v.get("reason") else ""
+    )
+
+    # The command the gates ran — the certificate's "Exact Run Command".
+    run = report.get("run") or {}
+    command_heading, command_lead = command_presentation(run)
+    run_block = (
+        f"<h3>{esc(command_heading)}</h3><p>{esc(command_lead)}</p>"
+        f"<pre><code>{esc(run.get('effective_cmd', run['cmd']))}</code></pre>"
+        if run.get("cmd") else ""
+    )
+
+    content_block = ""
+    outs = report.get("content_detail", {}).get("outputs", [])
+    stats = outs[0].get("stats") if outs and isinstance(outs[0], dict) else None
+    if stats:
+        str_loci = stats.get("str_loci", stats.get("loci", []))
+        n_str = stats.get("distinct_str_loci", len(str_loci))
+        n_snp = stats.get("distinct_snp_markers", 0)
+        markers_li = f"<li>STR loci detected: <b>{esc(n_str)}</b>"
+        if n_snp:
+            markers_li += (f" &middot; identity SNPs (rsNNNN): <b>{esc(n_snp)}</b> "
+                           f"(total panel markers: {esc(stats.get('distinct_loci', 0))})")
+        markers_li += "</li>"
+        # Which file, from the IO gate: the content gate describes the same one.
+        io_outs = (report.get("io_detail") or {}).get("outputs") or []
+        io0 = io_outs[0] if io_outs and isinstance(io_outs[0], dict) else {}
+        file_li = ""
+        if io0.get("resolved") or io0.get("path"):
+            fmt = f" ({esc(str(io0.get('format')).upper())})" if io0.get("format") else ""
+            file_li = f"<li>Output file: <code>{esc(io0.get('resolved') or io0.get('path'))}</code>{fmt}</li>"
+        given, hit = stats.get("regions_given"), stats.get("regions_hit")
+        coverage_li = (f"<li>Panel loci called: <b>{esc(hit)}</b> of {esc(given)}</li>"
+                       if isinstance(given, int) and isinstance(hit, int) and given > 0 else "")
+        # Every locus with its depth, as the certificate's appendix has it: a
+        # reader sees the shape of the output, not six names and an ellipsis.
+        depth = stats.get("top_loci_by_depth") or []
+        depth_table = ""
+        if depth:
+            mx = max((d for _, d in depth), default=0) or 1
+            drows = "".join(
+                f"<tr><td><code>{esc(l)}</code></td><td>{esc(d)}</td>"
+                f"<td><span class=\"bar\" style=\"width:{max(1, round(100 * d / mx))}%\"></span></td></tr>"
+                for l, d in depth)
+            depth_table = ("<h3>Read depth per locus</h3>"
+                           "<table class=\"depth\"><thead><tr><th>Locus</th><th>Reads</th><th></th></tr></thead>"
+                           f"<tbody>{drows}</tbody></table>")
+        content_block = f"""
+    <h2>Output content (plausibility evidence)</h2>
+    <ul class="stats">
+      {file_li}
+      <li>Sequence records: <b>{esc(stats.get('rows', 0))}</b> (malformed: {esc(stats.get('malformed_rows', 0))})</li>
+      {markers_li}
+      <li>Total reads across calls: <b>{esc(stats.get('total_reads', 0))}</b> (deepest single locus: {esc(stats.get('max_sequence_depth', 0))})</li>
+      {coverage_li}
+      {'<li>STR loci: ' + esc(", ".join(str_loci)) + '</li>' if str_loci else ''}
+    </ul>{depth_table}"""
+
+    # Verification matrix (own / external legs).
+    # Legs where fixture_source=="strhub" are omitted: both legs run on the same
+    # STRhub data, so showing them separately would be misleading.
+    matrix_block = ""
+    # Which legs reported errors — the matrix flags THAT, the section below says what.
+    all_diags = report.get("diagnostics") or {}
+    legs_with_errors = {
+        leg for leg, issues in all_diags.items()
+        if any(i.get("severity") == "error" for i in issues)
+    }
+
+    datasets = report.get("datasets") or []
+    visible_ds = [leg for leg in datasets if leg.get("fixture_source") != "strhub"]
+    if visible_ds:
+        mrows = []
+        for leg in visible_ds:
+            avail = leg.get("available", True)
+            if not avail:
+                chip = '<span class="no">N/A</span>'
+            elif leg.get("passed"):
+                chip = '<span class="ok">PASS</span>'
+            else:
+                chip = '<span class="no">—</span>'
+            err = ('<span class="warn">yes</span>'
+                   if leg.get("leg") in legs_with_errors else '<span class="no">—</span>')
+            mrows.append(
+                f"<tr><td>{esc(leg.get('label', leg.get('leg', '?')))}</td>"
+                f"<td>{chip}</td>"
+                f"<td>{err}</td>"
+                f"<td>{esc(leg.get('dataset', leg.get('type', '—')))}</td></tr>"
+            )
+        matrix_block = (
+            "<h2>Verification matrix</h2>"
+            "<table><thead><tr><th>Leg</th><th>Result</th><th>Errors reported</th>"
+            "<th>Dataset</th></tr></thead>"
+            f"<tbody>{''.join(mrows)}</tbody></table>"
+        )
+
+    # Who chose the regions + the slice caveat (see _regions_note).
+    regions_note = _regions_note(report.get("regions") or {})
+    regions_block = (
+        f"<h2>Regions</h2><p>{esc(regions_note)}</p>" if regions_note else ""
+    )
+    _up_note = upstream.note(report.get("upstream"))
+    upstream_li = f"<li>Upstream: {esc(_up_note)}</li>" if _up_note else ""
+
+    # Errors the tool reported, in its own section: the matrix says a leg had them,
+    # this says what they were, so a reviewer never has to open a container log.
+    errors_block = ""
+    errs = diagnose_log.summarize(all_diags)
+    if errs:
+        n_items = sum(len(e["items"]) for e in errs) or len(errs)
+        erows = "".join(
+            f"<tr><td>{esc(e['title'])}</td><td>{e['count']}</td>"
+            f"<td>{esc(', '.join(e['items']) if e['items'] else '—')}</td></tr>"
+            for e in errs
+        )
+        notes = "".join(
+            f"<p>{esc(n)}</p>"
+            for n in diagnose_log.external_leg_notes(all_diags)
+        )
+        mv_eligible = bool((report.get("manual_verification") or {}).get("eligible"))
+        fixable = diagnose_log.author_fixable_ids(all_diags)
+        free_note = (
+            f"<p>{esc(diagnose_log.configuration_fault_sentence())}</p>"
+            if fixable and not mv_eligible else ""
+        )
+        errors_block = (
+            "<h3>Errors reported during the run</h3>"
+            f"<p>The tool reported errors on {n_items} item(s) during the run. "
+            "This does not assess whether the results produced are correct.</p>"
+            "<table><thead><tr><th>What happened</th><th>Times</th>"
+            "<th>Affected</th></tr></thead>"
+            f"<tbody>{erows}</tbody></table>{notes}{free_note}"
+        )
+
+    # Manual verification (level 2). Only rendered when the engine itself marked
+    # the run eligible, so the offer can never appear on a run that worked.
+    manual_block = ""
+    mv = report.get("manual_verification") or {}
+    if mv.get("eligible"):
+        manual_block = (
+            "<h2>Manual verification available</h2>"
+            f"<div class='scope'><p>{esc(mv['reason'])}</p>"
+            "<p>This is a limitation of the automated environment, not a fault "
+            "found in the tool. STRhub can run it by hand and issue a certificate "
+            "labelled <b>manual verification</b>: a separate, paid service, "
+            "distinct from this automated attestation.</p>"
+            f"<p style='color:#888;font-size:.85rem'>Eligibility reason code: "
+            f"<code>{esc(mv['reason_code'])}</code> ({esc(mv['basis'])}).</p></div>"
+        )
+
+    # README minimum-to-run checklist (advisory).
+    readme_block = ""
+    rc = report.get("readme_check")
+    if rc:
+        items = "".join(
+            f"<li>{'<b>PASS</b>' if c.get('present') else '—'} {esc(name)}</li>"
+            for name, c in (rc.get("checks") or {}).items()
+        )
+        readme_block = (
+            "<h2>README check <span style='font-weight:400;color:#888'>(advisory)</span></h2>"
+            f"<p>Score: <b>{esc(rc.get('score', 0))}/{esc(rc.get('max', 5))}</b>. "
+            "Advisory only; does not affect the execution badge.</p>"
+            f"<ul class='stats'>{items}</ul>"
+        )
+
+    # What the run rests on, what it needed, what was read rather than run:
+    # the page and the certificate carry all three, and this copy did not.
+    evidence_block = ""
+    ev = report.get("evidence") or []
+    if ev:
+        items = []
+        for e in ev:
+            where = esc(e["path"]) + (f" line {esc(e['line'])}" if e.get("line") else "")
+            quote = (f": <code>{esc(e['text'])}</code>"
+                     if e.get("text") and e.get("kind") in ("readme", "doc", "wiki") else "")
+            items.append(f"<li>{esc(CLAIM_LABELS.get(e['claim'], e['claim']))}: "
+                         f"<a href=\"{esc(e['url'])}\">{where}</a>{quote}</li>")
+        evidence_block = (f"<h2>Evidence</h2><p>{esc(EVIDENCE_LEAD)}</p>"
+                          f"<ul class='stats'>{''.join(items)}</ul>")
+
+    needed_block = ""
+    needed = report.get("needed_beyond_repo") or []
+    if needed:
+        needed_block = (
+            f"<h2>What this run needed beyond the repository</h2><p>{esc(NEEDED_LEAD)}</p>"
+            f"<ul class='stats'>{''.join(f'<li>{esc(i)}</li>' for i in needed)}</ul>")
+
+    # The two chapters. A run of the repository's own instructions opens with
+    # what happens as it is; a run of a recipe STRhub wrote opens with what
+    # STRhub had to do, and the run follows in full.
+    reached = (f"<p>Reached <b>{esc(LABELS.get(level, 'not run'))}</b>: "
+               f"{esc(MEANING.get(level, ''))}.</p>")
+    if curated:
+        items = "".join(f"<li>{esc(w)}</li>" for w in workaround_lines(report)) or "<li>(not itemised for this recipe)</li>"
+        opening = (f"<h2>{esc(STRHUB_DID_HEADING)}</h2><p>{esc(STRHUB_DID_LEAD)}</p>"
+                   f"<ul class='stats'>{items}</ul>"
+                   f"<p>With those changes, the run reached <b>{esc(LABELS.get(level, 'not run'))}</b>: "
+                   f"{esc(MEANING.get(level, ''))}.</p>{verdict_block}"
+                   f"<h2>{esc(FULL_RUN_HEADING)}</h2>")
+    else:
+        opening = f"<h2>{esc(AS_IS_HEADING)}</h2>{verdict_block}{reached}"
+    logs_block = "".join(
+        f'<p style="font-size:.85rem">Log ({esc(leg)}): <a href="{esc(fname)}">{esc(fname)}</a></p>'
+        for leg, fname in (report.get("logs") or {}).items())
+
+    caveats_block = ""
+    cav = report.get("caveats") or {}
+    if cav.get("items"):
+        caveats_block = (
+            f"<h2>Notes from reading the repository</h2><p>{esc(CAVEATS_LEAD)}</p>"
+            f"<ul class='stats'>{''.join(f'<li>{esc(i)}</li>' for i in cav['items'])}</ul>")
+
+    ci = (f'<a href="{esc(report["ci_run"])}">CI run</a>'
+          if report.get("ci_run") else "")
+    return f"""<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>STRhub Verified · {esc(tool['name'])} ({esc(slug)})</title>
+<style>
+  body {{ font: 16px/1.6 system-ui, sans-serif; max-width: 820px; margin: 2rem auto;
+          padding: 0 1rem; background:#ffffff; color:#1a1a1a; }}
+  a {{ color: #2563eb; }}
+  .badge {{ display:inline-block; padding:.25rem .7rem; border-radius:999px; color:#fff; font-weight:600; background:{badge}; }}
+  table {{ border-collapse: collapse; width: 100%; margin: 1rem 0; }}
+  th, td {{ text-align: left; padding: .5rem .6rem; border-bottom: 1px solid #ddd; }}
+  .ok {{ color:#16a34a; font-weight:700; }}
+  .no {{ color:#999; }}
+  .warn {{ color:#b45309; font-weight:700; }}
+  .meta li, .stats li {{ margin:.15rem 0; }}
+  .scope {{ background:#f3f4f6; border-left:4px solid {badge}; padding:.8rem 1rem; border-radius:6px; }}
+  code {{ background:#eef0f2; padding:.1rem .3rem; border-radius:4px; }}
+  pre {{ background:#eef0f2; padding:.8rem 1rem; border-radius:6px; overflow-x:auto; white-space:pre-wrap; word-break:break-all; font-size:.85rem; }}
+  pre code {{ background:none; padding:0; }}
+  table.depth td {{ padding:.25rem .6rem; }}
+  table.depth td:nth-child(2) {{ text-align:right; font-variant-numeric:tabular-nums; width:5rem; }}
+  table.depth td:nth-child(3) {{ width:50%; }}
+  .bar {{ display:inline-block; height:.6rem; background:{badge}; border-radius:3px; vertical-align:middle; }}
+  nav {{ margin-bottom:1rem; }}
+  @media (prefers-color-scheme: dark) {{
+    body {{ background:#0d1117; color:#e6edf3; }}
+    a {{ color:#58a6ff; }}
+    th, td {{ border-bottom:1px solid #30363d; }}
+    .scope {{ background:#161b22; }}
+    code, pre {{ background:#21262d; }}
+  }}
+</style></head><body>
+<nav><a href="index.html">← All tools</a></nav>
+<h1>STRhub Verified · {esc(tool['name'])}</h1>
+<p><span class="badge">{esc(label)}</span></p>
+{opening}
+<h3>Gates</h3>
+<table><thead><tr><th>Gate</th><th>Status</th><th>Meaning</th></tr></thead>
+<tbody>{''.join(rows)}</tbody></table>
+{install_block}
+{errors_block}
+{known_block}
+{run_block}
+{logs_block}
+<h2>Run details</h2>
+<ul class="meta">
+  <li>Variant: <code>{esc(slug)}</code></li>
+  <li>Source: <code>{esc(report['source']['repo'])}</code> @ <code>{esc(report['source']['ref_resolved'])}</code></li>
+  <li>Environment: {_environment_line({**report['environment'], 'os': [esc(o) for o in report['environment'].get('os', [])]}, code=lambda t: f"<code>{esc(t)}</code>")}</li>
+  <li>Generated: {esc(report['generated'])}</li>
+  {upstream_li}
+  {f'<li>{ci}</li>' if ci else ''}
+</ul>
+{content_block}
+{matrix_block}
+{regions_block}
+{manual_block}
+{readme_block}
+{evidence_block}
+{needed_block}
+{caveats_block}
+<h2>Out of scope</h2>
+<p>This report does not evaluate any of the following:</p>
+<ul class="stats">{''.join(f'<li>{esc(i)}</li>' for i in OUT_OF_SCOPE)}</ul>
+<h2>Limitations</h2>
+<ul class="stats">{''.join(f'<li>{esc(i)}</li>' for i in LIMITATIONS)}</ul>
+<h2>Scope</h2>
+<p class="scope">{esc(report['scope'])}<br><br>
+This is <b>not</b> a claim that the genotypes are correct, nor that the tool is
+fit for casework or meets any regulatory standard. Concordance against known
+truth is out of scope.</p>
+<p style="color:#888;font-size:.85rem">{esc(RECORD_NOTE)}</p>
+<p style="color:#888;font-size:.85rem">Machine-readable:
+<a href="{esc(slug)}.json">{esc(slug)}.json</a> ·
+<a href="{esc(slug)}.badge.json">badge</a> ·
+<a href="{esc(slug)}.summary.md">summary.md</a></p>
+</body></html>
+"""
+
+
+def _certificate_cfg(report: dict, m: dict) -> dict:
+    """What conclusion_items_for reads, built here the way generate_pdf
+    builds it, so the block in the JSON and the certificate agree."""
+    name = display_name(m)
+    declared = (m.get("outputs") or [{}])[0]
+    outs = (report.get("content_detail") or {}).get("outputs") or []
+    stats = outs[0].get("stats") or {} if outs and isinstance(outs[0], dict) else {}
+    ds_name = next((d.get("dataset") for d in (report.get("datasets") or [])
+                    if d.get("leg") == "external" and d.get("dataset")), None)
+    if not ds_name:
+        try:
+            index = json.loads((ROOT / "datasets" / "index.json").read_text())
+            ds_name = (index.get("datasets", {}).get((m.get("inputs") or {}).get("type", "")) or {}).get("name")
+        except (OSError, json.JSONDecodeError):
+            ds_name = None
+    return {
+        "tool_display": f"{name} {m['tool'].get('version', '')}".strip(),
+        "tool_name": name,
+        "gates": report.get("gates") or {},
+        "verdict": report.get("verdict") or {},
+        "execution_finding_established": execution_finding_established(report),
+        "stats": stats,
+        "declared_format": (declared.get("format") or "—").upper(),
+        "dataset": {"name": ds_name} if ds_name else {},
+        "repo_test_data": report.get("repo_test_data") or {},
+    }
+
+
+def apply_engine_record(args, path: str) -> dict | None:
+    """The gate outcomes from the engine's RunRecord (harness/engine), in place
+    of the step outcomes the workflow used to pass one flag at a time.
+
+    No record means the gates never ran (a step of STRhub's own failed before
+    them): every outcome is "skipped", as a skipped step's would have been, and
+    `--infra-failure` says why. A failed evidence check inside a gate (the
+    checkout against the reviewed procedure, the mount against the registered
+    dataset) is the record's `infra_failure`, taken when the workflow passed
+    none of its own."""
+    p = pathlib.Path(path)
+    if not p.is_file():
+        args.available = args.installs = args.runs = args.example_runs = "skipped"
+        args.environment_built = ""
+        return None
+    rec = json.loads(p.read_text())
+    outcomes = rec.get("outcomes") or {}
+    ladder = rec.get("ladder") or {}
+    args.available = outcomes.get("available", "skipped")
+    args.installs = outcomes.get("installs", "skipped")
+    args.example_runs = outcomes.get("runs_example", "skipped")
+    args.runs = ladder.get("runs", "skipped")
+    args.io = ladder.get("io") or args.io
+    args.content = ladder.get("content") or args.content
+    args.environment_built = rec.get("environment_built") or ""
+    if not args.supported_loci:
+        args.supported_loci = ladder.get("supported_loci", "")
+    if not args.infra_failure.strip() and rec.get("infra_failure"):
+        args.infra_failure = rec["infra_failure"]
+    return rec
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--manifest", required=True)
+    ap.add_argument("--available", default="pass")
+    ap.add_argument("--installs", default="fail")
+    ap.add_argument("--runs", default="fail")
+    ap.add_argument("--io", default="io_result.json", help="path to io_result.json")
+    ap.add_argument("--content", default="content_result.json",
+                    help="path to content_result.json")
+    ap.add_argument("--matrix", default="matrix.json",
+                    help="path to matrix.json (own/external legs, Fase 3)")
+    ap.add_argument("--readme", default="readme_result.json",
+                    help="path to readme_result.json (advisory, Fase 3)")
+    ap.add_argument("--log-own", default="",
+                    help="path to captured stdout+stderr from own-data run")
+    ap.add_argument("--log-external", default="",
+                    help="path to captured stdout+stderr from external-data run")
+    ap.add_argument("--log-build", default="",
+                    help="path to captured output from the docker build (Installs)")
+    ap.add_argument("--engine-record", default="",
+                    help="run_record.json from harness/engine: supplies --available, --installs, "
+                         "--runs, --io, --content, --example-runs, --environment-built, "
+                         "--supported-loci and (when empty) --infra-failure from the record")
+    ap.add_argument("--environment-built", default="", choices=["", "primary"],
+                    help="which Dockerfile produced the image the gates ran on: 'primary' "
+                         "(the one the review admits) or empty when nothing built")
+    ap.add_argument("--check-upstream", action="store_true",
+                    help="ask GitHub how far the pinned ref has fallen behind the "
+                         "repository's default branch, and whether it still exists")
+    ap.add_argument("--ref", default="")
+    ap.add_argument("--run-url", default="")
+    ap.add_argument("--infra-failure", default="",
+                    help="a step of STRhub's own (reference genome download, ...) that "
+                         "failed before the gates ran; names it, empty when none did")
+    ap.add_argument("--example-runs", default="skipped",
+                    help="outcome of the own-example step (success/failure/skipped)")
+    ap.add_argument("--example", default="example.json", help="path to check_example.py output")
+    ap.add_argument("--log-example", default="", help="log of the own-example leg")
+    ap.add_argument("--starts", default="starts.json", help="check_starts.py output")
+    ap.add_argument("--log-starts", default="", help="log of the Starts check")
+    ap.add_argument("--procedure-review", default="", help="recomputed pre-execution procedure review")
+    ap.add_argument("--mounted-inputs", default="", help="verified provenance of the external runtime mount")
+    ap.add_argument("--recipe-proposal", default="",
+                    help="detect_recipe.py output when the recipe was proposed from the "
+                         "repository; lets the verdict tell a documentation gap from a failure")
+    ap.add_argument("--repo-read", default="",
+                    help="detect_recipe.py output for a run whose recipe was NOT proposed "
+                         "(a committed tool). Evidence only — what the repository holds and "
+                         "what its README documents — and never treated as a proposed recipe, "
+                         "which would change the verdict")
+    ap.add_argument("--mode", default="publish", choices=["publish", "trial"],
+                    help="trial: an unpublished rehearsal of a recipe; stamped into the "
+                         "report so a trial can never be mistaken for an attestation")
+    ap.add_argument("--regions-source", default="",
+                    help="who supplied the regions BED: tool | strhub | none")
+    ap.add_argument("--regions-validation", default="regions_validation.json",
+                    help="path to validate_bed.py output (panel coverage)")
+    ap.add_argument("--supported-loci", default="",
+                    help="path to the dataset's loci.bed — panel size fallback when "
+                         "no validation ran (STRhub-supplied BEDs skip the pre-flight)")
+    args = ap.parse_args()
+    if args.engine_record:
+        apply_engine_record(args, args.engine_record)
+
+    m = _manifest.load(args.manifest)
+    io_detail = {}
+    io_pass = False
+    p = pathlib.Path(args.io)
+    if p.exists():
+        io_detail = json.loads(p.read_text())
+        io_pass = bool(io_detail.get("passed"))
+
+    content_detail = {}
+    content_pass = False
+    cp = pathlib.Path(args.content)
+    if cp.exists():
+        content_detail = json.loads(cp.read_text())
+        content_pass = bool(content_detail.get("passed"))
+
+    # Fase 3: matrix of verification legs (own + external) and the advisory
+    # README check. Both are optional; absence keeps the legacy single-leg shape.
+    datasets = []
+    mp = pathlib.Path(args.matrix)
+    if mp.exists():
+        try:
+            loaded = json.loads(mp.read_text())
+            datasets = loaded if isinstance(loaded, list) else loaded.get("legs", [])
+        except Exception:  # noqa: BLE001
+            datasets = []
+
+    readme_check = None
+    rp = pathlib.Path(args.readme)
+    if rp.exists():
+        try:
+            readme_check = json.loads(rp.read_text())
+        except Exception:  # noqa: BLE001
+            readme_check = None
+
+    # Who defined the regions this run targeted. Material to a reader: it says
+    # whether the author chose the loci (within our panel) or STRhub did. Absent
+    # for tools that take no regions BED (FASTQ-based).
+    regions = None
+    if args.regions_source and args.regions_source != "none":
+        regions = {"source": args.regions_source}
+        vp = pathlib.Path(args.regions_validation)
+        if vp.exists():
+            try:
+                v = json.loads(vp.read_text())
+                regions["covered_loci"] = v.get("covered_count")
+                regions["panel_size"] = v.get("panel_size")
+                if v.get("out_of_panel"):
+                    regions["outside_panel"] = len(v["out_of_panel"])
+            except Exception:  # noqa: BLE001
+                pass
+        # Only the medical panel carries a label; a forensic report stays as it was.
+        label = _panel_label_for(args.supported_loci) if args.supported_loci else None
+        if label:
+            regions["panel_label"] = label
+        # Only author-supplied BEDs are pre-flighted, so a STRhub-supplied one has
+        # no validation file. Count the panel directly — the "this is a slice"
+        # caveat is true either way and the reader needs it either way.
+        if not regions.get("panel_size") and args.supported_loci:
+            sp = ROOT / args.supported_loci
+            if sp.is_file():
+                regions["panel_size"] = sum(
+                    1 for ln in sp.read_text().splitlines()
+                    if ln.strip() and not ln.startswith("#")
+                ) or None
+
+    gates = {
+        "available": _status(args.available),
+        "installs": _status(args.installs),
+        "runs": _status(args.runs),
+        "io": io_pass,
+        "content": content_pass,
+    }
+    # The tool's own example, outside the ladder: present only when the manifest
+    # declared one, so older readers that iterate the five ladder gates see
+    # nothing new and newer ones can show the reviewer's line.
+    example_detail = {}
+    ep = pathlib.Path(args.example)
+    if ep.exists():
+        try:
+            example_detail = json.loads(ep.read_text())
+        except Exception:  # noqa: BLE001
+            example_detail = {}
+    sp = pathlib.Path(args.starts)
+    if sp.exists():
+        try:
+            starts_detail = json.loads(sp.read_text())
+        except ValueError:
+            starts_detail = {}
+        if starts_detail.get("applicable"):
+            gates["starts"] = bool(starts_detail.get("passed"))
+    if example_detail.get("applicable"):
+        # The files the example left behind count only if the example's own
+        # command exited 0. The capture wrapper copies whatever was created
+        # while it ran, so a command that crashed after writing a .pyc, or one
+        # that did not exist, still left something for check_example to find.
+        ran_ok = args.example_runs == "success"
+        if example_detail.get("passed") and not ran_ok:
+            example_detail["passed"] = False
+            example_detail["reason"] = (
+                "The example's command did not exit successfully "
+                f"(step outcome: {args.example_runs}), so the files it left behind "
+                "are not counted as its output.")
+        gates["example"] = bool(example_detail.get("passed")) and ran_ok
+
+    # Highest contiguous green gate from the bottom of the ladder.
+    level = "none"
+    for g in LADDER:
+        if gates[g]:
+            level = g
+        else:
+            break
+
+    report = {
+        "schema": "strhub-verified/1",
+        # "trial" is a rehearsal: same gates, same honesty, no catalogue entry,
+        # no badge anyone can cite. Readers (the web, build_index) key on it.
+        "mode": args.mode,
+        "tool": m["tool"],
+        # Who filled in the submission, straight from the manifest. `tool` names
+        # whoever answers for the software; this names whoever asked for the run,
+        # and the report must not let a reader read the first as the second.
+        # None on manifests written before the form asked — an absence the prose
+        # handles by naming nobody.
+        "submission": m.get("submission"),
+        "source": {**m["source"], "ref_resolved": args.ref or m["source"]["ref"]},
+        "environment": m["environment"],
+        "generated": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
+        "ci_run": args.run_url,
+        # The configured command and the selected run step's outcome. A failed
+        # build leaves a planned command, not a claim that this command ran.
+        "run": _run_record(m, args.runs),
+        # Which instrument this is, and — for a recipe somebody wrote — what it
+        # does that the repository's instructions do not. The badge may rest
+        # only on `documented` or `maintainer`; `curated` is STRhub's note.
+        "instrument": instrument_of(m),
+        "recipe": {"origin": (m.get("recipe") or {}).get("origin")
+                             or {"documented": "proposed"}.get(instrument_of(m), instrument_of(m)),
+                   **({"workarounds": m["recipe"]["workarounds"]}
+                      if (m.get("recipe") or {}).get("workarounds") else {})},
+        "gates": gates,
+        "input_contract": m.get("inputs", {}),
+        "level": level,
+        "io_detail": io_detail,
+        "content_detail": content_detail,
+        "example_detail": example_detail or None,
+        "datasets": datasets,
+        "regions": regions,
+        "readme_check": readme_check,
+        "scope": SCOPE,
+    }
+
+    # Where the pinned commit sits now. One or two API calls, no CI: it answers
+    # the question a reviewer actually has — is what was verified the version I
+    # am looking at — and catches the case that matters, a ref nobody can fetch
+    # any more. Omitted entirely when the check could not be made: silence beats
+    # a guess about how current somebody's software is.
+    if args.check_upstream:
+        up = upstream.check(m["source"]["repo"], args.ref or m["source"]["ref"])
+        if up:
+            # When the pinned commit was made: a fact about the source, not
+            # about where the branch has gone since, so it lives with the
+            # source. It is what orders a tool's history (docs/PLAN-Version-
+            # History.md); a report that lacks it is one from before.
+            committed = up.pop("committed", None)
+            if committed:
+                report["source"]["committed"] = committed
+            report["upstream"] = up
+
+    # What the run needed that the repository does not provide.
+    #
+    # A green ladder reads as a property of the software, and quietly folds in
+    # whatever it took to get there. For STRsearch that was an 11-column hg38
+    # configuration file with flanking sequences, built by hand over half a day,
+    # against a repository whose only example is hg19 and covers five markers.
+    # None of that appeared anywhere, so the badge claimed more than the run
+    # measured. Stating the requirements is stronger than hedging the badge: each
+    # line is a checkable fact, and for a reader deciding whether to adopt the
+    # tool it is the practical question — what will this cost me to run.
+    needed = []
+    if (regions or {}).get("source") == "tool":
+        needed.append(
+            "A regions configuration file, supplied with the submission rather "
+            "than taken from the repository."
+        )
+    if not any(d.get("leg") == "own" and d.get("available") for d in (datasets or [])):
+        # Says what we know, not what we would have to have checked. An absent own
+        # leg means no repository test data was USED; it does not establish that
+        # the repository ships none. STRsearch ships some — for hg19, against an
+        # hg38 dataset — so the stronger sentence would have been false exactly
+        # where it was about to be published.
+        needed.append(
+            "Test data: no sample from the repository was used, so a public "
+            "reference sample stood in."
+        )
+    proposal = None
+    if args.recipe_proposal and pathlib.Path(args.recipe_proposal).exists():
+        try:
+            proposal = json.loads(pathlib.Path(args.recipe_proposal).read_text())
+        except Exception:  # noqa: BLE001
+            proposal = None
+    env_source = (m.get("environment") or {}).get("source")
+    if env_source == "documented":
+        needed.append(
+            "A fixed evaluator container for a cited source-installation transcript. "
+            "The container definition is supplied by STRhub and requires its separate "
+            "source-profile review. Base-image and package versions are not frozen "
+            "by the transcript."
+        )
+    elif env_source == "generated":
+        needed.append(
+            "A container environment, built from the tool's declared install "
+            "steps rather than from a recipe the repository ships."
+        )
+    elif env_source == "submitted":
+        needed.append(
+            "A container environment, supplied with the submission."
+        )
+    elif instrument_of(m) == "curated":
+        needed.append(CURATED_NEEDED)
+    if needed:
+        report["needed_beyond_repo"] = needed
+
+    # Whether the repository ships example data, as EVIDENCE rather than as an
+    # assumption. Only a run whose recipe was proposed from the repository has
+    # read the tree; for a committed recipe nobody looked, and a report must
+    # then say what STRhub used rather than what the author ships. The
+    # certificate used to state "This tool does not include its own demo or
+    # test data" unconditionally — false for STRsearch, which ships 35 files
+    # including example/test_data/test.bam.
+    # What the author already wrote down as wrong or incomplete, quoted from
+    # their README at the pinned ref. STRspy documents that its wrapper can
+    # exit without doing any work; a report on a run that died in that wrapper
+    # said nothing about it, because nobody carried the section out of the
+    # README. A reader deciding whether a failure is news needs this first.
+    # Reading the repository is evidence collection, and it is worth doing for
+    # every run — not only for one whose recipe STRhub proposed. A published
+    # tool's recipe is committed, so no proposal exists, and the catalogue
+    # carried none of this: no known-issue section, and a certificate still
+    # claiming the tool ships no test data because nobody had looked. The
+    # verdict keeps reading `proposal` alone, since "the recipe was proposed
+    # from the repository" is what changes a verdict, and reading a repository
+    # is not that.
+    evidence = proposal
+    if evidence is None and args.repo_read and pathlib.Path(args.repo_read).exists():
+        try:
+            evidence = json.loads(pathlib.Path(args.repo_read).read_text())
+        except Exception:  # noqa: BLE001
+            evidence = None
+    if evidence is not None and evidence.get("known_issues"):
+        report["author_known_issues"] = evidence["known_issues"]
+    # Every fact the run's configuration rests on, as something a reader can
+    # open: file, line, the text as read, and the URL at the pinned ref.
+    # Phase B of docs/PLAN-Claims-Need-Evidence.md — a claim that cannot be
+    # checked in one click cannot be challenged either.
+    if evidence is not None and evidence.get("evidence"):
+        report["evidence"] = evidence["evidence"]
+    if evidence is not None:
+        examples = evidence.get("example_data") or []
+        report["repo_test_data"] = {
+            "known": True,
+            "present": bool(examples),
+            "count": len(examples),
+            "examples": [e.get("path") for e in examples[:5] if isinstance(e, dict)],
+        }
+
+    # Notes taken while reading the repository, carried straight from the manifest
+    # and kept OUT of "gates" and "diagnostics" on purpose. Those two are what
+    # running the tool established; this is what somebody read beforehand, and a
+    # reader has to be able to tell the difference. The provenance travels with
+    # the text so they can weigh it.
+    if m.get("caveats", {}).get("items"):
+        report["caveats"] = m["caveats"]
+
+    # Prefer an explicit per-variant slug from the manifest (e.g. so the PowerSeq
+    # and ForenSeq variants of the same tool get distinct badges); otherwise fall
+    # back to a slug derived from the tool name.
+    slug = m.get("report", {}).get("slug")
+    if not slug:
+        slug = re.sub(r"[^a-z0-9]+", "-", m["tool"]["name"].lower()).strip("-")
+    reports = ROOT / "reports"
+    reports.mkdir(exist_ok=True)
+
+    import shutil
+    logs = {}
+    terminals = {}
+    # The build log rides along with the run logs. A reader told the build failed
+    # will want the same thing a reader told a run failed wants: the output.
+    for leg, flag in [("own", args.log_own), ("external", args.log_external),
+                      ("example", args.log_example), ("starts", args.log_starts), ("build", args.log_build)]:
+        if not flag:
+            continue
+        lp = pathlib.Path(flag)
+        if lp.exists() and lp.stat().st_size > 0:
+            dest = f"{slug}.log-{leg}.txt"
+            shutil.copy2(lp, reports / dest)
+            logs[leg] = dest
+        transcript = lp.with_suffix(lp.suffix + ".terminal")
+        if transcript.is_file() and transcript.stat().st_size > 0:
+            dest = f"{slug}.terminal-{leg}.txt"
+            shutil.copy2(transcript, reports / dest)
+            terminals[leg] = dest
+    if logs:
+        report["logs"] = logs
+    if terminals:
+        report["terminals"] = terminals
+
+    # Why the environment did not build.
+    #
+    # Kept out of `diagnostics`, which is keyed by verification leg and means
+    # "errors the tool reported while running". A build failure happens before
+    # any run, so folding it in there would put it under a heading that says
+    # "during the run" and count it toward a badge suffix about a run that never
+    # happened. It is its own thing, and only meaningful when Installs failed:
+    # a warning in a build that succeeded is not news.
+    install_detail = None
+    if args.log_build and not gates["installs"]:
+        issues = diagnose_log.diagnose_file(args.log_build)
+        install_detail = {
+            "passed": False,
+            "diagnostics": issues,
+            # The side each cause falls on, decided by class rather than by
+            # reading the text — so a fault of ours can never be published as a
+            # finding about somebody's software.
+            "faults": sorted({
+                f for f in (diagnose_log.fault_of(i["id"]) for i in issues) if f
+            }),
+        }
+    if install_detail is not None:
+        report["install_detail"] = install_detail
+
+    diagnostics = {}
+    for leg, flag in [("own", args.log_own), ("external", args.log_external),
+                      ("example", args.log_example)]:
+        if not flag:
+            continue
+        issues = diagnose_log.diagnose_file(flag)
+        if issues:
+            diagnostics[leg] = issues
+    if diagnostics:
+        report["diagnostics"] = diagnostics
+
+    # Whether this run may be offered the paid, human-run verification (level 2).
+    # Emitted unconditionally — including `eligible: false` — so the web can tell a
+    # report that was checked and did not qualify from an older one that predates
+    # the check. The decision is entirely mechanical (see diagnose_log): a declared
+    # environment ceiling, or one the log proves we hit. Nobody grants it by hand.
+    report["manual_verification"] = diagnose_log.manual_eligibility(
+        diagnostics, gates, m.get("compatibility"),
+    )
+
+    # The one sentence for a reader who does not program. Decided from the gates,
+    # the diagnostics and, when the recipe was proposed from the repository, the
+    # README gaps detect_recipe found (see harness/verdict.py for the policy).
+    # Whether the thing that stopped this run was STRhub's rather than the
+    # tool's. Only ever from a closed list: a step of ours that failed, or a
+    # log line whose class is ours (diagnose_log.STRHUB_FIXABLE).
+    strhub_fault = args.infra_failure.strip() or None
+    if not strhub_fault and install_detail and not gates["installs"] \
+            and "strhub" in (install_detail.get("faults") or []):
+        strhub_fault = "the environment's build could not fetch what STRhub supplies"
+    if not strhub_fault and not gates["runs"]:
+        ours = {i.get("id") for issues in diagnostics.values() for i in issues} \
+            & diagnose_log.STRHUB_FIXABLE
+        if ours:
+            strhub_fault = ", ".join(sorted(ours))
+    if not strhub_fault and gates["runs"] and not gates["io"]:
+        outputs = (io_detail or {}).get("outputs") or []
+        files = [f for o in outputs for f in o.get("files", [o])]
+        if files and all(f.get("passed") or f.get("validation_status") == "unsupported" for f in files) \
+                and any(f.get("validation_status") == "unsupported" for f in files):
+            strhub_fault = "the evaluator does not support a declared VCF version or feature; format validity was not established"
+        elif outputs and all(o.get("format") == "vcf" and o.get("checks", {}).get("parses_as_vcf")
+                             and int(o.get("uncalled_rows") or 0) > 0
+                             and int(o.get("called_records", o.get("records", 0)) or 0) == 0
+                             and int(o.get("records_without_gt") or 0) == 0 for o in outputs):
+            strhub_fault = "the structurally valid output VCF contains no called genotypes; this run does not establish why"
+    import authorization
+    procedure = authorization.rejection("The mandatory pre-execution procedure review was not supplied.")
+    review_validation = authorization.Validation(False, procedure["reason"])
+    if args.procedure_review:
+        try:
+            reviewed = json.loads(pathlib.Path(args.procedure_review).read_text())
+            review_validation = authorization.validate(reviewed, m)
+            if review_validation.valid:
+                binding = authorization.binding_validation(report, m)
+                if not binding.valid:
+                    review_validation = binding
+            if review_validation.valid:
+                procedure = review_validation.review
+            else:
+                procedure = authorization.rejection(review_validation.reason)
+                report["rejected_procedure_review"] = reviewed
+        except (OSError, ValueError, AttributeError):
+            review_validation = authorization.Validation(False, "The mandatory procedure review could not be read.")
+            procedure = authorization.rejection(review_validation.reason)
+    report["procedure_review"] = procedure
+    report["procedure_validation"] = {"schema": authorization.SCHEMA, "valid": review_validation.valid,
+                                      "reason": review_validation.reason}
+    if args.mounted_inputs and args.runs in ("success", "failure", "pass", "fail"):
+        try:
+            receipt = json.loads(pathlib.Path(args.mounted_inputs).read_bytes())
+            if (receipt.get("schema") != "strhub-mounted-inputs/1" or receipt.get("leg") != "external"
+                    or receipt.get("input_type") != m.get("inputs", {}).get("type")
+                    or not review_validation.valid
+                    or receipt.get("procedure_evidence_sha256") != procedure["evidence_sha256"]):
+                raise ValueError("the mounted inputs do not match the reviewed procedure")
+            report["mounted_inputs"] = receipt
+        except (OSError, ValueError, AttributeError):
+            procedure = authorization.rejection("The external run has no matching mounted-input evidence.")
+            report["procedure_review"] = procedure
+            report["procedure_validation"] = {"schema": authorization.SCHEMA, "valid": False,
+                                              "reason": procedure["reason"]}
+    report["verdict"] = verdict_lib.decide(
+        gates, diagnostics, report["manual_verification"], proposal, m.get("compatibility"),
+        strhub_fault=strhub_fault,
+        procedure=procedure,
+        manifest=m,
+    )
+
+    # Step 1 in the three sentences a maintainer is owed, with the block of
+    # docs/GUIA-PASO-1.md that is missing when one is. Derived from the
+    # classifier's blocker, not from check_readme's word search: searching a
+    # README for "install" never ran anything (docs/PLAN-Paso-1.md).
+    report["step1"] = step1_says(report)
+
+    # The certificate's own words, as data: what the PDF prints in its
+    # executive summary, its closing lists and its conclusion, so the page can
+    # print the same and a test can hold the two to it.
+    report["certificate"] = certificate_for(report, _certificate_cfg(report, m))
+
+    (reports / f"{slug}.json").write_text(json.dumps(report, indent=2))
+
+    # The badge is the one artifact that travels alone, and it says the
+    # result in words — what happens to the tool as it is in its repository —
+    # rather than the rung reached: "Installs" on a run that then failed read
+    # as a result, and a green from a recipe STRhub wrote read as the tool's
+    # own. One rule, certificate_text.headline, for the badge, both copies,
+    # the index and the certificate; it folds in the errors the tool reported
+    # (a green with errors is yellow) and says "Could not be determined" for a
+    # run nobody knew how to attempt.
+    message, color = headline(report)
+    badge = {"schemaVersion": 1, "label": "STRhub Verified",
+             "message": message, "color": color}
+    (reports / f"{slug}.badge.json").write_text(json.dumps(badge, indent=2))
+
+    (reports / f"{slug}.summary.md").write_text(_summary_md(report, slug))
+    (reports / f"{slug}.html").write_text(_summary_html(report, slug))
+
+    print(json.dumps(report, indent=2))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

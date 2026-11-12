@@ -1,0 +1,442 @@
+# RUNBOOK — Correr la verificación de STRspy de cero
+
+Objetivo: pasar de "tengo el zip" a "veo las compuertas corriendo en GitHub
+Actions y obtengo un badge". La única parte nueva es el paso 2 (el BAM de
+prueba); el resto es git + la pestaña Actions.
+
+Prerrequisitos: una cuenta de GitHub, `git`, y `samtools` instalado localmente.
+(Opcional pero cómodo: la GitHub CLI `gh`.)
+
+---
+
+## Paso 1 — Subir el scaffold a un repo de GitHub (PÚBLICO)
+
+El repo TIENE que ser público: ahí los runners de GitHub Actions son gratis e
+ilimitados. (En privado pagarías minutos.)
+
+```bash
+unzip strhub-verified.zip
+cd strhub-verified
+git init -b main
+git add .
+git commit -m "STRhub Verified v0 scaffold + STRspy 2.0"
+```
+
+Crear el repo y pushear. Con la CLI de GitHub:
+
+```bash
+gh repo create strhub-verified --public --source=. --push
+```
+
+O por la web: New repository → nombre `strhub-verified` → **Public** → Create →
+y seguí las instrucciones "push an existing repository":
+
+```bash
+git remote add origin https://github.com/<TU-USUARIO>/strhub-verified.git
+git push -u origin main
+```
+
+---
+
+## Paso 2 — Armar el BAM de prueba (el fixture)
+
+STRspy con input BAM necesita reads alineados a **hg38** sobre los loci de su
+base de datos. No bajamos nada gigante: tomamos UN BAM que ya tengas (de tu
+benchmark 1KGP-ONT) y le recortamos solo las regiones de los STRs.
+
+**2a.** Traer la lista de regiones de STRspy (congelada al commit que estamos verificando):
+
+```bash
+curl -sL https://raw.githubusercontent.com/unique379r/strspy/dafdee7e7e5672c8dc732e8577dbe153f53a12f5/db-v2/STRspy_v2.DB.sort.bed -o region.bed
+```
+
+**2b.** CHEQUEO IMPORTANTE — los nombres de cromosoma del BAM deben coincidir
+con el bed (`chr3`, no `3`). Si no coinciden, el recorte sale vacío y STRspy
+"corre" pero no produce nada (falla silenciosa — justo lo que queremos atrapar,
+pero acá lo evitamos a propósito):
+
+```bash
+samtools view -H TU_BAM_GRANDE.bam | grep '@SQ' | head -3
+# Debe mostrar SN:chr3, SN:chr12, etc. Si muestra SN:3, tu BAM usa otra
+# convención y habría que renombrar contigs (avisame y lo resolvemos).
+```
+
+**2c.** Recortar a las regiones de los STRs, ordenar e indexar:
+
+```bash
+mkdir -p strhub-verified/fixtures/strspy-bam
+samtools view -b -L region.bed TU_BAM_GRANDE.bam \
+  | samtools sort -o strhub-verified/fixtures/strspy-bam/sample.bam -
+samtools index strhub-verified/fixtures/strspy-bam/sample.bam
+```
+
+**2d.** Verificar que quedó chico y con reads (si pesa de más, down-sampleá con
+`samtools view -s 0.2 -b`):
+
+```bash
+ls -lh strhub-verified/fixtures/strspy-bam/sample.bam
+samtools view -c strhub-verified/fixtures/strspy-bam/sample.bam   # nº de reads, > 0
+```
+
+**2e.** Commitear el fixture. Si es < ~5 MB, directo; si es más, usá Git LFS
+(`git lfs track "*.bam"`):
+
+```bash
+cd strhub-verified
+git add fixtures/strspy-bam/
+git commit -m "Add tiny hg38 ONT BAM fixture for STRspy"
+git push
+```
+
+---
+
+## Paso 3 — Disparar las compuertas
+
+En la web del repo → pestaña **Actions**. La primera vez GitHub pide habilitar
+los workflows: "I understand my workflows, go ahead and enable them".
+
+Luego: workflow **STRhub Verified** (panel izquierdo) → botón **Run workflow** →
+en el campo `tool` escribí **`strspy`** → **Run workflow**.
+
+(Esto es el modo `workflow_dispatch`. También se dispara solo cuando abrís un PR
+que toca `tools/**`, `harness/**`, `schema/**` o el propio `verify.yml`.)
+
+En un PR el workflow verifica **las herramientas que el PR toca**, una por cada
+`tools/<slug>/` modificado. Antes verificaba siempre `strait-razor-PowerSeqv2.31`
+sin importar qué hubieras cambiado, así que el check daba verde por construcción
+y no decía nada sobre el PR. Quién decide está en `harness/pick_tools.py`:
+
+- PR que no toca ninguna herramienta (solo `harness/`, `schema/`, el workflow):
+  corre la herramienta por defecto como canario.
+- PR que toca más de 6: también corre solo el canario, y lista en el resumen del
+  run **todas** las herramientas que quedaron sin verificar. Un barrido —una
+  migración de schema, un campo agregado a todos los manifiestos— no se verifica
+  corriendo seis de dieciséis elegidas por nada en particular. Las que importen,
+  verificalas a mano con un dispatch.
+
+---
+
+## Paso 4 — Leer el resultado
+
+Entrá al run que apareció. Las compuertas corren dentro de un solo paso,
+`Gates · Available, Installs, Starts, Example, Runs, IO, Content` (`harness/engine`),
+que imprime una línea `[engine] <compuerta>: passed|failed|not_run` por cada una y
+deja `run_record.json` en el artifact con el comando exacto, el exit code y el log
+de cada compuerta. Las compuertas:
+
+| Paso en Actions | Compuerta |
+|---|---|
+| `Gate · Available` | el ref público existe |
+| `Gate · Installs` | **`docker build`** — ¿resuelve el env viejo de STRspy? |
+| `Gate · Runs` | **`docker run`** sobre tu BAM |
+| `Gate · Expected IO` | ¿produjo una tabla no vacía? |
+| `Build attestation + badge` | arma `reports/strspy.json` + el badge |
+
+Descargá el artifact **`attestation-strspy`** (sección Artifacts del run):
+adentro está `reports/strspy.json` (la atestación) y `reports/strspy.badge.json`.
+
+---
+
+## Paso 5 — Interpretar (y qué esperar)
+
+- Este primer run es, en parte, de **descubrimiento**: confirma los nombres
+  exactos de los archivos de salida de STRspy y si algún flag necesita ajuste.
+  El glob de salida en el manifest (`**/*.txt`) es a propósito conservador.
+- Si **Installs** falla, casi seguro es el env sin versiones fijadas + Python
+  3.7.7 (EOL): el solver de conda no arma el entorno hoy. **Eso es un hallazgo,
+  no un error tuyo.** No tocás STRspy; lo registrás (y, como sugirió Jonathan,
+  se reporta por GitHub Issues del repo original).
+- Si **Runs** falla con salida vacía, revisá el chequeo 2b (nombres de contig).
+- El badge refleja honestamente hasta dónde llegó: p. ej. "Available ✅;
+  Installs requiere ajustes no documentados". Constructivo, no humillante.
+
+---
+
+## Atajo para validar el motor primero (opcional)
+
+Si querés ver el pipeline entero en verde ANTES de pelear con el env real de
+STRspy, corré el workflow con `tool = strait-razor-PowerSeqv2.31`. Te confirma
+que Actions, las compuertas y el reporte funcionan; después vas por el caso difícil.
+
+---
+
+## StraitRazor sobre datos reales del NIST (Illumina, mds2-2157)
+
+StraitRazor es MPS/Illumina, así que se valida con los datos del NIST
+`mds2-2157` (no con los BAM ONT de STRspy). Ya hay **dos variantes** listas, con
+fixtures reales chiquitos (5.000 reads, mismo donante NTD01) commiteados:
+
+| `tool` en Actions (directorio) | Kit (Illumina) | Config |
+|---|---|---|
+| `strait-razor-PowerSeqv2.31` | Promega PowerSeq 46GY | `PowerSeqv2.31.config` |
+| `strait-razor-ForenSeqv1.27` | Verogen ForenSeq      | `ForenSeqv1.27.config` |
+
+Disparalas igual que STRspy: pestaña **Actions** → workflow **STRhub Verified** →
+**Run workflow** → en `tool` elegí la variante en el desplegable (el nombre ya
+incluye el kit y la versión del config). Cada corrida produce su atestación en
+`reports/<slug>.json` y su badge `reports/<slug>.badge.json`.
+
+La procedencia exacta de cada fixture (archivo dentro del zip + cómo se regenera
+con `remotezip`, sin bajar los 5-8 GB) está en el `SOURCE.txt` de cada carpeta
+`tools/<variante>/fixtures/nist-mds2-2157/` y en `fixtures/nist-mds2-2157/README.md`.
+
+Qué esperar en este primer run real:
+- **Available / Installs**: deberían pasar (repo público + build C++ del binario).
+- **Runs**: primer contacto del binario con reads reales; si algún flag o ruta de
+  config necesita ajuste, el log lo muestra (el manifest marca esos puntos).
+- **Expected IO**: confirma que `*.allsequences.txt` salió no vacío (atrapa el
+  exit-0-pero-vacío).
+- **Content**: el peldaño más alto. Confirma que el output *parece genotipos*:
+  5 columnas, columna de secuencia solo ADN, conteos enteros, y suficientes loci
+  forenses reconocibles (loci core obligatorios + mínimo de loci distintos). Lo
+  declarás en el bloque `outputs[].content` del manifest. NO afirma que los
+  genotipos sean correctos (eso es concordancia, fuera de alcance).
+
+## La escalera de niveles (qué dice el badge)
+
+| Nivel | Badge | Significa |
+|---|---|---|
+| `available` / `installs` | amarillo | el repo existe / la imagen compila |
+| `runs` | verde | ejecuta sin romperse |
+| `io` | verde | produjo un archivo no vacío del formato declarado |
+| `content` | **brightgreen** | el output parece datos de genotipos plausibles |
+
+Cada run genera también `reports/<slug>.summary.md`: un resumen legible para
+humanos (qué pasó, qué loci salieron, profundidad, y qué NO se afirma).
+
+---
+
+## Fase 2 — Submission self-service (GitHub App)
+
+La web (`strhub-web`) puede commitear el `manifest.yml` + `Dockerfile` a este repo
+y disparar el workflow en nombre del autor, vía una **GitHub App central**. El
+autor nunca toca este repo; su código nunca se guarda (el Dockerfile lo clona en
+build time).
+
+### Crear la GitHub App (una vez, acción del mantenedor)
+
+1. GitHub → Settings → Developer settings → **GitHub Apps** → New GitHub App.
+2. Permisos (mínimos):
+   - **Repository → Contents: Read and write** (commitear `tools/<slug>/`).
+   - **Repository → Actions: Read and write** (`workflow_dispatch` + leer runs).
+   - **Repository → Metadata: Read-only** (obligatorio).
+3. Instalar la App **solo en el repo `strhub-verified`**.
+4. Generar una **private key** (PEM) y anotar el **App ID** y el **Installation ID**.
+
+### Cargar los secrets en la web (Vercel/host de `strhub-web`)
+
+| Variable | Valor |
+|---|---|
+| `GITHUB_APP_ID` | el App ID numérico |
+| `GITHUB_APP_PRIVATE_KEY` | el PEM (raw o base64; el helper acepta ambos) |
+| `GITHUB_APP_INSTALLATION_ID` | el Installation ID |
+| `VERIFIED_ENGINE_REPO` | `Tfronta/strhub-verified` (default) |
+| `VERIFIED_ENGINE_BRANCH` | `main` (default) |
+| `VERIFIED_WORKFLOW_FILE` | `verify.yml` (default) |
+| `JWT_SECRET` | el mismo secreto admin (para `/api/verify/approve`) |
+
+### Flujo
+
+1. Autor completa `/verified/submit` (validación `zod` espejo del schema).
+2. `POST /api/verify/submit`: valida, rate-limit, chequea slug libre y que el
+   fixture BYOR sea público; si el repo es nuevo, queda **pendiente de aprobación**.
+3. Admin aprueba el repo nuevo: `POST /api/verify/approve` con `Authorization:
+   Bearer <jwt>` y `{ "repo": "https://github.com/owner/tool" }`. El autor reenvía.
+4. Repos aprobados: la web commitea `tools/<slug>/{manifest.yml,Dockerfile}` y
+   dispara `verify.yml` con un `dispatch_id` único. (Un `dockerfile_fallback` en
+   la receta ya no tiene lugar: el schema no admite `environment.fallback`.)
+5. `run-name` del workflow incluye el `dispatch_id`; `GET /api/verify/status?
+   dispatchId=` lo encuentra filtrando los runs y muestra el progreso en vivo.
+
+> Rate-limit por defecto: 5 envíos/hora por IP, 3/hora por repo
+> (`lib/verified/store.ts`).
+
+---
+
+## Fase 3 — Matriz own/external, datasets tipados y README-check
+
+### Librería de datasets (`datasets/`)
+
+Datasets de referencia tipados por assay. `datasets/index.json` mapea
+`inputs.type` → archivo de datos:
+
+```
+datasets/
+  README.md                   # disclaimer + catalogue (STRhub is not data custodian)
+  index.json                  # type → { data, bam_index?, name, source, license, … }
+  illumina-str-fastq/
+    dataset.yml               # metadata
+    sample.fastq              # datos (NIST mds2-2157)
+    SOURCE.txt                # procedencia
+  ont-bam-hg38/
+    dataset.yml               # metadata (data lives in ont_slices/)
+    SOURCE.txt                # 1000 Genomes ONT, R10 SUP, open access on AWS
+
+ont_slices/                   # pre-built hg38 CODIS BAM slices (shared by ont-bam-hg38)
+  codis_pm10kb.bed
+  HG00113.codis.bam (+ .bai)  # default external test file (~30 MB)
+  …                           # HG00154, GM19038, HG00097, HG00263 also available
+```
+
+Agregar un dataset: crear `datasets/<type>/` con metadata + `SOURCE.txt`, apuntar
+`data` (y `bam_index` si aplica) en `datasets/index.json`. Los BAM ONT ya
+commiteados viven en `ont_slices/` — no hace falta duplicarlos. Si un
+`inputs.type` no tiene match, la pierna externa se reporta **N/A** (nunca falla).
+
+### Matriz de verificación (en `verify.yml`)
+
+Cada run corre dos piernas (cuando aplican):
+
+| Pierna | Input | Origen |
+|---|---|---|
+| **own** | `work/in_own` | fixture del autor (path local o BYOR remoto `repo+ref+path`) |
+| **external** | `work/in_external` | dataset tipado de `datasets/` por `inputs.type` |
+
+`harness/prepare.py` resuelve el dataset y stagea ambas piernas (descarga el BYOR
+remoto desde `raw.githubusercontent.com`). El badge/escalera usa la pierna
+**own**; la matriz completa va a `matrix.json` → `report.py` → `<slug>.json`,
+HTML y `index.json` (`own_state` / `external_state`).
+
+### README-check (advisory)
+
+`harness/check_readme.py` baja el README del repo del autor (al ref fijado) y
+corre un checklist de presencia de 5 ítems (install, comando, input, output,
+dependencias). Es **siempre informativo**: nunca cambia el badge de ejecución.
+Determinista (keywords), sin costo de API.
+
+Salida en el reporte: `readme_check.score` / `readme_check.max` + cada ítem.
+
+---
+
+## Fase 1 — Ensayos, receta propuesta, veredictos
+
+### Ensayo (`mode=trial`): correr sin publicar
+
+Un ensayo corre las mismas compuertas que una verificación, pero **no commitea a
+`main`, no despliega a `gh-pages`, no borra ni crea avisos de rechazo**, y su
+reporte lleva `"mode": "trial"` (el índice del catálogo lo ignora aunque llegara
+a gh-pages). El resultado vive en el artifact `trial-<slug>` del run, 30 días.
+
+El ensayo recibe la URL pública y el commit del repositorio. El motor revisa la
+instalación y el comando documentados en ese commit.
+
+```bash
+gh workflow run verify.yml -f tool=strsearch-trial -f mode=trial \
+  -f repo=https://github.com/AnJingwd/STRsearch -f ref=c70179b3b175adc82a7314409af06900b3861d61
+```
+
+Para revisar localmente, usar `harness/local_trial.py --repo … --ref … --out-dir …`.
+Con `--docker` corre las mismas compuertas que CI (`harness/engine`), con imagen y
+nombre de contenedor propios del ensayo, y deja `run_record.json`, los logs y los
+transcripts junto al reporte; sin `--docker` no construye ni ejecuta nada y el
+reporte lo dice (modo preview).
+El modo por defecto prepara el informe sin ejecutar Docker. Ver
+[política de ejecución y evidencia](docs/UPSTREAM-FIDELITY.md).
+
+### Qué se publica (`harness/publish_gate.py`)
+
+Un fallo de la herramienta se publica igual que un éxito: es el dato que buscan el
+revisor, el usuario al que no le corre y el dueño. No se publican:
+
+- la corrida de un PR (es un chequeo del motor);
+- un veredicto que no habla de la herramienta: fuera de alcance, o una falla de
+  STRhub (descarga de hg38, rate-limit del registry, propuesta o staging caídos),
+  que sale como *Could not be determined* con `basis: strhub` y sin issue para el autor;
+- un ensayo desde URL que caería en la tarjeta de **otro** repositorio (el slug sale
+  del nombre del repo). Quien lo pidió recibe el informe completo igual, en el artifact.
+
+La compuerta Available exige que el commit fijado esté en una rama o tag del propio
+repositorio (no alcanza con que la API de GitHub lo resuelva: resuelve commits de forks).
+Una salida cuenta solo si la corrida terminó con éxito: un archivo que dejó un proceso
+caído no es evidencia de que corrió.
+
+### Receta propuesta desde el repo
+
+`harness/detect_recipe.py <repo> <ref> --json proposal.json` lee el árbol y el
+README al ref y propone, con evidencia: método de instalación (Dockerfile del
+repo, conda incluso bajo `setup/`, pip, make/cmake, cargo, go), datos de ejemplo
+por tipo (excluye vendored y salidas), comandos del README (continuaciones
+unidas; marcadores como `fastqfile` cuentan como entrada), tipo de entrada más
+probable con sus señales y avisos (hg19, BAM/FASTQ ambiguo), formato de salida,
+Dockerfile generado, y **los huecos del README** (qué no dice).
+
+**Entorno: una instalación seleccionada antes de ejecutar.** Installs construye
+el Dockerfile principal una sola vez. Si falla, conserva el fallo; no intenta
+una imagen publicada, Bioconda ni otro Dockerfile para recuperar la ejecución.
+`environment.fallback` y `Dockerfile.fallback` ya no existen: el schema del
+manifest no admite el campo, y un manifest antiguo que lo declare falla la
+validación en vez de arrastrar un Dockerfile que nadie construye.
+
+`harness/propose_manifest.py proposal.json --slug X` lo convierte en receta:
+comando del README reescrito a los mounts de STRhub (`/data/in/sample.fastq`,
+`/data/ref/hg38.fa`, `/data/in/regions.bed`; marcadores de config resueltos con
+el archivo del kit del dataset), envuelto para capturar todo lo que crea en
+`/data/out`; `outputs` por formato detectado; `caveats` con cada decisión. Si el
+repo trae Dockerfile, se construye ese (`environment.source: repository`).
+
+Snapshots de los 5 repos del catálogo en `harness/testdata/repos/` para tests
+sin red (`harness/tests/test_detect_recipe.py`, `test_propose_manifest.py`).
+
+### Qué lee el motor además del README (fase 2)
+
+`detect_recipe.gather()` lee, en el commit fijado: el árbol, el README, los documentos del repo que el
+README enlaza (y las páginas de `docs/`, hasta dos niveles, primero las de uso), las páginas de la wiki que
+enlaza (y su barra lateral), los archivos de build y packaging (`files/`), los archivos de loci que el repo
+trae (catálogos, BED de regiones), las versiones del paquete en Bioconda y los assets del release del tag.
+Cada comando lleva el archivo y la línea donde se leyó, y la evidencia cita ese archivo (`kind: doc` o
+`wiki`; una wiki no está versionada con el código y el informe lo dice).
+
+- **Instalación**: Dockerfile del repo; si la documentación manda a bajar el binario del release y el tag
+  tiene uno para Linux x86-64, ese binario (es el build del autor de ese mismo commit); si no, el build del
+  commit: conda (con `make`/`pip` encima cuando la doc lo pide), pip, cmake fuera del árbol (también en
+  `source/`), autotools, make (también en `src/`), cargo, R, Nim, o el `install.sh` que la doc manda correr.
+  Los ejecutables que el build deja se ponen en el PATH. Un build que clona por SSH se hace por HTTPS, y el
+  informe lo avisa. Bioconda cuenta como documentado solo si la doc lo dice (comando, `bioconda::`, badge o
+  enlace); si no, queda como dato en `registry`.
+- **Comando**: el programa propio primero (nombres del árbol y los ejecutables que declara el packaging);
+  nada de `--help`, helpers (`-merge`, `plot`, `convert`) ni líneas de usage de argparse; el subcomando de
+  análisis (`call`, `genotype`); el modo lecturas antes que el de ensamblado; el que lee el tipo de dato que
+  STRhub le va a dar. Si solo hay `--help` documentado, no hay comando. Si el comando lee un archivo que
+  escribe un paso anterior del mismo documento (`strling extract` → `.bin` → `strling call`), se corren los dos.
+- **Reescritura**: `<descripciones>`, variables `$sample`, opcionales `[...]` (se omiten, salvo los loci),
+  `path/to/`, listas `a.bam,...`, `./tool` cuando el build lo deja en otro lado, archivos de exclusión (se
+  quitan), catálogos del repo (el de hg38). Si el BAM no tiene read group y la doc documenta `--bam-samps`,
+  se usa. Todo queda en `caveats`.
+- **Antes de correr**: si los loci del catálogo del repo no caen en el panel del dataset
+  (`loci_outside_panel`) o el comando lee un archivo que nadie tiene (`documented_file_missing`), el
+  veredicto es *Could not be determined* con esa razón, no una corrida que falla.
+- **Entrada**: lo que dice el README; si no dice nada, los documentos; si tampoco, lo que toma el comando.
+  PacBio HiFi, VCF y señal cruda son tipos sin dataset: el ensayo lo dice en vez de darle lecturas de Illumina.
+
+### Biblioteca histórica de regiones
+
+Los archivos bajo `datasets/<tipo>/regions/` se conservan para reproducir la
+evidencia histórica. Un ensayo automático solo puede usar los catálogos que el
+comando documentado encuentra dentro del procedimiento original del repositorio.
+
+### Compuerta Content sin declarar columnas
+
+`harness/content_auto.py` lee la salida por sí misma cuando el manifest no dice
+qué columna es qué (o siempre, si el formato es VCF, cuyas columnas son del
+estándar y no de la tool):
+
+- **VCF**: registros con CHROM/POS/REF/ALT y muestra; una llamada es un
+  registro con GT no vacío; un locus se reconoce cuando el ID del registro es un
+  nombre del BED de regiones que la corrida recibió (HipSTR) o su posición cae
+  en una de esas regiones (GangSTR, ±50 pb). Un BED sin nombres (formato
+  GangSTR) toma los nombres del panel por solapamiento.
+- **TSV/CSV/TXT**: la columna cuyos valores parecen nombres de loci forenses
+  (`D\d+S\d+`, `DYS`, TH01, TPOX, vWA, FGA, SE33, Penta, AMEL, `rs\d+`, o los
+  nombres del panel) es la de loci; columnas ACGTN son secuencia; enteros son
+  conteos; números chicos con `.3` son alelos.
+
+Pasa si: hay registros; (VCF) al menos la mitad tienen genotipo llamado y
+volvió al menos el 30% (mínimo 3) de los loci dados; (tabla) hay columna de
+loci con al menos 3 distintos y alguna columna de conteos, secuencia o alelos.
+Un bloque `content` con `min_distinct_loci`, `expect_loci` o `min_total_reads`
+se aplica encima. **No dice si un genotipo es correcto**: eso es concordancia y
+queda fuera de alcance.
+
+El workflow pasa a la compuerta el BED de regiones de cada pierna y `loci.bed`
+del dataset (`--regions`, `--panel`). Tests con VCF reales de HipSTR y GangSTR
+en `harness/testdata/outputs/`.

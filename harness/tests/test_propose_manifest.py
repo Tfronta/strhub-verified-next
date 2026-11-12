@@ -1,0 +1,328 @@
+"""A proposal becomes a schema-valid trial recipe, and says what it guessed."""
+import json
+import pathlib
+
+import pytest
+
+import _manifest
+import detect_recipe as dr
+import propose_manifest as pm
+
+REPOS = pathlib.Path(__file__).resolve().parents[1] / "testdata" / "repos"
+
+
+def _proposal(name):
+    tree, readme, repo = dr.load_offline(REPOS / name)
+    return dr.detect(dr.repo_slug(repo), tree["ref"], tree, readme, "README.md")
+
+
+def _valid(manifest_yml, tmp_path):
+    p = tmp_path / "manifest.yml"
+    p.write_text(manifest_yml)
+    return _manifest.load(str(p))  # raises on schema violation
+
+
+def test_hipstr_proposal_preserves_the_documented_fasta_and_read_list(tmp_path):
+    r = pm.build(_proposal("hipstr"), "hipstr-trial")
+    m = _valid(r["manifest_yml"], tmp_path)
+    assert m["environment"]["source"] == "generated"
+    assert r["dockerfile"].endswith("FROM scratch\n")
+    assert not r["procedure"]["install_ready"]
+    assert m["inputs"]["type"] == "illumina-bam-hg38"
+    assert "run1.bam,run2.bam,run3.bam,run4.bam" in m["run"]["cmd"]
+    assert "--fasta genome.fa" in " ".join(m["run"]["cmd"].split())
+    assert "str_regions.bed" in m["run"]["cmd"]
+    assert m["run"]["cmd"].startswith("cd '/opt/tool' && touch /tmp/.strhub_mark")
+    assert m["outputs"][0] == {"path": "**/*.vcf*", "format": "vcf", "min_records": 1}
+    assert "regions" not in m["inputs"]
+    assert "install_profile_unsupported" in r["limitations"]
+    assert m["caveats"]["source"] == "detect_recipe"
+    assert "example" not in m  # README shows placeholders, not shipped data
+
+
+def test_strsearch_uses_the_repository_dockerfile_and_its_example(tmp_path):
+    r = pm.build(_proposal("strsearch"), "strsearch-trial")
+    m = _valid(r["manifest_yml"], tmp_path)
+    assert m["environment"]["source"] == "repository"
+    assert m["environment"]["from_repo"] == "Dockerfile"
+    assert m["example"]["cmd"].startswith("python3 pipeline.py from_")
+    assert m["example"]["cwd"] == "."
+    assert any("hg19" in c for c in m["caveats"]["items"])
+
+
+def test_straitrazor_config_and_positional_placeholders_are_not_guessed(tmp_path):
+    r = pm.build(_proposal("straitrazor"), "straitrazor-trial")
+    m = _valid(r["manifest_yml"], tmp_path)
+    assert m["inputs"]["type"] == "illumina-str-fastq"
+    # README placeholders resolved: the kit-matched config from the tree, and
+    # `fastqfile` pointed at the NIST sample. The un-piped form is chosen.
+    assert "str8rzr -c configFile fastqfile > allsequences.txt" in m["run"]["cmd"]
+    assert "zcat" not in m["run"]["cmd"]
+    assert not any("ForenSeq kit" in c for c in m["caveats"]["items"])
+    assert m["outputs"][0]["path"] == "**/*.t[sx][vt]"
+    assert not r["procedure"]["may_say_runs"]
+
+
+def test_empty_repository_yields_a_recipe_that_reports_its_gaps(tmp_path):
+    proposal = dr.detect("x/y", "abcdef0123", {"tree": [], "truncated": False}, "", None)
+    r = pm.build(proposal, "x-trial")
+    m = _valid(r["manifest_yml"], tmp_path)
+    assert "install_method_unknown" in r["limitations"] and "no_command" in r["limitations"]
+    assert m["outputs"][0]["format"] == "text"
+    assert r["readme_gaps"]
+
+
+def test_rewrite_leaves_unknown_types_alone():
+    cmd, notes = pm.rewrite_for_strhub("tool -i reads.fsa -o out", "capillary-fsa")
+    assert cmd == "tool -i reads.fsa -o out"
+
+
+def test_recipe_round_trips_through_json():
+    r = pm.build(_proposal("gangstr"), "gangstr-trial")
+    json.dumps({"manifest_yml": r["manifest_yml"], "dockerfile": r["dockerfile"]})
+
+
+def test_a_list_of_input_files_is_not_reduced_to_one_available_sample(tmp_path):
+    cmd, _ = pm.rewrite_for_strhub("./HipSTR --bams run1.bam,run2.bam,run3.bam --fasta g.fa", "illumina-bam-hg38")
+    assert cmd == "./HipSTR --bams run1.bam,run2.bam,run3.bam --fasta g.fa"
+
+
+def test_gangstr_recipe_does_not_manufacture_a_primary_or_fallback_install(tmp_path):
+    r = pm.build(_proposal("gangstr"), "gangstr-trial")
+    m = _valid(r["manifest_yml"], tmp_path)
+    assert m["environment"]["source"] == "generated"
+    assert "fallback" not in m["environment"]
+    assert r["dockerfile"].endswith("FROM scratch\n")
+    assert "dockerfile_fallback" not in r
+    env_caveat = next(c for c in m["caveats"]["items"] if c.startswith("Environment:"))
+    assert "no proven installation profile" in env_caveat
+
+
+def test_a_recipe_declares_no_plan_b_and_the_schema_admits_none(tmp_path):
+    import jsonschema
+    r = pm.build(_proposal("hipstr"), "hipstr-trial")
+    m = _valid(r["manifest_yml"], tmp_path)
+    assert "fallback" not in m["environment"]
+    assert "dockerfile_fallback" not in r
+    # `environment` admits no unknown keys: a manifest from before the plan B
+    # was removed fails loudly instead of carrying a Dockerfile nobody builds.
+    m["environment"]["fallback"] = {"dockerfile": "Dockerfile.fallback"}
+    with pytest.raises(jsonschema.ValidationError):
+        jsonschema.validate(m, json.loads(_manifest.SCHEMA.read_text()))
+
+
+def test_strspy_runs_on_the_input_type_strhub_has_data_for(tmp_path):
+    # The README documents FASTQ and BAM on one line and recommends BAM on
+    # another; the caveat quotes both, with their lines. Nothing is forced past
+    # that — the documented command runs as documented, config files and all.
+    r = pm.build(_proposal("strspy"), "strspy-trial")
+    m = _valid(r["manifest_yml"], tmp_path)
+    assert m["inputs"]["type"] == "ont-bam-hg38"
+    note = next(c for c in m["caveats"]["items"] if c.startswith("Input:"))
+    assert note.startswith("Input: the README documents BAM and FASTQ (line 44)")
+    assert "The author recommends BAM (line 295:" in note and "pre-aligned bams" in note
+    assert "***" not in note
+    assert "bash ./STRspy_run_v2.0_Args.sh config/InputConfig.txt config/ToolsConfig.txt" in m["run"]["cmd"]
+    assert "no_reference_dataset" not in r["limitations"]
+
+
+def test_nothing_to_run_on_is_a_limitation_not_a_failure(tmp_path):
+    proposal = _proposal("strspy")
+    proposal["input_type"] = {"best": "illumina-snp-fastq", "candidates": ["illumina-snp-fastq"],
+                              "signals": {}, "warnings": []}
+    proposal["example"] = None
+    r = pm.build(proposal, "strspy-trial")
+    m = _valid(r["manifest_yml"], tmp_path)
+    assert m["inputs"] == {"type": "illumina-snp-fastq"}
+    assert "no_reference_dataset" in r["limitations"]
+
+
+
+def test_the_tool_is_named_the_way_its_repository_writes_it():
+    # A GitHub path is case-flattened by its owner as often as not
+    # (unique379r/strspy); the certificate used to .title() that into "Strspy".
+    for repo, expected in [("strspy", "STRspy"), ("gangstr", "GangSTR"),
+                           ("hipstr", "HipSTR"), ("strsearch", "STRsearch")]:
+        proposal = _proposal(repo)
+        assert pm.tool_name_as_written(proposal["repo"], proposal) == expected, repo
+    # Nothing to go on: the path segment, not an invented capitalisation.
+    assert pm.tool_name_as_written("https://github.com/x/mytool", {"readme_text": ""}) == "mytool"
+
+
+def test_a_readme_that_says_nothing_about_input_gets_a_guess_that_says_so(tmp_path):
+    """Phase C3: when the reading finds nothing, say so — never dress a count
+    up as a reading. A file appearing afterwards does not make the guess a fact."""
+    import verdict
+    tree = {"tree": [{"path": "Makefile", "type": "blob", "size": 1}], "truncated": False}
+    # A documented command that reads a BAM is read, not guessed: the input is
+    # what the command takes, and the note cites the line.
+    readme = "# mytool\n\nGenotypes STRs.\n\n```\nmytool sample.bam out.vcf\n```\n"
+    proposal = dr.detect("x/mytool", "abc", tree, readme, "README.md")
+    assert proposal["input_type"]["how"] == "command"
+    r = pm.build(proposal, "mytool-trial")
+    note = next(c for c in r["manifest"]["caveats"]["items"] if c.startswith("Input:"))
+    assert note.startswith("Input: the documented command takes BAM (README.md, line 6)")
+    assert "input_type_guessed" not in r["limitations"]
+    # No sentence and no command that names its reads: a count, and it says so.
+    readme = "# mytool\n\nGenotypes STRs from bam files of aligned reads.\n\n```\nmytool --run\n```\n"
+    proposal = dr.detect("x/mytool", "abc", tree, readme, "README.md")
+    assert proposal["input_type"]["how"] == "counted"
+    r = pm.build(proposal, "mytool-trial")
+    m = _valid(r["manifest_yml"], tmp_path)
+    note = next(c for c in m["caveats"]["items"] if c.startswith("Input:"))
+    assert note.startswith("Input: no sentence in the README says what the tool takes")
+    assert "input_type_guessed" in r["limitations"]
+    proposal["limitations"] = r["limitations"]
+    stopped = {"available": True, "installs": True, "runs": False, "io": False, "content": False}
+    assert verdict.decide(stopped, recipe_proposal=proposal)["code"] == "undetermined"
+    produced = {"available": True, "installs": True, "runs": True, "io": True, "content": True}
+    assert verdict.decide(produced, recipe_proposal=proposal)["code"] == "undetermined"
+
+
+def test_a_trial_is_filed_under_the_tool_s_catalogue_slug_not_the_run_s_name(tmp_path):
+    # The run is named by whoever dispatched it (trial-<repo>-<ref>); the report
+    # is filed where a published result lives: one card per tool and assay,
+    # with no version or commit in it.
+    r = pm.build(_proposal("straitrazor"), "trial-straitrazor-b618e93")
+    m = _valid(r["manifest_yml"], tmp_path)
+    assert m["report"]["slug"] == "straitrazor"
+    # The same card a committed entry uses, so a trial refreshes it
+    # instead of opening a second one.
+    assert (pathlib.Path(__file__).resolve().parents[2] / "tools" / "straitrazor" / "manifest.yml").is_file()
+
+
+def test_catalogue_slug_adds_a_suffix_only_for_a_non_canonical_assay():
+    assert pm.catalogue_slug("HipSTR", "illumina-bam-hg38") == "hipstr"
+    assert pm.catalogue_slug("HipSTR", "illumina-bam-hg38-y") == "hipstr-y"
+    assert pm.catalogue_slug("STRspy", "ont-bam-hg38") == "strspy-ont"
+    # Not the last hyphen-segment, which would file a HiFi run as "trgt-hg38".
+    assert pm.catalogue_slug("TRGT", "pacbio-hifi-bam-hg38") == "trgt-hifi"
+    assert pm.catalogue_slug("ExpansionHunter", "illumina-bam-hg38-med") == "expansionhunter-med"
+    assert pm.catalogue_slug("TRGT", "pacbio-hifi-bam-hg38-med") == "trgt-hifi-med"
+    assert pm.catalogue_slug("STRait Razor", "illumina-str-fastq") == "strait-razor"
+    # Unlisted types fall back to their last segment; no type, no suffix.
+    assert pm.catalogue_slug("Tool", "some-new-assay") == "tool-assay"
+    assert pm.catalogue_slug("Tool", None) == "tool"
+    assert pm.catalogue_slug("!!", None) == "tool"
+
+
+def test_the_version_is_the_release_the_ref_came_from_else_the_short_sha(tmp_path):
+    p = _proposal("hipstr")
+    sha = p["ref"]
+    # A tag or release label is what a person cites.
+    m = _valid(pm.build(p, "t", ref_label="v0.7")["manifest_yml"], tmp_path)
+    assert m["tool"]["version"] == "v0.7"
+    # No label: the short commit, as before.
+    m = _valid(pm.build(p, "t")["manifest_yml"], tmp_path)
+    assert m["tool"]["version"] == sha[:7]
+    # A "label" that is just the SHA again (the form passes the resolved ref
+    # through when it found nothing better) is not a version.
+    m = _valid(pm.build(p, "t", ref_label=sha)["manifest_yml"], tmp_path)
+    assert m["tool"]["version"] == sha[:7]
+
+
+def test_a_loci_catalog_is_not_replaced_by_a_tool_name_lookup():
+    # vamos's README fetches vamos.effMotifs-0.1.GRCh38.tsv from Zenodo for -r.
+    # Which loci to annotate is the user's choice, as HipSTR's regions BED is.
+    cmd = "vamos --read -b demo.aln.bam -r vamos.effMotifs-0.1.GRCh38.tsv -s S1 -o reads.vcf -t 8"
+    new, notes = pm.rewrite_for_strhub(cmd, "ont-bam-hg38", library_format="motif", tree_paths=["README.md"])
+    assert "-r vamos.effMotifs-0.1.GRCh38.tsv" in new and "-o reads.vcf" in new
+    assert "/data/in/regions.bed" not in new
+    # A catalog the repository ships is the tool's own, and an output is an output.
+    kept, _ = pm.rewrite_for_strhub("vamos --read -b x.bam -r example/region_motifs.tsv -o motifs.tsv",
+                                    "ont-bam-hg38", library_format="motif",
+                                    tree_paths=["example/region_motifs.tsv"])
+    assert "-r example/region_motifs.tsv" in kept and "-o motifs.tsv" in kept
+    # No layout STRhub writes for the tool: nothing to put in its place.
+    none, _ = pm.rewrite_for_strhub(cmd, "ont-bam-hg38", library_format=None)
+    assert "vamos.effMotifs-0.1.GRCh38.tsv" in none
+
+
+def test_short_loci_keyword_outside_panel_flags_loci_outside_panel():
+    """mahi-mahi passes `--loci hg38` (a short keyword, not a path) that resolves
+    to shipped loci coordinates outside STRhub's CODIS slice."""
+    caveats = []
+    proposal = {
+        "tree_paths": ["mahi_mahi/data/hg38_loci.bed"],
+        "shipped_loci": {"mahi_mahi/data/hg38_loci.bed": [["chr4", 3074876, 3074933]]},
+    }
+    cmd = "mahi-mahi --bam /data/in/input.bam --ref /data/ref/hg38.fa --loci hg38 --out-dir out"
+    lims = pm.check_documented_files(cmd, proposal, "ont-bam-hg38", caveats)
+    assert "loci_outside_panel" in lims
+
+
+def test_local_trial_never_fabricates_a_passed_run_without_docker(tmp_path):
+    """local_trial.py without container execution must never mark a tool as
+    running (`runs`) or failing (`fails`); it is an undetermined preview."""
+    import local_trial
+    report = local_trial.build_local_trial(
+        "https://github.com/tfwillems/HipSTR", "", "", tmp_path / "trial_out", prefer_offline=True
+    )
+    assert report["gates"]["runs"] is False
+    assert report["gates"]["installs"] is False
+    assert report["verdict"]["code"] == "undetermined"
+    assert report["verdict"]["basis"] == "strhub"
+
+
+def test_bare_output_directory_does_not_authorize_mkdir():
+    cmd, notes = pm.normalize_documented("tool -i in.bam -o Results", "illumina-bam-hg38", [], "input.bam", "/data/ref/hg38.fa", False)
+    assert cmd == "tool -i in.bam -o Results"
+    assert not notes
+
+
+def test_file_output_does_not_create_dir():
+    cmd, notes = pm.normalize_documented("tool -i in.bam -o out.vcf", "illumina-bam-hg38", [], "input.bam", "/data/ref/hg38.fa", False)
+    assert "mkdir" not in cmd
+
+
+def test_input_directory_option_rewritten_to_data_in():
+    cmd, notes = pm.rewrite_for_strhub(
+        "tool -s my_reads -r yes -o Results",
+        "ont-bam-hg38",
+        docs_text="-s input read dir (either bam or fastq)",
+    )
+    assert cmd == "tool -s my_reads -r yes -o Results"
+    assert not notes
+
+
+def test_shipped_bed_is_not_replaced_with_panel_bed():
+    cmd, notes = pm.rewrite_for_strhub(
+        "tool -l db/loci.bed",
+        "ont-bam-hg38",
+        tree_paths=["db/loci.bed"],
+    )
+    assert "db/loci.bed" in cmd
+    assert "/data/in/regions.bed" not in cmd
+
+
+
+def test_shipped_catalog_does_not_select_a_different_dataset():
+    proposal = {
+        "repo": "Illumina/ExpansionHunter",
+        "ref": "9f5db1d4ab72016b2d93330b9792842d71582622",
+        "build": {"method": "release_binary"},
+        "output": {"format": "vcf"},
+        "tree_paths": ["catalog.json"],
+        "input_type": {
+            "best": "illumina-bam-hg38",
+            "how": "read",
+            "candidates": ["illumina-bam-hg38"],
+            "statements": {"inputs": [{"kind": "bam", "line": 15}]},
+        },
+        "commands": [{
+            "cmd": "ExpansionHunter --reads input.bam --reference hg38.fa --variant-catalog catalog.json --output-prefix out",
+            "origin": "readme",
+            "file": "README.md",
+            "line": 15,
+        }],
+        "shipped_loci": {"catalog.json": [["chr4", 3074876, 3074933]]},
+    }
+    r = pm.build(proposal, "eh-test")
+    assert r["manifest"]["inputs"] == {"type": "illumina-bam-hg38"}
+    assert "loci_outside_panel" in r["limitations"]
+    assert "--variant-catalog catalog.json" in r["manifest"]["run"]["cmd"]
+    caveats = r["manifest"]["caveats"]["items"]
+    assert not any("holds no reference sample" in c for c in caveats)
+    assert not any("other documented kind was used" in c for c in caveats)
+    assert r["procedure"]["may_say_runs"] is False
+    assert r["procedure"]["install_ready"] is False
