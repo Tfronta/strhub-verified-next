@@ -931,11 +931,6 @@ def main() -> int:
             "source-profile review. Base-image and package versions are not frozen "
             "by the transcript."
         )
-    elif env_source == "generated":
-        needed.append(
-            "A container environment, built from the tool's declared install "
-            "steps rather than from a recipe the repository ships."
-        )
     if needed:
         report["needed_beyond_repo"] = needed
 

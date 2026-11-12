@@ -710,9 +710,11 @@ def fault_of(issue_id: str) -> str | None:
 def _is_strhub_staged(path: str) -> bool:
     """True for the inputs STRhub puts in the container, not the author.
 
-    `/data/in` and `/data/ref` are populated by harness/prepare.py under names the
-    harness chooses (input.bam, sample.fastq, regions.bed, the reference genome).
-    The author names none of them, so when one is missing the fault is ours.
+    `/data/in` holds the registered dataset under a name the harness chooses
+    (input.bam, sample.fastq). Nothing is mounted at `/data/ref` and no
+    regions file is staged; a command that names one of these paths is naming
+    a path of STRhub's, never the author's, so when it is missing the fault
+    is ours.
     """
     p = path.strip().strip("'\"")
     return p.startswith("/data/ref/") or p in {

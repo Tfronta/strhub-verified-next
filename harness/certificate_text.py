@@ -218,9 +218,9 @@ def step1_says(report: dict) -> dict:
                 " ".join(x for x in (reason, STEP1_CANNOT_TELL) if x), missing)
 
 
-#: The README items check_readme.py already reports, mapped onto the guide's
-#: blocks. Those items are a word search and never decided whether a commit is
-#: runnable; here they only put a name on a gap the classifier already found.
+#: The README gaps detect_recipe reports, mapped onto the guide's blocks.
+#: They never decide whether a commit is runnable; here they only put a name
+#: on a gap the classifier already found.
 _GAP_BLOCK = {"install": "install", "install_steps": "install", "command": "command",
               "usage": "command", "input": "input", "input_type": "input",
               "output": "output", "output_format": "output"}

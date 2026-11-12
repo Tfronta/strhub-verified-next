@@ -72,7 +72,6 @@ REGISTER: dict[str, tuple[str, str]] = {
     "c3b2bcd382dc": ("propose_manifest", "readme"),  # Planned command, subject to full source citation and procedure review.
     "70be7a8f1331": ("propose_manifest", "readme"),  # true # no command found in the README; nothing to run
     "4febb7603b17": ("report", "policy"),  # <br><br> This is <b>not</b> a claim that the genotypes are correct, nor that the tool is fit for cas
-    "82688741465a": ("report", "manifest"),  # A container environment, built from the tool's declared install steps rather than from a recipe
     "316572e47dc0": ("report", "tree"),  # Recorded automatically from the tool's public files when this run was configured. **Not verifie
     "0bee1f1f9159": ("report", "run"),  # Test data: no sample from the repository was used, so a public reference sample stood in.
     "8abb5c27a292": ("report", "policy"),  # This is **not** a claim that the genotypes are correct, nor that the tool is fit for casework o
