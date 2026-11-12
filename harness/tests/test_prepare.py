@@ -1,4 +1,4 @@
-"""Preparation tests for internally generated descriptors and archived tools."""
+"""Preparation tests for the descriptor a run derives from the repository."""
 import json
 import pathlib
 import subprocess
@@ -13,20 +13,25 @@ def _run(args, env=None):
     return out.returncode, dict(ln.split("=", 1) for ln in out.stdout.splitlines() if "=" in ln), out.stderr
 
 
-def test_committed_tool_outputs_are_single_line(tmp_path):
-    rc, kv, _ = _run(["straitrazor", "--work", str(tmp_path)])
-    assert rc == 0
-    assert kv["mode"] == "publish"
-    assert kv["dockerdir"] == "tools/straitrazor"
-    assert all("\n" not in v and "\r" not in v for v in kv.values())
-
-
 def _trial(work, manifest, dockerfile):
     proposal = work / "proposal"
     proposal.mkdir(parents=True, exist_ok=True)
     (proposal / "manifest.yml").write_text(manifest)
     (proposal / "Dockerfile").write_text(dockerfile)
-    return ["--work", str(work), "--trial"]
+    return ["--work", str(work)]
+
+
+def test_outputs_are_single_line(tmp_path):
+    src = ROOT / "harness" / "testdata" / "fixtures" / "legacy_tools" / "hipstr"
+    args = _trial(tmp_path, src.joinpath("manifest.yml").read_text(), src.joinpath("Dockerfile").read_text())
+    rc, kv, err = _run(["hipstr", *args, "--plan-out", str(tmp_path / "plan.json")])
+    assert rc == 0, err
+    assert kv["mode"] == "trial"
+    assert all("\n" not in v and "\r" not in v for v in kv.values())
+    plan = json.loads((tmp_path / "plan.json").read_text())
+    assert plan["tool"] == "hipstr" and plan["cmd"] == kv["cmd"]
+    # Nothing STRhub invents is planned: no --help probe, no leg on a fixture of its own.
+    assert "starts_cmd" not in plan and "own_ready" not in plan
 
 
 def test_dispatched_recipe_argument_is_retired(tmp_path):
@@ -51,11 +56,10 @@ def test_the_tools_own_command_comes_back_out_of_the_wrapper():
 def test_the_ont_fastq_is_handed_over_uncompressed(tmp_path):
     # Committed gzipped to keep the repository small; staged as plain FASTQ,
     # which every reader takes, under the name the run command uses.
-    sys.path.insert(0, str(ROOT / "harness"))
-    import prepare
-    staged, name = prepare.stage_external("ont-fastq", tmp_path)
-    assert staged and "HG00113" in name
-    fq = tmp_path / "input.fastq"
+    import input_provenance
+    ds = input_provenance.stage(ROOT, tmp_path, "ont-fastq")
+    assert "HG00113" in ds["name"]
+    fq = tmp_path / "in_external" / "input.fastq"
     with fq.open() as f:
         head = [next(f) for _ in range(4)]
     assert head[0].startswith("@") and head[2].startswith("+") and len(head[1]) == len(head[3])
@@ -90,38 +94,23 @@ def test_shipped_example_cannot_bypass_absent_installation_evidence(tmp_path):
     assert kv2["example_ready"] == "0"
 
 
-def test_forensic_bam_run_keeps_only_its_selected_dataset(tmp_path):
-    """No alternate input is staged, and the retired promotion cannot mutate
-    the manifest after a failed attempt."""
+def test_a_run_keeps_only_its_selected_dataset(tmp_path):
+    """Without a reviewed procedure no input is staged at all, and no
+    argument exists that would swap the dataset after the fact."""
     src = ROOT / "harness" / "testdata" / "fixtures" / "legacy_tools" / "hipstr"
     manifest = src.joinpath("manifest.yml").read_text()
-    manifest = manifest.replace(
-        '  type: "illumina-bam-hg38"\n',
-        '  type: "illumina-bam-hg38"\n  regions:\n    library: "hipstr"\n',
-        1,
-    )
     args = _trial(tmp_path, manifest, src.joinpath("Dockerfile").read_text())
     rc, kv, err = _run(["hipstr", *args])
     assert rc == 0, err
     assert kv["input_type"] == "illumina-bam-hg38"
     assert kv["external_ready"] == "0"
-    assert not any(k.startswith("med_") for k in kv)
     assert not (tmp_path / "in_external").exists()
-    assert not (tmp_path / "in_external_med").exists()
 
     # Old callers must fail without modifying the selected procedure.
     mf_path = tmp_path / "proposal" / "manifest.yml"
     before = mf_path.read_bytes()
-    rc_prom, _, err_prom = _run(["--promote-medical", str(mf_path), "illumina-bam-hg38-med"])
+    rc_prom, _, err_prom = _run(["hipstr", *args, "--dataset", "illumina-bam-hg38-y"])
     assert rc_prom != 0
     assert "unrecognized arguments" in err_prom
     assert mf_path.read_bytes() == before
 
-
-def test_archived_medical_manifest_cannot_stage_inputs_without_evidence(tmp_path):
-    rc, kv, err = _run(["trgt-hifi-med", "--work", str(tmp_path)])
-    assert rc == 0, err
-    assert kv["input_type"] == "pacbio-hifi-bam-hg38-med"
-    assert kv["external_ready"] == "0"
-    assert not (tmp_path / "in_external").exists()
-    assert not (tmp_path / "in_external_med").exists()

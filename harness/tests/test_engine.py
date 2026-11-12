@@ -264,13 +264,18 @@ def test_starts_is_judged_by_its_check_not_by_the_raw_exit_status(tmp_path):
 
 
 def test_prepare_writes_the_plan_it_printed(tmp_path):
-    out = subprocess.run([sys.executable, str(ROOT / "harness" / "prepare.py"), "straitrazor",
+    src = ROOT / "harness" / "testdata" / "fixtures" / "legacy_tools" / "hipstr"
+    descriptor = tmp_path / "work" / "proposal"
+    descriptor.mkdir(parents=True)
+    for name in ("manifest.yml", "Dockerfile"):
+        (descriptor / name).write_text((src / name).read_text())
+    out = subprocess.run([sys.executable, str(ROOT / "harness" / "prepare.py"), "trial-hipstr",
                           "--work", str(tmp_path / "work"), "--plan-out", str(tmp_path / "plan.json")],
                          capture_output=True, text=True)
     assert out.returncode == 0, out.stderr
     printed = dict(ln.split("=", 1) for ln in out.stdout.splitlines() if "=" in ln)
     plan = json.loads((tmp_path / "plan.json").read_text())
-    assert plan.pop("tool") == "straitrazor"
+    assert plan.pop("tool") == "trial-hipstr"
     assert plan == printed
 
 

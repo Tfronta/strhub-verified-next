@@ -196,11 +196,11 @@ def test_preparation_recomputes_instead_of_trusting_a_forged_ready_flag(tmp_path
     (descriptor / "manifest.yml").write_text(yaml.safe_dump(m))
     (descriptor / "Dockerfile").write_text("FROM attacker\n")
     result = subprocess.run([sys.executable, str(ROOT / "harness/prepare.py"), "test", "--work", str(tmp_path / "work"),
-        "--proposal", str(proposal), "--trial"], capture_output=True, text=True)
+        "--proposal", str(proposal)], capture_output=True, text=True)
     assert result.returncode == 0, result.stderr
     output = dict(line.split("=", 1) for line in result.stdout.splitlines())
-    assert all(output[k] == "0" for k in ["install_ready", "procedure_ready", "own_ready", "external_ready", "example_ready"])
-    assert output["starts_cmd"] == ""
+    assert all(output[k] == "0" for k in ["install_ready", "procedure_ready", "external_ready", "example_ready"])
+    assert "starts_cmd" not in output
     assert not json.loads((tmp_path / "work/procedure_review.json").read_text())["may_say_runs"]
 
 
@@ -282,7 +282,7 @@ def test_positive_preparation_binds_the_review_to_the_actual_manifest(tmp_path):
     (descriptor / "assets").mkdir()
     (descriptor / "assets/regions.bed").write_text("historical tool-specific regions")
     result = subprocess.run([sys.executable, str(ROOT / "harness/prepare.py"), "test", "--work", str(tmp_path / "work"),
-        "--proposal", str(proposal), "--trial"], capture_output=True, text=True)
+        "--proposal", str(proposal)], capture_output=True, text=True)
     assert result.returncode == 0, result.stderr
     values = dict(line.split("=", 1) for line in result.stdout.splitlines())
     assert values["install_ready"] == values["procedure_ready"] == "1"
@@ -291,7 +291,7 @@ def test_positive_preparation_binds_the_review_to_the_actual_manifest(tmp_path):
     assert values["cmd"] == m["run"]["cmd"]
     r = json.loads((tmp_path / "work/procedure_review.json").read_text())
     assert r["manifest_sha256"] == fidelity.digest(json.dumps(m, sort_keys=True))
-    assert values["starts_cmd"] == ""  # never invent an extra --help command
+    assert "starts_cmd" not in values  # never invent an extra --help command
 
 
 @pytest.mark.parametrize("declared", [

@@ -30,7 +30,6 @@ import sys
 import tempfile
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-import benchmark_recipes as br  # noqa: E402
 import detect_recipe as dr  # noqa: E402
 import propose_manifest as pm  # noqa: E402
 import _manifest  # noqa: E402
@@ -179,13 +178,20 @@ def gather_via_git(slug: str, ref: str, tag: str = "") -> dict:
         }
 
 
+#: Frozen readings of public repositories (tree, README, cited files), for runs
+#: that must not depend on api.github.com.
+SNAPSHOTS = ROOT / "harness" / "testdata" / "benchmark"
+
+
 def _find_benchmark_snapshot(slug: str) -> pathlib.Path | None:
     want = slug.lower()
-    for spec in br.rows():
-        if spec["repo"].lower() == want:
-            d = br.BENCH / spec["name"]
-            if (d / "tree.json").is_file():
-                return d
+    for tree in sorted(SNAPSHOTS.glob("*/tree.json")):
+        try:
+            repo = json.loads(tree.read_text()).get("repo") or ""
+        except ValueError:
+            continue
+        if dr.repo_slug(repo).lower() == want:
+            return tree.parent
     return None
 
 
@@ -281,7 +287,7 @@ def build_local_trial(repo_url: str, ref: str, ref_label: str, out_dir: pathlib.
         # --- Step 1: Pre-flight (prepare.py), which also writes the plan the engine runs ---
         prep_res = subprocess.run(
             [sys.executable, str(ROOT / "harness" / "prepare.py"), run_slug, "--work", str(work_dir),
-             "--trial", "--proposal", str(proposal_json), "--plan-out", str(work_dir / "plan.json")],
+             "--proposal", str(proposal_json), "--plan-out", str(work_dir / "plan.json")],
             cwd=str(ROOT), capture_output=True, text=True, check=True,
         )
         preflight = _parse_kv_output(prep_res.stdout)
@@ -348,7 +354,6 @@ def build_local_trial(repo_url: str, ref: str, ref_label: str, out_dir: pathlib.
             "--procedure-review", str(work_dir / "procedure_review.json"),
             "--mounted-inputs", str(work_dir / "mounted_inputs.json"),
             "--matrix", str(results_dir / "matrix.json"),
-            "--readme", str(tmp_path / "no-readme.json"),
             "--example", str(results_dir / "example.json"),
             "--starts", str(results_dir / "starts.json"),
             "--regions-validation", str(tmp_path / "no-regions.json"),

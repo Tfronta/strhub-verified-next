@@ -177,12 +177,12 @@ def test_proposal_and_preparation_recompute_the_same_plan_without_using_submitte
     (descriptor / "manifest.yml").write_text(built["manifest_yml"])
     (descriptor / "Dockerfile").write_text("FROM attacker\nRUN repair\n")
     result = subprocess.run([sys.executable, str(ROOT / "harness/prepare.py"), "analyzer", "--work", str(tmp_path / "work"),
-                             "--proposal", str(proposal), "--trial"], capture_output=True, text=True)
+                             "--proposal", str(proposal)], capture_output=True, text=True)
     assert result.returncode == 0, result.stderr
     values = dict(line.split("=", 1) for line in result.stdout.splitlines())
     assert values["install_ready"] == values["procedure_ready"] == "1"
     assert values["installation_profile"] == source_install.PROFILE
-    assert values["starts_cmd"] == ""
+    assert "starts_cmd" not in values
     saved = json.loads((tmp_path / "work/procedure_review.json").read_text())
     assert "attacker" not in saved["installation"]["carrier_dockerfile"]
 
