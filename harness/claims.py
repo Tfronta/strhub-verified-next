@@ -58,10 +58,7 @@ REGISTER: dict[str, tuple[str, str]] = {
     "9bb264480cf8": ("certificate_text", "gates"),  # That does not mean the tool does not work. It means a third party following the README at this co
     "f65b34dd9bd8": ("certificate_text", "readme"),  # Nothing was executed. That does not mean the tool does not work: what the guide asks for is miss
     "ef1d9f98ef6e": ("verdict", "run"),  # The tool did not finish within the run's time limit, so it was stopped.
-    "bd3265ea8d34": ("verdict", "tree"),  # the loci the documented command genotypes, from a file the repository ships, are not in STRhub's ref
-    "25a65b298a9c": ("verdict", "tree"),  # The loci the documented command genotypes, from a file the repository ships, are not in STRhub's ref
     "06e75c4bbbd2": ("verdict", "tree"),  # The documented command reads a file that is not in the repository at this commit and that STRhub doe
-    "e48aa747fbd5": ("verdict", "tree"),  # STRhub Verified tried the documented command on a public hg38 sample that covers the forensic STR lo
     # The one diagnostic sentence that still speaks about the author's side: a
     # COPY/ADD of a file the checkout does not hold. It rests on the build log
     # line and on the context being the pinned checkout (tanda 4: every other

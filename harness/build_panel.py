@@ -55,12 +55,6 @@ PANELS = {
         "datasets/illumina-bam-hg38-y/str_candidates.bed",
         FLANK,
     ),
-    # Disease-associated STR loci; candidates from harness/build_medical_candidates.py.
-    "illumina-bam-hg38-med": (
-        "illumina_slices/NA12878.medical.bam",
-        "datasets/illumina-bam-hg38-med/str_candidates.bed",
-        FLANK,
-    ),
 }
 
 

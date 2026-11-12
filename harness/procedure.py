@@ -120,13 +120,6 @@ def classify(proposal: dict, manifest: dict, limitations: list[str],
     if (manifest.get("inputs") or {}).get("type") and not transformation["read_bindings"]:
         amendments.append({"code": "input_not_substituted", "what": "This evaluator cannot establish that the cited command reads the declared reference input; no config or input list was rewritten to make it do so."})
     inputs = manifest.get("inputs") or {}
-    regions = inputs.get("regions") or {}
-    if isinstance(regions, dict) and regions.get("library"):
-        amendments.append({"code": "regions_profile_unsupported", "what": "A tool-name lookup or generated region layout is not upstream procedure evidence; this profile does not establish that input conversion."})
-    elif regions:
-        amendments.append({"code": "regions_profile_unsupported", "what": "Automatic verification does not stage a separate catalog or regions file. The documented command must use the upstream file at its original path."})
-    if inputs.get("fixture") is not None:
-        amendments.append({"code": "fixture_profile_unsupported", "what": "Automatic verification cannot mount a separate fixture. Repository examples must use the files in the pinned upstream procedure."})
     input_evidence = proposal.get("input_type") or {}
     declared_type = input_evidence.get("best")
     if declared_type and inputs.get("type") != declared_type:
@@ -170,10 +163,6 @@ def classify(proposal: dict, manifest: dict, limitations: list[str],
         amendments.append({"code": "ssh_rewritten",
                            "what": "A build step fetches dependencies over SSH; STRhub would rewrite that "
                                    "to HTTPS, which is a change to the procedure."})
-    if "regions_format_guessed" in limitations or "regions_format_unknown" in limitations:
-        amendments.append({"code": "regions_guessed",
-                           "what": "The regions file would be one STRhub guessed a layout for, not one "
-                                   "the commit states."})
     glob = ((manifest.get("outputs") or [{}])[0].get("path"))
     if glob in ("**/*", "**/*.*"):
         amendments.append({"code": "output_unnamed",
@@ -199,8 +188,6 @@ def classify(proposal: dict, manifest: dict, limitations: list[str],
         blocker, basis = "missing_file", "recipe"
     elif any(a["code"] == "input_not_substituted" for a in amendments):
         blocker, basis = "input_not_substituted", "strhub"
-    elif "loci_outside_panel" in limitations:
-        blocker, basis = "loci_outside_panel", "recipe"
     elif "no_command" in limitations:
         blocker, basis = "no_command", "recipe"
     elif any(a["code"] == "no_install_procedure" for a in amendments):
@@ -226,8 +213,6 @@ def classify(proposal: dict, manifest: dict, limitations: list[str],
                                  "and the repository ships no example to run, so nothing was executed.",
                 "missing_file": "The documented command reads a file that neither the repository nor "
                                 "STRhub holds, so the command was not run.",
-                "loci_outside_panel": "The loci the documented command genotypes are not in STRhub's "
-                                      "reference sample, so the run was not taken as a result about the tool.",
                 "no_command": "No command line invoking the tool was found in the commit, so nothing was run.",
             }.get(blocker, "STRhub could not complete a procedure stated at this commit.")
         attribution = "strhub"

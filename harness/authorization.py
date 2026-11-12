@@ -79,7 +79,7 @@ def validate(review, manifest) -> Validation:
         return Validation(False, "The effective contract could not be validated: " + type(exc).__name__)
 
 
-def rejection(reason: str) -> dict:
+def refusal(reason: str) -> dict:
     return {"may_say_runs": False, "install_ready": False, "basis": "strhub", "attribution": "strhub",
             "blocker": "procedure_evidence_invalid", "reason": reason}
 

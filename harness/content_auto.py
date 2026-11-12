@@ -153,7 +153,7 @@ def vcf_record_depth_with_source(
       4. AD — standard Allele Depth (comma-separated, e.g. '10,25')
       5. SR / NR / NV — supporting or total read counts
       6. LC — ExpansionHunter Locus Coverage (float/int, rounded to nearest int)
-      7. INFO/DP — fallback when depth is recorded only in the INFO column.
+      7. INFO/DP — used when depth is recorded only in the INFO column.
     """
     depth = 0
     found = False

@@ -87,13 +87,13 @@ def test_a_list_of_input_files_is_not_reduced_to_one_available_sample(tmp_path):
     assert cmd == "./HipSTR --bams run1.bam,run2.bam,run3.bam --fasta g.fa"
 
 
-def test_gangstr_recipe_does_not_manufacture_a_primary_or_fallback_install(tmp_path):
+def test_gangstr_recipe_does_not_manufacture_an_install(tmp_path):
     r = pm.build(_proposal("gangstr"), "gangstr-trial")
     m = _valid(r["manifest_yml"], tmp_path)
     assert m["environment"]["source"] == "generated"
-    assert "fallback" not in m["environment"]
+    assert set(m["environment"]) == {"dockerfile", "os", "source"}
     assert r["dockerfile"].endswith("FROM scratch\n")
-    assert "dockerfile_fallback" not in r
+    assert set(r) == {"manifest", "manifest_yml", "dockerfile", "limitations", "readme_gaps", "procedure"}
     env_caveat = next(c for c in m["caveats"]["items"] if c.startswith("Environment:"))
     assert "no proven installation profile" in env_caveat
 
@@ -102,11 +102,10 @@ def test_a_recipe_declares_no_plan_b_and_the_schema_admits_none(tmp_path):
     import jsonschema
     r = pm.build(_proposal("hipstr"), "hipstr-trial")
     m = _valid(r["manifest_yml"], tmp_path)
-    assert "fallback" not in m["environment"]
-    assert "dockerfile_fallback" not in r
-    # `environment` admits no unknown keys: a manifest from before the plan B
-    # was removed fails loudly instead of carrying a Dockerfile nobody builds.
-    m["environment"]["fallback"] = {"dockerfile": "Dockerfile.fallback"}
+    assert set(m["environment"]) == {"dockerfile", "os", "source"}
+    # `environment` admits no unknown keys: a manifest naming a second
+    # Dockerfile fails loudly instead of carrying one nobody builds.
+    m["environment"]["plan_b"] = {"dockerfile": "Dockerfile.second"}
     with pytest.raises(jsonschema.ValidationError):
         jsonschema.validate(m, json.loads(_manifest.SCHEMA.read_text()))
 
@@ -194,8 +193,6 @@ def test_catalogue_slug_adds_a_suffix_only_for_a_non_canonical_assay():
     assert pm.catalogue_slug("STRspy", "ont-bam-hg38") == "strspy-ont"
     # Not the last hyphen-segment, which would file a HiFi run as "trgt-hg38".
     assert pm.catalogue_slug("TRGT", "pacbio-hifi-bam-hg38") == "trgt-hifi"
-    assert pm.catalogue_slug("ExpansionHunter", "illumina-bam-hg38-med") == "expansionhunter-med"
-    assert pm.catalogue_slug("TRGT", "pacbio-hifi-bam-hg38-med") == "trgt-hifi-med"
     assert pm.catalogue_slug("STRait Razor", "illumina-str-fastq") == "strait-razor"
     # Unlisted types fall back to their last segment; no type, no suffix.
     assert pm.catalogue_slug("Tool", "some-new-assay") == "tool-assay"
@@ -222,30 +219,13 @@ def test_a_loci_catalog_is_not_replaced_by_a_tool_name_lookup():
     # vamos's README fetches vamos.effMotifs-0.1.GRCh38.tsv from Zenodo for -r.
     # Which loci to annotate is the user's choice, as HipSTR's regions BED is.
     cmd = "vamos --read -b demo.aln.bam -r vamos.effMotifs-0.1.GRCh38.tsv -s S1 -o reads.vcf -t 8"
-    new, notes = pm.rewrite_for_strhub(cmd, "ont-bam-hg38", library_format="motif", tree_paths=["README.md"])
+    new, notes = pm.rewrite_for_strhub(cmd, "ont-bam-hg38")
     assert "-r vamos.effMotifs-0.1.GRCh38.tsv" in new and "-o reads.vcf" in new
     assert "/data/in/regions.bed" not in new
     # A catalog the repository ships is the tool's own, and an output is an output.
     kept, _ = pm.rewrite_for_strhub("vamos --read -b x.bam -r example/region_motifs.tsv -o motifs.tsv",
-                                    "ont-bam-hg38", library_format="motif",
-                                    tree_paths=["example/region_motifs.tsv"])
+                                    "ont-bam-hg38")
     assert "-r example/region_motifs.tsv" in kept and "-o motifs.tsv" in kept
-    # No layout STRhub writes for the tool: nothing to put in its place.
-    none, _ = pm.rewrite_for_strhub(cmd, "ont-bam-hg38", library_format=None)
-    assert "vamos.effMotifs-0.1.GRCh38.tsv" in none
-
-
-def test_short_loci_keyword_outside_panel_flags_loci_outside_panel():
-    """mahi-mahi passes `--loci hg38` (a short keyword, not a path) that resolves
-    to shipped loci coordinates outside STRhub's CODIS slice."""
-    caveats = []
-    proposal = {
-        "tree_paths": ["mahi_mahi/data/hg38_loci.bed"],
-        "shipped_loci": {"mahi_mahi/data/hg38_loci.bed": [["chr4", 3074876, 3074933]]},
-    }
-    cmd = "mahi-mahi --bam /data/in/input.bam --ref /data/ref/hg38.fa --loci hg38 --out-dir out"
-    lims = pm.check_documented_files(cmd, proposal, "ont-bam-hg38", caveats)
-    assert "loci_outside_panel" in lims
 
 
 def test_local_trial_never_fabricates_a_passed_run_without_docker(tmp_path):
@@ -261,22 +241,10 @@ def test_local_trial_never_fabricates_a_passed_run_without_docker(tmp_path):
     assert report["verdict"]["basis"] == "strhub"
 
 
-def test_bare_output_directory_does_not_authorize_mkdir():
-    cmd, notes = pm.normalize_documented("tool -i in.bam -o Results", "illumina-bam-hg38", [], "input.bam", "/data/ref/hg38.fa", False)
-    assert cmd == "tool -i in.bam -o Results"
-    assert not notes
-
-
-def test_file_output_does_not_create_dir():
-    cmd, notes = pm.normalize_documented("tool -i in.bam -o out.vcf", "illumina-bam-hg38", [], "input.bam", "/data/ref/hg38.fa", False)
-    assert "mkdir" not in cmd
-
-
 def test_input_directory_option_rewritten_to_data_in():
     cmd, notes = pm.rewrite_for_strhub(
         "tool -s my_reads -r yes -o Results",
         "ont-bam-hg38",
-        docs_text="-s input read dir (either bam or fastq)",
     )
     assert cmd == "tool -s my_reads -r yes -o Results"
     assert not notes
@@ -286,7 +254,6 @@ def test_shipped_bed_is_not_replaced_with_panel_bed():
     cmd, notes = pm.rewrite_for_strhub(
         "tool -l db/loci.bed",
         "ont-bam-hg38",
-        tree_paths=["db/loci.bed"],
     )
     assert "db/loci.bed" in cmd
     assert "/data/in/regions.bed" not in cmd
@@ -312,11 +279,9 @@ def test_shipped_catalog_does_not_select_a_different_dataset():
             "file": "README.md",
             "line": 15,
         }],
-        "shipped_loci": {"catalog.json": [["chr4", 3074876, 3074933]]},
     }
     r = pm.build(proposal, "eh-test")
     assert r["manifest"]["inputs"] == {"type": "illumina-bam-hg38"}
-    assert "loci_outside_panel" in r["limitations"]
     assert "--variant-catalog catalog.json" in r["manifest"]["run"]["cmd"]
     caveats = r["manifest"]["caveats"]["items"]
     assert not any("holds no reference sample" in c for c in caveats)

@@ -37,26 +37,12 @@ TITLES = {
 
 
 LIMITATION_TEXT = {
-    # "The tool needs a regions file" was never established by reading
-    # anything: it comes from REQUIRES_REGIONS, which is a property of STRhub's
-    # own reference data — a slice around panel loci rather than a whole
-    # genome. The requirement is ours; only the layout is about the tool, and
-    # that rests on STRhub's table of program names.
-    "regions_format_guessed": "this run had to supply a regions file, because STRhub's reference "
-                              "data covers a panel of loci rather than a whole genome, and STRhub "
-                              "records no layout for this program; a plain chrom/start/end/name "
-                              "file was tried",
     "no_command": "no command line invoking the tool was found in the README",
     "install_method_unknown": "no install method was found in the repository",
-    "regions_format_unknown": "this run had to supply a regions file and STRhub could not write "
-                              "one in a layout it records for this program",
     "no_reference_dataset": "STRhub holds no reference sample of the kind this tool reads and "
                             "the repository ships no example to run, so nothing was executed",
     "input_type_guessed": "no sentence in the README says what the tool takes as input, so "
                           "the reference data was chosen on the strength of mentions alone",
-    "loci_outside_panel": "the loci the documented command genotypes, from a file the repository "
-                          "ships, are not in STRhub's reference sample, which covers a panel of "
-                          "forensic STR loci; run there, the tool would have nothing to genotype",
     "documented_file_missing": "the documented command reads a file that neither the repository nor "
                                "STRhub holds",
 }
@@ -68,18 +54,6 @@ LIMITATION_TEXT = {
 #: change the recipe under test (docs/NO-ADAPTIVE-RETRIES.md). The web renders
 #: the owner issue as a button; the codes are the contract.
 BLOCKERS = {
-    "loci_outside_panel": {
-        "what": "The loci the documented command genotypes, from a file the repository ships, are not in "
-                "STRhub's reference sample, which covers a panel of forensic STR loci. Run there, the "
-                "tool would have nothing to genotype, so it was not taken as a result about the tool.",
-        "ask_owner": {
-            "title": "Document how to genotype loci other than the shipped catalog",
-            "body": "STRhub Verified tried the documented command on a public hg38 sample that covers the "
-                    "forensic STR loci (CODIS and the usual expanded panel). The catalog the repository "
-                    "ships covers other loci, so the run had nothing to genotype. A documented way to write "
-                    "a catalog for other loci would let users run the tool on the loci they need.",
-        },
-    },
     "documented_file_missing": {
         "what": "The documented command reads a file that is not in the repository at this commit and "
                 "that STRhub does not hold, so the command cannot run as written.",
@@ -89,29 +63,6 @@ BLOCKERS = {
                     "environment at the pinned commit. The command reads a file that is not in the "
                     "repository at that commit. Shipping it, or a documented step that fetches it, would "
                     "let a new user run the command as written.",
-        },
-    },
-    "regions_format_unknown": {
-        # Two claims were folded in here that nobody had checked: that the tool
-        # requires a per-tool BED (STRhub's reference data does), and that the
-        # repository ships no hg38 forensic BED (never looked — STRsearch ships
-        # example/ref_test.bed). What is left is what STRhub did and what
-        # STRhub knows, which is enough to act on.
-        "what": "This run had to supply a regions file (BED): STRhub's reference data covers a panel "
-                "of forensic STR loci, not a whole genome. STRhub writes the HipSTR, GangSTR and "
-                "STRsearch layouts and a plain BED, and records none of them for this program.",
-        "ask_owner": {
-            "title": "Publish a regions file (hg38) for forensic STR loci",
-            # This text is posted to the author's own issue tracker by whoever
-            # reads the report, so every sentence in it has to be one STRhub
-            # can stand behind. It no longer says what the repository lacks.
-            "body": "STRhub Verified ran the tool in a clean environment on a public hg38 reference "
-                    "sample covering forensic STR loci (CODIS and the usual expanded panel). It had "
-                    "to supply a regions file (BED) and could not write one in a layout it knows "
-                    "this tool reads. If the tool reads the HipSTR, GangSTR or STRsearch layout, "
-                    "saying so in the README would be enough; publishing a regions file for hg38 "
-                    "forensic loci in the repository would also let anyone run the documented "
-                    "example.",
         },
     },
     "no_reference_dataset": {
@@ -190,9 +141,7 @@ def blockers_for(gates: dict, limits: list[str], gaps: list[dict], ids: set[str]
     """The blockers that apply, most actionable first, at most three."""
     out: list[str] = []
     for l in limits:
-        if l == "regions_format_guessed" and not gates.get("io"):
-            out.append("regions_format_unknown")
-        elif l in BLOCKERS:
+        if l in BLOCKERS:
             out.append(l)
     gap_items = {g.get("item") for g in gaps}
     if "install" in gap_items and "install_method_unknown" not in out:
@@ -201,8 +150,7 @@ def blockers_for(gates: dict, limits: list[str], gaps: list[dict], ids: set[str]
         out.append("no_command")
     if gates.get("available") and not gates.get("installs") and "install_method_unknown" not in out:
         out.append("build_failed")
-    elif gates.get("installs") and not gates.get("runs") and "no_command" not in out \
-            and "regions_format_unknown" not in out:
+    elif gates.get("installs") and not gates.get("runs") and "no_command" not in out:
         out.append("run_stopped" if "run_timeout" in ids else "run_failed")
     elif gates.get("runs") and not gates.get("io"):
         out.append("no_output")

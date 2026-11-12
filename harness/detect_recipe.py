@@ -388,46 +388,13 @@ def release_assets(slug: str, tag: str, token: str | None, ref: str = "") -> dic
                                    for a in r.get("assets") or []]}
 
 
-#: Files that define the loci a tool genotypes (ExpansionHunter's variant
-#: catalog, a regions BED the docs use): read so a proposal can tell whether
-#: those loci are in STRhub's sample at all.
-LOCI_FILE = re.compile(r"(?:catalog|catalogue|loci|locus|regions?|repeats?|motifs?)[^/]*\.(?:json|bed|tsv)$", re.I)
-MAX_LOCI_FILES = 6
-MAX_LOCI_BYTES = 2_000_000
-
-
-def loci_file_paths(tree: list[dict]) -> list[str]:
-    out = [e["path"] for e in tree if e["type"] == "blob" and LOCI_FILE.search(e["path"])
-           and not VENDOR_DIRS.search(e["path"]) and 0 < e.get("size", 0) <= MAX_LOCI_BYTES]
-    out.sort(key=lambda p: (not re.search(r"hg38|grch38", p, re.I), p.count("/"), p))
-    return out[:MAX_LOCI_FILES]
-
-
-COORD = re.compile(r"\b(chr[0-9XYMT]{1,2}|[0-9]{1,2}|X|Y)[:\t ]+([0-9]{2,10})[-\t ]+([0-9]{2,10})\b")
-
-
-def shipped_loci(files: dict[str, str], paths: list[str]) -> dict[str, list[list]]:
-    """{path: [[chrom, start, end], ...]} for each loci file read."""
-    out = {}
-    for p in paths:
-        text = files.get(p)
-        if not text:
-            continue
-        coords = [[m.group(1) if m.group(1).startswith("chr") else f"chr{m.group(1)}",
-                   int(m.group(2)), int(m.group(3))] for m in COORD.finditer(text)]
-        coords = [c for c in coords if c[1] < c[2]]
-        if coords:
-            out[p] = coords[:5000]
-    return out
-
-
 def gather(slug: str, ref: str, tag: str = "", token: str | None = None) -> dict:
     """Everything detect() reads about a repository, fetched at `ref`."""
     tree_resp = fetch_tree(slug, ref, token)
     readme, readme_name = fetch_readme(slug, ref)
     paths = [e["path"] for e in tree_resp["tree"]]
     files = {}
-    for p in build_content_paths(paths) + loci_file_paths(tree_resp["tree"]):
+    for p in build_content_paths(paths):
         text = fetch_file(slug, ref, p)
         if text is not None:
             files[p] = text
@@ -703,7 +670,7 @@ def detect_build(paths: list[str], readme: str, files: dict[str, str] | None = N
     # the pinned commit (conda, pip, cmake, make, ...), in tier order: what the
     # report names is what ran. A published image or Bioconda package comes
     # after: it is the author's environment too, but holds whatever version was
-    # last pushed to it. A published one is kept under `fallback` as EVIDENCE
+    # last pushed to it. A published one is kept under `also_published` as EVIDENCE
     # of what the README points at (cited in the report); the engine never
     # builds it in the commit's place.
     # Source builds keep the order they were found in (BUILD_FILES first:
@@ -718,9 +685,9 @@ def detect_build(paths: list[str], readme: str, files: dict[str, str] | None = N
     # The repository's own Dockerfile gets one too: STRsearch ships a Dockerfile
     # AND tells readers to `docker pull` its image. When the Dockerfile does not
     # build, the image the README documents is still the author's word.
-    fallback = None
+    also_published = None
     if chosen and method not in PUBLISHED_METHODS:
-        fallback = next((f for f in found if f["method"] in PUBLISHED_METHODS), None)
+        also_published = next((f for f in found if f["method"] in PUBLISHED_METHODS), None)
     # What a source build needs from the environment that no file says: a
     # Makefile that clones its dependencies over SSH (LongTR's spoa) needs a
     # GitHub key nobody has in a fresh environment.
@@ -755,7 +722,7 @@ def detect_build(paths: list[str], readme: str, files: dict[str, str] | None = N
         "then": then,
         "ssh_urls_in": ssh,
         "readme_line": chosen.get("readme_line") if chosen else None,
-        "fallback": fallback,
+        "also_published": also_published,
         "candidates": found,
         "readme_install_lines": install_lines[:12],
     }
@@ -1683,7 +1650,7 @@ def evidence_for(slug: str, ref: str, readme: str, readme_name: str | None,
     if build.get("method") in ("docker_image", "bioconda") and build.get("readme_line"):
         out.append(readme_at(build["readme_line"],
                              "published_image" if build["method"] == "docker_image" else "bioconda_package"))
-    fb = build.get("fallback") or {}
+    fb = build.get("also_published") or {}
     if fb.get("readme_line"):
         out.append(readme_at(fb["readme_line"], "fallback_environment"))
     if commands and commands[0].get("line"):
@@ -1761,15 +1728,12 @@ def detect(slug: str, ref: str, tree_resp: dict, readme: str, readme_name: str |
         "build": build,
         "example_data": examples,
         "tool_names": names,
-        # The tree's paths travel for the rewrite: a documented file the
-        # repository ships (a variant catalog) is used from where it is.
+        # The tree's paths travel with the proposal: a file the documented
+        # command reads is looked for there, never supplied.
         "tree_paths": [e["path"] for e in tree if e["type"] == "blob" and not VENDOR_DIRS.search(e["path"])][:4000],
         # What the packaging declares: the executables a user types and the
         # names a registry knows the tool by.
         "packaging": pkg,
-        # The coordinates in the loci files the repository ships, so the
-        # proposal can tell whether a catalog's loci are in STRhub's sample.
-        "shipped_loci": shipped_loci(files, loci_file_paths(tree)),
         # What is published outside the repository, documented or not: ten of
         # seventeen STR tools are on Bioconda at the exact release, and only
         # two READMEs say so. A fact for the report and for a recipe STRhub
@@ -1778,11 +1742,6 @@ def detect(slug: str, ref: str, tree_resp: dict, readme: str, readme_name: str |
         # Documents read besides the README, and where each came from. A wiki
         # page is read as it is today: wikis are not versioned with the code.
         "docs_read": [{"path": d["path"], "origin": d["origin"]} for d in docs],
-        # Configuration files a README placeholder like `configFile` can resolve
-        # to; propose_manifest picks the one matching the dataset's kit.
-        "config_files": sorted(e["path"] for e in tree if e["type"] == "blob"
-                               and e["path"].count("/") <= 1
-                               and e["path"].lower().endswith((".config", ".cfg", ".conf", ".ini"))),
         "commands": commands,
         "source_documents": command_sources(readme, readme_name, docs),
         "upstream_files": ({build["file"]: files[build["file"]]}
@@ -1790,8 +1749,7 @@ def detect(slug: str, ref: str, tree_resp: dict, readme: str, readme_name: str |
         "input_type": input_type,
         "output": output,
         "readme": rd,
-        # The first part of the README and linked docs travel with the proposal
-        # so the regions library can read how the tool describes its regions file.
+        # The first part of the README and linked docs travel with the proposal.
         "readme_text": readme[:20_000],
         "docs_text": docs_text[:30_000],
         # What the author already wrote down as wrong or incomplete. Quoted, so

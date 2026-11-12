@@ -8,17 +8,19 @@ Two legs come out of one proposal:
   example   the README's command, verbatim, on the repository's own data,
             captured by the wrapper (see prepare.example_wrapper). Needs no
             rewriting and no STRhub data. The reviewer's gate.
-  run       the same command rewritten to STRhub's reference dataset for the
-            detected input type: input tokens become the canonical mount
-            (/data/in/input.bam, /data/in/sample.fastq), reference tokens
-            /data/ref/hg38.fa, regions tokens /data/in/regions.bed. Outputs are
-            not rewritten: the command runs in the clone and whatever it
-            creates is captured, so the tool's own output layout is kept.
+  run       the same command with only the substitutions the closed profile
+            in fidelity.rewrite admits: the input token becomes the registered
+            dataset's canonical mount (/data/in/input.bam,
+            /data/in/sample.fastq). Nothing else is supplied: no reference
+            genome and no regions or catalog file. A command that reads one
+            the repository does not ship is recorded as a limitation and is
+            not run. Outputs are not rewritten: the command runs in the clone
+            and whatever it creates is captured, so the tool's own output
+            layout is kept.
 
 Everything uncertain is written down: the manifest carries `caveats` with the
-rewrites made and the warnings detect_recipe raised, so the report can say
-"this is what STRhub guessed" rather than present a guess as the author's
-configuration.
+substitutions made and the warnings detect_recipe raised, so the report says
+what STRhub did rather than present it as the author's configuration.
 
 Usage:
   python harness/propose_manifest.py proposal.json --slug <slug> \
@@ -46,30 +48,7 @@ OUTPUT_GLOB = {
     "json": ("**/*.json", "json"),
 }
 
-def resolve_placeholders(cmd: str, config_files: list[str], kit: str | None) -> tuple[str, list[str]]:
-    """No implicit config selection from a kit name or a repository listing."""
-    return cmd, []
-
-
-def normalize_documented(cmd: str, input_type: str | None, tree_paths: list[str] | None,
-                         canonical: str | None, ref_mount: str | None,
-                         has_regions: bool, binary_elsewhere: bool = False,
-                         catalog_from_library: bool = False) -> tuple[str, list[str]]:
-    """Retained API: normalization cannot invent a runnable command."""
-    return cmd, []
-
-
-def from_the_path(cmd: str, tree: set[str], binary_elsewhere: bool) -> tuple[str, list[str]]:
-    """Executable paths are part of the cited procedure, never rewritten."""
-    return cmd, []
-
-
-BINARY_ELSEWHERE = set()
-
-
-def rewrite_for_strhub(cmd: str, input_type: str | None, config_files: list[str] | None = None,
-                       tree_paths: list[str] | None = None, build_method: str | None = None,
-                       docs_text: str = "", library_format: str | None = None) -> tuple[str, list[str]]:
+def rewrite_for_strhub(cmd: str, input_type: str | None) -> tuple[str, list[str]]:
     """Apply only the closed, independently checked substitution profile."""
     import fidelity
     review = fidelity.rewrite(cmd, input_type)
@@ -84,11 +63,8 @@ TYPE_SLUG_SUFFIX = {
     "illumina-str-fastq": "",
     "illumina-bam-hg38-y": "y",
     "ont-bam-hg38": "ont",
-    "ont-bam-hg38-med": "ont-med",
     "ont-fastq": "ont",
     "pacbio-hifi-bam-hg38": "hifi",
-    "illumina-bam-hg38-med": "med",
-    "pacbio-hifi-bam-hg38-med": "hifi-med",
     "illumina-snp-fastq": "snp",
     "capillary-fsa": "fsa",
 }
@@ -100,9 +76,8 @@ def catalogue_slug(name: str, input_type: str | None) -> str:
     One card per tool and assay, whose version moves as releases do: the
     name, and a suffix only for a non-canonical input type. No version and
     no commit — `hipstr-v0-7` would have lied the day v0.8 was verified, or
-    spawned a second card. The committed entries under tools/ follow the same
-    rule, so a trial of a tool that is already listed lands on its card and
-    refreshes it rather than opening another.
+    spawned a second card. A trial of a tool that is already listed lands on
+    its card and refreshes it rather than opening another.
     """
     base = re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
     suffix = ""
@@ -119,8 +94,8 @@ def tool_name_as_written(repo: str, proposal: dict) -> str:
     (`unique379r/strspy`), and a report that renders that is naming the
     project something nobody calls it. The same word usually appears
     correctly cased in the README prose and in the repository's own file
-    names; the most frequent such spelling wins, and the path segment is the
-    fallback.
+    names; the most frequent such spelling wins, and the path segment is
+    used when there is none.
     """
     segment = repo.rstrip("/").split("/")[-1]
     pattern = re.compile(re.escape(segment), re.I)
@@ -263,11 +238,9 @@ def build(proposal: dict, slug: str, submitted_by: str = "third_party",
     }
     ex = proposal.get("example")
     if ex and ex.get("cmd"):
-        ex_cmd, ex_notes = from_the_path(ex["cmd"], set(proposal.get("tree_paths") or []),
-                                         build_info.get("method") in BINARY_ELSEWHERE)
+        # Executable paths are part of the cited procedure, never rewritten.
         ex_cwd = "." if from_repo else (ex.get("cwd") or cwd)
-        manifest["example"] = {"cmd": ex_cmd, "cwd": ex_cwd, "source": "detected"}
-        caveat_items += [f"Example: {n}" for n in ex_notes]
+        manifest["example"] = {"cmd": ex["cmd"], "cwd": ex_cwd, "source": "detected"}
     # Nothing to run on at all: no STRhub data for the input type and no
     # example in the repository. Every run leg is then N/A, and a verdict read
     # off the gates would call that "fails" — it is nothing of the kind.
@@ -300,57 +273,23 @@ def build(proposal: dict, slug: str, submitted_by: str = "third_party",
 INPUT_FILE_FLAG = re.compile(r"^--?(?:r|ref|reference|genome|motifs?|catalog|variant[-_]catalog|loci|regions?|"
                              r"repeats?|db|database|model|library|lib|config|conf|in|input|i|b|bams?|bed|"
                              r"annotation|table|rmsk|microsat)$", re.I)
-LOCI_KEYWORD_FLAG = re.compile(r"^--?(?:loci|regions?|repeats?|catalog|variant[-_]catalog|targets?)$", re.I)
 DATA_FILE = re.compile(r"\.(?:tsv|txt|json|bed|csv|pa|model|pkl|tab|gz|ini|cfg|conf|config|fa|fasta)$", re.I)
-
-
-def _panel_windows(input_type: str) -> list[tuple[str, int, int]]:
-    ds = datasets_lib.resolve(input_type) or {}
-    rel = ds.get("supported_loci")
-    path = datasets_lib.ROOT / rel if rel else None
-    if not path or not path.is_file():
-        return []
-    out = []
-    for ln in path.read_text().splitlines():
-        f = ln.split("\t")
-        if len(f) >= 3 and not ln.startswith("#"):
-            out.append((f[0], int(f[1]), int(f[2])))
-    return out
 
 
 def check_documented_files(run_cmd: str, proposal: dict, input_type: str,
                            caveats: list[str]) -> list[str]:
-    """What the documented command reads that the run cannot give it.
-
-    Two things make a run say nothing about the tool, and both are knowable
-    before running: the loci it genotypes, from a file the repository ships,
-    lie outside STRhub's sample (ExpansionHunter's catalog is 31 disease loci,
-    none of them forensic); or it reads a file nobody holds, and STRhub has
-    nothing in its place (vamos's Zenodo motif list was one, until STRhub
-    wrote its panel in vamos's layout)."""
+    """What the documented command reads that the run cannot give it: a file
+    that is neither in the repository at the pinned commit nor the registered
+    dataset. STRhub puts nothing in its place; the command is not run and the
+    report says which file."""
     from prepare import unwrap_example
     cmd, _ = unwrap_example(run_cmd)
     tree = set(proposal.get("tree_paths") or [])
-    shipped = proposal.get("shipped_loci") or {}
-    windows = _panel_windows(input_type)
     out: list[str] = []
     toks = cmd.split()
     for i, t in enumerate(toks):
         path = t.strip("'\"").lstrip("./")
         prev = toks[i - 1] if i else ""
-        if path in shipped and windows:
-            inside = any(c == w[0] and s < w[2] and e > w[1] for c, s, e in shipped[path] for w in windows)
-            if not inside:
-                caveats.append(f"Loci: {path}, which the command genotypes, lists {len(shipped[path])} "
-                               "locus coordinate(s), none inside STRhub's reference sample.")
-                out.append("loci_outside_panel")
-        elif LOCI_KEYWORD_FLAG.match(prev) and not t.startswith(("/data/", "-")) and shipped and windows:
-            matching = [sp for sp in shipped if path.lower() in sp.lower()] or list(shipped)
-            coords = [pt for sp in matching for pt in shipped[sp]]
-            if coords and not any(c == w[0] and s < w[2] and e > w[1] for c, s, e in coords for w in windows):
-                caveats.append(f"Loci: {prev} {path} resolves to repository loci ({', '.join(matching[:2])}) "
-                               f"with {len(coords)} coordinate(s), none inside STRhub's reference sample.")
-                out.append("loci_outside_panel")
         if (INPUT_FILE_FLAG.match(prev) and DATA_FILE.search(path) and not t.startswith(("/data/", "-"))
                 and path not in tree and "*" not in path):
             caveats.append(f"File: the documented command reads {t} (after {prev}), which is neither in "

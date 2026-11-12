@@ -146,8 +146,6 @@ STEP1_BLOCKERS = {
     "input_swapped":         ("input", "strhub"),
     "input_not_substituted": ("input", "strhub"),
     "missing_input":         ("input", "strhub"),
-    "loci_outside_panel":    ("input", "strhub"),
-    "regions_guessed":       ("input", "strhub"),
     "ssh_rewritten":         ("install", "strhub"),
 }
 

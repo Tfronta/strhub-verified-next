@@ -8,7 +8,7 @@ runs, with the same evidence checks before Docker and before the run, on a
 per-trial image tag and container name. Without it nothing is built or run
 and the report says so (local preview mode).
 
-Works for both the 23 benchmark tools and any brand-new public GitHub
+Works for the frozen snapshots under harness/testdata/benchmark and any public GitHub
 repository (via `detect_recipe.gather` or `git clone --filter=blob:none` when
 `api.github.com` is unreachable or rate-limited).
 
@@ -155,7 +155,7 @@ def gather_via_git(slug: str, ref: str, tag: str = "") -> dict:
                 break
 
         files: dict[str, str] = {}
-        for rel in dr.build_content_paths(paths) + dr.loci_file_paths(tree_entries):
+        for rel in dr.build_content_paths(paths):
             txt = read_blob(rel)
             if txt is not None:
                 files[rel] = txt

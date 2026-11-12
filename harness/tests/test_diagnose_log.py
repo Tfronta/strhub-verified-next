@@ -103,7 +103,7 @@ def test_a_build_that_runs_autoconf_without_install_is_the_repositorys_to_fix():
 
 
 def test_a_file_the_build_reads_but_the_commit_lacks_is_named_and_is_the_repositorys():
-    # The first history check: STRspy's curated recipe unzips the database the
+    # The first history check: a hand-written STRspy recipe unzipped the database the
     # author added six weeks after v2.0. At the first v2.0 commit the build
     # stopped there and the report said the cause could not be classified.
     log = ("#11 [7/8] RUN unzip -oq db-v2/STRspy2.0-DB.zip -d db\n"

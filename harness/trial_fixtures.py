@@ -173,7 +173,7 @@ SCENARIOS = [
         "build": "release_binary",
         "cited": "ExpansionHunter --reads sample.bam --reference hg38.fa --variant-catalog variants.json --output-prefix out",
         "run": "ExpansionHunter --reads /data/in/input.bam --reference /data/ref/hg38.fa --variant-catalog /data/ref/variants.json --output-prefix /data/out/out",
-        "outputs": "out.vcf", "limitations": ["loci_outside_panel"], "notes": [],
+        "outputs": "out.vcf", "limitations": [], "notes": [],
     },
     {
         # Our own reader would add a flag the cited command does not carry.
@@ -195,7 +195,7 @@ SCENARIOS = [
         "build": "release_binary",
         "cited": "strling call sample.bam sample.bin -o out",
         "run": "strling call /data/in/input.bam /data/out/sample.bin -o /data/out/out",
-        "outputs": "out-genotype.txt", "limitations": ["regions_format_guessed"], "notes": [],
+        "outputs": "out-genotype.txt", "limitations": [], "notes": [],
     },
     {
         # The command still names the repository's own files, so running it

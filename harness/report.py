@@ -1086,7 +1086,7 @@ def main() -> int:
                              and int(o.get("records_without_gt") or 0) == 0 for o in outputs):
             strhub_fault = "the structurally valid output VCF contains no called genotypes; this run does not establish why"
     import authorization
-    procedure = authorization.rejection("The mandatory pre-execution procedure review was not supplied.")
+    procedure = authorization.refusal("The mandatory pre-execution procedure review was not supplied.")
     review_validation = authorization.Validation(False, procedure["reason"])
     if args.procedure_review:
         try:
@@ -1099,11 +1099,11 @@ def main() -> int:
             if review_validation.valid:
                 procedure = review_validation.review
             else:
-                procedure = authorization.rejection(review_validation.reason)
+                procedure = authorization.refusal(review_validation.reason)
                 report["rejected_procedure_review"] = reviewed
         except (OSError, ValueError, AttributeError):
             review_validation = authorization.Validation(False, "The mandatory procedure review could not be read.")
-            procedure = authorization.rejection(review_validation.reason)
+            procedure = authorization.refusal(review_validation.reason)
     report["procedure_review"] = procedure
     report["procedure_validation"] = {"schema": authorization.SCHEMA, "valid": review_validation.valid,
                                       "reason": review_validation.reason}
@@ -1117,7 +1117,7 @@ def main() -> int:
                 raise ValueError("the mounted inputs do not match the reviewed procedure")
             report["mounted_inputs"] = receipt
         except (OSError, ValueError, AttributeError):
-            procedure = authorization.rejection("The external run has no matching mounted-input evidence.")
+            procedure = authorization.refusal("The external run has no matching mounted-input evidence.")
             report["procedure_review"] = procedure
             report["procedure_validation"] = {"schema": authorization.SCHEMA, "valid": False,
                                               "reason": procedure["reason"]}

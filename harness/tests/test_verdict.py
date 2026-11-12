@@ -69,16 +69,9 @@ def test_example_data_gap_is_never_a_reason():
 
 
 def test_proposal_with_known_limitations_is_undetermined():
-    p = {**PROPOSAL_OK, "limitations": ["regions_format_unknown"]}
+    p = {**PROPOSAL_OK, "limitations": ["input_type_guessed"]}
     v = decide(G_RUN_FAIL, recipe_proposal=p)
-    assert v["code"] == "undetermined" and "regions" in v["reason"]
-
-
-def test_unproven_region_layout_does_not_ask_the_author_to_patch_the_procedure():
-    p = {**PROPOSAL_OK, "limitations": ["regions_format_unknown"]}
-    v = decide(G_RUN_FAIL, recipe_proposal=p)
-    assert v["basis"] == "strhub" and v["blockers"] == []
-    assert "guessed" in v["reason"]
+    assert v["code"] == "undetermined"
 
 
 def test_blockers_follow_the_gate_that_failed():
@@ -103,7 +96,8 @@ def test_nothing_executed_is_undetermined_with_an_ask_for_example_data():
     assert v["code"] == "undetermined" and v["basis"] == "recipe"
     assert "nothing was executed" in v["reason"]
     assert v["blockers"][0]["code"] == "no_reference_dataset"
-    assert "self_fix" not in v["blockers"][0] and "self_fix_text" not in v["blockers"][0]
+    # A blocker says what stopped the run and what to ask the owner; it proposes no fix.
+    assert set(v["blockers"][0]) == {"code", "what", "ask_owner"}
     assert v["blockers"][0]["ask_owner"]["title"] == "Ship a small example dataset"
 
 

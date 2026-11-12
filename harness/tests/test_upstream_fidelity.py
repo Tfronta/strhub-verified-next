@@ -126,8 +126,6 @@ def test_no_synopsis_variables_configs_lists_or_executable_path_fixes():
     for cmd in ["tool [--threshold 30]", "tool --threads $N", "./tool --reads a.bam,b.bam", "tool -c configFile fastqfile"]:
         r = fidelity.rewrite(cmd, "illumina-bam-hg38")
         assert r["command"] == cmd and r["limitations"]
-    import propose_manifest
-    assert propose_manifest.from_the_path("./tool --reads x.bam", set(), True) == ("./tool --reads x.bam", [])
 
 
 @pytest.mark.parametrize("dockerfile", ['FROM scratch\n', 'FROM scratch\nENTRYPOINT ["tool"]\n',
@@ -300,12 +298,16 @@ def test_positive_preparation_binds_the_review_to_the_actual_manifest(tmp_path):
     {"regions": {"repo": "https://github.com/example/tool", "ref": "a" * 40, "path": "regions.bed"}},
     {"regions": {"library": "hipstr"}},
 ])
-def test_a_cited_command_does_not_authorize_a_separately_supplied_file(declared):
+def test_a_manifest_cannot_declare_a_separately_supplied_file(declared):
+    """No fixture and no regions file reaches the container: the schema has
+    no field to name one."""
+    import _manifest
+    from jsonschema import ValidationError
     p, m = case()
+    _manifest.validate(m)
     m["inputs"].update(declared)
-    r = review(p, m)
-    assert r["install_ready"] and not r["may_say_runs"]
-    assert r["blocker"] in {"regions_profile_unsupported", "fixture_profile_unsupported"}
+    with pytest.raises(ValidationError):
+        _manifest.validate(m)
 
 
 @pytest.mark.parametrize("command", [
