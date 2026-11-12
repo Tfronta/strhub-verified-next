@@ -13,20 +13,17 @@ someone verifying the first commit of STRspy v2 from strhub.app would have
 replaced the current attestation with a two-year-old one. Now it lands below.
 See docs/PLAN-Version-History.md.
 
-Within a commit's directory there are two places (docs/PLAN-Documented-Is-
-The-Badge.md): the files at `<slug>/<sha>/` are the run of the repository's
-own instructions (or of a recipe its maintainer submitted), which may stand
-behind the badge; `<slug>/<sha>/curated/` holds the run of a recipe STRhub
-wrote by hand, a note that never does. The alias is the newest commit AMONG
-THE RUNS THAT MAY STAND BEHIND THE BADGE; only a tool that has none falls
-back to its newest curated run, and its badge then says so.
+This engine writes one kind of run: the repository's own instructions, read
+at the pinned commit. Only such a run is placed, scanned or aliased here. A
+file already on gh-pages that is anything else (certificate_text.
+is_documented_run says no) is history this engine did not write: it is left
+where it is, never moved, never deleted, and never the alias.
 
 What holds it (harness/tests/test_publish_layout.py): a newer commit published
 later becomes the alias; an older one does not move it; the same commit
-re-verified replaces its files; a curated run never displaces a documented
-one, at any commit; a root set from before this layout is folded into its
-place first, with its commit date fetched when missing, and competes as an
-equal; no commit directory is ever deleted.
+re-verified replaces its files; a root set from before this layout is folded
+into its place first, with its commit date fetched when missing, and competes
+as an equal; no commit directory is ever deleted.
 
 Usage (the deploy step, from a clone of gh-pages):
     python harness/publish_layout.py <site> --reports reports --slug hipstr
@@ -43,14 +40,12 @@ from typing import Callable
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import upstream  # noqa: E402
-from certificate_text import instrument_of_report, BADGE_INSTRUMENTS  # noqa: E402
+from certificate_text import is_documented_run, INSTRUMENT  # noqa: E402
 
-CURATED_DIR = "curated"
 #: A tombstone beside a run's files: the run stays where it is and its URL
 #: keeps resolving, but it is no longer a result — never the alias, never
 #: the note, and the index lists it as retired with the reason. Written by
-#: `retire`, by hand, for a run that can no longer be reproduced (its recipe
-#: is gone from tools/) or that was STRhub's fault. Nothing is ever deleted.
+#: `retire`, by hand, for a run that was STRhub's fault. Nothing is ever deleted.
 TOMBSTONE = "retired.json"
 
 #: How a report is looked up under its directory: the same stem the run wrote.
@@ -59,9 +54,8 @@ Resolver = Callable[[str, str], "str | None"]
 
 def report_files(folder: pathlib.Path, slug: str) -> list[pathlib.Path]:
     """Every file of one run: `<slug>.json`, `.html`, `.pdf`, `.badge.json`,
-    `.summary.md`, `.log-*.txt`. Not the recipe attachment, which the web reads
-    out of the run's artifact and which is committed under tools/ when it
-    publishes; and not another slug that happens to share a prefix
+    `.summary.md`, `.log-*.txt`, `.terminal-*.txt`. Not the recipe attachment,
+    which the web reads out of the run's artifact; and not another slug that happens to share a prefix
     (`hipstr-y.json` does not start with `hipstr.`)."""
     return sorted(
         p for p in folder.iterdir()
@@ -106,12 +100,6 @@ def _backfill(report: dict, path: pathlib.Path, resolve: Resolver | None) -> Non
         path.write_text(json.dumps(report, indent=2))
 
 
-def place_of(site: pathlib.Path, slug: str, sha: str, instrument: str) -> pathlib.Path:
-    """Where a run of `instrument` at `sha` lives."""
-    base = site / slug / sha
-    return base if instrument in BADGE_INSTRUMENTS else base / CURATED_DIR
-
-
 def _move_set(files: list[pathlib.Path], dest: pathlib.Path) -> None:
     dest.mkdir(parents=True, exist_ok=True)
     for f in files:
@@ -134,29 +122,14 @@ def fold_root(site: pathlib.Path, slug: str, resolve: Resolver | None = None) ->
     root_json = site / f"{slug}.json"
     report = _read(root_json) if root_json.exists() else None
     sha = sha_of(report) if report else None
-    if not report or not sha:
+    if not report or not sha or not is_documented_run(report):
         return None
-    dest = place_of(site, slug, sha, instrument_of_report(report))
+    dest = site / slug / sha
     if (dest / f"{slug}.json").exists():
         return None
     _move_set(report_files(site, slug), dest)
     _backfill(report, dest / f"{slug}.json", resolve)
     return sha
-
-
-def settle(site: pathlib.Path, slug: str, sha: str) -> bool:
-    """Put a commit's runs where their instrument says. A set published at
-    `<slug>/<sha>/` before instruments existed may be a curated run; it moves
-    to `curated/` so a documented run of the same commit can land beside it
-    instead of over it. Returns True when something moved."""
-    base = site / slug / sha
-    r = _read(base / f"{slug}.json")
-    if not r or instrument_of_report(r) in BADGE_INSTRUMENTS:
-        return False
-    if (base / CURATED_DIR / f"{slug}.json").exists():
-        return False        # a curated run is already there; leave both to be looked at
-    _move_set(report_files(base, slug), base / CURATED_DIR)
-    return True
 
 
 def tombstone_of(folder: pathlib.Path) -> dict | None:
@@ -175,11 +148,9 @@ def _with_tombstone(folder: pathlib.Path, r: dict) -> dict:
     return {**r, "retired": t} if t else r
 
 
-def scan(site: pathlib.Path, slug: str) -> list[tuple[str, str, dict]]:
-    """Every run of `slug`: (sha, instrument, report), newest commit first,
-    and at one commit the run that may stand behind the badge before the
-    curated one. Reads what is there; `settle` is what puts it in place. A
-    retired run is listed, with its tombstone under `retired`."""
+def scan(site: pathlib.Path, slug: str) -> list[tuple[str, dict]]:
+    """Every run of `slug`: (sha, report), newest commit first. Reads what is
+    there. A retired run is listed, with its tombstone under `retired`."""
     found = []
     base = site / slug
     if base.is_dir():
@@ -187,32 +158,21 @@ def scan(site: pathlib.Path, slug: str) -> list[tuple[str, str, dict]]:
             if not d.is_dir():
                 continue
             r = _read(d / f"{slug}.json")
-            if r:
-                found.append((d.name, instrument_of_report(r), _with_tombstone(d, r)))
-            c = _read(d / CURATED_DIR / f"{slug}.json")
-            if c:
-                found.append((d.name, "curated", _with_tombstone(d / CURATED_DIR, c)))
-    # Newest commit first; at one commit, the run that may stand behind the
-    # badge before the curated one, whichever was verified later.
-    def key(item):
-        sha, instrument, r = item
-        src = r.get("source") or {}
-        committed = src.get("committed") or ""
-        return (bool(committed), committed, instrument in BADGE_INSTRUMENTS, r.get("generated") or "")
-    found.sort(key=key, reverse=True)
+            if r and is_documented_run(r):
+                found.append((d.name, _with_tombstone(d, r)))
+    found.sort(key=lambda item: rank(item[1]), reverse=True)
     return found
 
 
-def alias_source(site: pathlib.Path, slug: str) -> tuple[str, str, dict] | None:
-    """The run the root alias copies: the newest commit among the runs that
-    may stand behind the badge; failing any, the newest curated run."""
+def alias_source(site: pathlib.Path, slug: str) -> tuple[str, dict] | None:
+    """The run the root alias copies: the newest commit among the runs whose
+    procedure evidence still validates."""
     import publish_gate
     # Historical files remain readable; they do not acquire authority simply
-    # by being on disk or carrying an origin/maintainer label.
-    runs = [r for r in scan(site, slug) if not r[2].get("retired")
-            and publish_gate.validated_finding(r[2]).valid]
-    eligible = [r for r in runs if r[1] in BADGE_INSTRUMENTS]
-    return (eligible or runs or [None])[0]
+    # by being on disk.
+    runs = [r for r in scan(site, slug) if not r[1].get("retired")
+            and publish_gate.validated_finding(r[1]).valid]
+    return runs[0] if runs else None
 
 
 def place(site: pathlib.Path, reports: pathlib.Path, slug: str,
@@ -234,11 +194,13 @@ def place(site: pathlib.Path, reports: pathlib.Path, slug: str,
     fold_root(site, slug, resolve)
 
     # This run's files, replaced whole: a re-verification of the same commit
-    # must not keep a log the new run did not write. Files only — the other
-    # instrument's run of the same commit lives in a subdirectory and stays.
-    instrument = instrument_of_report(report)
-    settle(site, slug, sha)
-    target = place_of(site, slug, sha, instrument)
+    # must not keep a log the new run did not write. Files only: whatever
+    # else sits in a subdirectory of that commit stays.
+    if not is_documented_run(report):
+        raise SystemExit(f"{run_json}: not a run of the repository's own instructions")
+    target = site / slug / sha
+    if (target / f"{slug}.json").exists() and not is_documented_run(_read(target / f"{slug}.json") or {}):
+        raise SystemExit(f"{target}: holds a report this engine did not write; it is not replaced")
     target.mkdir(parents=True, exist_ok=True)
     for f in report_files(target, slug):
         f.unlink()
@@ -246,46 +208,38 @@ def place(site: pathlib.Path, reports: pathlib.Path, slug: str,
     _backfill(report, target / f"{slug}.json", resolve)
 
     alias = write_alias(site, slug)
-    return {"slug": slug, "sha": sha, "instrument": instrument,
-            "alias": alias[0] if alias else None,
-            "alias_instrument": alias[1] if alias else None,
-            "versions": [(v_sha, v_inst) for v_sha, v_inst, _ in scan(site, slug)]}
+    return {"slug": slug, "sha": sha, "instrument": INSTRUMENT, "alias": alias,
+            "versions": [v_sha for v_sha, _ in scan(site, slug)]}
 
 
-def write_alias(site: pathlib.Path, slug: str) -> tuple[str, str] | None:
+def write_alias(site: pathlib.Path, slug: str) -> str | None:
     """Point the root `<slug>.*` set at the run the badge may rest on (see
     alias_source), rewritten from scratch so nothing stale survives beside it.
-    Every commit is settled first. Returns (sha, instrument) of the alias, or
-    None when the slug has no run."""
-    base = site / slug
-    if base.is_dir():
-        for d in sorted(base.iterdir()):
-            if d.is_dir():
-                settle(site, slug, d.name)
+    Returns the sha of the alias, or None when the slug has no such run."""
     src = alias_source(site, slug)
     if not src:
         # A withdrawal must not leave the former result at the root when
-        # every run is retired. A separately authored editorial notice stays.
+        # every run is retired. A root set this engine did not write stays.
         current = _read(site / f"{slug}.json")
-        if not current or current.get("record_type") != "editorial_review":
+        if current is None or is_documented_run(current):
             for f in report_files(site, slug):
                 f.unlink()
         return None
-    sha, instrument, _ = src
+    sha, _ = src
     for f in report_files(site, slug):
         f.unlink()
-    _copy_set(report_files(place_of(site, slug, sha, instrument), slug), site)
-    return sha, instrument
+    _copy_set(report_files(site / slug / sha, slug), site)
+    return sha
 
 
-def retire(site: pathlib.Path, slug: str, sha: str, instrument: str, reason: str,
+def retire(site: pathlib.Path, slug: str, sha: str, reason: str,
            when: str | None = None) -> pathlib.Path:
     """Put a tombstone beside one run and point the alias elsewhere. The
     run's files stay, so its URL keeps resolving; what changes is that it is
     no longer a result the site rests on. Returns the tombstone's path."""
-    folder = place_of(site, slug, sha, instrument)
+    folder = site / slug / sha
     if not (folder / f"{slug}.json").exists():
-        raise SystemExit(f"{folder}: no run of {slug} at {sha[:7]} ({instrument})")
+        raise SystemExit(f"{folder}: no run of {slug} at {sha[:7]}")
     if not reason.strip():
         raise SystemExit("a retirement needs a reason")
     stone = folder / TOMBSTONE
@@ -297,51 +251,25 @@ def retire(site: pathlib.Path, slug: str, sha: str, instrument: str, reason: str
     return stone
 
 
-def settle_all(site: pathlib.Path) -> list[tuple[str, str, str]]:
-    """Every slug on the site: put each commit's runs where their instrument
-    says and rewrite the alias by the rule. For the day the rule changes —
-    once, by hand, after docs/PLAN-Documented-Is-The-Badge.md — and harmless
-    any other day. Returns (slug, alias sha, alias instrument) per slug."""
-    out = []
-    for d in sorted(site.iterdir()):
-        if d.is_dir() and not d.name.startswith(".") and (site / f"{d.name}.json").exists():
-            alias = write_alias(site, d.name)
-            if alias:
-                out.append((d.name, alias[0], alias[1]))
-    return out
-
-
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("site", help="a clone of gh-pages")
     ap.add_argument("--reports", default="reports", help="the run's reports/ directory")
     ap.add_argument("--slug", help="the slug the run published as")
-    ap.add_argument("--settle-all", action="store_true",
-                    help="no run: settle every slug's runs by instrument and rewrite every alias")
     ap.add_argument("--retire", metavar="SHA",
                     help="no run: put a tombstone beside the run of --slug at this commit")
-    ap.add_argument("--instrument", default="documented", choices=["documented", "maintainer", "curated"],
-                    help="with --retire: which run at that commit")
     ap.add_argument("--reason", default="", help="with --retire: why, for the reader")
     args = ap.parse_args()
-    if args.retire:
-        if not args.slug:
-            ap.error("--slug is required with --retire")
-        stone = retire(pathlib.Path(args.site), args.slug, args.retire, args.instrument, args.reason)
-        print(f"retired {args.slug} @ {args.retire[:7]} ({args.instrument}): {stone}")
-        return 0
-    if args.settle_all:
-        for slug, sha, instrument in settle_all(pathlib.Path(args.site)):
-            print(f"{slug}: alias {sha[:7]} ({instrument})")
-        return 0
     if not args.slug:
-        ap.error("--slug is required unless --settle-all")
+        ap.error("--slug is required")
+    if args.retire:
+        stone = retire(pathlib.Path(args.site), args.slug, args.retire, args.reason)
+        print(f"retired {args.slug} @ {args.retire[:7]}: {stone}")
+        return 0
     done = place(pathlib.Path(args.site), pathlib.Path(args.reports), args.slug,
                  resolve=upstream.commit_date)
-    where = "" if done["alias"] == done["sha"] and done["alias_instrument"] == done["instrument"] \
-        else f" (alias stays at {done['alias'][:7]} {done['alias_instrument']})"
-    print(f"{done['slug']} @ {done['sha'][:7]} placed as {done['instrument']}; "
-          f"{len(done['versions'])} run(s) known{where}")
+    where = "" if done["alias"] == done["sha"] else f" (alias stays at {done['alias'][:7]})"
+    print(f"{done['slug']} @ {done['sha'][:7]} placed; {len(done['versions'])} run(s) known{where}")
     return 0
 
 

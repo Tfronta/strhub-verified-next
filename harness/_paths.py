@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import pathlib
 import re
-from urllib.parse import quote
 
 
 def relative(value: str) -> pathlib.PurePosixPath:
@@ -41,21 +40,6 @@ def destination(root: pathlib.Path, value: str) -> pathlib.Path:
             break
         current = current.parent
     return path
-
-
-def raw_url(pointer: dict) -> str:
-    """One public GitHub file. Quote path/ref so URL parsing cannot change them."""
-    repo = pointer.get("repo", "")
-    match = re.fullmatch(r"https://github\.com/([A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+?)(?:\.git)?/?", repo)
-    ref = pointer.get("ref", "")
-    if not match or not isinstance(ref, str) or not re.fullmatch(r"[A-Za-z0-9_][A-Za-z0-9_./-]*", ref):
-        raise ValueError("remote input needs a public GitHub repository and a valid ref")
-    if any(p in (".", "..", ".git") for p in match[1].split("/")):
-        raise ValueError("remote input needs a repository root URL")
-    relative(match[1])
-    relative(ref)
-    path = relative(pointer["path"])
-    return f"https://raw.githubusercontent.com/{match[1]}/{quote(ref, safe='')}/{quote(str(path), safe='/')}"
 
 
 if __name__ == "__main__":

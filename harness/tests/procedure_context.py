@@ -39,18 +39,17 @@ def decide(gates, diagnostics=None, **kwargs):
     return verdict.decide(gates, diagnostics, recipe_proposal=p, manifest=m, procedure=reviewed, **kwargs)
 
 
-def report(code="runs", repo="https://github.com/example/tool", ref="a" * 40, instrument="documented"):
+def report(code="runs", repo="https://github.com/example/tool", ref="a" * 40):
     """A freshly synthesized bound report for publication-policy tests."""
     import certificate_text
     import verdict
-    origin = {"documented": "proposed", "maintainer": "maintainer", "curated": "curated"}[instrument]
     source = {"repo": repo, "ref": ref}
-    p, m, reviewed = context({**source}, {"source": source, "recipe": {"origin": origin}})
+    p, m, reviewed = context({**source}, {"source": source})
     gates = {"available": True, "installs": True, "runs": code == "runs", "io": code == "runs", "content": code == "runs"}
     inner, cwd = prepare.unwrap_example(m["run"]["cmd"])
     return {"schema": "strhub-verified/1", "tool": m["tool"], "source": {**source, "ref_resolved": ref},
             "environment": m["environment"], "input_contract": m["inputs"], "gates": gates,
-            "instrument": certificate_text.instrument_of(m), "recipe": m["recipe"],
+            "instrument": certificate_text.INSTRUMENT, "recipe": {"origin": "proposed"},
             "procedure_review": reviewed,
             "run": {"cmd": inner, "effective_cmd": m["run"]["cmd"], "cwd": cwd,
                     "step_outcome": "success" if gates["runs"] else "failure"},

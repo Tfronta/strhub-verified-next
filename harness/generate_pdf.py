@@ -1,7 +1,7 @@
 """Generate a STRhub Verified PDF attestation report.
 
 Usage (called by verify.yml after report.py):
-    python harness/generate_pdf.py --manifest tools/<tool>/manifest.yml
+    python harness/generate_pdf.py --manifest work/proposal/manifest.yml
 
 Reads:
     reports/<slug>.json   (written by harness/report.py)
@@ -27,8 +27,8 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import diagnose_log  # noqa: E402
 from command_record import presentation as command_presentation  # noqa: E402
 from certificate_text import (  # noqa: E402
-    conclusion_items_for, install_meaning, instrument_of_report, workaround_lines, headline, execution_finding_established,
-    AS_IS_HEADING, STRHUB_DID_HEADING, STRHUB_DID_LEAD, NOT_DOCUMENTED, display_name,
+    conclusion_items_for, install_meaning, headline, execution_finding_established,
+    AS_IS_HEADING, NOT_DOCUMENTED, display_name,
     PURPOSE, EXEC_SCOPE, NOT_EVALUATED, SCOPE_STATEMENT, SCOPE_NOT, DISCLAIMER, OUT_OF_SCOPE, LIMITATIONS,
 )
 
@@ -453,7 +453,6 @@ def build_body(cfg):
     # §1 Executive Summary: the result in words, then the rung and the why.
     result_label = cfg.get("headline") or LEVEL_LABEL.get(cfg["level"], "Not verified")
     attest_label = LEVEL_LABEL.get(cfg["level"], "Not verified")
-    curated = cfg.get("instrument") == "curated"
     gates_dict = dict(cfg["gates"])
     n_pass = sum(1 for ok in gates_dict.values() if ok)
     n_total = len(gates_dict)
@@ -491,7 +490,7 @@ def build_body(cfg):
     # reviewer is owed, plus the missing block of docs/GUIA-PASO-1.md when one
     # is missing.
     step1 = cfg.get("step1") or {}
-    if step1.get("headline") and not curated:
+    if step1.get("headline"):
         s1_els = [
             Paragraph(f"<b>{esc(step1['headline'])}</b>", ST["tbl_cell"]),
             vspace(2),
@@ -510,25 +509,8 @@ def build_body(cfg):
         sec += 1
         els.append(boxed(s1_els))
 
-    # What STRhub had to do to run this tool. The opening chapter of a run of
-    # a recipe STRhub wrote, before the run itself: each item a departure a
-    # first-time user would have to discover, and a recommendation; and the
-    # rung the run reached with them. It never changes the label.
-    if curated:
-        cur_els = [Paragraph(STRHUB_DID_LEAD, ST["body"]), vspace(2)]
-        cur_els += [Paragraph(
-            f'<font color="#9ca3af">–</font>  {esc(item)}',
-            S("cw", fontSize=8.5, textColor=GRAY, leading=14,
-              leftIndent=10, spaceAfter=1)) for item in (cfg.get("workarounds") or ["(not itemised for this recipe)"])]
-        cur_els.append(vspace(2))
-        cur_els.append(Paragraph(
-            f"With those changes, the run reached: <b>{esc(attest_label)}</b>.", ST["body"]))
-        els.append(section_num(str(sec), STRHUB_DID_HEADING))
-        sec += 1
-        els.append(boxed(cur_els))
-
     # §4 Verification Gates
-    els.append(section_num(str(sec), "Verification Gates" if curated else f"{AS_IS_HEADING}: Verification Gates"))
+    els.append(section_num(str(sec), f"{AS_IS_HEADING}: Verification Gates"))
     sec += 1
     gdata = []
     stopped_found = False
@@ -803,15 +785,6 @@ def build_body(cfg):
     else:
         intro = ("This tool ships no demo or test data of its own. "
                  "STRhub ran the verification using the public reference dataset listed below.")
-    # Say plainly that the dataset is a slice. Without this a reader sees only
-    # "Illumina BAM (hg38) — HG002" and may take it for a whole genome, which makes
-    # the narrow locus list below look like a shortcoming of the tool.
-    panel_size = cfg.get("regions", {}).get("panel_size")
-    if panel_size:
-        # Reports from before the medical panel carry no label; all ran on forensic loci.
-        label = cfg.get("regions", {}).get("panel_label") or "forensic STR loci"
-        intro += (f" That dataset is a slice around {panel_size} {label}, "
-                  "not a whole genome: it carries reads only at the loci listed below.")
     # Last, so the sentence above stays next to the dataset it refers to. The
     # recommendation leads with what a test file gives the tool's own users,
     # because that is the larger reason and the one an author acts on; being
@@ -826,8 +799,7 @@ def build_body(cfg):
     els.append(Paragraph(intro, ST["body"]))
     els.append(vspace(3))
 
-    ref_genome = ds.get("reference_genome", {})
-    ref_assembly = ref_genome.get("assembly", "—") if isinstance(ref_genome, dict) else str(ref_genome)
+    ref_assembly = ds.get("reference") or "—"
     src = ds.get("source", "")
     src_display = (src[:60] + "…") if len(src) > 60 else src
     loci_list = cfg.get("loci_list", [])
@@ -836,25 +808,10 @@ def build_body(cfg):
         ("Dataset",     ds.get("name", "—")),
         ("Source",      link(src, src_display) if src else "—"),
         ("License",     ds.get("license", "—")),
-        ("Ref. genome", ref_assembly),
+        ("Aligned to",  ref_assembly),
         ("Loci tested", loci_val),
     ]
 
-    # Who chose the regions. A coordinate-based tool only calls where its BED points,
-    # so the reader needs to know whether that BED was the author's or ours.
-    rg = cfg.get("regions", {})
-    if rg.get("source") == "tool":
-        covered, total = rg.get("covered_loci"), rg.get("panel_size")
-        detail = (f" (covers {covered} of {total} supported loci)"
-                  if covered and total else "")
-        # Intervals the slice has no reads for are allowed and never assessed.
-        outside = rg.get("outside_panel")
-        if outside:
-            detail += f"; {outside} interval{'s' if outside != 1 else ''} outside the slice, not assessed"
-        # Never "the tool's author" — see report.py::_regions_note.
-        ds_rows.append(("Regions BED", f"Provided with the submission{detail}"))
-    elif rg.get("source") == "strhub":
-        ds_rows.append(("Regions BED", "Provided by STRhub"))
     tdata = [[Paragraph(k, ST["meta_label"]),
               Paragraph(v, S("dv", fontSize=8, textColor=GRAY, leading=13))]
              for k, v in ds_rows]
@@ -872,9 +829,6 @@ def build_body(cfg):
     els.append(dst)
 
     # §8 Verification Matrix
-    rc = cfg.get("readme_check") or {}
-    rc_score = rc.get("score", 0)
-    rc_max = rc.get("max", 5)
     # The reference-data row used to read PASS whatever happened on that leg,
     # so a run that produced nothing still showed a green matrix.
     ext = next((d for d in (cfg.get("datasets") or [])
@@ -886,23 +840,7 @@ def build_body(cfg):
     else:
         ext_tag = '<font color="#9ca3af"><b>N/A</b></font>'
 
-    own = next((d for d in (cfg.get("datasets") or [])
-                if d.get("leg") == "own"), None)
-    matrix_rows = []
-    if own:
-        own_tag = '<font color="#00909c"><b>PASS</b></font>' if own.get("passed") else ('<font color="#ef4444"><b>FAIL</b></font>' if own.get("available") else '<font color="#9ca3af"><b>N/A</b></font>')
-        matrix_rows.append((own_tag, "Run on repository test data", own.get("dataset", "—")))
-
-    matrix_rows += [
-        (ext_tag, "Run on reference dataset",        ds.get("name", "—")),
-        ("",     f"README check ({rc_score}/{rc_max})",
-                 "Advisory: all items present" if rc_score == rc_max else f"{rc_score}/{rc_max} items present"),
-        ("",     "Install / environment setup", "Present"),
-        ("",     "Run command",                 "Present"),
-        ("",     "Expected input format",       "Present"),
-        ("",     "Produced output format",      "Present"),
-        ("",     "Dependencies / versions",     "Present"),
-    ]
+    matrix_rows = [(ext_tag, "Run on reference dataset", ds.get("name", "—"))]
     tdata = []
     for tag, label, val in matrix_rows:
         tag_p = Paragraph(tag if tag else "", ST["tbl_cell"])
@@ -1226,9 +1164,9 @@ def load_config(manifest_path: str, datasets_path: str | None = None,
     # Terminal failure excerpt from log if the run stopped
     failure_excerpt = report.get("failure_excerpt", "")
     if not failure_excerpt:
-        log_fname = (report.get("logs") or {}).get("external") or (report.get("logs") or {}).get("own", "") or (report.get("logs") or {}).get("build", "")
+        log_fname = (report.get("logs") or {}).get("external") or (report.get("logs") or {}).get("build", "")
         if log_fname:
-            candidates = [pathlib.Path(f"reports/{log_fname}"), pathlib.Path(log_fname), pathlib.Path(f"tools/{slug}/{log_fname}")]
+            candidates = [pathlib.Path(f"reports/{log_fname}"), pathlib.Path(log_fname)]
             for p in candidates:
                 if p.exists():
                     try:
@@ -1239,7 +1177,7 @@ def load_config(manifest_path: str, datasets_path: str | None = None,
                         pass
                     break
 
-    # Declared output (from the manifest) — the honest fallback when the Content
+    # Declared output (from the manifest) — what is shown instead when the Content
     # gate did not run (no content: block), instead of a hardcoded VCF guess.
     declared_out = (m.get("outputs") or [{}])[0]
     declared_output = declared_out.get("path", "—")
@@ -1293,10 +1231,9 @@ def load_config(manifest_path: str, datasets_path: str | None = None,
         "loci_with_depth":loci_with_depth,
         "loci_list":      stats.get("str_loci", []),
         "dataset":        dataset,
-        # Per-leg outcomes (own / external / example), so the matrix reports
+        # Per-leg outcomes (external / example), so the matrix reports
         # what each leg did instead of asserting a pass.
         "datasets":       report.get("datasets") or [],
-        "regions":        report.get("regions") or {},
         # Why the build failed, with the side it falls on. Absent unless the
         # Installs gate failed and the build log named a cause.
         "install_detail": report.get("install_detail") or {},
@@ -1319,19 +1256,13 @@ def load_config(manifest_path: str, datasets_path: str | None = None,
         # software: the two are the same person only when a tool's own maintainer
         # submits it. Empty on runs from before the form asked.
         "submitted_by":   (report.get("submission") or {}).get("by") or "",
-        "readme_check":   report.get("readme_check") or {},
         "diagnostics":    report.get("diagnostics") or {},
         # Read off the repository when the run was configured, not produced by it.
         "caveats":        report.get("caveats") or {},
         "needed_beyond_repo": report.get("needed_beyond_repo") or [],
-        # Which instrument, and what a curated recipe did that the README
-        # does not (docs/PLAN-Documented-Is-The-Badge.md).
-        "instrument":     instrument_of_report(report) if report else "",
         "headline":       headline(report)[0] if report else "",
         "certificate":    report.get("certificate") or {},
-        "workarounds":    workaround_lines(report) if report else [],
-        "log_filename":   (report.get("logs") or {}).get("external")
-                          or (report.get("logs") or {}).get("own", ""),
+        "log_filename":   (report.get("logs") or {}).get("external", ""),
         "failure_excerpt": failure_excerpt,
     }
 
@@ -1340,7 +1271,7 @@ def main() -> int:
     ap = argparse.ArgumentParser(
         description="Generate a STRhub Verified PDF from a completed CI run.")
     ap.add_argument("--manifest", required=True,
-                    help="Path to tools/<slug>/manifest.yml")
+                    help="Path to the run's manifest.yml")
     ap.add_argument("--datasets",
                     help="Path to datasets/index.json (auto-detected if omitted)")
     ap.add_argument("--out",

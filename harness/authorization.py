@@ -91,9 +91,9 @@ def binding_validation(report: dict, manifest: dict) -> Validation:
     from prepare import unwrap_example
     if report.get("tool") != manifest["tool"]:
         return Validation(False, "The report tool identity does not match its effective manifest.")
-    from certificate_text import instrument_of
-    if report.get("instrument") != instrument_of(manifest):
-        return Validation(False, "The report instrument does not match its effective manifest.")
+    from certificate_text import is_documented_run
+    if not is_documented_run(report):
+        return Validation(False, "The report is not a run of the repository's own instructions.")
     source = report.get("source") or {}
     if not isinstance(source, dict) or not isinstance(source.get("repo"), str):
         return Validation(False, "The report source is malformed.")

@@ -22,7 +22,7 @@ def _trial(work, manifest, dockerfile):
 
 
 def test_outputs_are_single_line(tmp_path):
-    src = ROOT / "harness" / "testdata" / "fixtures" / "legacy_tools" / "hipstr"
+    src = ROOT / "harness" / "testdata" / "fixtures" / "proposed" / "hipstr"
     args = _trial(tmp_path, src.joinpath("manifest.yml").read_text(), src.joinpath("Dockerfile").read_text())
     rc, kv, err = _run(["hipstr", *args, "--plan-out", str(tmp_path / "plan.json")])
     assert rc == 0, err
@@ -70,7 +70,7 @@ def test_shipped_example_cannot_bypass_absent_installation_evidence(tmp_path):
     """When the repository ships its own example (example.cmd) and states how to
     install, a STRhub reference-sample limitation (such as loci_outside_panel)
     must only disable the external leg, never the repository's own example leg."""
-    src = ROOT / "harness" / "testdata" / "fixtures" / "legacy_tools" / "strsearch"
+    src = ROOT / "harness" / "testdata" / "fixtures" / "proposed" / "strsearch"
     manifest = src.joinpath("manifest.yml").read_text()
     manifest += "\nexample:\n  cmd: python3 STRsearch.py -i example/test_data/ -c example/STR.configuration.txt -o out/\n  cwd: /opt/tool\n"
     args = _trial(tmp_path, manifest, src.joinpath("Dockerfile").read_text())
@@ -97,7 +97,7 @@ def test_shipped_example_cannot_bypass_absent_installation_evidence(tmp_path):
 def test_a_run_keeps_only_its_selected_dataset(tmp_path):
     """Without a reviewed procedure no input is staged at all, and no
     argument exists that would swap the dataset after the fact."""
-    src = ROOT / "harness" / "testdata" / "fixtures" / "legacy_tools" / "hipstr"
+    src = ROOT / "harness" / "testdata" / "fixtures" / "proposed" / "hipstr"
     manifest = src.joinpath("manifest.yml").read_text()
     args = _trial(tmp_path, manifest, src.joinpath("Dockerfile").read_text())
     rc, kv, err = _run(["hipstr", *args])

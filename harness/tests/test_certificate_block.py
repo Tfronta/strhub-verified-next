@@ -19,8 +19,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 
 
 def _run_report(tmp_path, runs="fail"):
-    doc = yaml.safe_load((ROOT / "harness" / "testdata" / "fixtures" / "legacy_tools" / "strspy-ont" / "manifest.yml").read_text())
-    doc["recipe"] = {"origin": "proposed"}
+    doc = yaml.safe_load((ROOT / "harness" / "testdata" / "fixtures" / "proposed" / "strspy" / "manifest.yml").read_text())
     manifest = tmp_path / "manifest.yml"
     manifest.write_text(yaml.safe_dump(doc, sort_keys=False))
     env = {"PATH": "/usr/bin:/bin", "HOME": str(tmp_path)}
@@ -44,7 +43,7 @@ def test_the_report_carries_the_certificate_and_the_badge_says_the_same(tmp_path
     written, badge, md, html, _ = _run_report(tmp_path)
     cert = written["certificate"]
     assert cert["schema"] == ct.CERTIFICATE_SCHEMA
-    # The historical recipe has no mandatory procedure evidence. Synthetic
+    # This call hands report.py no procedure review. Synthetic
     # gate outcomes cannot turn it into a documented execution finding.
     assert cert["label"] == badge["message"] == "Could not be determined"
     assert cert["reached"] == "Installs"

@@ -11,35 +11,16 @@ from __future__ import annotations
 import diagnose_log
 
 
-#: Which instrument a run is, and what the badge may rest on
-#: (docs/PLAN-Documented-Is-The-Badge.md). `documented` and `maintainer` may
-#: stand behind the badge; `curated` is a note under the documented result.
-INSTRUMENT_LINE = {
-    "documented": "the repository's own instructions, read off the README and the tree at the pinned commit",
-    "maintainer": "a recipe the tool's maintainer submitted",
-    "curated": "a recipe STRhub wrote by hand, not read off the repository: a note under the documented result, never the badge",
-}
-BADGE_INSTRUMENTS = ("documented", "maintainer")
+#: The one instrument this engine has: the repository's own instructions,
+#: read off the README and the tree at the pinned commit. Nothing else may
+#: stand behind the badge.
+INSTRUMENT = "documented"
 
-#: The two chapters of a report, in this order (docs/PLAN-Documented-Is-The-
-#: Badge.md, tanda 5c): first what happens to the tool as it is in its
-#: repository — the label, where it stopped, why, how; then, apart, what
-#: STRhub had to do to run it. The second never changes the label.
+#: The chapter a report opens with: what happens to the tool as it is in its
+#: repository — the label, where it stopped, why, how.
 AS_IS_HEADING = "As it is in the repository"
-STRHUB_DID_HEADING = "What STRhub had to do to run this tool"
-STRHUB_DID_LEAD = ("STRhub wrote its own recipe for this tool, an environment and a command of "
-                   "its own rather than the repository's instructions, and ran that. Each item below "
-                   "is something a first-time user following the README would have to work out "
-                   "for themselves, and so a recommendation to the author. This run does not "
-                   "change the tool's label: the label is what happens as it is in the repository.")
-FULL_RUN_HEADING = "This run, in full"
+#: The label of a report on gh-pages that is not a run of this instrument.
 NOT_DOCUMENTED = "Not verified as documented"
-# Older names, kept for callers.
-CURATED_HEADING = STRHUB_DID_HEADING
-CURATED_LEAD = STRHUB_DID_LEAD
-CURATED_NEEDED = ("A container environment and a command written by STRhub, not taken from the "
-                  "repository's instructions; what they do differently is listed under "
-                  f"\"{STRHUB_DID_HEADING}\".")
 
 #: Where a run that does not run stopped, in the label's words, by the rung
 #: it reached. The rung itself stays in the ladder.
@@ -136,8 +117,6 @@ def errors_reported(report: dict) -> bool:
     return any(i.get("severity") == "error"
                for issues in (report.get("diagnostics") or {}).values() for i in issues)
 
-
-RUNS_FALLBACK = "Runs from its published image; the pinned commit does not build"
 
 #: The four blocks docs/GUIA-PASO-1.md asks for, in its words. A report that
 #: says a block is missing uses the same name the guide gives it, so correcting
@@ -269,11 +248,9 @@ def headline(report: dict) -> tuple[str, str]:
       Does not run as documented: stops at run   the documented run did not, and where
       Could not be determined                     nobody knew how to attempt it (the README)
       Out of scope                                the free runner cannot provide something
-      Not verified as documented                  the run is of a recipe STRhub wrote
+      Not verified as documented                  not a run of the repository's instructions
     """
-    if report.get("record_type") == "editorial_review":
-        return "Evidence insufficient", "lightgrey"
-    if instrument_of_report(report) not in BADGE_INSTRUMENTS:
+    if not is_documented_run(report):
         return NOT_DOCUMENTED, "lightgrey"
     code = (report.get("verdict") or {}).get("code")
     level = report.get("level", "none")
@@ -291,38 +268,19 @@ def headline(report: dict) -> tuple[str, str]:
     return f"Does not run as documented: {STOPS_AT.get(level, 'stops at ' + level)}", "red"
 
 
-def instrument_of(m: dict) -> str:
-    """`documented` | `maintainer` | `curated`, from the manifest's recipe.origin;
-    for a manifest from before that field, derived: proposed if detect_recipe
-    wrote its notes, the maintainer's if the submission says so, curated
-    otherwise — which is every recipe STRhub wrote to fill the catalogue."""
-    origin = (m.get("recipe") or {}).get("origin")
-    if origin == "proposed":
-        return "documented"
-    if origin in ("maintainer", "curated"):
-        return origin
-    if (m.get("caveats") or {}).get("source") == "detect_recipe":
-        return "documented"
-    if (m.get("submission") or {}).get("by") == "maintainer":
-        return "maintainer"
-    return "curated"
-
-
-def instrument_of_report(report: dict) -> str:
-    """The same reading for a published report, which carries `instrument`
-    since this plan and can only be derived before it."""
-    return report.get("instrument") or instrument_of(report)
-
-
-def workaround_lines(report: dict) -> list[str]:
-    """One line per workaround of a curated recipe, for any rendering."""
-    out = []
-    for w in ((report.get("recipe") or {}).get("workarounds") or []):
-        line = f"{w.get('what', '')} Instead of: {w.get('instead_of', '')}"
-        if w.get("why"):
-            line += f" {w['why']}"
-        out.append(line)
-    return out
+def is_documented_run(report: dict) -> bool:
+    """Whether a report is a run of the repository's own instructions, which
+    is all this engine writes. A report already on gh-pages that is anything
+    else (another instrument, a record that is not a run) is history this
+    engine did not produce: it is never the badge. Reports from before the
+    `instrument` field are recognised by the proposal that wrote them."""
+    if report.get("record_type"):
+        return False
+    instrument = report.get("instrument")
+    if instrument:
+        return instrument == INSTRUMENT
+    return ((report.get("recipe") or {}).get("origin") == "proposed"
+            or (report.get("caveats") or {}).get("source") == "detect_recipe")
 
 
 def test_data_item(cfg: dict, ds_name: str) -> tuple[str, str]:

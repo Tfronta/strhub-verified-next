@@ -79,8 +79,9 @@ are for:
 - `tool`: `{ name, version?, contact? }`
 - `source`: `{ repo, ref, ref_resolved?, committed? }`
 - `submission`: `{ by }`
-- `instrument`: `documented` | `curated` (a curated run never carries the badge)
-- `record_type`: `editorial_review` marks a hand-written review, not a run
+- `instrument`: always `documented` (the repository's own instructions; the
+  engine has no other instrument)
+- `recipe`: `{ origin: "proposed" }`
 
 **What happened**
 - `gates`: `{ available, installs, runs, io, content }`, booleans
@@ -105,8 +106,9 @@ are for:
   `author_known_issues`, `needed_beyond_repo`, `repo_test_data`,
   `caveats`, `scope`, `recipe`, `certificate`
 - **Never again:** `manual_verification`, `readme_check`, `regions`,
-  `gates.starts`, and the `own` leg in `datasets`, `logs`, `terminals` and
-  `diagnostics` (removed on `prune/clean-engine`).
+  `gates.starts`, `record_type`, `evidence_review`, `recipe.workarounds`,
+  any `instrument` other than `documented`, and the `own` leg in `datasets`,
+  `logs`, `terminals` and `diagnostics` (removed on `prune/clean-engine`).
 
 ## 4. Publication (engine → gh-pages → web)
 
@@ -119,7 +121,13 @@ one entry per slug with `slug, name, level, label, verdict, generated,
 sha, version, variant, committed, versions[], report, page, …` and per
 version `{ sha, instrument, version, variant, committed, generated, level,
 label, verdict, errors_reported, ci_run, report, page, pdf?, retired? }`.
-**Never again:** `fallback_used` on entries or versions.
+Only runs of the repository's own instructions are placed, listed in
+`versions[]` or aliased at the root. A report already on `gh-pages` that
+the engine did not write (another `instrument`, a `record_type`) is left
+where it is; if it is still a root set its entry's `label` reads "Not
+verified as documented". **Never again:** `fallback_used`, `own_state`,
+`readme_score`, `readme_max`, `record_type`, `evidence_review` on entries
+or versions, and version rows under `<slug>/<sha>/curated/`.
 
 ## 5. How to change any of this
 

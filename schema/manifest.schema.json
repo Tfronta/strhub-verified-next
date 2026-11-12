@@ -55,7 +55,7 @@
           "items": { "type": "string" },
           "description": "OS targets the attestation is scoped to, e.g. ['ubuntu-22.04']. Honesty matters: only claim what you test."
         },
-        "source": { "type": "string", "enum": ["submitted", "generated", "repository", "documented"], "description": "Where the container definition came from: 'submitted' for a submission, 'generated' for historical generated recipes or unsupported descriptors, 'repository' for an unchanged upstream Dockerfile, 'documented' for a fixed evaluator carrier transcribing a separately verified complete source-installation block. A source label alone never authorizes execution." },
+        "source": { "type": "string", "enum": ["generated", "repository", "documented"], "description": "Where the container definition came from: 'generated' for a descriptor with no proven installation (never built), 'repository' for an unchanged upstream Dockerfile, 'documented' for a fixed evaluator carrier transcribing a separately verified complete source-installation block. A source label alone never authorizes execution." },
         "from_repo": { "$ref": "#/$defs/relativePath", "description": "With source 'repository': path of the Dockerfile inside the repository. The engine clones the repository at the pinned ref and builds it with the clone as context; the run then uses the image's own entrypoint and working directory." }
       }
     },
@@ -78,61 +78,6 @@
         "type": {
           "type": "string",
           "description": "Assay/input type used to match a compatible external reference dataset (e.g. 'illumina-str-fastq'). See datasets/index.json. The external matrix leg is N/A if no dataset matches."
-        },
-        "fixture": {
-          "description": "The author's own test data (BYOR). Either a path inside this repo, OR a remote pointer into the author's PUBLIC repo (repo + ref + path) so STRhub stores no data.",
-          "oneOf": [
-            { "$ref": "#/$defs/relativePath", "description": "Path to the test fixture dir, relative to repo root", "default": "fixtures/example" },
-            {
-              "type": "object",
-              "required": ["repo", "ref", "path"],
-              "additionalProperties": false,
-              "properties": {
-                "repo": { "type": "string", "format": "uri", "description": "Author's PUBLIC repo URL" },
-                "ref": { "type": "string", "description": "Immutable commit SHA or tag" },
-                "path": { "$ref": "#/$defs/relativePath", "description": "Path to the fixture file inside that repo" }
-              }
-            }
-          ]
-        },
-        "regions": {
-          "description": "Regions BED for coordinate-based tools (HipSTR, GangSTR, ...). STRhub's reference BAMs are SLICES, not whole genomes: this BED's intervals must overlap the dataset's supported-loci panel (datasets/<type>/loci.bed). A BED outside the panel is a rejected submission, NOT a failed tool — it is validated before any gate runs. Only columns 1-3 (chrom, start, end) are read, so any tool's column layout is accepted: STRhub supplies the coordinates, the author supplies the format.",
-          "oneOf": [
-            {
-              "type": "object",
-              "required": ["library"],
-              "additionalProperties": false,
-              "description": "A ready-made regions file from STRhub's library for the dataset (datasets/<type>/regions/<format>.bed): the panel's loci in the format the tool reads. Provenance is STRhub; nobody wrote a file for this tool.",
-              "properties": {
-                "library": { "type": "string", "enum": ["hipstr", "gangstr", "strsearch", "bed4", "motif", "eh_catalog", "trgt"], "description": "Which format: HipSTR (7 columns), GangSTR (5), STRsearch (11 with flanks), plain chrom/start/end/name, chrom/start/end/motif (LongTR, straglr, NanoRepeat, strkit), ExpansionHunter's variant catalog (JSON, staged as /data/in/regions.json), or TRGT's repeat definitions." }
-              }
-            },
-            {
-              "$ref": "#/$defs/relativePath",
-              "description": "Path to a regions BED committed in THIS repo, relative to the repo root. Provenance is STRhub."
-            },
-            {
-              "type": "object",
-              "description": "A BED uploaded through the submit form. STRhub commits it under the tool's assets/ and records that the SUBMITTER, not STRhub's own committed panel, chose the regions. Note the value says nothing about who wrote the file: the submitter is the tool's author only when a tool's own author submits it, and reports must not claim authorship this does not establish.",
-              "required": ["path", "provided_by"],
-              "additionalProperties": false,
-              "properties": {
-                "path": { "$ref": "#/$defs/relativePath", "description": "Path relative to the repo root, e.g. tools/<slug>/assets/regions.bed" },
-                "provided_by": { "type": "string", "enum": ["author"], "description": "Records that the regions came from the submission rather than from a panel STRhub committed. The single allowed value predates STRhub submitting third-party tools and is kept for compatibility; it does not assert who authored the file." }
-              }
-            },
-            {
-              "type": "object",
-              "description": "DEPRECATED: a pointer into the author's PUBLIC repo. The submit form no longer produces this — chasing every tool's publishing habits (gzipped files, /raw/ URLs, genome-wide references) was unbounded, so authors upload the BED instead. Still honoured for hand-written manifests.",
-              "required": ["repo", "ref", "path"],
-              "additionalProperties": false,
-              "properties": {
-                "repo": { "type": "string", "format": "uri", "description": "Author's PUBLIC repo URL" },
-                "ref": { "type": "string", "description": "Immutable commit SHA or tag" },
-                "path": { "$ref": "#/$defs/relativePath", "description": "Path to the regions BED inside that repo" }
-              }
-            }
-          ]
         }
       }
     },
@@ -192,16 +137,6 @@
         "slug": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$", "description": "Safe filename stem for this variant's report + badge, e.g. 'strait-razor-PowerSeqv2.31'. No directory components." }
       }
     },
-    "starts": {
-      "type": "object",
-      "description": "How to ask the installed program whether it starts, when the run command does not say (a README that documents no command). Otherwise the engine derives it from run.cmd: the program, then --help.",
-      "required": ["cmd"],
-      "additionalProperties": false,
-      "properties": {
-        "cmd": { "type": "string", "description": "A command that only starts the program, such as `tool --help`." },
-        "cwd": { "type": "string", "default": "/opt/tool" }
-      }
-    },
     "example": {
       "type": "object",
       "description": "The tool's OWN documented example: the command its README shows, run on the data its repository ships, inside the built image (the clone lives at /opt/tool). This is the reviewer's question, 'does the Quick Start work?', and it needs nothing from STRhub. Whatever the command creates is captured and checked for a non-empty result; declare `outputs` to check for specific files, and `expected` to compare against a golden file the repository publishes.",
@@ -229,25 +164,11 @@
     },
     "recipe": {
       "type": "object",
-      "description": "OPTIONAL. Where this recipe came from, and what it does that the repository's own instructions do not. The badge says a tool installs and runs from its public source at the pinned commit; only a recipe read off the repository ('proposed') or handed in by the tool's maintainer ('maintainer') can stand behind that. A recipe somebody else wrote by hand ('curated' — STRhub, for the tools it filled the catalogue with) is a note under the documented result, never the badge. See docs/PLAN-Documented-Is-The-Badge.md.",
+      "description": "OPTIONAL. Where this recipe came from. There is one origin: 'proposed', read off the repository by detect_recipe in the run. The engine runs no recipe anybody wrote by hand.",
       "required": ["origin"],
       "additionalProperties": false,
       "properties": {
-        "origin": { "type": "string", "enum": ["proposed", "maintainer", "curated"], "description": "'proposed' if detect_recipe read it off the repository in the run; 'maintainer' if the tool's maintainer submitted it; 'curated' if a third party wrote it by hand." },
-        "workarounds": {
-          "type": "array",
-          "description": "What a curated recipe does that the repository's instructions do not — each one a departure from the README a first-time user would have to discover, and so a recommendation to the author. Absent for a proposed recipe: it does only what it read.",
-          "items": {
-            "type": "object",
-            "required": ["what", "instead_of"],
-            "additionalProperties": false,
-            "properties": {
-              "what": { "type": "string", "maxLength": 300, "description": "What the recipe does." },
-              "instead_of": { "type": "string", "maxLength": 300, "description": "The documented step it replaces, or what the README leaves undocumented." },
-              "why": { "type": "string", "maxLength": 300, "description": "What goes wrong with the documented step." }
-            }
-          }
-        }
+        "origin": { "type": "string", "enum": ["proposed"], "description": "'proposed': detect_recipe read it off the repository in the run." }
       }
     }
   }

@@ -1,0 +1,38 @@
+# STRhub Verified candidate, proposed by detect_recipe.
+# Requires pinned upstream evidence and a strict procedure review.
+# An origin label is not proof; unsupported procedures must not run.
+tool:
+  name: HipSTR
+  version: b2033bf
+  contact: https://github.com/tfwillems/HipSTR/issues
+submission:
+  by: third_party
+source:
+  repo: https://github.com/tfwillems/HipSTR
+  ref: b2033bfbb5cf55496b776463bdf2993fa763a4be
+recipe:
+  origin: proposed
+report:
+  slug: hipstr
+environment:
+  dockerfile: Dockerfile
+  os:
+  - ubuntu-22.04
+  source: generated
+run:
+  cmd: cd '/opt/tool' && touch /tmp/.strhub_mark && ( ./HipSTR --bams          run1.bam,run2.bam,run3.bam,run4.bam --fasta         genome.fa --regions       str_regions.bed --str-vcf       str_calls.vcf.gz ); rc=$?; find . -xdev -type f -newer /tmp/.strhub_mark -size +0 ! -path './.git/*' ! -path './proc/*' ! -path './sys/*' ! -path './dev/*' ! -path './data/*' ! -path '*/__pycache__/*' ! -name '*.pyc' ! -name '*.pyo' 2>/dev/null | head -500 | while IFS= read -r f; do mkdir -p "/data/out/$(dirname "$f")" && cp "$f" "/data/out/$f"; done; exit $rc
+  timeout_minutes: 20
+inputs:
+  type: illumina-bam-hg38
+outputs:
+- path: '**/*.vcf*'
+  format: vcf
+  min_records: 1
+caveats:
+  source: detect_recipe
+  items:
+  - 'Environment: no proven installation profile; STRhub did not manufacture installation steps.'
+  - 'Input: the README documents BAM (line 69); this plan selects STRhub''s illumina-bam-hg38 reference data.'
+  - 'Evaluator limitation: input list cardinality is not changed to fit one available sample.'
+  - 'Run command: the README''s own command, rewritten to STRhub''s mounts; the capture wrapper is planned only if the procedure review passes.'
+  - 'File: the documented command reads str_regions.bed (after --regions), which is neither in the repository nor among STRhub''s data.'

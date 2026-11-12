@@ -252,7 +252,7 @@ def test_report_takes_its_gate_outcomes_and_the_evidence_failure_from_the_record
 
 
 def test_prepare_writes_the_plan_it_printed(tmp_path):
-    src = ROOT / "harness" / "testdata" / "fixtures" / "legacy_tools" / "hipstr"
+    src = ROOT / "harness" / "testdata" / "fixtures" / "proposed" / "hipstr"
     descriptor = tmp_path / "work" / "proposal"
     descriptor.mkdir(parents=True)
     for name in ("manifest.yml", "Dockerfile"):

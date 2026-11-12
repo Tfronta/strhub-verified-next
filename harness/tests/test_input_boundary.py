@@ -16,13 +16,10 @@ CASES = json.loads((pathlib.Path(__file__).parents[1] / "testdata/input_path_cas
 
 
 @pytest.mark.parametrize("case", CASES)
-def test_manifest_path_contract_matches_web_cases(case):
-    for field in ("fixture", "regions", "dockerfile", "from_repo"):
+def test_manifest_path_contract(case):
+    for field in ("dockerfile", "from_repo"):
         m = manifest()
-        if field in ("fixture", "regions"):
-            m["inputs"] = {field: case["path"]}
-        else:
-            m["environment"][field] = case["path"]
+        m["environment"][field] = case["path"]
         if case["valid"]:
             _manifest.validate(m)
         else:
@@ -102,12 +99,3 @@ def test_entire_preparation_checks_all_paths_before_any_staging(tmp_path, monkey
         prepare.main()
     assert [p.name for p in sentinel.iterdir()] == ["private"]
     assert (sentinel / "private").read_text() == "never read"
-
-
-def test_remote_url_quotes_literals_without_url_traversal_or_query():
-    url = _paths.raw_url({"repo": "https://github.com/example/tool.git", "ref": "release/v1",
-                          "path": "examples/a b?x#y.bam"})
-    assert url == "https://raw.githubusercontent.com/example/tool/release%2Fv1/examples/a%20b%3Fx%23y.bam"
-    with pytest.raises(ValueError):
-        _paths.raw_url({"repo": "https://github.com/example/tool", "ref": "main", "path": "../other"})
-

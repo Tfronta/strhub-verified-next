@@ -20,14 +20,6 @@ def validate(data: dict) -> dict:
     for value in (env["dockerfile"], env.get("from_repo")):
         if value is not None:
             _paths.relative(value)
-    inputs = data.get("inputs") or {}
-    for item in (inputs.get("fixture"), inputs.get("regions")):
-        if isinstance(item, str):
-            _paths.relative(item)
-        elif isinstance(item, dict) and "repo" in item:
-            _paths.raw_url(item)
-        elif isinstance(item, dict) and "path" in item:
-            _paths.relative(item["path"])
     return data
 
 
@@ -48,8 +40,8 @@ def safe_glob(out, pattern):
     """Glob `pattern` under `out` (the /data/out mount), refusing anything that
     could reach outside it.
 
-    The pattern is author-supplied. Before this existed, `path: "../in_own/*"`
-    passed the IO and Content gates by pointing them at the INPUT the harness
+    The pattern comes from the manifest. Before this existed, a path with
+    `..` passed the IO and Content gates by pointing them at the INPUT the harness
     had staged, so a tool that wrote nothing at all could be attested at
     "content". An absolute pattern raised NotImplementedError out of pathlib and
     took the whole step down instead. Both now come back as a refusal the gate

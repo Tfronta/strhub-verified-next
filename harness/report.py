@@ -24,10 +24,8 @@ import diagnose_log  # noqa: E402
 from command_record import presentation as command_presentation  # noqa: E402
 from prepare import unwrap_example  # noqa: E402
 from certificate_text import (  # noqa: E402
-    install_meaning, instrument_of, instrument_of_report, workaround_lines, headline,
-    AS_IS_HEADING, STRHUB_DID_HEADING, STRHUB_DID_LEAD, FULL_RUN_HEADING, COLOR_HEX,
+    install_meaning, headline, AS_IS_HEADING, COLOR_HEX, INSTRUMENT,
     certificate_for, display_name, LIMITATIONS, OUT_OF_SCOPE,
-    INSTRUMENT_LINE, BADGE_INSTRUMENTS, CURATED_HEADING, CURATED_LEAD, CURATED_NEEDED,
     step1_says, execution_finding_established,
 )
 import verdict as verdict_lib  # noqa: E402
@@ -167,20 +165,10 @@ def _summary_md(report: dict, slug: str) -> str:
     gates = report["gates"]
     mark = {True: "PASS", False: "—"}
     label, _ = headline(report)
-    curated = instrument_of_report(report) not in BADGE_INSTRUMENTS
     reached = f"Reached **{LABELS.get(level, 'not run')}**: {MEANING.get(level, '')}."
     lines = [f"# STRhub Verified: {tool['name']} ({slug})", "", f"**{label}.**"]
-    # Chapter one: the tool as it is in its repository — where it stopped, why,
-    # how. A run of a recipe STRhub wrote has no such chapter: it opens with
-    # what STRhub had to do, and the run itself follows, in full.
-    if curated:
-        lines += ["", f"## {STRHUB_DID_HEADING}", "", STRHUB_DID_LEAD, ""]
-        lines += [f"- {w}" for w in workaround_lines(report)] or ["- (not itemised for this recipe)"]
-        lines += ["", f"With those changes, the run reached **{LABELS.get(level, 'not run')}**: "
-                      f"{MEANING.get(level, '')}.", *_verdict_md(report),
-                  "", f"## {FULL_RUN_HEADING}"]
-    else:
-        lines += ["", f"## {AS_IS_HEADING}", *_verdict_md(report), "", reached]
+    # The tool as it is in its repository: where it stopped, why, how.
+    lines += ["", f"## {AS_IS_HEADING}", *_verdict_md(report), "", reached]
     lines += [
         "",
         "### Gates",
@@ -382,7 +370,6 @@ def _summary_html(report: dict, slug: str) -> str:
     gates = report["gates"]
     label, color = headline(report)
     badge = COLOR_HEX.get(color, "#c33")
-    curated = instrument_of_report(report) not in BADGE_INSTRUMENTS
 
     def esc(s):
         return _html.escape(str(s))
@@ -596,20 +583,10 @@ def _summary_html(report: dict, slug: str) -> str:
             f"<h2>What this run needed beyond the repository</h2><p>{esc(NEEDED_LEAD)}</p>"
             f"<ul class='stats'>{''.join(f'<li>{esc(i)}</li>' for i in needed)}</ul>")
 
-    # The two chapters. A run of the repository's own instructions opens with
-    # what happens as it is; a run of a recipe STRhub wrote opens with what
-    # STRhub had to do, and the run follows in full.
+    # The tool as it is in its repository: where it stopped, why, how.
     reached = (f"<p>Reached <b>{esc(LABELS.get(level, 'not run'))}</b>: "
                f"{esc(MEANING.get(level, ''))}.</p>")
-    if curated:
-        items = "".join(f"<li>{esc(w)}</li>" for w in workaround_lines(report)) or "<li>(not itemised for this recipe)</li>"
-        opening = (f"<h2>{esc(STRHUB_DID_HEADING)}</h2><p>{esc(STRHUB_DID_LEAD)}</p>"
-                   f"<ul class='stats'>{items}</ul>"
-                   f"<p>With those changes, the run reached <b>{esc(LABELS.get(level, 'not run'))}</b>: "
-                   f"{esc(MEANING.get(level, ''))}.</p>{verdict_block}"
-                   f"<h2>{esc(FULL_RUN_HEADING)}</h2>")
-    else:
-        opening = f"<h2>{esc(AS_IS_HEADING)}</h2>{verdict_block}{reached}"
+    opening = f"<h2>{esc(AS_IS_HEADING)}</h2>{verdict_block}{reached}"
     logs_block = "".join(
         f'<p style="font-size:.85rem">Log ({esc(leg)}): <a href="{esc(fname)}">{esc(fname)}</a></p>'
         for leg, fname in (report.get("logs") or {}).items())
@@ -892,14 +869,10 @@ def main() -> int:
         # The configured command and the selected run step's outcome. A failed
         # build leaves a planned command, not a claim that this command ran.
         "run": _run_record(m, args.runs),
-        # Which instrument this is, and — for a recipe somebody wrote — what it
-        # does that the repository's instructions do not. The badge may rest
-        # only on `documented` or `maintainer`; `curated` is STRhub's note.
-        "instrument": instrument_of(m),
-        "recipe": {"origin": (m.get("recipe") or {}).get("origin")
-                             or {"documented": "proposed"}.get(instrument_of(m), instrument_of(m)),
-                   **({"workarounds": m["recipe"]["workarounds"]}
-                      if (m.get("recipe") or {}).get("workarounds") else {})},
+        # The one instrument there is: the repository's own instructions, as
+        # propose_manifest.py read them at the pinned commit.
+        "instrument": INSTRUMENT,
+        "recipe": {"origin": "proposed"},
         "gates": gates,
         "input_contract": m.get("inputs", {}),
         "level": level,
@@ -965,12 +938,6 @@ def main() -> int:
             "A container environment, built from the tool's declared install "
             "steps rather than from a recipe the repository ships."
         )
-    elif env_source == "submitted":
-        needed.append(
-            "A container environment, supplied with the submission."
-        )
-    elif instrument_of(m) == "curated":
-        needed.append(CURATED_NEEDED)
     if needed:
         report["needed_beyond_repo"] = needed
 

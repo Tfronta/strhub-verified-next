@@ -23,7 +23,7 @@ import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import publish_layout  # noqa: E402
-from certificate_text import instrument_of_report, headline, COLOR_HEX  # noqa: E402
+from certificate_text import headline, COLOR_HEX  # noqa: E402
 
 LABELS = {"none": "not run", "available": "Available", "installs": "Installs",
           "runs": "Runs", "io": "Runs + Expected IO",
@@ -85,7 +85,6 @@ def _summary_entry(slug: str, r: dict) -> dict:
     level = r.get("level", "none")
     stats = _stats(r) or {}
     datasets = r.get("datasets") or []
-    readme = r.get("readme_check") or {}
     # Whether the run reported errors, so the catalogue card can qualify a green
     # level the same way the detail page and badge do. Without this the list shows
     # a clean green for a run that failed on some loci.
@@ -109,11 +108,10 @@ def _summary_entry(slug: str, r: dict) -> dict:
         # distinct from `generated`, which is when it was verified. Absent on
         # reports from before it was recorded.
         "committed": r.get("source", {}).get("committed"),
-        # Which instrument produced it: `documented` or `maintainer` may stand
-        # behind the badge; `curated` (a recipe STRhub wrote) is a note, and
-        # an entry whose alias is one says so here so the web can show it as
-        # not verified as documented. See docs/PLAN-Documented-Is-The-Badge.md.
-        "instrument": instrument_of_report(r),
+        # As the report states it. This engine writes `documented` only; a
+        # report already on gh-pages that says anything else is listed as it
+        # is, and its label reads "Not verified as documented".
+        "instrument": r.get("instrument"),
         "level": level,
         # The result in words — what happens as it is in the repository — the
         # same the badge and the certificate print (certificate_text.headline).
@@ -128,15 +126,10 @@ def _summary_entry(slug: str, r: dict) -> dict:
         "source_repo": r.get("source", {}).get("repo"),
         "source_ref": ref,
         "ci_run": r.get("ci_run"),
-        **({"record_type": "editorial_review", "evidence_review": r["evidence_review"]}
-           if r.get("record_type") == "editorial_review" else {}),
         "distinct_str_loci": stats.get("distinct_str_loci", stats.get("distinct_loci")),
         "distinct_snp_markers": stats.get("distinct_snp_markers"),
         "total_reads": stats.get("total_reads"),
-        "own_state": _leg_state(datasets, "own"),
         "external_state": _leg_state(datasets, "external"),
-        "readme_score": readme.get("score"),
-        "readme_max": readme.get("max"),
         "dataset_types": _dataset_types(datasets),
         "report": f"{slug}.json",
         "page": f"{slug}.html",
@@ -177,9 +170,7 @@ def versions_of(reports: pathlib.Path, slug: str, root: dict) -> list[dict]:
     found = publish_layout.scan(reports, slug)
     if not found:
         return [_version_entry(slug, root.get("source", {}).get("ref_resolved"), root, "")]
-    return [_version_entry(slug, sha, r, f"{slug}/{sha}/"
-                           + (f"{publish_layout.CURATED_DIR}/" if inst == "curated" else ""))
-            for sha, inst, r in found]
+    return [_version_entry(slug, sha, r, f"{slug}/{sha}/") for sha, r in found]
 
 
 def build_catalogue(reports: pathlib.Path) -> dict:

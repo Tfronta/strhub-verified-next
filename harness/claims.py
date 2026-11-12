@@ -112,11 +112,6 @@ REGISTER: dict[str, tuple[str, str]] = {
     # A failed build, in plain words, resting on the Installs gate: the build
     # STRhub ran from the repository's declared steps stopped.
     "dbdbe7fb4255": ("report", "gates"),             # STRhub tried to build the tool from its source at the pinned commit, following the build steps…
-    # A curated recipe is STRhub's own configuration, and the sentences say
-    # so: what STRhub had to do to run the tool is STRhub's work, listed as
-    # recommendations, and it never changes the label (tanda 5c).
-    "02784c0c4344": ("certificate_text", "run"),               # A container environment and a command written by STRhub, not taken from the repository's instructions…
-    "6c6a0dea9ce0": ("certificate_text", "run"),               # STRhub wrote its own recipe for this tool — an environment and a command of its own…
 }
 
 #: Phrasings that may never be published, whatever evidence is attached: they
