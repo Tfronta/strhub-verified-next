@@ -1,0 +1,64 @@
+Fixture provenance — illumina-bam-hg38 (GIAB NA12878/HG001 300x, hg38-aligned autosomal STR slices)
+====================================================================================================
+
+STRhub Verified does NOT host or redistribute full genomes. The BAM file in
+`illumina_slices/` is a **small, pre-built slice** over forensic STR regions,
+derived from publicly available GIAB high-coverage data. It is used only as a
+smoke-test input for the external verification leg.
+
+Upstream (open access)
+----------------------
+Project   : Genome in a Bottle (GIAB) / NIST — NA12878 (HG001) 300x Illumina WGS
+Portal    : https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/data/NA12878/NIST_NA12878_HG001_HiSeq_300x/
+Source BAM: NHGRI_Illumina300X_novoalign_bams/HG001.GRCh38_full_plus_hs38d1_analysis_set_minus_alts.300x.bam
+Reference : GRCh38 (GRCh38_full_plus_hs38d1_analysis_set_minus_alts; chr-prefixed).
+            Primary chromosomes are identical to UCSC hg38.fa, which the harness
+            mounts for tools needing --fasta. All loci are on primary chromosomes.
+Sequencer : Illumina HiSeq 2500 (novoalign-aligned)
+
+Slice preparation
+-----------------
+Remote-streamed per-locus with `samtools view` over the 24 autosomal forensic
+STR loci, ±1000bp flanking, then coordinate-sorted, tagged with a single sample
+read group (@RG SM:NA12878), and indexed. ~200-350x per locus. The source BAM
+header is SO:unsorted and carries no @RG, so slices are re-sorted and re-tagged
+on build (HipSTR requires read groups; see download.sh).
+
+License / use scope
+-------------------
+Open-access GIAB/NIST reference data. STRhub adds no additional restrictions
+beyond documenting that this file is third-party material used for
+reproducible-execution smoke tests only — not for donor identification,
+database searching, or casework claims.
+
+Sample in illumina_slices/
+--------------------------
+  NA12878.autosomal.bam   (~9 MB)  ← default for external verification leg
+    Sample: NA12878 / HG001 (CEU, EUR, FEMALE — no Y chromosome)
+
+Regions covered
+---------------
+Region BED (HipSTR format): `tools/hipstr-v0-7/assets/regions.bed`
+24 autosomal forensic STR loci:
+  CODIS 20 core (CSF1PO, FGA, TH01, TPOX, vWA, D3S1358, D5S818, D7S820, D8S1179,
+  D13S317, D16S539, D18S51, D21S11, D1S1656, D2S441, D2S1338, D10S1248, D12S391,
+  D19S433, D22S1045) + PentaD + PentaE + D6S1043 + SE33.
+
+Notes vs. the previous fixture
+------------------------------
+- Replaced the old 1000G 30x HG00145 CODIS slice (low coverage failed HipSTR
+  filters, which made reports look broken). NA12878 at ~300x passes comfortably.
+- Female sample: Y-STRs and Amelogenin-Y are NOT present. For Y-chromosome tools
+  use the `illumina-bam-hg38-y` dataset (HG002).
+- Dropped D17S1301 and D20S482 (not in this panel).
+- SE33 coordinate corrected: the previous regions.bed placed SE33 at
+  chr6:88,987,500-88,988,200, which is ~710 kb off. The verified GRCh38 SE33
+  repeat is at chr6:88,277,144-88,277,245 (NC_000006.12; cross-checks with the
+  3.46 Mb SE33-D6S1043 distance). The new slice and regions.bed use the correct
+  locus.
+
+Default for CI / external matrix leg
+------------------------------------
+`datasets/index.json` points the `illumina-bam-hg38` type at NA12878.autosomal.bam.
+Tools that read `/data/in` as a directory receive the BAM + BAI pair via
+`harness/prepare.py`.

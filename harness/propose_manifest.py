@@ -65,8 +65,11 @@ TYPE_SLUG_SUFFIX = {
     "illumina-str-fastq": "",
     "illumina-bam-hg38-y": "y",
     "ont-bam-hg38": "ont",
+    "ont-bam-hg38-med": "ont-med",
     "ont-fastq": "ont",
     "pacbio-hifi-bam-hg38": "hifi",
+    "illumina-bam-hg38-med": "med",
+    "pacbio-hifi-bam-hg38-med": "hifi-med",
     "illumina-snp-fastq": "snp",
     "capillary-fsa": "fsa",
 }

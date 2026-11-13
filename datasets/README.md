@@ -28,10 +28,22 @@ See each subdirectory's `SOURCE.txt` for provenance, chemistry, and rebuild note
 | `ont-fastq` | FASTQ | `ont_slices/HG00113.codis.panel.fastq.gz` (the ONT reads over the panel loci) | [1000 Genomes ONT on AWS](https://s3.amazonaws.com/1000g-ont/index.html?prefix=PROCESSED_DATA/ALIGNED_TO_HG38/MINIMAP2_ALIGNED_BAMS/) |
 | `pacbio-hifi-bam-hg38` | BAM (hg38) | `pacbio_slices/HG002.hifi.codis.bam` | [GIAB HG002 PacBio HiFi Revio](https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/data/AshkenazimTrio/HG002_NA24385_son/PacBio_HiFi-Revio_20231031/) |
 | `illumina-bam-hg38` | BAM (hg38) | `illumina_slices/*.codis.bam` | [1000 Genomes 30x Illumina](https://www.internationalgenome.org/data-portal/data-collection/30x-grch38) |
+| `illumina-bam-hg38-med` | BAM (hg38) | `illumina_slices/NA12878.medical.bam` (disease-associated STR loci) | [GIAB NA12878 300x](https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/data/NA12878/NIST_NA12878_HG001_HiSeq_300x/) |
+| `ont-bam-hg38-med` | BAM (hg38) | `ont_slices/HG00113.medical.bam` (disease-associated STR loci) | [1000 Genomes ONT on AWS](https://s3.amazonaws.com/1000g-ont/index.html?prefix=PROCESSED_DATA/ALIGNED_TO_HG38/MINIMAP2_ALIGNED_BAMS/) |
+| `pacbio-hifi-bam-hg38-med` | BAM (hg38) | `pacbio_slices/HG002.hifi.medical.bam` (disease-associated STR loci) | [GIAB HG002 PacBio HiFi Revio](https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/data/AshkenazimTrio/HG002_NA24385_son/PacBio_HiFi-Revio_20231031/) |
 
-**Scope:** reference datasets cover **STR assays only** (Illumina STR FASTQ,
-Illumina BAM, ONT CODIS BAM and FASTQ, PacBio HiFi CODIS BAM). No SNP panels or
-capillary FSA/HID reference data.
+
+**Scope:** reference datasets cover **STR assays only**: forensic panels (CODIS and
+expanded, Y-STR) and medical panels (the `-med` types, disease-associated STR loci,
+for tools designed for repeat expansions). No SNP panels or capillary FSA/HID
+reference data. A run on a `-med` type proves reproducible execution only: it is
+not a clinical or diagnostic validation.
+
+**Regions files.** Each BAM dataset has a `regions/` folder with its own loci written
+in the layout each tool family reads (HipSTR, GangSTR, STRsearch, plain BED, motif
+BED, ExpansionHunter catalog, TRGT). A regions file is an input STRhub supplies,
+like the sample and the reference genome, and only when a tool's preparation names
+which one. It is declared in the report and never chosen from a program's name.
 
 **What is mounted:** the one registered dataset for the input type, read-only at
 `/data/in` under its canonical name, verified by hash. When the documented command

@@ -55,6 +55,12 @@ PANELS = {
         "datasets/illumina-bam-hg38-y/str_candidates.bed",
         FLANK,
     ),
+    # Disease-associated STR loci.
+    "illumina-bam-hg38-med": (
+        "illumina_slices/NA12878.medical.bam",
+        "datasets/illumina-bam-hg38-med/str_candidates.bed",
+        FLANK,
+    ),
 }
 
 
