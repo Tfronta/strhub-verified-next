@@ -108,6 +108,11 @@ REGISTER: dict[str, tuple[str, str]] = {
     # A failed build, in plain words, resting on the Installs gate: the build
     # STRhub ran from the repository's declared steps stopped.
     "dbdbe7fb4255": ("report", "gates"),             # STRhub tried to build the tool from its source at the pinned commit, following the build steps…
+    # Recommendations: said on every report, whatever the verdict. The first
+    # rests on the tree read at the pinned ref (no example data found), the
+    # second on the README (no assembly named) and on what this run mounted.
+    "f841d5fe9c41": ("report", "tree"),    # The repository ships no example input. A small example the documented command can read…
+    "70716d03c2fd": ("report", "readme"),  # The documented command reads a reference genome and the README does not say which assembly…
 }
 
 #: Phrasings that may never be published, whatever evidence is attached: they

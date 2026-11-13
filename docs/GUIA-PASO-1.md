@@ -59,8 +59,24 @@ The file the command names, plus one line saying what kind of file it is (BAM, C
 other). The file is either in the commit or an explicit placeholder: `<sample.bam>`,
 `path/to/sample.bam`, `$BAM`.
 
-If the reference genome or the assembly matters, say which one (hg19, hg38, T2T). If the command
-reads a regions or catalog file, say what its columns are, or ship the file.
+**The reference genome.** If the command reads one, name it in the command and say which
+assembly it is (hg19, hg38, T2T):
+
+```bash
+# good: the flag says it is the reference, the name says which one
+mytool --bam sample.bam --fasta hg38.fa --out sample.vcf
+```
+
+You do not ship the genome and you are not asked to. When the command names a reference after a
+flag such as `--fasta`, `--ref`, `--reference` or `--genome`, or names a file called `hg38` or
+`GRCh38`, STRhub mounts the public UCSC hg38 FASTA (uncompressed, with its `.fai` index) in its
+place and says so in the report. What STRhub cannot stand in for: a compressed (`.fa.gz`) or
+`.2bit` reference, another assembly, or a reference passed with no flag under a name that does
+not say what it is. Those are reported as a limitation of STRhub's, not as a gap of yours.
+
+**Any other file the command reads** (a regions BED, a catalog, a model, a config): ship it in
+the commit, or document the step that fetches it. STRhub does not write or supply one. If it is
+missing, the report says which file and the run is not attempted.
 
 **The strongest thing you can do here is commit a small example.** A slice of a few megabytes
 that the command in block 2 can read turns step 1 into something any user, reviewer or editor can
@@ -101,6 +117,12 @@ There is also a fourth case that is **ours, not yours**: STRhub may not hold a s
 your command reads, or may hold slices of other coordinates. The report says so in those words.
 It is a limitation of our reference data and it is never reported as your tool failing.
 
+## Recommendations in the report
+
+Whatever the outcome, the report ends with what the README or the repository could add. They do
+not change the result. Typical ones: the repository ships no example data; the README does not
+say which reference assembly the command expects; the README does not describe the output.
+
 ## Trying again
 
 Fix the block the report names, then submit the link again on the new commit. Verification is
@@ -113,6 +135,6 @@ It does not say the genotypes are correct, that the tool agrees with capillary e
 or that it is fit for casework. Those need a truth set, and phase 1 does not have one. Step 1 is
 reproducibility of installation and execution, and the report says so on its first page.
 
-Only after step 1 finishes does STRhub run the forensic pipeline (the public hg38 reference
-sample over the CODIS and expanded panels, the registered regions file, the content check). If we
-cannot do that part, the step 1 result stands on its own.
+The run on STRhub's data uses one public hg38 reference sample per input type (slices over the
+CODIS and expanded panels), mounted read-only, and nothing else beyond the reference genome
+described above.

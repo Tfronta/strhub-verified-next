@@ -110,6 +110,44 @@ def _step1_md(report: dict) -> list[str]:
     return lines
 
 
+RECOMMENDATIONS_HEADING = "What the README or repository could add"
+RECOMMENDATIONS_LEAD = ("Read off the repository at the verified commit. None of these changes the "
+                        "result above; each would make the tool easier for a new user, and for "
+                        "STRhub, to run as documented.")
+
+
+def recommendations_for(report: dict, proposal: dict | None) -> list[dict]:
+    """What the documentation or the repository lacks that did not decide the
+    verdict: said on every report, whatever the outcome, so an author who
+    passed still learns that the repository ships no example data.
+
+    Each item is {code, text}. What DID stop the run is the verdict's
+    (`verdict.readme_gaps`, `verdict.blockers`) and is not repeated here."""
+    if not proposal:
+        return []
+    told = {g.get("item") for g in (report.get("verdict") or {}).get("readme_gaps") or []}
+    out = []
+    for gap in (proposal.get("readme") or {}).get("gaps") or []:
+        item = gap.get("item")
+        if not item or item in told:
+            continue
+        if item == "example_data":
+            out.append({"code": item, "text":
+                        "The repository ships no example input. A small example the documented "
+                        "command can read, with the output it should produce, would let any user "
+                        "reproduce the run without outside data."})
+        else:
+            out.append({"code": item, "text": gap.get("text") or ""})
+    reference = (report.get("mounted_inputs") or {}).get("reference")
+    signals = (proposal.get("input_type") or {}).get("signals") or {}
+    if reference and not signals.get("hg38"):
+        out.append({"code": "reference_assembly", "text":
+                    "The documented command reads a reference genome and the README does not say "
+                    "which assembly it expects. STRhub mounted hg38; stating the assembly would "
+                    "remove the guess."})
+    return [r for r in out if r["text"]]
+
+
 def _verdict_md(report: dict) -> list[str]:
     v = report.get("verdict")
     if not v:
@@ -240,6 +278,11 @@ def _summary_md(report: dict, slug: str) -> str:
         for k in known:
             quote = k["text"] + ("…" if k.get("truncated") else "")
             lines += ["", f"**{k['heading']}** (README line {k['line']})", "", f"> {quote}"]
+
+    recs = report.get("recommendations") or []
+    if recs:
+        lines += ["", f"### {RECOMMENDATIONS_HEADING}", "", RECOMMENDATIONS_LEAD, ""]
+        lines += [f"- {r['text']}" for r in recs]
 
     # How: the command the gates ran, and the logs.
     run = report.get("run") or {}
@@ -422,6 +465,12 @@ def _summary_html(report: dict, slug: str) -> str:
             "<p>Quoted from the repository's README at the verified commit. STRhub did "
             "not establish any of this by running the tool; it is the author's own note "
             "about their own software.</p>" + quotes)
+
+    recs = report.get("recommendations") or []
+    rec_items = "".join("<li>" + esc(r["text"]) + "</li>" for r in recs)
+    recommendations_block = (
+        f"<h3>{esc(RECOMMENDATIONS_HEADING)}</h3><p>{esc(RECOMMENDATIONS_LEAD)}</p>"
+        f"<ul class='stats'>{rec_items}</ul>") if recs else ""
 
     # The verdict the page leads with. A copy that omits it can read as a pass
     # while the page it mirrors says "Fails".
@@ -645,6 +694,7 @@ def _summary_html(report: dict, slug: str) -> str:
 {install_block}
 {errors_block}
 {known_block}
+{recommendations_block}
 {run_block}
 {logs_block}
 <h2>Run details</h2>
@@ -1114,6 +1164,11 @@ def main() -> int:
         procedure=procedure,
         manifest=m,
     )
+
+    # What the README or the repository could add, whatever the verdict.
+    recommendations = recommendations_for(report, proposal)
+    if recommendations:
+        report["recommendations"] = recommendations
 
     # Step 1 in the three sentences a maintainer is owed, with the block of
     # docs/GUIA-PASO-1.md that is missing when one is. Derived from the
