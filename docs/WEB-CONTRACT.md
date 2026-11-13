@@ -134,6 +134,12 @@ are for:
 
 ## 4. Publication (engine → gh-pages → web)
 
+Publication is a job of its own (`publish`), the only one with write
+permission. It runs only on `main`, only when the dispatch said
+`publish: true`, and decides again on the downloaded report whether it is
+published. The job that built and ran the tool (`verify`) cannot write.
+None of this changes what the web reads.
+
 `harness/publish_layout.py` lands a published run at
 `<slug>/<sha>/<slug>.{json,html,pdf,badge.json,log-*.txt,terminal-*.txt}`
 on `gh-pages`, with the root `<slug>.*` set an alias of the newest commit.

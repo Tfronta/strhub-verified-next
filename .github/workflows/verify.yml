@@ -46,7 +46,16 @@ on:
         required: false
         default: "false"
 
-# Granted per job, to the least it needs.
+# Granted per job, to the least it needs. Two jobs, on two machines, because
+# installing and running a stranger's tool means executing a stranger's code
+# (a Dockerfile, a Makefile, the tool itself):
+#
+#   verify   reads the repository, builds, runs and writes the report. Its
+#            token can only READ this repository. Nothing on that machine can
+#            write anywhere, whatever the code it ran managed to do.
+#   publish  the only job that can write (to gh-pages). It never clones,
+#            builds or runs anything of the author's: it downloads the report
+#            as data, checks it again, and places it.
 permissions: {}
 
 jobs:
@@ -54,7 +63,9 @@ jobs:
     runs-on: ubuntu-22.04
     timeout-minutes: 45
     permissions:
-      contents: write        # the deploy step pushes reports to gh-pages
+      contents: read         # checkout only; this job cannot write anywhere
+    outputs:
+      publishable: ${{ steps.attest.outputs.publishable }}
     env:
       TOOL: ${{ inputs.tool }}
       MODE: ${{ inputs.mode }}
@@ -80,8 +91,7 @@ jobs:
 
       - uses: actions/checkout@v6
         with:
-          # The token is not left in .git/config: only the deploy step writes,
-          # and it names the remote with the token explicitly.
+          # The token (read-only here) is not left in .git/config.
           persist-credentials: false
 
       - uses: actions/setup-python@v6
@@ -181,7 +191,7 @@ jobs:
           INFRA_FAILURE: ${{ steps.m.outputs.input_failure || (steps.ref_dl.outcome == 'failure' && 'the reference genome download') || (steps.engine.outcome == 'failure' && 'the gate runner') || '' }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           PUBLISH: ${{ inputs.publish == 'true' && 'true' || 'false' }}
-          # Read-only, for the upstream check: raises the API allowance.
+          # This job's read-only token, for the upstream check: raises the API allowance.
           GH_TOKEN: ${{ github.token }}
         run: |
           python harness/report.py \
@@ -273,12 +283,55 @@ jobs:
               sys.exit(1)
           PY
 
-      # --- Publication ---------------------------------------------------------------
-      # Only on main (gh-pages IS production, and the web dispatches on main),
-      # and only when publish_gate said so: the dispatch asked for it, the
-      # verdict is about the tool or its documentation, the procedure evidence
-      # validates, and the card belongs to this repository.
-      #
+  # --- Publication -------------------------------------------------------------------
+  # Only on main (gh-pages IS production, and the web dispatches on main), only
+  # when the dispatch asked for it, and only when publish_gate says so: the
+  # verdict is about the tool or its documentation, the procedure evidence
+  # validates, and the card belongs to this repository.
+  #
+  # This job trusts nothing the other one decided. It takes the report as a
+  # file, runs publish_gate on it again here, and publish_layout validates it
+  # once more before placing it. No step below executes anything that came
+  # from the author's repository.
+  publish:
+    needs: verify
+    if: always() && inputs.publish == 'true' && needs.verify.outputs.publishable == 'true' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    permissions:
+      contents: write        # pushes the report to gh-pages
+    env:
+      TOOL: ${{ inputs.tool }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+      - run: pip install -q pyyaml jsonschema
+
+      - name: Download the report
+        uses: actions/download-artifact@v8
+        with:
+          name: ${{ inputs.mode == 'trial' && 'trial' || 'attestation' }}-${{ inputs.tool }}
+          path: artifact
+
+      - id: gate
+        name: Decide again, here, whether the report is published
+        env:
+          PUBLISH: "true"
+        run: |
+          REPORT_JSON=$(ls artifact/reports/*.json | grep -v -e '\.badge\.json$' -e '\.recipe\.json$' | head -1)
+          SLUG=$(basename "$REPORT_JSON" .json)
+          printf '%s' "$SLUG" | grep -Eq '^[a-z0-9][a-z0-9._-]*$' || { echo "::error::the report's slug is not a safe name"; exit 1; }
+          echo "slug=$SLUG" >> "$GITHUB_OUTPUT"
+          curl -fsSL "https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/gh-pages/index.json" \
+            -o published_index.json || rm -f published_index.json
+          python harness/publish_gate.py --report "$REPORT_JSON" --slug "$SLUG" --index published_index.json \
+            | tee -a "$GITHUB_OUTPUT"
+
       # The run's files go to <slug>/<sha>/ and the root <slug>.* set is an
       # alias of the newest commit verified (harness/publish_layout.py).
       #
@@ -286,12 +339,11 @@ jobs:
       # finish together and both rewrite index.json, so a lost race is redone
       # from a fresh clone of the branch, and running out of attempts fails
       # the step.
-      - id: deploy
-        name: Deploy the report to gh-pages
-        if: always() && steps.attest.outputs.publishable == 'true' && github.ref == 'refs/heads/main'
+      - name: Deploy the report to gh-pages
+        if: steps.gate.outputs.publishable == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
-          SLUG: ${{ steps.attest.outputs.slug }}
+          SLUG: ${{ steps.gate.outputs.slug }}
         run: |
           set -e
           git config --global user.name "github-actions[bot]"
@@ -308,7 +360,7 @@ jobs:
               git -C "$tmp" checkout -q --orphan gh-pages || return 1
               git -C "$tmp" rm -rfq . || true
             fi
-            python harness/publish_layout.py "$tmp" --reports reports --slug "$SLUG" || return 1
+            python harness/publish_layout.py "$tmp" --reports artifact/reports --slug "$SLUG" || return 1
             touch "$tmp/.nojekyll" || return 1
             python harness/build_index.py "$tmp" --out "$tmp/index.html" || return 1
             git -C "$tmp" add -A || return 1

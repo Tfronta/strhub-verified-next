@@ -34,6 +34,7 @@ import argparse
 import datetime as dt
 import json
 import pathlib
+import re
 import shutil
 import sys
 from typing import Callable
@@ -41,6 +42,10 @@ from typing import Callable
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import upstream  # noqa: E402
 from certificate_text import is_documented_run, INSTRUMENT  # noqa: E402
+
+#: What may name a directory on the site.
+SAFE_SLUG = re.compile(r"[a-z0-9][a-z0-9._-]*")
+FULL_SHA = re.compile(r"[0-9a-f]{40}")
 
 #: A tombstone beside a run's files: the run stays where it is and its URL
 #: keeps resolving, but it is no longer a result — never the alias, never
@@ -59,7 +64,7 @@ def report_files(folder: pathlib.Path, slug: str) -> list[pathlib.Path]:
     (`hipstr-y.json` does not start with `hipstr.`)."""
     return sorted(
         p for p in folder.iterdir()
-        if p.is_file() and p.name.startswith(f"{slug}.")
+        if p.is_file() and not p.is_symlink() and p.name.startswith(f"{slug}.")
         and not p.name.endswith(".recipe.json")
     )
 
@@ -179,6 +184,10 @@ def place(site: pathlib.Path, reports: pathlib.Path, slug: str,
           resolve: Resolver | None = None) -> dict:
     """Land one run and point the alias at the newest commit. Returns what was
     done: the run's sha, the alias's sha, and every commit known, newest first."""
+    # The report arrives as a file from the job that ran the author's code:
+    # nothing in it may choose where on the site it is written.
+    if not SAFE_SLUG.fullmatch(slug or ""):
+        raise SystemExit(f"{slug!r}: not a slug a report can be published under")
     run_json = reports / f"{slug}.json"
     report = _read(run_json)
     if not report:
@@ -190,6 +199,8 @@ def place(site: pathlib.Path, reports: pathlib.Path, slug: str,
     sha = sha_of(report)
     if not sha:
         raise SystemExit(f"{run_json}: no pinned commit (source.ref_resolved)")
+    if not FULL_SHA.fullmatch(str(sha)):
+        raise SystemExit(f"{run_json}: the pinned commit is not a full commit SHA")
 
     fold_root(site, slug, resolve)
 

@@ -35,7 +35,9 @@ and try again.
 ## Layout
 
 - `.github/workflows/verify.yml` — the one workflow: a `workflow_dispatch`
-  that runs the commands below and uploads the artifact the web reads.
+  that runs the commands below and uploads the artifact the web reads. Two
+  jobs: `verify` executes the author's code and can only read; `publish`
+  can write to `gh-pages` and executes nothing of the author's.
 - `harness/engine/` — the gate runner (`python -m harness.engine run`).
 - `harness/*.py` — reading the repository, preparing the plan, checking
   outputs, writing the report, publishing.
@@ -148,8 +150,13 @@ python harness/generate_pdf.py --manifest work/proposal/manifest.yml --publishab
    con nombre `trial-<tool>` (o `attestation-<tool>` si `mode` es
    `publish`). Su forma está en `docs/WEB-CONTRACT.md`.
 
-8. Solo en `main` y solo si la compuerta dijo `publishable=true`, el
-   workflow coloca el reporte en un clon de `gh-pages` y regenera el índice:
+8. Solo en `main`, solo si el dispatch pidió `publish: true` y solo si la
+   compuerta dijo `publishable=true`, un **segundo job** (`publish`) baja el
+   artifact, vuelve a correr la compuerta, coloca el reporte en un clon de
+   `gh-pages` y regenera el índice. Los pasos 1 a 7 corren en el job
+   `verify`, cuyo token solo puede leer este repositorio: es el que ejecuta
+   código del autor (su Dockerfile, su Makefile, la herramienta). `publish`
+   es el único con permiso de escritura y no ejecuta nada del autor.
 
 ```bash
 python harness/publish_layout.py <clon-de-gh-pages> --reports reports --slug hipstr
