@@ -38,6 +38,15 @@ PACKABLE_FROM_REPO = {
 PUBLISHED_INSTALL = {"docker_image", "bioconda"}
 
 
+def _sentence(text: str) -> str:
+    """A finding as one sentence: a capital to open it and a full stop to end it."""
+    text = " ".join(str(text).split())
+    if not text:
+        return ""
+    text = text[0].upper() + text[1:]
+    return text if text[-1] in ".!?" else text + "."
+
+
 def _flags(cmd: str) -> set[str]:
     return set(re.findall(r"(?:^|\s)(--[\w-]+|-\w)\b", cmd))
 
@@ -108,14 +117,14 @@ def classify(proposal: dict, manifest: dict, limitations: list[str],
     if _cwd is not None and raw_cmd != example_wrapper(rewritten, _cwd):
         amendments.append({"code": "capture_wrapper_changed", "what": "The capture wrapper differs from the evaluator's exact wrapper; no prefix or suffix may hide a procedure change."})
     if _cwd is not None and _cwd != ".":
-        amendments.append({"code": "working_directory_changed", "what": "The command was moved from the upstream image's working directory; this profile does not establish that change."})
+        amendments.append({"code": "working_directory_changed", "what": "The command would run from a directory other than the root of the repository; this profile does not establish that change."})
     identity = ((manifest.get("source") or {}).get("ref") == proposal.get("ref")
                 and str((manifest.get("source") or {}).get("repo", "")).removesuffix(".git").rstrip("/")
                 == str(proposal.get("repo") or "").removesuffix(".git").rstrip("/"))
     if not identity or not citations or not all(c["verified"] for c in citations):
         amendments.append({"code": "command_evidence_missing", "what": "The complete command and prerequisite must be established at the cited lines of this same pinned upstream commit; wiki text or a recipe label is not proof."})
     if transformation["limitations"]:
-        amendments.append({"code": "command_profile_unsupported", "what": "; ".join(transformation["limitations"])})
+        amendments.append({"code": "command_profile_unsupported", "what": " ".join(_sentence(item) for item in transformation["limitations"])})
     if (manifest.get("inputs") or {}).get("type") and not transformation["read_bindings"]:
         amendments.append({"code": "input_not_substituted", "what": "This evaluator cannot establish that the cited command reads the declared reference input; no config or input list was rewritten to make it do so."})
     inputs = manifest.get("inputs") or {}
@@ -216,7 +225,10 @@ def classify(proposal: dict, manifest: dict, limitations: list[str],
             }.get(blocker, "STRhub could not complete a procedure stated at this commit.")
         attribution = "strhub"
     else:
-        reason = " ".join(a["what"] for a in amendments)
+        # What stopped it first, then everything else the review found, each
+        # as a sentence of its own: a reader gets the lead before the list.
+        ordered = sorted(amendments, key=lambda a: a["code"] != blocker)
+        reason = " ".join(dict.fromkeys(_sentence(a["what"]) for a in ordered))
         attribution = "strhub"
 
     return {
