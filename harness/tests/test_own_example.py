@@ -122,6 +122,11 @@ def test_the_certificate_and_the_label_say_it_ran_its_example():
               "instrument": "documented", "level": "installs", "gates": gates(example=True)}
     assert ct.execution_finding_established(report) is True
     assert ct.headline(report) == ("Runs as documented", "green")
+    cert = ct.certificate_for(report, {"tool_display": "Tool test", "tool_name": "Tool", "gates": report["gates"],
+                                       "verdict": v, "execution_finding_established": True})
+    # Not "Installs, 2/5 gates passed" under a result that says the tool runs.
+    assert cert["reached"] == "Reproduces own example"
+    assert cert["summary"]["reached"] == "Installs and reproduces its own example"
     items = ct.conclusion_items_for({"tool_display": "Tool test", "tool_name": "Tool", "gates": report["gates"],
                                      "verdict": v, "execution_finding_established": True})
     assert items[0][0] == "Reproduces its own example" and "produced its output" in items[0][1]

@@ -94,14 +94,22 @@ def certificate_for(report: dict, cfg: dict) -> dict:
     gates = dict(report.get("gates") or {})
     n_pass = sum(1 for k in ("available", "installs", "runs", "io", "content") if gates.get(k))
     verdict = report.get("verdict") or {}
+    reached, reached_long = REACHED.get(level, "not run"), f"{REACHED.get(level, 'not run')}, {n_pass}/5 gates passed"
+    if verdict.get("basis") == "example":
+        # The repository's own example decided. The five gates describe the
+        # run on STRhub's sample, which is another matter: counting them here
+        # would read "2/5" under a result that says the tool runs.
+        reached = "Reproduces own example" if verdict.get("code") == "runs" else "Installs"
+        reached_long = ("Installs and reproduces its own example" if verdict.get("code") == "runs"
+                        else "Installs; its own example did not produce its output")
     return {
         "schema": CERTIFICATE_SCHEMA,
         "label": label,
-        "reached": REACHED.get(level, "not run"),
+        "reached": reached,
         "summary": {
             "purpose": PURPOSE,
             "result": label,
-            "reached": f"{REACHED.get(level, 'not run')}, {n_pass}/5 gates passed",
+            "reached": reached_long,
             **({"why": verdict["reason"]} if verdict.get("reason") else {}),
             "scope": EXEC_SCOPE,
             "not_evaluated": list(NOT_EVALUATED),
