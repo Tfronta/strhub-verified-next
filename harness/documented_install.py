@@ -293,6 +293,8 @@ def carrier(commands: list[dict], uses_conda: bool, environment: str | None) -> 
         lines += ["RUN " + json.dumps(["bash", "-c", "apt-get install curl ca-certificates bzip2 && "
                                        f"curl -fsSL {MINIFORGE_URL} -o /tmp/miniforge.sh && "
                                        "bash /tmp/miniforge.sh -b -p /opt/conda && rm /tmp/miniforge.sh && "
+                                       # A login shell may reset PATH; conda stays on it either way.
+                                       "echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/00-strhub-conda.sh && "
                                        "ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh"]),
                   "ENV PATH=/opt/conda/bin:$PATH"]
     lines += ['COPY [".", "/opt/tool"]', "WORKDIR /opt/tool"]
