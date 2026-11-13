@@ -87,7 +87,14 @@ are for:
 **Identity and source**
 - `schema`, `generated`, `ci_run`, `mode` (`trial` | `publish`)
 - `tool`: `{ name, version?, contact? }`
-- `source`: `{ repo, ref, ref_resolved?, committed? }`
+- `source`: `{ repo, ref, ref_resolved?, committed?, fork? }`. `fork` is
+  present only when the repository is a fork: `{ is_fork: true, parent,
+  parent_url, base_branch, merge_base, ahead_by, behind_by, files_changed,
+  truncated, counts: { documentation, data, code }, changed: { documentation[],
+  data[], code[] } (up to 25 paths each), kind, compare_url }`. `kind` is
+  `documentation_only`, `documentation_and_data` (the code is the original
+  author's) or `code` (the result is about the fork). **The web does not
+  render it yet.**
 - `submission`: `{ by }`
 - `instrument`: always `documented` (the repository's own instructions; the
   engine has no other instrument)

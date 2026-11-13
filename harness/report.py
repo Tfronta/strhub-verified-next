@@ -33,6 +33,7 @@ from certificate_text import (  # noqa: E402
 )
 import verdict as verdict_lib  # noqa: E402
 import upstream  # noqa: E402
+import fork_provenance  # noqa: E402
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 SCOPE = ("Assessment of documented execution in the stated environment and "
@@ -300,6 +301,9 @@ def _summary_md(report: dict, slug: str) -> str:
     up_note = upstream.note(report.get("upstream"))
     if up_note:
         lines.append(f"- Upstream: {up_note}")
+    fork_note = fork_provenance.note((report.get("source") or {}).get("fork"))
+    if fork_note:
+        lines.append(f"- Fork: {fork_note}")
     if report.get("ci_run"):
         lines.append(f"- CI run: {report['ci_run']}")
 
@@ -583,6 +587,9 @@ def _summary_html(report: dict, slug: str) -> str:
 
     _up_note = upstream.note(report.get("upstream"))
     upstream_li = f"<li>Upstream: {esc(_up_note)}</li>" if _up_note else ""
+    _fork_note = fork_provenance.note((report.get("source") or {}).get("fork"))
+    if _fork_note:
+        upstream_li += f"<li>Fork: {esc(_fork_note)}</li>"
 
     # Errors the tool reported, in its own section: the matrix says a leg had them,
     # this says what they were, so a reviewer never has to open a container log.
@@ -947,6 +954,10 @@ def main() -> int:
             if committed:
                 report["source"]["committed"] = committed
             report["upstream"] = up
+        # A fork is not its original: say of what, and what it changes.
+        fork = fork_provenance.provenance(m["source"]["repo"], args.ref or m["source"]["ref"])
+        if fork and fork.get("is_fork"):
+            report["source"]["fork"] = fork
 
     # What the run needed that the repository does not provide.
     #
