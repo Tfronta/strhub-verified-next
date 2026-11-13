@@ -135,6 +135,7 @@ GUIDE_BLOCKS = {
 #: command. A gap of ours is never told as a gap of theirs.
 STEP1_BLOCKERS = {
     "no_install_procedure":  ("install", "commit"),
+    "install_not_copyable":  ("install", "commit"),
     "published_image":       ("install", "commit"),
     "no_command":            ("command", "commit"),
     "synopsis_trimmed":      ("command", "commit"),

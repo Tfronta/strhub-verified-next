@@ -119,6 +119,9 @@ REGISTER: dict[str, tuple[str, str]] = {
     "d1359b6f7115": ("verdict", "gates"),           # The tool installed with the commands its repository documents, and its own documented example produced…
     "0ae676b3791b": ("verdict", "gates"),           # The tool installed with the commands its repository documents, and its own documented example (raised…)
     "10eb3131c11b": ("verdict", "log"),             # The tool's own example needs something the automated runner cannot provide:
+    # Rests on the documents read at the pinned ref: none shows an
+    # installation written as plain commands.
+    "e5c7a1476bf1": ("verdict", "readme"),  # The installation the repository documents is not written as commands that can be copied and run…
 }
 
 #: Phrasings that may never be published, whatever evidence is attached: they

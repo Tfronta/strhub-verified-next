@@ -229,11 +229,15 @@ def installation(proposal: dict, manifest: dict) -> dict:
             if result.get("ready"):
                 break
         return result
-    reason = ("This evaluator has no proven installation profile for this recipe; no dependencies, "
-              "compiler options or environment fixes may be supplied by STRhub.")
+    # Why no profile could transcribe the installation, in the plan's own
+    # words, and whose the gap is: the documentation's or this evaluator's.
+    plan = install_plan(proposal)
+    reason = plan.get("reason") or ("This evaluator has no proven installation profile for this recipe; no "
+                                    "dependencies, compiler options or environment fixes may be supplied by STRhub.")
     if build.get("method") == "dockerfile":
         reason += " A Dockerfile shipped in the repository is not built."
-    return {"profile": PROFILE, "ready": False, "method": build.get("method", "unknown"), "reason": reason}
+    return {"profile": PROFILE, "ready": False, "method": build.get("method", "unknown"), "reason": reason,
+            "gap": plan.get("gap", "strhub")}
 
 
 def image_invocation_supported(proposal: dict, installation_review: dict | None = None) -> bool:

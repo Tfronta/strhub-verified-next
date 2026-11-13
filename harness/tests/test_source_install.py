@@ -105,7 +105,8 @@ def test_unsupported_transcripts_remain_blocked_without_filling_or_repair(block)
     p, m = case(DOCUMENT.replace(BLOCK, block))
     r = review(p, m)
     assert not r["install_ready"] and not r["may_say_runs"]
-    assert r["blocker"] == "install_profile_unsupported"
+    # A gap of the documentation, which the author can close: the report asks for it.
+    assert r["blocker"] == "install_not_copyable" and r["basis"] == "recipe"
 
 
 SOURCE_PROFILE_ONLY = [

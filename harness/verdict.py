@@ -98,6 +98,21 @@ BLOCKERS = {
                     "stranger build it and let STRhub verify it automatically.",
         },
     },
+    "install_not_copyable": {
+        # `what` is replaced by the review's own sentence, which names the
+        # file and line; this one stands when there is none.
+        "what": "The installation the repository documents is not written as commands that can be "
+                "copied and run, so it was not attempted.",
+        "ask_owner": {
+            "title": "Write the installation as commands that can be copied and run",
+            "body": "STRhub Verified reads the installation from the repository's documentation and runs it "
+                    "exactly as written, adding nothing. At this commit it could not follow it. Writing the "
+                    "installation as plain commands in one code block (apt, conda, pip, make or cmake, with "
+                    "the files they name in the repository) lets a new user, a reviewer and STRhub install "
+                    "the tool by copying it. The forms it can follow are listed in the guide: "
+                    "https://github.com/Tfronta/strhub-verified/blob/main/docs/GUIA-PASO-1.md",
+        },
+    },
     "build_failed": {
         "what": "The environment did not build from the install steps found in the repository.",
         "ask_owner": {
@@ -354,6 +369,16 @@ def decide(gates: dict, diagnostics: dict[str, list[dict]] | None = None,
     limits = [l for l in evidence.get("limitations", []) if l in LIMITATION_TEXT]
     gaps = [g for g in (proposal.get("readme") or {}).get("gaps", []) if g.get("item") != "example_data"]
     v["blockers"] = blockers_for(gates or {}, limits, gaps, _ids(diagnostics))
+    if (procedure or {}).get("blocker") == "install_not_copyable":
+        # Nothing was built, so nothing failed to build: what stopped the run
+        # is how the installation is written, and the review says where.
+        lead = {"code": "install_not_copyable", **BLOCKERS["install_not_copyable"]}
+        found = (procedure.get("reason") or "").strip()
+        if found:
+            lead = {**lead, "what": found,
+                    "ask_owner": {**lead["ask_owner"],
+                                  "body": lead["ask_owner"]["body"] + " What stopped it: " + found}}
+        v["blockers"] = [lead] + [b for b in v["blockers"] if b["code"] not in ("build_failed", "install_method_unknown")][:2]
     raised = _raised(diagnostics)
     if raised:
         # What to fix, in the issue the author is asked to read.

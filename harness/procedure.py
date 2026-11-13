@@ -141,8 +141,12 @@ def classify(proposal: dict, manifest: dict, limitations: list[str],
     citable = installation["ready"]
     if installation["ready"] and not fidelity.image_invocation_supported(proposal, installation):
         amendments.append({"code": "image_invocation_unsupported", "what": "The upstream image does not declare the shell entrypoint this evaluator needs; ENTRYPOINT is not overridden or repaired."})
+    install_gap = "strhub" if installation["ready"] else installation.get("gap", "strhub")
     if not installation["ready"]:
-        amendments.append({"code": "install_profile_unsupported", "what": installation["reason"]})
+        # The documentation falls short of what the guide asks (the author can
+        # close it), or this evaluator's profiles do (nothing is asked of them).
+        amendments.append({"code": "install_not_copyable" if install_gap == "commit" else "install_profile_unsupported",
+                           "what": installation["reason"]})
 
     if any("holds no reference sample as" in n or "other documented kind was used" in n for n in notes):
         amendments.append({"code": "input_swapped",
@@ -190,6 +194,8 @@ def classify(proposal: dict, manifest: dict, limitations: list[str],
         blocker, basis = "procedure_evidence_missing", "strhub"
     elif "no_reference_dataset" in limitations:
         blocker, basis = "missing_input", "recipe"
+    elif not installation["ready"] and method != "unknown" and install_gap == "commit":
+        blocker, basis = "install_not_copyable", "recipe"
     elif not installation["ready"] and method != "unknown":
         blocker, basis = "install_profile_unsupported", "strhub"
     elif "documented_file_missing" in limitations:

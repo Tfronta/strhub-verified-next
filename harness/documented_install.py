@@ -159,23 +159,34 @@ def _documents(proposal: dict) -> list[dict]:
 def discover(proposal: dict) -> dict:
     result = {"profile": PROFILE, "ready": False, "method": (proposal.get("build") or {}).get("method", "unknown"),
               "reason": "No repository document shows an installation this profile can transcribe literally; "
-                        "no missing step, dependency or choice was supplied by STRhub."}
+                        "no missing step, dependency or choice was supplied by STRhub.",
+              # Whose the gap is when the plan is not ready: `commit` when the
+              # documentation is what falls short of the guide (the author can
+              # close it), `strhub` when it is a limit of this profile.
+              "gap": "commit"}
     repo, ref = proposal.get("repo"), str(proposal.get("ref") or "")
     match = re.fullmatch(r"https://github\.com/([\w.-]+/[\w.-]+?)(?:\.git)?/?", str(repo or ""))
     if not match or not re.fullmatch(r"[0-9a-f]{40}", ref) or proposal.get("tree_truncated"):
+        result["gap"] = "strhub"
         return result
     slug = match[1]
     files = set(proposal.get("tree_paths") or [])
     if ".gitmodules" in files:
         result["reason"] = "The repository uses submodules, which this profile does not fetch."
+        result["gap"] = "strhub"
         return result
     if ".dockerignore" in files:
         # The carrier copies the checkout whole; a .dockerignore would decide what it copies.
         result["reason"] = "The repository ships a .dockerignore, which would change what the evaluator's carrier copies."
+        result["gap"] = "strhub"
         return result
     directories = {str(parent) for f in files for parent in pathlib.PurePosixPath(f).parents if str(parent) != "."}
 
     commands, published, documents = [], [], []
+    if not _documents(proposal):
+        # Nothing was read: that is this evaluator's lack of evidence, not a gap in the documentation.
+        result["gap"] = "strhub"
+        return result
     for doc in _documents(proposal):
         documents.append({"path": doc["file"], "sha256": digest(doc["text"])})
         for block in _blocks(doc["text"]):
@@ -240,6 +251,7 @@ def discover(proposal: dict) -> dict:
     environment = activated[-1] if activated else None
     dockerfile = carrier(commands, uses_conda, environment)
     first = commands[0]
+    result.pop("gap")
     result.update(
         ready=True, repo=repo, ref=ref, documents=documents, commands=commands,
         published_alternatives=published, conda_environment=environment,

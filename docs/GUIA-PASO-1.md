@@ -19,22 +19,34 @@ still fail step 1, because step 1 is about the commit, not about the code.
 
 ### 1. Installation, copyable
 
-A code block with the commands and the versions. Any one of these is enough:
-
-- a release binary that the documentation tells the reader to download;
-- the lines of the block: `conda env create -f environment.yml`, `pip install .`, `make`,
-  `cmake .. && make`, `cargo build --release`, an install script the block invokes.
+The commands, in a code block, under a heading about installing. STRhub runs them exactly as
+written, in order, on a clean Ubuntu 22.04 (with conda, python and pip when a command uses
+them), and adds nothing: no package, no option, no missing step.
 
 ```bash
-# good: unambiguous, and the file it names is in the tree
+# good: plain commands, and every file they name is in the commit
 conda env create -f environment.yml
 conda activate mytool
 pip install .
 ```
 
-What does not count: prose that has to be interpreted (“install the usual dependencies and
-compile”), a list of library names without the command that installs them, or a link to an
-external wiki. The wiki is not in the commit.
+What it can follow: `apt install`, `conda create` / `conda env create` / `conda install` /
+`conda activate`, `pip install .` / `pip install -r requirements.txt`, `python setup.py install`,
+`make`, `cmake`, `./configure`, `cargo build --release`, `mkdir`, `cd`, and `&&` between them.
+The full list is in [DOCUMENTED-INSTALLATION.md](DOCUMENTED-INSTALLATION.md).
+
+What it cannot follow, and reports as missing with the line that stopped it:
+
+- prose that has to be interpreted ("install the usual dependencies and compile");
+- a list of library names without the command that installs them: on a clean machine `make`
+  has no compiler unless a line installs one;
+- a download or an archive to unpack (`wget`, `curl`, `tar`), a script, a pipe, a variable, a
+  glob or a placeholder such as `mytool-X.X.tar.gz`;
+- a link to an external wiki: the wiki is not in the commit;
+- a `Dockerfile`: one shipped in the repository is never built.
+
+A line that installs a published copy (`pip install mytool`, a Bioconda package, a Docker
+image) is not the commit under test. It is listed in the report and not run.
 
 ### 2. One command
 
@@ -77,9 +89,11 @@ not say what it is. Those are reported as a limitation of STRhub's, not as a gap
 the commit, or document the step that fetches it. STRhub does not write or supply one. If it is
 missing, the report says which file and the run is not attempted.
 
-**The strongest thing you can do here is commit a small example.** A slice of a few megabytes
-that the command in block 2 can read turns step 1 into something any user, reviewer or editor can
-reproduce in seconds, and it removes STRhub's sample shelf from the equation entirely.
+**The strongest thing you can do here is commit a small example**, and show a command that
+runs on it. A slice of a few megabytes turns step 1 into something any user, reviewer or editor
+can reproduce in seconds. When the README has a command whose input files are in the commit,
+that command is the result STRhub reports: it runs it as written, on your data, with nothing of
+its own. The run on STRhub's reference sample is then a second, separate observation.
 
 ### 4. The declared output
 
@@ -94,6 +108,32 @@ stray file the run left behind, so it will not claim the output appeared. A dire
 the extension is enough (`out/*.vcf`), as long as it is stated.
 
 ---
+
+## A section you can copy
+
+Everything above, as one README section. Replace the names; keep the shape.
+
+````markdown
+## Installation
+
+```bash
+conda env create -f environment.yml
+conda activate mytool
+pip install .
+```
+
+## Example
+
+Reads `example/sample.bam` (BAM, aligned to hg38) and writes `example/out.vcf`.
+
+```bash
+mytool --bam example/sample.bam --fasta hg38.fa --out example/out.vcf
+```
+````
+
+With that section and `example/sample.bam` in the commit, anyone can paste the repository's
+link into STRhub Verified and get an answer. If you are submitting a manuscript, run it
+yourself first and cite the result's link: your reviewers only have to open it.
 
 ## What STRhub does with this
 

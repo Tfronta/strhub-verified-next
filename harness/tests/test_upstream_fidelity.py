@@ -123,7 +123,8 @@ def test_a_dockerfile_the_repository_ships_is_never_an_admitted_install():
         m["environment"] = env
         r = review(p, m)
         assert not r["install_ready"] and not r["may_say_runs"]
-        assert r["blocker"] == "install_profile_unsupported" and r["basis"] == "strhub"
+        # What the author can do about it: write the installation as commands.
+        assert r["blocker"] == "install_not_copyable" and r["basis"] == "recipe"
         assert "Dockerfile shipped in the repository is not built" in r["reason"]
     # And the schema has no field left to point at one.
     import _manifest
