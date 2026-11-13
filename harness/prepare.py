@@ -188,7 +188,9 @@ def main() -> int:
             print(f"::error::{input_failure}", file=sys.stderr)
             install_ready = procedure_ready = False
 
-    example_ready = install_ready and procedure_ready and bool(fidelity.example_citation(proposal_data, m))
+    # The repository's own example needs the documented install and nothing of
+    # STRhub's: it runs whether or not the run on STRhub's sample can.
+    example_ready = install_ready and bool(review.get("example_ready")) and bool(fidelity.example_citation(proposal_data, m))
     example = m.get("example") or {}
 
     values = {

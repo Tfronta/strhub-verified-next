@@ -244,6 +244,11 @@ def classify(proposal: dict, manifest: dict, limitations: list[str],
         "output_glob": glob,
         "profile": fidelity.PROFILE,
         "install_ready": installation["ready"],
+        # The repository's own example can be run as documented: the install
+        # is admitted and the example's command is cited, whole, at the commit.
+        # It needs nothing of STRhub's, so it does not wait for `may_say_runs`,
+        # which is about the run on STRhub's sample.
+        "example_ready": bool(installation["ready"] and fidelity.example_citation(proposal, manifest)),
         "installation": installation,
         "command_review": {**transformation, "expected": expected, "executed": rewritten,
                            "cited_sha256": fidelity.digest(cited),

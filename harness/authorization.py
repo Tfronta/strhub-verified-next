@@ -80,7 +80,7 @@ def validate(review, manifest) -> Validation:
 
 
 def refusal(reason: str) -> dict:
-    return {"may_say_runs": False, "install_ready": False, "basis": "strhub", "attribution": "strhub",
+    return {"may_say_runs": False, "install_ready": False, "example_ready": False, "basis": "strhub", "attribution": "strhub",
             "blocker": "procedure_evidence_invalid", "reason": reason}
 
 

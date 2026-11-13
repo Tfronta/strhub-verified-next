@@ -315,10 +315,11 @@ def execution_finding_established(report: dict) -> bool | None:
     """
     if "procedure_validation" not in report:
         return None
-    return bool((report.get("procedure_validation") or {}).get("valid")
-                and (report.get("procedure_review") or {}).get("may_say_runs") is True
-                and (report.get("verdict") or {}).get("code") in ("runs", "fails")
-                and (report.get("verdict") or {}).get("basis") != "strhub")
+    review, verdict = report.get("procedure_review") or {}, report.get("verdict") or {}
+    reviewed = (review.get("may_say_runs") is True
+                or (review.get("example_ready") is True and verdict.get("basis") == "example"))
+    return bool((report.get("procedure_validation") or {}).get("valid") and reviewed
+                and verdict.get("code") in ("runs", "fails") and verdict.get("basis") != "strhub")
 
 
 def conclusion_items_for(cfg: dict) -> list[tuple[str, str]]:
@@ -341,6 +342,24 @@ def conclusion_items_for(cfg: dict) -> list[tuple[str, str]]:
             items.append((f"Verdict: {verdict['title']}", verdict["reason"]))
         items.append(("Reproducibility not established",
                       "These observations are insufficient to establish a reproducible documented execution finding."))
+        return items
+    verdict = cfg.get("verdict") or {}
+    if verdict.get("basis") == "example":
+        # The repository's own example decided: nothing here is about
+        # STRhub's sample, so nothing here speaks of loci or reference data.
+        ok = verdict.get("code") == "runs"
+        items = [("Reproduces its own example" if ok else "Does not reproduce its own example",
+                  f"{cfg['tool_display']} installs with the commands its repository documents, in a clean "
+                  "ubuntu-22.04 environment at the pinned commit. The example its documentation shows, run on "
+                  "the data the repository ships, "
+                  + ("produced its output." if ok else
+                     "stopped before producing its output. The messages it printed are in the execution log."))]
+        if verdict.get("title") and verdict.get("reason"):
+            items.append((f"Verdict: {verdict['title']}", verdict["reason"]))
+        items.append(("Reproducibility statement",
+                      "The documented installation and the documented example command, executed at the "
+                      "pinned commit in the described environment, are sufficient to reproduce this "
+                      "verification result independently."))
         return items
     stats = cfg.get("stats") or {}
     top_loci = stats.get("top_loci_by_depth", [])

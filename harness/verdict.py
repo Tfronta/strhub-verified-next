@@ -4,7 +4,9 @@ The gate ladder is exact and stays; this is the sentence on top of it that a
 paper reviewer, or somebody who could not get the tool running at home, can
 act on without reading a log:
 
-  runs           it installed and produced its documented output
+  runs           it installed and produced its documented output: its own
+                 example on its own data when the repository documents one,
+                 else the documented command on STRhub's sample
   fails          it did not, and the evidence says the tool (or its recipe)
                  is what failed
   undetermined   STRhub could not work out how to run it, and says what the
@@ -224,6 +226,30 @@ def _decide(gates: dict, diagnostics: dict[str, list[dict]] | None = None,
     # reference sample.
     ran = bool(gates.get("runs")) and bool(gates.get("io"))
     produced = ran
+
+    # The repository's own example decides when there is one: its documented
+    # command, on its own data, in the documented installation, with nothing
+    # of STRhub's. What happened on STRhub's sample is a second observation,
+    # kept in the matrix and never set against this one.
+    if procedure.get("example_ready") is True and gates["installs"] and type(gates.get("example")) is bool:
+        if gates["example"]:
+            return {"code": "runs", "title": TITLES["runs"], "basis": "example",
+                    "reason": "The tool installed with the commands its repository documents, and its "
+                              "own documented example produced its output.",
+                    "readme_gaps": []}
+        of_example = {"example": (diagnostics or {}).get("example") or []}
+        beyond = _ids(of_example) & diagnose_log.HARNESS_INCOMPATIBLE
+        if beyond:
+            return {"code": "out_of_scope", "title": TITLES["out_of_scope"], "basis": "environment",
+                    "reason": "The tool's own example needs something the automated runner cannot provide: "
+                              + ", ".join(sorted(beyond)) + ".",
+                    "readme_gaps": []}
+        raised = _raised(of_example)
+        return {"code": "fails", "title": TITLES["fails"], "basis": "example",
+                "reason": "The tool installed with the commands its repository documents, and its own "
+                          "documented example " + (f"raised {raised}" if raised else "exited with an error")
+                          + " before producing its output.",
+                "readme_gaps": gaps}
 
     blocked = _procedure_block(procedure, gaps)
     if blocked:

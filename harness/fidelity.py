@@ -123,7 +123,10 @@ def rewrite(command: str, input_type: str | None) -> dict:
             else:
                 target, role = reference_mount, "reference_path"
                 reference_used = True
-        elif i and previous not in OUTPUT_FLAGS and READ_PATH.fullmatch(value) and value != f"/data/in/{canonical}":
+        elif ds and i and previous not in OUTPUT_FLAGS and READ_PATH.fullmatch(value) and value != f"/data/in/{canonical}":
+            # Only when a dataset is being substituted. With none (the
+            # repository's own example) a read file the command names is the
+            # repository's own, at its own path, and is left exactly there.
             result["limitations"].append("a read-file argument is outside the closed input substitution table")
         if target and role == "read_path":
             result["read_bindings"].append({"token": i, "original": raw, "target": target})
@@ -257,7 +260,8 @@ def verify_checkout(root, review: dict, manifest: dict | None = None) -> None:
     module.verify_checkout(root, install)
     citations = (review.get("command_review") or {}).get("citations") or []
     checks = [(c.get("path"), c.get("document_sha256")) for c in citations]
-    example = example_citation(review["evidence"]["proposal"], manifest) if review["may_say_runs"] else None
+    example = (example_citation(review["evidence"]["proposal"], manifest)
+               if review["may_say_runs"] or review.get("example_ready") else None)
     if example:
         checks.append((example["path"], example["document_sha256"]))
     for relative, expected in checks:

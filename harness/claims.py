@@ -112,6 +112,13 @@ REGISTER: dict[str, tuple[str, str]] = {
     # second on the README (no assembly named) and on what this run mounted.
     "f841d5fe9c41": ("report", "tree"),    # The repository ships no example input. A small example the documented command can read…
     "70716d03c2fd": ("report", "readme"),  # The documented command reads a reference genome and the README does not say which assembly…
+    # The repository's own example as the result: each sentence rests on this
+    # run's own gates (the documented install built, the example ran or did
+    # not) or, for the runner's ceiling, on a line the tool itself printed.
+    "6c4cc2a897e0": ("certificate_text", "gates"),  # installs with the commands its repository documents, in a clean ubuntu-22.04 environment…
+    "d1359b6f7115": ("verdict", "gates"),           # The tool installed with the commands its repository documents, and its own documented example produced…
+    "0ae676b3791b": ("verdict", "gates"),           # The tool installed with the commands its repository documents, and its own documented example (raised…)
+    "10eb3131c11b": ("verdict", "log"),             # The tool's own example needs something the automated runner cannot provide:
 }
 
 #: Phrasings that may never be published, whatever evidence is attached: they
