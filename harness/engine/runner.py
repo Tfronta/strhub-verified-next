@@ -18,7 +18,7 @@ from .stages import Ctx
 #: STRhub's own evidence checks, which must never read as the tool failing.
 EVIDENCE_FAILURES = {
     "installs": "the upstream procedure evidence check before Docker",
-    "runs_external": "the mounted dataset provenance check",
+    "runs_external": "the provenance check of the mounted dataset and reference genome",
 }
 
 

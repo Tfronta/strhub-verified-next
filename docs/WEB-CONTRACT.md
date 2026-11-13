@@ -112,6 +112,12 @@ are for:
   claim was read in the repository, openable at the pinned ref. `claim`
   includes `fallback_environment` (the published image the README names;
   evidence, not a plan B).
+- `mounted_inputs`: what the external leg was given, verified before launch:
+  `files[]` (the registered dataset under `/data/in`, by sha256) and, only
+  when the documented command names a reference genome, `reference`:
+  `{ mount_path, index_mount_path, assembly, source_url, sha256, size_bytes,
+  transformation }` (the public genome mounted read-only at `/data/ref`).
+  The web does not read it yet.
 - `upstream`, `procedure_review`, `procedure_validation`,
   `author_known_issues`, `needed_beyond_repo`, `repo_test_data`,
   `caveats`, `scope`, `recipe`, `certificate`

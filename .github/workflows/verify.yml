@@ -117,11 +117,47 @@ jobs:
           python harness/prepare.py "$TOOL" --work work --mode "$MODE" \
             --proposal recipe_proposal.json --plan-out work/plan.json >> "$GITHUB_OUTPUT"
 
+      # --- Reference genome ------------------------------------------------------
+      # Only when the documented command names a reference genome and the
+      # registered dataset is aligned to one (prepare says reference_ready).
+      # It is a public, standard file no repository ships: STRhub supplies it,
+      # read-only at /data/ref, the way it supplies the sample. The download is
+      # checked against the checksum its provider publishes, then cached.
+      - name: Cache the reference genome
+        if: steps.m.outputs.reference_ready == '1'
+        uses: actions/cache@v4
+        id: ref-cache
+        with:
+          path: work/ref
+          key: ref-${{ steps.m.outputs.ref_genome_filename }}-v2
+
+      - id: ref_dl
+        name: Download and index the reference genome
+        if: steps.m.outputs.reference_ready == '1' && steps.ref-cache.outputs.cache-hit != 'true'
+        env:
+          REF_GENOME_URL: ${{ steps.m.outputs.ref_genome_url }}
+          REF_GENOME_MD5_URL: ${{ steps.m.outputs.ref_genome_md5_url }}
+          REF_GENOME_FILE: ${{ steps.m.outputs.ref_genome_filename }}
+        run: |
+          set -euo pipefail
+          mkdir -p work/ref
+          archive="work/ref/$(basename "$REF_GENOME_URL")"
+          curl -fsSL -o "$archive" "$REF_GENOME_URL"
+          expected=$(curl -fsSL "$REF_GENOME_MD5_URL" | awk -v f="$(basename "$REF_GENOME_URL")" '$2 == f {print $1}')
+          test -n "$expected" || { echo "::error::the provider publishes no checksum for $(basename "$REF_GENOME_URL")"; exit 1; }
+          echo "$expected  $archive" | md5sum -c -
+          gunzip -c "$archive" > "work/ref/$REF_GENOME_FILE"
+          rm -f "$archive"
+          sudo apt-get install -y -qq samtools >/dev/null
+          samtools faidx "work/ref/$REF_GENOME_FILE"
+          ls -lh work/ref/
+
       # --- The gates: harness/engine -------------------------------------------
       # Available, Installs, the example leg and its check, the external leg
       # and its checks. The tool runs as a container built from the one
-      # environment the review admits, with the registered dataset mounted
-      # read-only, no network, a memory and CPU ceiling, a process cap and no
+      # environment the review admits, with the registered dataset (and the
+      # reference genome, when the command names one) mounted read-only, no
+      # network, a memory and CPU ceiling, a process cap and no
       # capabilities (stages.HARDENING).
       #
       # The runner exits 0 whatever the gates found: a failed gate is a result,
@@ -142,7 +178,7 @@ jobs:
           TOOL_REF: ${{ steps.m.outputs.ref }}
           # A step of STRhub's own that failed. The gates below it did not run
           # and would otherwise read as the tool stopping.
-          INFRA_FAILURE: ${{ steps.m.outputs.input_failure || (steps.engine.outcome == 'failure' && 'the gate runner') || '' }}
+          INFRA_FAILURE: ${{ steps.m.outputs.input_failure || (steps.ref_dl.outcome == 'failure' && 'the reference genome download') || (steps.engine.outcome == 'failure' && 'the gate runner') || '' }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           PUBLISH: ${{ inputs.publish == 'true' && 'true' || 'false' }}
           # Read-only, for the upstream check: raises the API allowance.

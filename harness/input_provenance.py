@@ -1,4 +1,6 @@
-"""Stage and verify the only runner-supplied inputs allowed in an automatic run."""
+"""Stage and verify the only runner-supplied inputs allowed in an automatic run:
+the registered dataset, and the reference genome it is aligned to when the
+documented command names one."""
 from __future__ import annotations
 
 import argparse
@@ -57,6 +59,38 @@ def _plan(root, input_type):
     return commit, dataset, files
 
 
+def reference_for(dataset, command):
+    """The dataset's reference genome record when `command` names its mount.
+
+    The substitution profile (fidelity.rewrite) is the only thing that writes
+    that path into a command, and only in place of a reference genome the
+    documentation names. A command that does not name it gets no reference."""
+    genome = (dataset or {}).get("reference_genome") or {}
+    mount = genome.get("mount_path") or ""
+    filename = genome.get("filename") or ""
+    if not mount or not filename or mount not in command:
+        return None
+    if mount != f"/data/ref/{filename}" or len(_paths.relative(filename).parts) != 1:
+        raise ValueError("the reference genome requires a single filename under /data/ref")
+    return genome
+
+
+def _reference_receipt(work, genome):
+    """The reference about to be mounted: present, with its index, and what it
+    is. It is downloaded by the workflow (checked there against the provider's
+    published checksum), not tracked in Git, so its sha256 is recorded here as
+    observed."""
+    folder = _paths.destination(work, "ref")
+    fasta = _paths.destination(folder, genome["filename"])
+    index = _paths.destination(folder, genome["filename"] + ".fai")
+    if not fasta.is_file() or not fasta.stat().st_size or not index.is_file():
+        raise ValueError("the reference genome the command names was not staged with its index")
+    return {"mount_path": genome["mount_path"], "index_mount_path": genome["mount_path"] + ".fai",
+            "assembly": genome.get("assembly"), "source_url": genome.get("url"),
+            "sha256": _sha256(fasta), "size_bytes": fasta.stat().st_size,
+            "transformation": "gunzip; samtools faidx"}
+
+
 def stage(root, work, input_type):
     """Copy the exact registered data into a new directory; never overlay it."""
     _, dataset, files = _plan(root, input_type)
@@ -93,10 +127,12 @@ def verify(root, work, manifest, review, command):
             "source_sha256": _sha256(source) if unpack else expected,
             "transformation": "gunzip" if unpack else "none",
         })
+    genome = reference_for(dataset, command)
     return {"schema": "strhub-mounted-inputs/1", "leg": "external",
             "evaluator_commit": commit, "dataset_registry": INDEX, "input_type": input_type,
             "dataset": dataset["name"], "assembly": dataset.get("reference"), "source": dataset.get("source"),
-            "procedure_evidence_sha256": review["evidence_sha256"], "files": verified}
+            "procedure_evidence_sha256": review["evidence_sha256"], "files": verified,
+            **({"reference": _reference_receipt(work, genome)} if genome else {})}
 
 
 def main():

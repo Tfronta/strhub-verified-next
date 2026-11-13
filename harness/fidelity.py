@@ -17,6 +17,15 @@ TOKEN = re.compile(r"'[^']*'|\"(?:\\.|[^\"\\])*\"|<[^<>\n]+>|[^\s'\";&|<>()]+|[;
 INPUT_FLAGS = {"--in", "--input", "--bam", "--bams", "--reads", "--fastq", "-i", "-b"}
 OUTPUT_FLAGS = {"--out", "--output", "--output-prefix", "--out-dir", "-o"}
 READ_PATH = re.compile(r"[\w./-]+\.(?:bam|cram|f(?:ast)?q)(?:\.gz)?\Z", re.I)
+#: A reference genome is a public, standard file the documentation names and no
+#: repository ships. When the registered dataset is aligned to one, the token
+#: that names it becomes that genome's read-only mount: after one of these
+#: flags, or anywhere when the file is called hg38/GRCh38.
+REFERENCE_FLAGS = {"--fasta", "--ref", "--reference", "--genome", "--ref-fasta", "--reference-fasta",
+                   "--fasta-ref", "-r", "-R", "-f", "-g"}
+REFERENCE_PATH = re.compile(r"[\w./-]+\.(?:fa|fasta|fna)\Z", re.I)
+REFERENCE_OTHER_FORM = re.compile(r"[\w./-]+\.(?:(?:fa|fasta|fna)\.(?:gz|bgz)|2bit)\Z", re.I)
+HG38_NAME = re.compile(r"(?:hg38|grch38)", re.I)
 
 
 def digest(text: str) -> str:
@@ -50,7 +59,8 @@ def tokens(command: str) -> list[str]:
 
 
 def rewrite(command: str, input_type: str | None) -> dict:
-    """Only standalone read paths and explicit output placeholders.
+    """Only standalone read paths, the reference genome the registered dataset
+    is aligned to, and explicit output placeholders.
 
     No executable changes, defaults, config selection, region conversion,
     list reduction, synopsis expansion, shell-variable filling or mkdir.
@@ -69,6 +79,8 @@ def rewrite(command: str, input_type: str | None) -> dict:
         return result
     ds = datasets_lib.resolve(input_type) if input_type else None
     canonical = (ds or {}).get("canonical_input")
+    reference_mount = ((ds or {}).get("reference_genome") or {}).get("mount_path")
+    reference_used = False
     if ((ds or {}).get("reference") == "hg38"
             and re.search(r"(?:hg19|grch37|hg18|ncbi36|t2t|chm13)(?![a-z0-9])", command, re.I)):
         result["limitations"].append("the command names a different assembly from the registered hg38 dataset")
@@ -99,6 +111,18 @@ def rewrite(command: str, input_type: str | None) -> dict:
             result["limitations"].append("input list cardinality is not changed to fit one available sample")
         elif previous in OUTPUT_FLAGS and angle and re.search(r"output|prefix|directory", value, re.I):
             target, role = "sample", "output_placeholder"
+        elif ds and i and previous not in OUTPUT_FLAGS and not value.startswith("/data/") and (
+                (previous in REFERENCE_FLAGS and (REFERENCE_PATH.fullmatch(value) or REFERENCE_OTHER_FORM.fullmatch(value)
+                                                  or (angle and re.search(r"reference|genome|fasta|\.fa\b", value, re.I))))
+                or ((REFERENCE_PATH.fullmatch(value) or REFERENCE_OTHER_FORM.fullmatch(value))
+                    and HG38_NAME.search(value.rsplit("/", 1)[-1]))):
+            if not reference_mount:
+                result["limitations"].append("the command reads a reference genome and none is registered for the declared dataset")
+            elif REFERENCE_OTHER_FORM.fullmatch(value):
+                result["limitations"].append("the command reads the reference genome in a form STRhub does not mount (it mounts an uncompressed FASTA with its .fai index)")
+            else:
+                target, role = reference_mount, "reference_path"
+                reference_used = True
         elif i and previous not in OUTPUT_FLAGS and READ_PATH.fullmatch(value) and value != f"/data/in/{canonical}":
             result["limitations"].append("a read-file argument is outside the closed input substitution table")
         if target and role == "read_path":
@@ -107,7 +131,8 @@ def rewrite(command: str, input_type: str | None) -> dict:
             replacement = raw[0] + target + raw[-1] if raw[0] in "'\"" else target
             changes.append((m.start(), m.end(), replacement))
             result["substitutions"].append({"token": i, "original": raw,
-                "replacement": replacement, "role": role, "basis": "declared dataset mount" if role != "output_placeholder" else "explicit output-path placeholder"})
+                "replacement": replacement, "role": role, "basis": {"output_placeholder": "explicit output-path placeholder",
+                                                         "reference_path": "registered reference genome mount"}.get(role, "declared dataset mount")})
     if len(result["read_bindings"]) > 1:
         result["limitations"].append("multiple read inputs cannot be mapped to a single shared sample")
         return result
@@ -118,9 +143,11 @@ def rewrite(command: str, input_type: str | None) -> dict:
     declared_paths = {f"/data/in/{canonical}"} if canonical else set()
     if canonical and (ds or {}).get("format") == "bam":
         declared_paths.add(f"/data/in/{canonical}.bai")
+    if reference_used:
+        declared_paths.add(reference_mount)
     mounted_paths = set(re.findall(r"/data/(?:in|ref)(?:/[\w./-]+)?", rewritten))
     if mounted_paths - declared_paths:
-        result["limitations"].append("the command requires a runner input outside the shared dataset; no reference, catalog or configuration is supplied to fill that path")
+        result["limitations"].append("the command requires a runner input outside the shared dataset; no catalog, regions file or configuration is supplied to fill that path")
     if re.search(r"<[^<>]+>|\b(?:configFile|fastqfile)\b", rewritten, re.I):
         result["limitations"].append("unresolved placeholder; no value was invented")
     return result

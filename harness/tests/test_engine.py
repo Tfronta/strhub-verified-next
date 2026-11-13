@@ -199,7 +199,7 @@ def test_an_unverified_mount_never_launches_the_container(tmp_path):
     assert "run_external" not in fake.kinds()
     assert stage(rec, "io_external")["status"] == "not_run" and stage(rec, "content_external")["status"] == "not_run"
     assert rec["ladder"]["runs"] == "skipped" and rec["outcomes"]["runs_external"] == "failure"
-    assert rec["infra_failure"] == "the mounted dataset provenance check"
+    assert rec["infra_failure"] == "the provenance check of the mounted dataset and reference genome"
 
 
 def test_a_failed_run_is_run_once_and_keeps_its_exit_status(tmp_path):

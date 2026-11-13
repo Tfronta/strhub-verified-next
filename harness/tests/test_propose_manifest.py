@@ -22,7 +22,7 @@ def _valid(manifest_yml, tmp_path):
     return _manifest.load(str(p))  # raises on schema violation
 
 
-def test_hipstr_proposal_preserves_the_documented_fasta_and_read_list(tmp_path):
+def test_hipstr_proposal_preserves_the_read_list_and_mounts_only_the_reference(tmp_path):
     r = pm.build(_proposal("hipstr"), "hipstr-trial")
     m = _valid(r["manifest_yml"], tmp_path)
     assert m["environment"]["source"] == "generated"
@@ -30,8 +30,12 @@ def test_hipstr_proposal_preserves_the_documented_fasta_and_read_list(tmp_path):
     assert not r["procedure"]["install_ready"]
     assert m["inputs"]["type"] == "illumina-bam-hg38"
     assert "run1.bam,run2.bam,run3.bam,run4.bam" in m["run"]["cmd"]
-    assert "--fasta genome.fa" in " ".join(m["run"]["cmd"].split())
+    # The reference genome the README names is STRhub's to supply; the
+    # regions file is not, and stays as written.
+    assert "--fasta /data/ref/hg38.fa" in " ".join(m["run"]["cmd"].split())
     assert "str_regions.bed" in m["run"]["cmd"]
+    assert "documented_file_missing" in r["limitations"]
+    assert not any("genome.fa" in c for c in m["caveats"]["items"] if c.startswith("File:"))
     assert m["run"]["cmd"].startswith("cd '/opt/tool' && touch /tmp/.strhub_mark")
     assert m["outputs"][0] == {"path": "**/*.vcf*", "format": "vcf", "min_records": 1}
     assert "regions" not in m["inputs"]
@@ -84,7 +88,7 @@ def test_recipe_round_trips_through_json():
 
 def test_a_list_of_input_files_is_not_reduced_to_one_available_sample(tmp_path):
     cmd, _ = pm.rewrite_for_strhub("./HipSTR --bams run1.bam,run2.bam,run3.bam --fasta g.fa", "illumina-bam-hg38")
-    assert cmd == "./HipSTR --bams run1.bam,run2.bam,run3.bam --fasta g.fa"
+    assert cmd == "./HipSTR --bams run1.bam,run2.bam,run3.bam --fasta /data/ref/hg38.fa"
 
 
 def test_gangstr_recipe_does_not_manufacture_an_install(tmp_path):

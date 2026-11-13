@@ -22,6 +22,9 @@ and try again.
 1. Nothing in here may force a run: no fallback environments, no recipes
    written by STRhub, no fixes proposed to the author's commands, no
    retries, no regions or reference files the author did not document.
+   A reference genome the author's command names is the one exception to
+   "STRhub supplies only the sample": it is a public, standard file no
+   repository ships, so STRhub mounts it read-only and says so in the report.
 2. The web depends only on what `docs/WEB-CONTRACT.md` says. Change the
    engine and that file in one commit, and the web's fixture test in the
    same step.
@@ -81,6 +84,24 @@ python harness/propose_manifest.py recipe_proposal.json --slug "$TOOL" --ref-lab
 
 ```bash
 python harness/prepare.py "$TOOL" --work work --mode "$MODE" --proposal recipe_proposal.json --plan-out work/plan.json
+```
+
+   Si el comando documentado nombra un genoma de referencia, `prepare.py`
+   imprime `reference_ready=1` con `ref_genome_url`, `ref_genome_md5_url` y
+   `ref_genome_filename`. Solo en ese caso el workflow lo descarga a
+   `work/ref/`, lo coteja con el checksum que publica UCSC, lo indexa y lo
+   deja en caché (son unos 3 GB descomprimido; hace falta `samtools`):
+
+```bash
+mkdir -p work/ref && curl -fsSL -o work/ref/hg38.fa.gz https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz
+```
+
+```bash
+echo "$(curl -fsSL https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/md5sum.txt | awk '$2 == "hg38.fa.gz" {print $1}')  work/ref/hg38.fa.gz" | md5sum -c -
+```
+
+```bash
+gunzip work/ref/hg38.fa.gz && samtools faidx work/ref/hg38.fa
 ```
 
 3. Las compuertas: Available, Installs, el ejemplo del README, la corrida

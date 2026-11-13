@@ -48,11 +48,14 @@ def _check_dataset(input_type) -> None:
         # A canonical name is a filename, never a destination directory.
         if len(_paths.relative(rec["canonical_input"]).parts) != 1:
             raise ValueError("canonical_input must be a filename")
+    rg = rec.get("reference_genome") or {}
+    if rg.get("filename") and len(_paths.relative(rg["filename"]).parts) != 1:
+        raise ValueError("reference genome filename must be a filename")
 
 
 def preflight(m: dict, tool_dir: pathlib.Path, work: pathlib.Path) -> None:
     """All runner-side paths are checked before the first staging effect."""
-    for name in ("proposal", "in_external", "out_external", "out_example", "ctx"):
+    for name in ("proposal", "in_external", "ref", "out_external", "out_example", "ctx"):
         dest = _paths.destination(work, name)
         if dest.is_dir():
             # Includes stale files: staging must not follow a symlink
@@ -169,12 +172,17 @@ def main() -> int:
     # repository's own example reads its files at the original paths in the image.
     external_ready = False
     dataset_name = supported_loci = input_failure = ""
+    reference = {}
     if procedure_ready and input_type:
         try:
             ds = input_provenance.stage(ROOT, work, input_type)
             external_ready = True
             dataset_name = ds["name"]
             supported_loci = ds.get("supported_loci", "")
+            # The reference genome the dataset is aligned to, only when the
+            # reviewed command names it: the workflow then downloads it and
+            # the engine mounts it read-only. Never for a command that does not.
+            reference = input_provenance.reference_for(ds, m["run"]["cmd"]) or {}
         except (ValueError, OSError, KeyError) as exc:
             input_failure = f"shared dataset staging could not be verified: {exc}"
             print(f"::error::{input_failure}", file=sys.stderr)
@@ -207,6 +215,10 @@ def main() -> int:
         "input_type": input_type or "",
         "external_ready": "1" if external_ready else "0",
         "dataset_name": dataset_name,
+        "reference_ready": "1" if reference else "0",
+        "ref_genome_url": reference.get("url", ""),
+        "ref_genome_md5_url": reference.get("md5_url", ""),
+        "ref_genome_filename": reference.get("filename", ""),
         "input_failure": input_failure,
         "supported_loci": supported_loci,
     }

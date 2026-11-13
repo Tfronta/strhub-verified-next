@@ -215,7 +215,7 @@ def installs(ctx: Ctx, available_result: StageResult) -> StageResult:
 # --- Run legs ----------------------------------------------------------------
 
 def _run_leg(ctx: Ctx, name: str, cmd: str, in_dir: pathlib.Path | None,
-             out_dir: pathlib.Path, log: pathlib.Path) -> tuple[int, list[str]]:
+             out_dir: pathlib.Path, log: pathlib.Path, ref_dir: pathlib.Path | None = None) -> tuple[int, list[str]]:
     """One container run, the reviewed command, on one leg's mounts."""
     out_abs = ctx.root / out_dir if not out_dir.is_absolute() else out_dir
     out_abs.mkdir(parents=True, exist_ok=True)
@@ -227,6 +227,9 @@ def _run_leg(ctx: Ctx, name: str, cmd: str, in_dir: pathlib.Path | None,
     if in_dir is not None:
         in_abs = ctx.root / in_dir if not in_dir.is_absolute() else in_dir
         mounts += ["-v", f"{in_abs}:/data/in:ro"]
+    if ref_dir is not None:
+        ref_abs = ctx.root / ref_dir if not ref_dir.is_absolute() else ref_dir
+        mounts += ["-v", f"{ref_abs}:/data/ref:ro"]
     mounts += ["-v", f"{out_abs}:/data/out"]
     argv = ["bash", ctx.harness("run_container.sh"), f"{ctx.container_prefix}_{name}", str(ctx.plan["timeout"]),
             str(log), *HARDENING, *mounts, ctx.image, cmd]
@@ -261,7 +264,8 @@ def check_example(ctx: Ctx) -> StageResult:
 
 
 def runs_external(ctx: Ctx, installs_result: StageResult) -> StageResult:
-    """Runs (external data): the one shared dataset the review admits, run
+    """Runs (external data): the one shared dataset the review admits (and
+    the reference genome it is aligned to, when the command names one), run
     once. Before the container starts, input_provenance.py recomputes the
     mount's provenance from Git and the bytes about to be mounted, and
     checks the launch command against the reviewed one; a difference stops
@@ -281,7 +285,11 @@ def runs_external(ctx: Ctx, installs_result: StageResult) -> StageResult:
         _say(None, said.rstrip())
     if rc != 0:
         return st.finish(rc, prov, input_evidence="unverified", provenance=said.strip())
-    rc, argv = _run_leg(ctx, "external", ctx.plan["cmd"], ctx.work / "in_external", ctx.work / "out_external", log)
+    # The reference genome the dataset is aligned to, read-only, only when
+    # the reviewed command names it (input_provenance checked it is there).
+    ref_dir = ctx.work / "ref" if ctx.ready("reference_ready") else None
+    rc, argv = _run_leg(ctx, "external", ctx.plan["cmd"], ctx.work / "in_external", ctx.work / "out_external", log,
+                        ref_dir=ref_dir)
     return st.finish(rc, argv, input_evidence="verified", mounted_inputs=str(ctx.work / "mounted_inputs.json"))
 
 

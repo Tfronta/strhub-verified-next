@@ -1,6 +1,6 @@
 {
   "schema": "strhub-verified/datasets/1",
-  "description": "Typed reference-dataset library. The engine looks up the one dataset registered for the manifest's inputs.type and mounts it read-only at /data/in under its canonical name, verified by hash. If no entry matches, the external leg is reported N/A (never a failure). Each entry also carries its contract: kit (for FASTQ), chrom_naming and read_length. Nothing else is mounted: no reference genome and no regions file.",
+  "description": "Typed reference-dataset library. The engine looks up the one dataset registered for the manifest's inputs.type and mounts it read-only at /data/in under its canonical name, verified by hash. If no entry matches, the external leg is reported N/A (never a failure). Each entry also carries its contract: kit (for FASTQ), chrom_naming and read_length. A dataset aligned to hg38 also names its reference_genome: the public UCSC FASTA, downloaded and mounted read-only at /data/ref only when the documented command names a reference genome. No regions file is mounted.",
   "datasets": {
     "illumina-str-fastq": {
       "dir": "datasets/illumina-str-fastq",
@@ -22,6 +22,13 @@
       "format": "bam",
       "canonical_input": "input.bam",
       "reference": "hg38",
+      "reference_genome": {
+        "assembly": "GRCh38 / hg38",
+        "url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz",
+        "md5_url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/md5sum.txt",
+        "filename": "hg38.fa",
+        "mount_path": "/data/ref/hg38.fa"
+      },
       "name": "1000 Genomes ONT, hg38 CODIS slice (R10 SUP)",
       "source": "https://s3.amazonaws.com/1000g-ont/index.html?prefix=PROCESSED_DATA/ALIGNED_TO_HG38/MINIMAP2_ALIGNED_BAMS/",
       "license": "Open access (1000 Genomes / HPRC). Research use. STRhub is not the data provider.",
@@ -39,6 +46,13 @@
       "format": "bam",
       "canonical_input": "input.bam",
       "reference": "hg38",
+      "reference_genome": {
+        "assembly": "GRCh38 / hg38",
+        "url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz",
+        "md5_url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/md5sum.txt",
+        "filename": "hg38.fa",
+        "mount_path": "/data/ref/hg38.fa"
+      },
       "name": "GIAB HG002 PacBio HiFi (Revio), hg38 CODIS slice",
       "source": "https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/data/AshkenazimTrio/HG002_NA24385_son/PacBio_HiFi-Revio_20231031/",
       "license": "Open access (GIAB / NIST). Research and educational use. STRhub is not the data provider.",
@@ -55,6 +69,13 @@
       "format": "fastq",
       "canonical_input": "input.fastq",
       "reference": "hg38",
+      "reference_genome": {
+        "assembly": "GRCh38 / hg38",
+        "url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz",
+        "md5_url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/md5sum.txt",
+        "filename": "hg38.fa",
+        "mount_path": "/data/ref/hg38.fa"
+      },
       "name": "1000 Genomes ONT, HG00113 reads over the CODIS panel loci (FASTQ)",
       "source": "https://s3.amazonaws.com/1000g-ont/index.html?prefix=PROCESSED_DATA/ALIGNED_TO_HG38/MINIMAP2_ALIGNED_BAMS/",
       "license": "Open access (1000 Genomes / HPRC). Research use. STRhub is not the data provider.",
@@ -71,6 +92,13 @@
       "format": "bam",
       "canonical_input": "input.bam",
       "reference": "hg38",
+      "reference_genome": {
+        "assembly": "GRCh38 / hg38",
+        "url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz",
+        "md5_url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/md5sum.txt",
+        "filename": "hg38.fa",
+        "mount_path": "/data/ref/hg38.fa"
+      },
       "supported_loci": "datasets/illumina-bam-hg38/loci.bed",
       "loci_count": 24,
       "min_loci": 5,
@@ -89,6 +117,13 @@
       "format": "bam",
       "canonical_input": "input.bam",
       "reference": "hg38",
+      "reference_genome": {
+        "assembly": "GRCh38 / hg38",
+        "url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz",
+        "md5_url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/md5sum.txt",
+        "filename": "hg38.fa",
+        "mount_path": "/data/ref/hg38.fa"
+      },
       "supported_loci": "datasets/illumina-bam-hg38-y/loci.bed",
       "loci_count": 14,
       "min_loci": 5,

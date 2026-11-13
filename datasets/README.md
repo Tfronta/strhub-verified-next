@@ -34,8 +34,11 @@ Illumina BAM, ONT CODIS BAM and FASTQ, PacBio HiFi CODIS BAM). No SNP panels or
 capillary FSA/HID reference data.
 
 **What is mounted:** the one registered dataset for the input type, read-only at
-`/data/in` under its canonical name, verified by hash. No reference genome and no
-regions file are mounted.
+`/data/in` under its canonical name, verified by hash. When the documented command
+names a reference genome and the dataset is aligned to one (`reference_genome` in
+the index: UCSC's hg38), that genome is downloaded, checked against the checksum
+UCSC publishes, indexed and mounted read-only at `/data/ref`. No regions file is
+mounted.
 
 Machine-readable index: `datasets/index.json`. The workflow resolves
 `manifest.inputs.type` → compatible dataset (or **N/A** if none).

@@ -1101,6 +1101,13 @@ def main() -> int:
             report["procedure_review"] = procedure
             report["procedure_validation"] = {"schema": authorization.SCHEMA, "valid": False,
                                               "reason": procedure["reason"]}
+    mounted_reference = (report.get("mounted_inputs") or {}).get("reference")
+    if mounted_reference:
+        # Said with the other things the run needed: the genome is a public
+        # file the documentation names, and it was STRhub that supplied it.
+        report.setdefault("needed_beyond_repo", []).append(
+            f"A reference genome ({mounted_reference.get('assembly') or 'as documented'}): the command "
+            f"names one, and STRhub mounted the public copy at {mounted_reference['mount_path']}.")
     report["verdict"] = verdict_lib.decide(
         gates, diagnostics, proposal, m.get("compatibility"),
         strhub_fault=strhub_fault,

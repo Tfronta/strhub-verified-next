@@ -11,10 +11,12 @@ Two legs come out of one proposal:
   run       the same command with only the substitutions the closed profile
             in fidelity.rewrite admits: the input token becomes the registered
             dataset's canonical mount (/data/in/input.bam,
-            /data/in/sample.fastq). Nothing else is supplied: no reference
-            genome and no regions or catalog file. A command that reads one
-            the repository does not ship is recorded as a limitation and is
-            not run. Outputs are not rewritten: the command runs in the clone
+            /data/in/sample.fastq), and the reference genome the README
+            names becomes the one that dataset is aligned to
+            (/data/ref/hg38.fa, a public file no repository ships). Nothing
+            else is supplied: no regions or catalog file. A command that
+            reads one the repository does not ship is recorded as a
+            limitation and is not run. Outputs are not rewritten: the command runs in the clone
             and whatever it creates is captured, so the tool's own output
             layout is kept.
 
@@ -274,6 +276,11 @@ INPUT_FILE_FLAG = re.compile(r"^--?(?:r|ref|reference|genome|motifs?|catalog|var
                              r"repeats?|db|database|model|library|lib|config|conf|in|input|i|b|bams?|bed|"
                              r"annotation|table|rmsk|microsat)$", re.I)
 DATA_FILE = re.compile(r"\.(?:tsv|txt|json|bed|csv|pa|model|pkl|tab|gz|ini|cfg|conf|config|fa|fasta)$", re.I)
+#: A reference genome is STRhub's to supply (fidelity.rewrite mounts the one
+#: the dataset is aligned to). When it cannot, that is a limitation of the
+#: substitution profile and is recorded there: it is never a file to ask the
+#: tool's author to ship.
+REFERENCE_GENOME_FILE = re.compile(r"\.(?:fa|fasta|fna)(?:\.(?:gz|bgz))?$|\.2bit$", re.I)
 
 
 def check_documented_files(run_cmd: str, proposal: dict, input_type: str,
@@ -281,7 +288,8 @@ def check_documented_files(run_cmd: str, proposal: dict, input_type: str,
     """What the documented command reads that the run cannot give it: a file
     that is neither in the repository at the pinned commit nor the registered
     dataset. STRhub puts nothing in its place; the command is not run and the
-    report says which file."""
+    report says which file. A reference genome is not such a file: it is
+    STRhub's to supply."""
     from prepare import unwrap_example
     cmd, _ = unwrap_example(run_cmd)
     tree = set(proposal.get("tree_paths") or [])
@@ -290,6 +298,8 @@ def check_documented_files(run_cmd: str, proposal: dict, input_type: str,
     for i, t in enumerate(toks):
         path = t.strip("'\"").lstrip("./")
         prev = toks[i - 1] if i else ""
+        if REFERENCE_GENOME_FILE.search(path) and path not in tree:
+            continue
         if (INPUT_FILE_FLAG.match(prev) and DATA_FILE.search(path) and not t.startswith(("/data/", "-"))
                 and path not in tree and "*" not in path):
             caveats.append(f"File: the documented command reads {t} (after {prev}), which is neither in "
@@ -299,7 +309,7 @@ def check_documented_files(run_cmd: str, proposal: dict, input_type: str,
             k, v = path.split("=", 1)
             v_clean = v.strip("'\"").lstrip("./")
             if (INPUT_FILE_FLAG.match(f"--{k.split('_')[-1]}") and DATA_FILE.search(v_clean)
-                    and not v.startswith("/data/") and v_clean not in tree and "*" not in v_clean):
+                    and not REFERENCE_GENOME_FILE.search(v_clean) and not v.startswith("/data/") and v_clean not in tree and "*" not in v_clean):
                 caveats.append(f"File: the documented command reads {v} (in {t}), which is neither in "
                                "the repository nor among STRhub's data.")
                 out.append("documented_file_missing")
