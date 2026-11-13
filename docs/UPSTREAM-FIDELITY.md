@@ -60,14 +60,15 @@ The generic Dockerfile generator has therefore been removed. This also removes
 its generic packages, HTTPS protocol rewrites, symlinks, library-path changes,
 tolerated submodule failures and generated fallback installations.
 
-The original installation profile admits an **upstream Dockerfile**, unchanged, with a cited literal
-`docker build` command using repository-root context. The supported build
-arguments are an optional literal Dockerfile and image tag; other arguments,
-contexts or submodule setups are evaluator limits. The evaluator's local image
-tag is an output identifier, not a build-argument override. Duplicate or invalid
-tag/file options are not silently fixed.
+**A Dockerfile shipped in the repository is never built.** It is arbitrary code
+its author wrote for their own machines, and building it would hand the
+evaluator's build to it. An earlier profile admitted an upstream Dockerfile with
+a cited `docker build` line; it was removed on 2026-11-13. The repository's
+Dockerfile is still read as evidence of what the repository holds. The only
+admitted installation is the literal source transcript of
+`docs/SOURCE-INSTALLATION.md`, built inside a carrier the evaluator writes.
 
-After checkout, before Docker, the source documents and Dockerfile are checked
+After checkout, before Docker, the source documents and the Makefile are checked
 against their recorded SHA-256 digests. A mismatch or read failure stops the
 build as an evaluator evidence failure. No parent-context inference, recursive
 submodule update, ignored checkout failure or build-argument override is used.

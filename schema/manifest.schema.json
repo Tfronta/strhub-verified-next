@@ -55,8 +55,7 @@
           "items": { "type": "string" },
           "description": "OS targets the attestation is scoped to, e.g. ['ubuntu-22.04']. Honesty matters: only claim what you test."
         },
-        "source": { "type": "string", "enum": ["generated", "repository", "documented"], "description": "Where the container definition came from: 'generated' for a descriptor with no proven installation (never built), 'repository' for an unchanged upstream Dockerfile, 'documented' for a fixed evaluator carrier transcribing a separately verified complete source-installation block. A source label alone never authorizes execution." },
-        "from_repo": { "$ref": "#/$defs/relativePath", "description": "With source 'repository': path of the Dockerfile inside the repository. The engine clones the repository at the pinned ref and builds it with the clone as context; the run then uses the image's own entrypoint and working directory." }
+        "source": { "type": "string", "enum": ["generated", "documented"], "description": "Where the container definition came from: 'documented' for the fixed evaluator carrier transcribing a separately verified, complete source-installation block; 'generated' for a descriptor with no proven installation (never built). A Dockerfile shipped in the repository is never built. A source label alone never authorizes execution." }
       }
     },
     "run": {

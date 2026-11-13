@@ -17,9 +17,7 @@ def validate(data: dict) -> dict:
         raise RuntimeError("jsonschema is required; manifest validation cannot be skipped") from exc
     jsonschema.validate(data, json.loads(SCHEMA.read_text()))
     env = data["environment"]
-    for value in (env["dockerfile"], env.get("from_repo")):
-        if value is not None:
-            _paths.relative(value)
+    _paths.relative(env["dockerfile"])
     return data
 
 

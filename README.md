@@ -155,7 +155,7 @@ python harness/generate_pdf.py --manifest work/proposal/manifest.yml --publishab
    artifact, vuelve a correr la compuerta, coloca el reporte en un clon de
    `gh-pages` y regenera el índice. Los pasos 1 a 7 corren en el job
    `verify`, cuyo token solo puede leer este repositorio: es el que ejecuta
-   código del autor (su Dockerfile, su Makefile, la herramienta). `publish`
+   código del autor (su Makefile, la herramienta). `publish`
    es el único con permiso de escritura y no ejecuta nada del autor.
 
 ```bash

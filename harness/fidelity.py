@@ -189,97 +189,36 @@ def example_citation(proposal: dict, manifest: dict) -> dict | None:
 
 
 def installation(proposal: dict, manifest: dict) -> dict:
-    """Review an upstream Dockerfile or a separately versioned source transcript.
+    """Review the one installation this evaluator admits: a separately
+    versioned, literal source transcript (harness/source_install.py).
 
-    A Makefile, package name or release link alone is discovery evidence, not proof
-    of every dependency, compiler option and environment setting we might add.
+    A Dockerfile in the repository is never built. It is arbitrary code its
+    author wrote for their own machines, and building it would hand the
+    evaluator's build to it. A Makefile, package name or release link alone is
+    discovery evidence, not proof of every dependency, compiler option and
+    environment setting we might add.
     """
     env, build = manifest.get("environment") or {}, proposal.get("build") or {}
     if env.get("source") == "documented":
         import source_install
         return source_install.installation(proposal, manifest)
-    ready = (env.get("source") == "repository" and build.get("method") == "dockerfile"
-             and bool(env.get("from_repo")) and env.get("from_repo") == build.get("file")
-             and re.fullmatch(r"[0-9a-f]{40}", str(proposal.get("ref") or ""))
-             and (manifest.get("source") or {}).get("ref") == proposal.get("ref")
-             and (manifest.get("source") or {}).get("repo") == proposal.get("repo"))
-    result = {"profile": PROFILE, "ready": False, "method": build.get("method", "unknown"),
-            "source_file": env.get("from_repo"),
-            "reason": "This evaluator has no proven installation profile for this recipe; no dependencies, compiler options or environment fixes may be supplied by STRhub."}
-    if not ready or ".gitmodules" in (proposal.get("tree_paths") or []):
-        return result
-    content = (proposal.get("upstream_files") or {}).get(env["from_repo"])
-    if not isinstance(content, str) or not content.strip():
-        return result
-    for doc in proposal.get("source_documents") or []:
-        if doc.get("origin") == "wiki":
-            continue
-        for number, line in literal_lines(doc.get("text") or ""):
-            try:
-                args = shlex.split(line)
-            except ValueError:
-                continue
-            if args[:2] != ["docker", "build"] or any(c in line for c in "$`;&|<>\\\n"):
-                continue
-            # Root context, optional literal Dockerfile and tag. Unknown build
-            # arguments/contexts are limits, never silently dropped or guessed.
-            options, i, filename, valid, seen = args[2:], 0, "Dockerfile", True, set()
-            while i < len(options) - 1:
-                if options[i] not in ("-f", "--file", "-t", "--tag") or i + 1 >= len(options) - 1:
-                    valid = False
-                    break
-                if options[i] in ("-f", "--file"):
-                    if "file" in seen:
-                        valid = False
-                    filename = options[i + 1]
-                    seen.add("file")
-                else:
-                    if "tag" in seen or not re.fullmatch(r"[a-z0-9]+(?:[._/-][a-z0-9]+)*(?::[A-Za-z0-9_][A-Za-z0-9_.-]{0,127})?", options[i + 1]):
-                        valid = False
-                    seen.add("tag")
-                i += 2
-            candidate = {"cmd": line.strip(), "file": doc["file"], "line": number}
-            citation = cite(proposal, candidate)
-            if valid and options[-1:] == ["."] and filename.removeprefix("./") == env["from_repo"] and citation["verified"]:
-                result.update(ready=True, citation=citation, documented_command=line.strip(),
-                              dockerfile_sha256=digest(content), context=".",
-                              reason="Build the cited upstream Dockerfile unchanged, in the documented root context, with no generated installation steps or build-argument overrides.")
-                return result
-    return result
+    reason = ("This evaluator has no proven installation profile for this recipe; no dependencies, "
+              "compiler options or environment fixes may be supplied by STRhub.")
+    if build.get("method") == "dockerfile":
+        reason += " A Dockerfile shipped in the repository is not built."
+    return {"profile": PROFILE, "ready": False, "method": build.get("method", "unknown"), "reason": reason}
 
 
 def image_invocation_supported(proposal: dict, installation_review: dict | None = None) -> bool:
-    """Do not replace ENTRYPOINT or add shell options the image did not state."""
+    """The only image is the evaluator's own carrier around the cited
+    transcript, whose entrypoint is fixed; anything else is not run."""
     import source_install
-    if installation_review and installation_review.get("profile") == source_install.PROFILE:
-        return bool(installation_review.get("ready") and source_install.discover(proposal) == installation_review)
-    filename = (proposal.get("build") or {}).get("file")
-    text = (proposal.get("upstream_files") or {}).get(filename, "")
-    # Decline heredocs, alternate escaping and multiple stages rather than
-    # mistake text inside RUN (or an earlier stage) for the final entrypoint.
-    if "<<" in text or re.search(r"^\s*#\s*escape\s*=", text, re.I | re.M):
-        return False
-    instructions, pending = [], ""
-    for raw in text.splitlines():
-        line = raw.strip()
-        if not line or line.startswith("#"):
-            continue
-        if line.endswith("\\"):
-            pending += line[:-1] + " "
-        else:
-            instructions.append(pending + line)
-            pending = ""
-    entries = [line.split(None, 1)[1] for line in instructions if re.match(r"ENTRYPOINT\s", line, re.I)]
-    if pending or len(entries) != 1 or sum(bool(re.match(r"FROM\s", line, re.I)) for line in instructions) != 1:
-        return False
-    try:
-        return json.loads(entries[-1]) == ["/bin/bash", "-lc"]
-    except ValueError:
-        return False
+    return bool(installation_review and installation_review.get("profile") == source_install.PROFILE
+                and installation_review.get("ready") and source_install.discover(proposal) == installation_review)
 
 
 def verify_checkout(root, review: dict, manifest: dict | None = None) -> None:
-    """Check the documents and Dockerfile against the actual pinned checkout."""
+    """Check the cited documents and source against the actual pinned checkout."""
     import _paths
     import authorization
     checked = authorization.validate(review, manifest)
@@ -290,14 +229,11 @@ def verify_checkout(root, review: dict, manifest: dict | None = None) -> None:
     if review.get("profile") != PROFILE or not install.get("ready"):
         raise ValueError("no proven installation profile; Docker must not run")
     import source_install
-    if install.get("profile") == source_install.PROFILE:
-        source_install.verify_checkout(root, install)
-        citations = (review.get("command_review") or {}).get("citations") or []
-        checks = [(c.get("path"), c.get("document_sha256")) for c in citations]
-    else:
-        checks = [(install.get("source_file"), install.get("dockerfile_sha256"))]
-        citations = [install.get("citation") or {}] + ((review.get("command_review") or {}).get("citations") or [])
-        checks += [(c.get("path"), c.get("document_sha256")) for c in citations]
+    if install.get("profile") != source_install.PROFILE:
+        raise ValueError("no proven installation profile; Docker must not run")
+    source_install.verify_checkout(root, install)
+    citations = (review.get("command_review") or {}).get("citations") or []
+    checks = [(c.get("path"), c.get("document_sha256")) for c in citations]
     example = example_citation(review["evidence"]["proposal"], manifest) if review["may_say_runs"] else None
     if example:
         checks.append((example["path"], example["document_sha256"]))

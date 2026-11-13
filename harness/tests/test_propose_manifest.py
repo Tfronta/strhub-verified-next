@@ -44,13 +44,18 @@ def test_hipstr_proposal_preserves_the_read_list_and_mounts_only_the_reference(t
     assert "example" not in m  # README shows placeholders, not shipped data
 
 
-def test_strsearch_uses_the_repository_dockerfile_and_its_example(tmp_path):
+def test_a_dockerfile_in_the_repository_is_not_an_install_strhub_builds(tmp_path):
+    """STRsearch ships a Dockerfile. It is the author's, written for the
+    author's machines, and building it would hand the evaluator's build to
+    arbitrary code: it is read as evidence and never built."""
     r = pm.build(_proposal("strsearch"), "strsearch-trial")
     m = _valid(r["manifest_yml"], tmp_path)
-    assert m["environment"]["source"] == "repository"
-    assert m["environment"]["from_repo"] == "Dockerfile"
+    assert m["environment"] == {"dockerfile": "Dockerfile", "os": ["ubuntu-22.04"], "source": "generated"}
+    assert r["dockerfile"].endswith("FROM scratch\n")
+    assert "install_profile_unsupported" in r["limitations"]
+    assert not r["procedure"]["install_ready"] and not r["procedure"]["may_say_runs"]
+    assert any("does not build a Dockerfile" in c for c in m["caveats"]["items"])
     assert m["example"]["cmd"].startswith("python3 pipeline.py from_")
-    assert m["example"]["cwd"] == "."
     assert any("hg19" in c for c in m["caveats"]["items"])
 
 

@@ -2,7 +2,7 @@
 write executes nothing of the stranger's.
 
 Installing and running a tool as its author documents means running the
-author's Dockerfile, Makefile and program. That happens in `verify`, whose
+author's Makefile and program. That happens in `verify`, whose
 token only reads. `publish` holds the one write permission (gh-pages) and
 handles the report as data."""
 import json

@@ -21,6 +21,7 @@ from engine import stages
 from engine.executor import Executor
 from engine.record import StageResult
 
+from procedure_context import MAKEFILE, document, line_of
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 MOUNT = "/data/ref/hg38.fa"
 CITED = "tool --reads x.bam --fasta genome.fa --output out.vcf"
@@ -28,17 +29,18 @@ DOCKERFILE = 'FROM scratch\nENTRYPOINT ["/bin/bash", "-lc"]\n'
 
 
 def case(cited=CITED):
-    doc = f"# Tool\n```sh\ndocker build -t upstream .\n{cited}\n```\n"
+    cited = cited
+    doc = document(cited)
     source = {"repo": "https://github.com/example/tool", "ref": "a" * 40}
-    proposal = {**source, "build": {"method": "dockerfile", "file": "Dockerfile"},
-                "commands": [{"cmd": cited, "file": "README.md", "line": 4, "origin": "readme"}],
-                "source_documents": [{"file": "README.md", "origin": "readme", "text": doc}],
-                "upstream_files": {"Dockerfile": DOCKERFILE}, "tree_paths": ["Dockerfile", "README.md"]}
+    proposal = {**source, "build": {"method": "make", "file": "Makefile"},
+        "commands": [{"cmd": cited, "file": "README.md", "line": line_of(doc, cited), "origin": "readme"}],
+        "source_documents": [{"file": "README.md", "origin": "readme", "text": doc}],
+        "upstream_files": {"Makefile": MAKEFILE}, "tree_paths": ["Makefile", "README.md"], "tree_truncated": False}
     manifest = {"tool": {"name": "Tool", "version": "test"}, "source": source,
-                "environment": {"source": "repository", "from_repo": "Dockerfile", "dockerfile": "Dockerfile"},
-                "inputs": {"type": "illumina-bam-hg38"},
-                "run": {"cmd": prepare.example_wrapper(fidelity.rewrite(cited, "illumina-bam-hg38")["command"], ".")},
-                "outputs": [{"path": "out.vcf", "format": "vcf", "min_records": 1}]}
+        "environment": {"source": "documented", "dockerfile": "Dockerfile", "os": ["ubuntu-22.04"]},
+        "inputs": {"type": "illumina-bam-hg38"},
+        "run": {"cmd": prepare.example_wrapper(fidelity.rewrite(cited, "illumina-bam-hg38")["command"], ".")},
+        "outputs": [{"path": "out.vcf", "format": "vcf", "min_records": 1}]}
     return proposal, manifest
 
 

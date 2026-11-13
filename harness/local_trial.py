@@ -233,11 +233,10 @@ def upstream_build_command(manifest: dict, review: dict, checkout: pathlib.Path,
         raise ValueError("checkout is not the cited immutable commit")
     fidelity.verify_checkout(checkout, review, manifest)
     import source_install
-    if review["installation"].get("profile") == source_install.PROFILE:
-        path = checkout.parent / "source-install.Dockerfile"
-        source_install.materialise(checkout, review["installation"], path)
-    else:
-        path = _paths.confined(checkout, manifest["environment"]["from_repo"])
+    if review["installation"].get("profile") != source_install.PROFILE:
+        raise ValueError("no proven installation profile; Docker must not run")
+    path = checkout.parent / "source-install.Dockerfile"
+    source_install.materialise(checkout, review["installation"], path)
     return ["docker", "build", "-f", str(path), "-t", tag, str(checkout)]
 
 

@@ -102,7 +102,11 @@ are for:
   the web drafts for the author. **Never again:** `self_fix`,
   `self_fix_text` (removed in ca612d9).
 - `step1`: the documented run as the headline: `{ code, headline, body, missing, missing_text, guide }`
-- `environment`: `{ dockerfile?, os?, source? }`. **Never again:**
+- `environment`: `{ dockerfile?, os?, source? }`; `source` is `documented`
+  (the evaluator's carrier around the cited install block) or `generated`
+  (no proven install; nothing was built). **Never again:** `source:
+  repository` and `from_repo` (a Dockerfile shipped in the repository is
+  never built; removed 2026-11-13). **Never again:**
   `environment.fallback`, `fallback_used` (removed in df57a78).
 - `install_detail`: `{ passed?, diagnostics?, faults? }` — why the build failed
 - `io_detail`, `content_detail`, `datasets`, `run`: what the run read and wrote

@@ -20,7 +20,7 @@ environment:
   - ubuntu-22.04
   source: generated
 run:
-  cmd: cd '/opt/tool' && touch /tmp/.strhub_mark && ( ./HipSTR --bams          run1.bam,run2.bam,run3.bam,run4.bam --fasta         genome.fa --regions       str_regions.bed --str-vcf       str_calls.vcf.gz ); rc=$?; find . -xdev -type f -newer /tmp/.strhub_mark -size +0 ! -path './.git/*' ! -path './proc/*' ! -path './sys/*' ! -path './dev/*' ! -path './data/*' ! -path '*/__pycache__/*' ! -name '*.pyc' ! -name '*.pyo' 2>/dev/null | head -500 | while IFS= read -r f; do mkdir -p "/data/out/$(dirname "$f")" && cp "$f" "/data/out/$f"; done; exit $rc
+  cmd: cd '/opt/tool' && touch /tmp/.strhub_mark && ( ./HipSTR --bams          run1.bam,run2.bam,run3.bam,run4.bam --fasta         /data/ref/hg38.fa --regions       str_regions.bed --str-vcf       str_calls.vcf.gz ); rc=$?; find . -xdev -type f -newer /tmp/.strhub_mark -size +0 ! -path './.git/*' ! -path './proc/*' ! -path './sys/*' ! -path './dev/*' ! -path './data/*' ! -path '*/__pycache__/*' ! -name '*.pyc' ! -name '*.pyo' 2>/dev/null | head -500 | while IFS= read -r f; do mkdir -p "/data/out/$(dirname "$f")" && cp "$f" "/data/out/$f"; done; exit $rc
   timeout_minutes: 20
 inputs:
   type: illumina-bam-hg38
@@ -33,6 +33,7 @@ caveats:
   items:
   - 'Environment: no proven installation profile; STRhub did not manufacture installation steps.'
   - 'Input: the README documents BAM (line 69); this plan selects STRhub''s illumina-bam-hg38 reference data.'
+  - 'reference_path: genome.fa -> /data/ref/hg38.fa.'
   - 'Evaluator limitation: input list cardinality is not changed to fit one available sample.'
   - 'Run command: the README''s own command, rewritten to STRhub''s mounts; the capture wrapper is planned only if the procedure review passes.'
   - 'File: the documented command reads str_regions.bed (after --regions), which is neither in the repository nor among STRhub''s data.'

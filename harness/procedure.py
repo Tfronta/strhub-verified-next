@@ -32,9 +32,8 @@ import fidelity  # noqa: E402
 
 # Discovery families are not execution permissions. Only the versioned
 # installation profile can establish a citable installation.
-CITABLE_INSTALL = {"dockerfile"}
-PACKABLE_FROM_REPO = CITABLE_INSTALL | {
-    "conda", "pip", "cmake", "make", "autotools", "cargo", "go", "r", "nim", "script", "release_binary",
+PACKABLE_FROM_REPO = {
+    "dockerfile", "conda", "pip", "cmake", "make", "autotools", "cargo", "go", "r", "nim", "script", "release_binary",
 }
 PUBLISHED_INSTALL = {"docker_image", "bioconda"}
 
@@ -83,7 +82,7 @@ def classify(proposal: dict, manifest: dict, limitations: list[str],
     build = proposal.get("build") or {}
     method = build.get("method") or "unknown"
     source = (manifest.get("environment") or {}).get("source")
-    citable = method in CITABLE_INSTALL and (method != "dockerfile" or source == "repository")
+    citable = False
     published = method in PUBLISHED_INSTALL
 
     cited = ""

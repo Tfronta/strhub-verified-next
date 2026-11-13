@@ -20,10 +20,10 @@ SHA = "a" * 40
 def base_plan(**over):
     p = {
         "tool": "x", "ref": SHA, "repo": "https://github.com/o/Tool",
-        "procedure_ready": "1", "install_ready": "1", "installation_profile": "",
+        "procedure_ready": "1", "install_ready": "1", "installation_profile": stages.SOURCE_INSTALL_PROFILE,
         "example_ready": "0", "example_cmd": "",
         "cmd": "tool --reads /data/in/input.bam --output result.vcf",
-        "dockerdir": "work/proposal", "dockerfile": "Dockerfile", "dockerfile_from_repo": "Dockerfile",
+        "dockerdir": "work/proposal", "dockerfile": "Dockerfile",
         "timeout": "20", "step_timeout": "23", "manifest": "work/proposal/manifest.yml",
         "mode": "trial", "input_type": "illumina-bam-hg38",
         "external_ready": "1", "dataset_name": "ds", "input_failure": "",
@@ -115,16 +115,19 @@ def test_the_order_the_conditions_and_the_commands_are_the_workflows(tmp_path):
         "runs_external", "io_external", "content_external",
     ]
     assert all(s["status"] == "passed" for s in rec["stages"])
-    # Installs: the clone at the pinned ref, the path and evidence checks, then ONE build.
-    assert fake.kinds()[:9] == ["git_ls-remote", "git_init", "git_fetch", "git_cat-file",
-                                "git_clone", "git_checkout", "git_rev-parse", "git_rev-parse", "_paths"]
-    assert fake.kinds()[9] == "fidelity" and fake.kinds().count("docker_build") == 1
+    # Installs: the clone at the pinned ref, the evidence check, then ONE build
+    # of the evaluator's own carrier. Never a Dockerfile from the clone.
+    assert fake.kinds()[:8] == ["git_ls-remote", "git_init", "git_fetch", "git_cat-file",
+                                "git_clone", "git_checkout", "git_rev-parse", "git_rev-parse"]
+    assert fake.kinds()[8] == "fidelity" and fake.kinds().count("docker_build") == 1
+    carrier = str(tmp_path / "work" / "source-install.Dockerfile")
     fid = next(c for c in fake.calls if pathlib.Path(c[1]).stem == "fidelity")
     assert fid[2:] == ["--checkout", "work/ctx/Tool", "--review", "work/procedure_review.json",
-                       "--manifest", "work/proposal/manifest.yml"]
+                       "--manifest", "work/proposal/manifest.yml", "--source-install-dockerfile", carrier]
     build = next(c for c in fake.calls if c[0] == "bash" and c[1].endswith("record_terminal.sh"))
-    assert build[2:] == ["work/log_build.txt", "docker", "build", "-f", "work/ctx/Tool/Dockerfile",
+    assert build[2:] == ["work/log_build.txt", "docker", "build", "-f", carrier,
                          "-t", "toolimg:ci", "work/ctx/Tool"]
+    assert not build[build.index("-f") + 1].startswith("work/ctx/")
     assert "--build-arg" not in build and "submodule" not in " ".join(fake.kinds())
     assert stage(rec, "installs")["outputs"] == {"source_evidence": "verified", "environment": "primary"}
     # The external leg: provenance first, then one container on the verified mount.
@@ -147,20 +150,18 @@ def test_the_order_the_conditions_and_the_commands_are_the_workflows(tmp_path):
     assert [l["leg"] for l in rec["matrix"]] == ["external", "example"]
 
 
-def test_a_source_install_profile_builds_the_verified_carrier_from_work(tmp_path):
+def test_a_dockerfile_in_the_repository_is_never_what_is_built(tmp_path):
+    """Whatever the plan says about a Dockerfile of the repository's, the
+    engine has no path that hands one to `docker build`."""
     fake = Fake(tmp_path)
-    rec = go(tmp_path, base_plan(dockerfile_from_repo="", installation_profile=stages.SOURCE_INSTALL_PROFILE), fake)
-    fid = next(c for c in fake.calls if pathlib.Path(c[1]).stem == "fidelity")
-    carrier = str(tmp_path / "work" / "source-install.Dockerfile")
-    assert fid[-2:] == ["--source-install-dockerfile", carrier] and "_paths" not in fake.kinds()
-    build = next(c for c in fake.calls if c[1].endswith("record_terminal.sh"))
-    assert build[build.index("-f") + 1] == carrier and build[-1] == "work/ctx/Tool"
-    assert stage(rec, "installs")["status"] == "passed"
+    rec = go(tmp_path, base_plan(dockerfile_from_repo="Dockerfile", installation_profile=""), fake)
+    assert stage(rec, "installs")["status"] == "failed"
+    assert "git_clone" not in fake.kinds() and "docker_build" not in fake.kinds()
 
 
 def test_no_proven_installation_is_refused_before_git_and_docker(tmp_path):
     fake = Fake(tmp_path)
-    rec = go(tmp_path, base_plan(dockerfile_from_repo="", installation_profile=""), fake)
+    rec = go(tmp_path, base_plan(installation_profile=""), fake)
     ins = stage(rec, "installs")
     assert ins["status"] == "failed" and ins["exit_code"] == 1 and ins["command"] is None
     assert ins["outputs"] == {"source_evidence": "unverified"}

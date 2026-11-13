@@ -17,7 +17,7 @@ CASES = json.loads((pathlib.Path(__file__).parents[1] / "testdata/input_path_cas
 
 @pytest.mark.parametrize("case", CASES)
 def test_manifest_path_contract(case):
-    for field in ("dockerfile", "from_repo"):
+    for field in ("dockerfile",):
         m = manifest()
         m["environment"][field] = case["path"]
         if case["valid"]:

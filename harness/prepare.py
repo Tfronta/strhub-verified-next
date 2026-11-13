@@ -201,10 +201,6 @@ def main() -> int:
         "cmd": m["run"]["cmd"],
         "dockerdir": tool_dir.relative_to(ROOT) if tool_dir.is_relative_to(ROOT) else tool_dir,
         "dockerfile": m["environment"]["dockerfile"],
-        # Set when the repository ships its own Dockerfile: the Installs step then
-        # clones the repository and builds that file with the clone as context,
-        # and the run legs use the image's own entrypoint.
-        "dockerfile_from_repo": (m["environment"].get("from_repo") or "") if m["environment"].get("source") == "repository" else "",
         "timeout": min(int(m["run"].get("timeout_minutes", 30)), 120),
         # The step's own ceiling, a little above the run's: harness/run_container.sh
         # enforces `timeout` and writes why into the log; this is only a backstop.

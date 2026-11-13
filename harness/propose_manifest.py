@@ -162,21 +162,12 @@ def build(proposal: dict, slug: str, submitted_by: str = "third_party",
             input_note = (f"Input: no sentence in the README says what the tool takes; "
                           f"{input_type} is only a guess from mentions; it is not authorization to execute.")
             limitations.append("input_type_guessed")
-    from_repo = build_info.get("method") == "dockerfile"
     caveat_items: list[str] = []
     import source_install
-    source_plan = source_install.discover(proposal) if not from_repo else {"ready": False}
+    source_plan = source_install.discover(proposal)
 
     # --- environment
-    if from_repo:
-        dockerfile_text = (f"# The repository ships its own Dockerfile ({build_info['file']}); the engine\n"
-                           "# builds that one with the repository at the pinned ref as context.\n")
-        env = {"dockerfile": "Dockerfile", "os": ["ubuntu-22.04"], "source": "repository",
-               "from_repo": build_info["file"]}
-        cwd = "."
-        caveat = f"Environment: the repository's own {build_info['file']} is selected as-is, subject to the evidence check."
-        caveat_items.append(caveat)
-    elif source_plan["ready"]:
+    if source_plan["ready"]:
         # One generic transcript: no tool names, prior results or package guesses.
         dockerfile_text = source_plan["carrier_dockerfile"]
         env = {"dockerfile": "Dockerfile", "os": ["ubuntu-22.04"], "source": "documented"}
@@ -189,7 +180,8 @@ def build(proposal: dict, slug: str, submitted_by: str = "third_party",
         cwd = "/opt/tool"
         limitations.append("install_method_unknown" if build_info.get("method") == "unknown"
                            else "install_profile_unsupported")
-        caveat_items.append("Environment: no proven installation profile; STRhub did not manufacture installation steps.")
+        caveat_items.append("Environment: no proven installation profile; STRhub did not manufacture installation steps."
+                            + (" STRhub does not build a Dockerfile shipped in a repository." if build_info.get("method") == "dockerfile" else ""))
 
     # --- the command
     best = commands[0]["cmd"] if commands else ""
@@ -241,7 +233,7 @@ def build(proposal: dict, slug: str, submitted_by: str = "third_party",
     ex = proposal.get("example")
     if ex and ex.get("cmd"):
         # Executable paths are part of the cited procedure, never rewritten.
-        ex_cwd = "." if from_repo else (ex.get("cwd") or cwd)
+        ex_cwd = "." if source_plan["ready"] else (ex.get("cwd") or cwd)
         manifest["example"] = {"cmd": ex["cmd"], "cwd": ex_cwd, "source": "detected"}
     # Nothing to run on at all: no STRhub data for the input type and no
     # example in the repository. Every run leg is then N/A, and a verdict read

@@ -10,19 +10,31 @@ import fidelity
 import prepare
 
 COMMAND = 'tool --reads sample.bam --output result.vcf'
-DOCKERFILE = 'FROM scratch\nENTRYPOINT ["/bin/bash", "-lc"]\n'
+INSTALL_BLOCK = "apt-get update\napt-get install -y make g++\nmake"
+MAKEFILE = "all:\n\t$(CXX) main.cpp -o tool\n"
+
+
+def document(command):
+    """A README with the one installation section the source profile admits
+    and the command, each on its own cited line."""
+    return ("# Tool\n\n## Installation (Ubuntu 22.04)\n\n```sh\n" + INSTALL_BLOCK
+            + "\n```\n\n## Usage\n\n```sh\n" + command + "\n```\n")
+
+
+def line_of(text, command):
+    return next(i for i, row in enumerate(text.splitlines(), 1) if row == command)
 
 
 def context(proposal_fields=None, manifest_fields=None):
     source = {"repo": "https://github.com/example/tool", "ref": "a" * 40}
-    document = '# Tool\n```sh\ndocker build -t upstream .\n' + COMMAND + '\n```\n'
-    p = {**source, "build": {"method": "dockerfile", "file": "Dockerfile"},
-         "commands": [{"cmd": COMMAND, "file": "README.md", "line": 4, "origin": "readme"}],
-         "source_documents": [{"file": "README.md", "origin": "readme", "text": document}],
-         "upstream_files": {"Dockerfile": DOCKERFILE}, "tree_paths": ["Dockerfile", "README.md"]}
+    doc = document(COMMAND)
+    p = {**source, "build": {"method": "make", "file": "Makefile"},
+         "commands": [{"cmd": COMMAND, "file": "README.md", "line": line_of(doc, COMMAND), "origin": "readme"}],
+         "source_documents": [{"file": "README.md", "origin": "readme", "text": doc}],
+         "upstream_files": {"Makefile": MAKEFILE}, "tree_paths": ["Makefile", "README.md"], "tree_truncated": False}
     p.update(copy.deepcopy(proposal_fields or {}))
     m = {"tool": {"name": "Example", "version": "test"}, "source": source,
-         "environment": {"source": "repository", "from_repo": "Dockerfile", "dockerfile": "Dockerfile"},
+         "environment": {"source": "documented", "dockerfile": "Dockerfile", "os": ["ubuntu-22.04"]},
          "inputs": {"type": "illumina-bam-hg38"},
          "run": {"cmd": prepare.example_wrapper(fidelity.rewrite(COMMAND, "illumina-bam-hg38")["command"], ".")},
          "outputs": [{"path": "result.vcf", "format": "vcf", "min_records": 1}]}

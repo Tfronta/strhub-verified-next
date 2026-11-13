@@ -48,7 +48,7 @@ on:
 
 # Granted per job, to the least it needs. Two jobs, on two machines, because
 # installing and running a stranger's tool means executing a stranger's code
-# (a Dockerfile, a Makefile, the tool itself):
+# (its Makefile, the tool itself; a Dockerfile it ships is never built):
 #
 #   verify   reads the repository, builds, runs and writes the report. Its
 #            token can only READ this repository. Nothing on that machine can

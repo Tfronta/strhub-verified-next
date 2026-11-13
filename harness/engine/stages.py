@@ -76,10 +76,6 @@ class Ctx:
     def manifest(self) -> str:
         return self.plan["manifest"]
 
-    @property
-    def from_repo(self) -> str:
-        return self.plan.get("dockerfile_from_repo") or ""
-
     def ready(self, key: str) -> bool:
         return str(self.plan.get(key, "")) == "1"
 
@@ -146,8 +142,9 @@ def available(ctx: Ctx) -> StageResult:
 
 def installs(ctx: Ctx, available_result: StageResult) -> StageResult:
     """`docker build`, once, of the one environment the review admits: the
-    repository's own Dockerfile at the pinned ref, or the literal
-    source-installation transcript it cites. Before Docker, the checkout is
+    evaluator's own carrier around the literal source-installation
+    transcript the repository cites. A Dockerfile in the repository is never
+    built. Before Docker, the checkout is
     compared with the reviewed evidence; a difference stops the gate with
     `source_evidence: unverified`, which the report counts as STRhub's
     inability to establish the procedure, never as the tool failing."""
@@ -160,7 +157,7 @@ def installs(ctx: Ctx, available_result: StageResult) -> StageResult:
     st = StageResult.start("installs", log)
     outputs: dict = {"source_evidence": "unverified"}
     profile = ctx.plan.get("installation_profile") or ""
-    if not ctx.from_repo and profile != SOURCE_INSTALL_PROFILE:
+    if profile != SOURCE_INSTALL_PROFILE:
         _say(log, "::error::no proven upstream installation")
         return st.finish(1, None, **outputs)
     # Obtain the immutable source once for either supported profile. Each
@@ -183,21 +180,15 @@ def installs(ctx: Ctx, available_result: StageResult) -> StageResult:
         return st.finish(1, ["git", "-C", str(src), "rev-parse", "HEAD"], **outputs)
     review = str(ctx.work / "procedure_review.json")
     context = src
-    if ctx.from_repo:
-        docker_dir, docker_file = src, ctx.from_repo
-        checks = [
-            [ctx.python, ctx.harness("_paths.py"), str(src), docker_file],
-            [ctx.python, ctx.harness("fidelity.py"), "--checkout", str(src), "--review", review,
-             "--manifest", ctx.manifest],
-        ]
-    else:
-        # Re-derive every command from checked source bytes. Never build a
-        # submitted or generated descriptor, never select packages by name.
-        docker_dir, docker_file = ctx.work_abs, SOURCE_INSTALL_DOCKERFILE
-        checks = [
-            [ctx.python, ctx.harness("fidelity.py"), "--checkout", str(src), "--review", review,
-             "--manifest", ctx.manifest, "--source-install-dockerfile", str(docker_dir / docker_file)],
-        ]
+    # Re-derive every command from checked source bytes. Never build a
+    # Dockerfile the repository ships, a submitted or generated descriptor,
+    # and never select packages by name: the only file handed to `docker
+    # build` is the evaluator's own carrier around the cited transcript.
+    docker_dir, docker_file = ctx.work_abs, SOURCE_INSTALL_DOCKERFILE
+    checks = [
+        [ctx.python, ctx.harness("fidelity.py"), "--checkout", str(src), "--review", review,
+         "--manifest", ctx.manifest, "--source-install-dockerfile", str(docker_dir / docker_file)],
+    ]
     for argv in checks:
         rc = ctx.exe.run(argv, log=log, cwd=ctx.root)
         if rc != 0:
