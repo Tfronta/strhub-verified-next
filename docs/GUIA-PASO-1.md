@@ -21,7 +21,6 @@ still fail step 1, because step 1 is about the commit, not about the code.
 
 A code block with the commands and the versions. Any one of these is enough:
 
-- the `Dockerfile` in the commit itself, built as it is;
 - a release binary that the documentation tells the reader to download;
 - the lines of the block: `conda env create -f environment.yml`, `pip install .`, `make`,
   `cmake .. && make`, `cargo build --release`, an install script the block invokes.
