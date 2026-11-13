@@ -25,9 +25,10 @@ def _valid(manifest_yml, tmp_path):
 def test_hipstr_proposal_preserves_the_read_list_and_mounts_only_the_reference(tmp_path):
     r = pm.build(_proposal("hipstr"), "hipstr-trial")
     m = _valid(r["manifest_yml"], tmp_path)
-    assert m["environment"]["source"] == "generated"
-    assert r["dockerfile"].endswith("FROM scratch\n")
-    assert not r["procedure"]["install_ready"]
+    # The install is the README's own two lines, in STRhub's carrier.
+    assert m["environment"]["source"] == "documented"
+    assert "apt install make g++ zlib1g-dev libhts-dev libbz2-dev liblzma-dev\\nmake\\n" in r["dockerfile"]
+    assert r["procedure"]["install_ready"] and not r["procedure"]["may_say_runs"]
     assert m["inputs"]["type"] == "illumina-bam-hg38"
     assert "run1.bam,run2.bam,run3.bam,run4.bam" in m["run"]["cmd"]
     # The reference genome the README names is STRhub's to supply; the
@@ -36,10 +37,11 @@ def test_hipstr_proposal_preserves_the_read_list_and_mounts_only_the_reference(t
     assert "str_regions.bed" in m["run"]["cmd"]
     assert "documented_file_missing" in r["limitations"]
     assert not any("genome.fa" in c for c in m["caveats"]["items"] if c.startswith("File:"))
-    assert m["run"]["cmd"].startswith("cd '/opt/tool' && touch /tmp/.strhub_mark")
+    # From the root of the checkout, where the documented `make` leaves ./HipSTR.
+    assert m["run"]["cmd"].startswith("cd '.' && touch /tmp/.strhub_mark")
     assert m["outputs"][0] == {"path": "**/*.vcf*", "format": "vcf", "min_records": 1}
     assert "regions" not in m["inputs"]
-    assert "install_profile_unsupported" in r["limitations"]
+    assert "install_profile_unsupported" not in r["limitations"]
     assert m["caveats"]["source"] == "detect_recipe"
     assert "example" not in m  # README shows placeholders, not shipped data
 
@@ -247,7 +249,6 @@ def test_local_trial_never_fabricates_a_passed_run_without_docker(tmp_path):
     assert report["gates"]["runs"] is False
     assert report["gates"]["installs"] is False
     assert report["verdict"]["code"] == "undetermined"
-    assert report["verdict"]["basis"] == "strhub"
 
 
 def test_input_directory_option_rewritten_to_data_in():

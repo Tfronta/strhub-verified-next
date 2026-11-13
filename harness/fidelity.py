@@ -188,9 +188,29 @@ def example_citation(proposal: dict, manifest: dict) -> dict | None:
     return None
 
 
+def install_profiles() -> dict:
+    """The installation profiles this evaluator admits, by name, in the order
+    they are tried. Each one builds a carrier the evaluator writes around
+    commands the repository documents; none builds a file the repository ships."""
+    import documented_install
+    import source_install
+    return {source_install.PROFILE: source_install, documented_install.PROFILE: documented_install}
+
+
+def install_plan(proposal: dict) -> dict:
+    """The first profile that can transcribe the repository's installation."""
+    plan = {}
+    for module in install_profiles().values():
+        plan = module.discover(proposal)
+        if plan.get("ready"):
+            break
+    return plan
+
+
 def installation(proposal: dict, manifest: dict) -> dict:
-    """Review the one installation this evaluator admits: a separately
-    versioned, literal source transcript (harness/source_install.py).
+    """Review the installations this evaluator admits: a literal source
+    transcript (harness/source_install.py) or the install commands a document
+    shows (harness/documented_install.py).
 
     A Dockerfile in the repository is never built. It is arbitrary code its
     author wrote for their own machines, and building it would hand the
@@ -200,8 +220,12 @@ def installation(proposal: dict, manifest: dict) -> dict:
     """
     env, build = manifest.get("environment") or {}, proposal.get("build") or {}
     if env.get("source") == "documented":
-        import source_install
-        return source_install.installation(proposal, manifest)
+        result = {}
+        for module in install_profiles().values():
+            result = module.installation(proposal, manifest)
+            if result.get("ready"):
+                break
+        return result
     reason = ("This evaluator has no proven installation profile for this recipe; no dependencies, "
               "compiler options or environment fixes may be supplied by STRhub.")
     if build.get("method") == "dockerfile":
@@ -212,9 +236,8 @@ def installation(proposal: dict, manifest: dict) -> dict:
 def image_invocation_supported(proposal: dict, installation_review: dict | None = None) -> bool:
     """The only image is the evaluator's own carrier around the cited
     transcript, whose entrypoint is fixed; anything else is not run."""
-    import source_install
-    return bool(installation_review and installation_review.get("profile") == source_install.PROFILE
-                and installation_review.get("ready") and source_install.discover(proposal) == installation_review)
+    module = install_profiles().get((installation_review or {}).get("profile"))
+    return bool(module and installation_review.get("ready") and module.discover(proposal) == installation_review)
 
 
 def verify_checkout(root, review: dict, manifest: dict | None = None) -> None:
@@ -228,10 +251,10 @@ def verify_checkout(root, review: dict, manifest: dict | None = None) -> None:
     install = review.get("installation") or {}
     if review.get("profile") != PROFILE or not install.get("ready"):
         raise ValueError("no proven installation profile; Docker must not run")
-    import source_install
-    if install.get("profile") != source_install.PROFILE:
+    module = install_profiles().get(install.get("profile"))
+    if module is None:
         raise ValueError("no proven installation profile; Docker must not run")
-    source_install.verify_checkout(root, install)
+    module.verify_checkout(root, install)
     citations = (review.get("command_review") or {}).get("citations") or []
     checks = [(c.get("path"), c.get("document_sha256")) for c in citations]
     example = example_citation(review["evidence"]["proposal"], manifest) if review["may_say_runs"] else None
@@ -260,6 +283,5 @@ if __name__ == "__main__":
     import _manifest
     verify_checkout(pathlib.Path(args.checkout), review, _manifest.load(args.manifest))
     if args.source_install_dockerfile:
-        import source_install
-        source_install.materialise(pathlib.Path(args.checkout), review["installation"],
-                                   pathlib.Path(args.source_install_dockerfile))
+        install_profiles()[review["installation"]["profile"]].materialise(
+            pathlib.Path(args.checkout), review["installation"], pathlib.Path(args.source_install_dockerfile))

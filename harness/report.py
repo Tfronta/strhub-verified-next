@@ -975,11 +975,12 @@ def main() -> int:
             proposal = None
     env_source = (m.get("environment") or {}).get("source")
     if env_source == "documented":
+        # The install commands are the repository's; the machine they ran on
+        # is STRhub's, and a reader repeating the run needs to know which.
         needed.append(
-            "A fixed evaluator container for a cited source-installation transcript. "
-            "The container definition is supplied by STRhub and requires its separate "
-            "source-profile review. Base-image and package versions are not frozen "
-            "by the transcript."
+            "A base environment for the documented installation: STRhub ran the repository's "
+            "install commands unchanged on Ubuntu 22.04 (with conda, python and pip added when "
+            "a command uses them). Base-image and package versions are not frozen by the commands."
         )
     if needed:
         report["needed_beyond_repo"] = needed

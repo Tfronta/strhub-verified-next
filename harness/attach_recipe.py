@@ -46,10 +46,9 @@ def main() -> int:
             pass
     if (m.get("environment") or {}).get("source") == "documented":
         import fidelity
-        import source_install
         import authorization
         reviewed = json.loads(pathlib.Path(args.procedure_review).read_text()) if args.procedure_review else {}
-        install = source_install.installation(recipe.get("proposal") or {}, m)
+        install = fidelity.installation(recipe.get("proposal") or {}, m)
         if (not authorization.validate(reviewed, m).valid
                 or not install.get("ready") or install != reviewed.get("installation")
                 or reviewed.get("profile") != fidelity.PROFILE

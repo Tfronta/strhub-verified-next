@@ -64,9 +64,11 @@ tolerated submodule failures and generated fallback installations.
 its author wrote for their own machines, and building it would hand the
 evaluator's build to it. An earlier profile admitted an upstream Dockerfile with
 a cited `docker build` line; it was removed on 2026-11-13. The repository's
-Dockerfile is still read as evidence of what the repository holds. The only
-admitted installation is the literal source transcript of
-`docs/SOURCE-INSTALLATION.md`, built inside a carrier the evaluator writes.
+Dockerfile is still read as evidence of what the repository holds. The
+admitted installations are the literal source transcript of
+`docs/SOURCE-INSTALLATION.md` and the documented install commands of
+`docs/DOCUMENTED-INSTALLATION.md`, each built inside a carrier the evaluator
+writes.
 
 After checkout, before Docker, the source documents and the Makefile are checked
 against their recorded SHA-256 digests. A mismatch or read failure stops the

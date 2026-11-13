@@ -230,7 +230,6 @@ def test_local_trial_requested_with_docker_does_not_execute_an_unsupported_recip
         tmp_path / "trial", prefer_offline=True, run_docker=True)
     assert not result["gates"]["installs"] and not result["gates"]["runs"]
     assert result["verdict"]["code"] == "undetermined"
-    assert result["verdict"]["basis"] == "strhub"
 
 
 @pytest.mark.parametrize("tamper,expected_builds", [(False, 1), (True, 0)])

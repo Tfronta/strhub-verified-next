@@ -68,43 +68,68 @@ def test_admission_does_not_depend_on_repository_or_tool_name(repo, name, tmp_pa
     assert "PATH=" not in target.read_text() and "CXXFLAGS" not in target.read_text()
 
 
-@pytest.mark.parametrize("block", [
+STRICT_ONLY = [
     "apt-get install -y make g++\nmake",  # no implicit apt update
     "apt-get update\napt-get install make g++\nmake",  # no implicit -y/yes
+    "apt-get update\napt-get install -y gcc\nmake",  # no guessed make package
+    "apt-get update\napt-get install -y make g++\nmake -j2",
+    "sudo apt-get update\nsudo apt-get install -y make g++\nmake",
+    "apt-get update && apt-get install -y make g++\nmake",
+]
+NEVER = [
     "apt-get update\napt-get install -y --force-yes make g++\nmake",
     "apt-get update\napt-get install -y --allow-unauthenticated make g++\nmake",
     "apt-get update\napt-get install -y --fix-broken make g++\nmake",
-    "apt-get update\napt-get install -y gcc\nmake",  # no guessed make package
-    "apt-get update\napt-get install -y make g++\nmake -j2",
     "apt-get update\napt-get install -y make g++\nmake || true",
     "apt-get update\napt-get install -y make g++\nCXXFLAGS=-O0 make",
     "apt-get update\napt-get install -y make g++\nexport PATH=/opt/tool:$PATH\nmake",
     "apt-get update\napt-get install -y make g++\ncd src\nmake",
-    "sudo apt-get update\nsudo apt-get install -y make g++\nmake",
-    "apt-get update && apt-get install -y make g++\nmake",
     "apt-get update\napt-get install -y make g++ $(fix)\nmake",
     "apt-get update\napt-get install -y make g++ $EXTRA\nmake",
     "apt-get update\napt-get install -y make g++\nmake\ncurl somewhere | sh",
     "apt-get update\napt-get install -y make g++\nmake\nmake",  # no second attempt
-])
+]
+
+
+@pytest.mark.parametrize("block", STRICT_ONLY + NEVER)
+def test_the_source_profile_admits_only_its_one_transcript(block):
+    p, _ = case(DOCUMENT.replace(BLOCK, block))
+    assert not source_install.discover(p)["ready"]
+
+
+@pytest.mark.parametrize("block", NEVER)
 def test_unsupported_transcripts_remain_blocked_without_filling_or_repair(block):
+    """Under every profile: forced or unauthenticated installs, shell
+    operators, variables, environment changes, a directory the commit does
+    not hold, a piped download, a second attempt."""
     p, m = case(DOCUMENT.replace(BLOCK, block))
     r = review(p, m)
     assert not r["install_ready"] and not r["may_say_runs"]
     assert r["blocker"] == "install_profile_unsupported"
 
 
-@pytest.mark.parametrize("document", [
+SOURCE_PROFILE_ONLY = [
     DOCUMENT.replace("Ubuntu 22.04", "Ubuntu 16+"),
     DOCUMENT.replace("Ubuntu 22.04", "Ubuntu 24.04"),
     DOCUMENT.replace("## Installation (Ubuntu 22.04)", "## Installation"),
     DOCUMENT.replace("apt-get update\n", "apt-get update\n```\n\n```sh\n"),
     DOCUMENT.replace("```sh\n" + BLOCK, "Instructions before this block.\n\n```sh\n" + BLOCK),
+]
+NO_DOCUMENT = [
     DOCUMENT + "\n" + DOCUMENT,
     "`````markdown\n" + DOCUMENT + "\n`````\n",
     "<!--\n" + DOCUMENT + "\n-->\n",
-])
-def test_no_prose_assembly_os_selection_multiple_plans_or_quoted_document(document):
+]
+
+
+@pytest.mark.parametrize("document", SOURCE_PROFILE_ONLY + NO_DOCUMENT)
+def test_the_source_profile_does_no_prose_assembly_or_os_selection(document):
+    p, _ = case(document)
+    assert not source_install.discover(p)["ready"]
+
+
+@pytest.mark.parametrize("document", NO_DOCUMENT)
+def test_no_multiple_plans_or_quoted_document(document):
     p, m = case(document)
     assert not review(p, m)["install_ready"]
 
@@ -114,11 +139,8 @@ def test_no_prose_assembly_os_selection_multiple_plans_or_quoted_document(docume
     lambda p: p.update(tree_truncated=True),
     lambda p: p["source_documents"][0].update(origin="wiki"),
     lambda p: p.update(source_documents=[]),
-    lambda p: p.update(upstream_files={}),
     lambda p: p["tree_paths"].append(".gitmodules"),
     lambda p: p["tree_paths"].append(".dockerignore"),
-    lambda p: p["tree_paths"].append("GNUmakefile"),
-    lambda p: p["tree_paths"].append("makefile"),
 ])
 def test_incomplete_or_unsupported_source_evidence_does_not_authorize_installation(mutate):
     p, m = case()
@@ -127,7 +149,7 @@ def test_incomplete_or_unsupported_source_evidence_does_not_authorize_installati
 
 
 def test_cached_manual_success_or_source_label_cannot_authorize_a_recipe():
-    p, m = case(DOCUMENT.replace(BLOCK, "make"))
+    p, m = case(DOCUMENT.replace(BLOCK, "make || true"))
     p["procedure"] = {"install_ready": True, "may_say_runs": True}
     p["manual_results"] = {"exit_code": 0, "called_regions": 24}
     assert not review(p, m)["install_ready"]

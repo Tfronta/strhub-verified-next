@@ -37,8 +37,12 @@ HARDENING = [
     "--security-opt", "no-new-privileges",
 ]
 IMAGE = "toolimg:ci"
-#: The literal source-installation transcript profile (harness/source_install.py).
+#: The profiles whose carrier the engine builds: the literal source transcript
+#: (harness/source_install.py) and the install commands a document shows
+#: (harness/documented_install.py).
 SOURCE_INSTALL_PROFILE = "strhub-source-install/1"
+DOCUMENTED_INSTALL_PROFILE = "strhub-documented-install/1"
+CARRIER_PROFILES = (SOURCE_INSTALL_PROFILE, DOCUMENTED_INSTALL_PROFILE)
 SOURCE_INSTALL_DOCKERFILE = "source-install.Dockerfile"
 
 
@@ -157,7 +161,7 @@ def installs(ctx: Ctx, available_result: StageResult) -> StageResult:
     st = StageResult.start("installs", log)
     outputs: dict = {"source_evidence": "unverified"}
     profile = ctx.plan.get("installation_profile") or ""
-    if profile != SOURCE_INSTALL_PROFILE:
+    if profile not in CARRIER_PROFILES:
         _say(log, "::error::no proven upstream installation")
         return st.finish(1, None, **outputs)
     # Obtain the immutable source once for either supported profile. Each

@@ -163,8 +163,8 @@ def build(proposal: dict, slug: str, submitted_by: str = "third_party",
                           f"{input_type} is only a guess from mentions; it is not authorization to execute.")
             limitations.append("input_type_guessed")
     caveat_items: list[str] = []
-    import source_install
-    source_plan = source_install.discover(proposal)
+    import fidelity
+    source_plan = fidelity.install_plan(proposal)
 
     # --- environment
     if source_plan["ready"]:
@@ -172,7 +172,8 @@ def build(proposal: dict, slug: str, submitted_by: str = "third_party",
         dockerfile_text = source_plan["carrier_dockerfile"]
         env = {"dockerfile": "Dockerfile", "os": ["ubuntu-22.04"], "source": "documented"}
         cwd = "."
-        caveat_items.append("Environment: a fixed evaluator carrier transcribes the single complete cited installation block unchanged; its operating system is explicitly named by that block's heading.")
+        caveat_items.append("Environment: STRhub transcribed the documented installation commands unchanged into its own carrier ("
+                            + source_plan["base_condition"].get("description", source_plan["base_condition"]["image"]) + ").")
     else:
         # Non-runnable: never infer dependencies, interpreters or library paths.
         dockerfile_text = "# Installation profile not established; must not be built.\nFROM scratch\n"
