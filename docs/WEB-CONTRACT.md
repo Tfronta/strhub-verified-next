@@ -125,12 +125,17 @@ are for:
   evidence, not a plan B).
 - `preparation`: present only when STRhub prepared the environment by hand
   because the repository's own instructions were not enough
-  (`docs/PREPARATION.md`): `{ file, dataset, regions?, base, steps[],
+  (`docs/PREPARATION.md`): `{ file, dataset, regions?, installation, base, steps[],
   files[] ({ path, replaces }), why[], without_preparation ({ blocker,
   basis, reason }), control? }`. The command is still the README's. The
   report's label then reads "Documented command runs, with STRhub's
   preparation" or "Documented command fails, with STRhub's preparation",
   and the same card carries it. `environment.source` is `prepared`.
+  `installation` is `strhub` (the steps are STRhub's) or `repository` (the
+  steps are the README's own install commands, unchanged, and the
+  preparation supplied only inputs); for `repository` the label reads "Runs
+  as documented, on STRhub's inputs" or "Does not run as documented, on
+  STRhub's inputs".
   **The web does not render it yet.**
 - `recommendations[]`: `{ code, text }`, what the README or the repository
   could add, on every report whatever the verdict (never what stopped the

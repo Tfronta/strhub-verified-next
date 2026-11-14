@@ -15,15 +15,16 @@ recipe:
 report:
   slug: hipstr
 environment:
+  source: prepared
   dockerfile: Dockerfile
   os:
   - ubuntu-22.04
-  source: documented
 run:
-  cmd: cd '.' && touch /tmp/.strhub_mark && ( ./HipSTR --bams          run1.bam,run2.bam,run3.bam,run4.bam --fasta         /data/ref/hg38.fa --regions       str_regions.bed --str-vcf       str_calls.vcf.gz ); rc=$?; find . -xdev -type f -newer /tmp/.strhub_mark -size +0 ! -path './.git/*' ! -path './proc/*' ! -path './sys/*' ! -path './dev/*' ! -path './data/*' ! -path '*/__pycache__/*' ! -name '*.pyc' ! -name '*.pyo' 2>/dev/null | head -500 | while IFS= read -r f; do mkdir -p "/data/out/$(dirname "$f")" && cp "$f" "/data/out/$f"; done; exit $rc
+  cmd: cd '.' && touch /tmp/.strhub_mark && ( ./HipSTR --bams          /data/in/input.bam --fasta         /data/ref/hg38.fa --regions       /data/in/regions.bed --str-vcf       str_calls.vcf.gz ); rc=$?; find . -xdev -type f -newer /tmp/.strhub_mark -size +0 ! -path './.git/*' ! -path './proc/*' ! -path './sys/*' ! -path './dev/*' ! -path './data/*' ! -path '*/__pycache__/*' ! -name '*.pyc' ! -name '*.pyo' 2>/dev/null | head -500 | while IFS= read -r f; do mkdir -p "/data/out/$(dirname "$f")" && cp "$f" "/data/out/$f"; done; exit $rc
   timeout_minutes: 20
 inputs:
   type: illumina-bam-hg38
+  regions: hipstr
 outputs:
 - path: '**/*.vcf*'
   format: vcf
@@ -31,9 +32,9 @@ outputs:
 caveats:
   source: detect_recipe
   items:
-  - 'Environment: STRhub transcribed the documented installation commands unchanged into its own carrier (Ubuntu 22.04, package lists refreshed, apt answering yes).'
-  - 'Input: the README documents BAM (line 69); this plan selects STRhub''s illumina-bam-hg38 reference data.'
+  - 'Environment: STRhub transcribed the documented installation commands unchanged into its own carrier; its preparation (preparations/hipstr.yml) supplies the inputs only.'
+  - 'Input: STRhub''s preparation selects its illumina-bam-hg38 reference data and its loci in the hipstr layout.'
+  - 'read_path: run1.bam,run2.bam,run3.bam,run4.bam -> /data/in/input.bam.'
   - 'reference_path: genome.fa -> /data/ref/hg38.fa.'
-  - 'Evaluator limitation: input list cardinality is not changed to fit one available sample.'
+  - 'regions_path: str_regions.bed -> /data/in/regions.bed.'
   - 'Run command: the README''s own command, rewritten to STRhub''s mounts; the capture wrapper is planned only if the procedure review passes.'
-  - 'File: the documented command reads str_regions.bed (after --regions), which is neither in the repository nor among STRhub''s data.'

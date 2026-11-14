@@ -157,6 +157,9 @@ PREPARATION_HEADING = "What STRhub did to get it ready"
 PREPARATION_LEAD = ("The repository's own instructions were not enough to install and run the tool as written. "
                     "STRhub prepared the environment by hand, as a user would have to, and then ran the "
                     "command the README shows without changing it. Nothing below is part of that command.")
+INPUTS_LEAD = ("The tool was installed with the repository's own commands, unchanged. Its documented command "
+               "names files the reader is expected to bring, so STRhub supplied the inputs below and ran the "
+               "command the README shows without changing anything else in it.")
 
 
 def _preparation_lines(prep: dict) -> list[str]:
@@ -166,7 +169,10 @@ def _preparation_lines(prep: dict) -> list[str]:
     if without.get("reason"):
         lines.append(f"Without it: {without['reason']}")
     lines.append(f"Base: {prep.get('base')}.")
-    lines += [f"Step: {step}" for step in prep.get("steps") or []]
+    if prep.get("installation") == "repository":
+        lines.append("Installation: the repository's own commands, unchanged: " + "; ".join(prep.get("steps") or []) + ".")
+    else:
+        lines += [f"Step: {step}" for step in prep.get("steps") or []]
     lines += [f"File {'replaced' if f.get('replaces') else 'added'}: {f['path']}" for f in prep.get("files") or []]
     lines.append(f"Sample: STRhub's {prep.get('dataset')} reference data"
                  + (f", with its loci in the {prep['regions']} layout." if prep.get("regions") else "."))
@@ -317,7 +323,8 @@ def _summary_md(report: dict, slug: str) -> str:
         lines += ["", f"### {heading}", "", lead, "", "```", run.get("effective_cmd", run["cmd"]), "```"]
     # Right under the command it ran: what STRhub did before it could.
     if report.get("preparation"):
-        lines += ["", f"### {PREPARATION_HEADING}", "", PREPARATION_LEAD, ""]
+        lead = INPUTS_LEAD if report["preparation"].get("installation") == "repository" else PREPARATION_LEAD
+        lines += ["", f"### {PREPARATION_HEADING}", "", lead, ""]
         lines += [f"- {line}" for line in _preparation_lines(report["preparation"])]
     for leg, fname in (report.get("logs") or {}).items():
         lines.append(f"- Log ({leg}): [`{fname}`]({fname})")
@@ -503,7 +510,8 @@ def _summary_html(report: dict, slug: str) -> str:
     preparation_block = ""
     if report.get("preparation"):
         prep_items = "".join("<li>" + esc(line) + "</li>" for line in _preparation_lines(report["preparation"]))
-        preparation_block = (f"<h3>{esc(PREPARATION_HEADING)}</h3><p>{esc(PREPARATION_LEAD)}</p>"
+        prep_lead = INPUTS_LEAD if report["preparation"].get("installation") == "repository" else PREPARATION_LEAD
+        preparation_block = (f"<h3>{esc(PREPARATION_HEADING)}</h3><p>{esc(prep_lead)}</p>"
                              f"<ul class='stats'>{prep_items}</ul>")
     rec_items = "".join("<li>" + esc(r["text"]) + "</li>" for r in recs)
     recommendations_block = (
@@ -1218,6 +1226,9 @@ def main() -> int:
     if review_validation.valid and installed.get("profile") == "strhub-prepared-environment/1" and installed.get("ready"):
         report["preparation"] = {
             "file": installed["file"], "dataset": installed["dataset"], "regions": installed.get("regions"),
+            # `repository`: installed with the README's own commands, and the
+            # preparation supplied inputs only. `strhub`: STRhub's steps.
+            "installation": installed.get("installed_by", "strhub"),
             "base": (installed.get("base_condition") or {}).get("description"),
             "steps": installed["steps"],
             "files": [{"path": f["path"], "replaces": f["replaces"]} for f in installed.get("files") or []],

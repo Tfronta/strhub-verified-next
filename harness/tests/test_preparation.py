@@ -193,3 +193,43 @@ def test_the_report_lists_what_was_done_right_under_the_command():
     assert report.PREPARATION_HEADING in report._summary_html(r, "tool")
     recs = report.recommendations_for(r, {"readme": {"gaps": []}})
     assert [x["text"] for x in recs] == ["The README gives no install command."]
+
+
+def test_a_preparation_without_an_environment_uses_the_repository_s_own_installation(prepared, tmp_path):
+    prepared({k: v for k, v in PREP.items() if k != "environment"})
+    p = proposal()
+    # No documented installation the evaluator can follow: inputs alone are not enough.
+    assert not preparation.discover(p)["ready"]
+    text = p["source_documents"][0]["text"].replace("Requires zlib. Build with make.",
+                                                    "## Installation\n\n```sh\napt install make g++ zlib1g-dev\nmake\n```")
+    p["source_documents"][0]["text"] = text
+    p["commands"][0]["line"] = next(i for i, row in enumerate(text.splitlines(), 1) if row == CITED)
+    r = pm.build(p, "trial-tool")
+    install = r["procedure"]["installation"]
+    assert install["installed_by"] == "repository" and install["steps"] == ["apt install make g++ zlib1g-dev", "make"]
+    assert install["documented_installation"]["profile"] == "strhub-documented-install/1"
+    assert r["procedure"]["may_say_runs"]
+    report = {"verdict": {"code": "runs"}, "instrument": "documented", "level": "io",
+              "preparation": {"installation": "repository"}}
+    assert ct.headline(report) == (ct.INPUTS_RUNS, "green")
+    assert ct.headline({**report, "verdict": {"code": "fails"}}) == (ct.INPUTS_FAILS, "red")
+    # The checkout is held to the README the installation was read from.
+    checkout = tmp_path / "checkout"
+    for name in p["tree_paths"]:
+        (checkout / name).parent.mkdir(parents=True, exist_ok=True)
+        (checkout / name).write_text(text if name == "README.md" else "x\n")
+    fidelity.verify_checkout(checkout, r["procedure"], r["manifest"])
+    (checkout / "README.md").write_text(text.replace("apt install make", "apt install curl make"))
+    with pytest.raises(ValueError):
+        fidelity.verify_checkout(checkout, r["procedure"], r["manifest"])
+
+
+def test_a_command_written_over_indented_option_lines_is_read_as_one():
+    text = "```\n./tool --bams   a.bam\n       --fasta  g.fa\n       --out    o.vcf\n./other --x\n```\n"
+    assert fidelity.continued_lines(text) == [(2, 4, "./tool --bams   a.bam --fasta  g.fa --out    o.vcf")]
+    doc = {"repo": REPO, "ref": "a" * 40, "source_documents": [{"file": "README.md", "origin": "readme", "text": text}]}
+    cmd = "./tool --bams   a.bam --fasta  g.fa --out    o.vcf"
+    cited = fidelity.cite(doc, {"cmd": cmd, "file": "README.md", "line": 2})
+    assert cited["verified"] and cited["continued"] and cited["end_line"] == 4
+    # A following line that is not an option is another command, never joined.
+    assert not fidelity.cite(doc, {"cmd": cmd + " ./other --x", "file": "README.md", "line": 2})["verified"]

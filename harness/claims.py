@@ -73,6 +73,7 @@ REGISTER: dict[str, tuple[str, str]] = {
     "4febb7603b17": ("report", "policy"),  # <br><br> This is <b>not</b> a claim that the genotypes are correct, nor that the tool is fit for cas
     "316572e47dc0": ("report", "tree"),  # Recorded automatically from the tool's public files when this run was configured. **Not verifie
     "0bee1f1f9159": ("report", "run"),  # Test data: no sample from the repository was used, so a public reference sample stood in.
+    "ec009cb4ad6b": ("report", "manifest"),  # The tool was installed with the repository's own commands, unchanged. Its documented command names f
     "8abb5c27a292": ("report", "policy"),  # This is **not** a claim that the genotypes are correct, nor that the tool is fit for casework o
     "36231f28bb59": ("report", "readme"),  # What the README does not say:
     "f48849517921": ("verdict", "readme"),  # No command line invoking the tool was found in the README.

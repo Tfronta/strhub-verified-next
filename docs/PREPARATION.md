@@ -8,8 +8,15 @@ Decided by the owner on 2026-11-13.
    command, nothing of STRhub's but the sample and the reference genome. If
    that can be run, that is the result, and no preparation is looked at.
 2. **Only when step 1 cannot be run: STRhub's preparation**, if one is
-   committed under `preparations/` for that repository. The environment is
-   then STRhub's. The command is still the README's, at the pinned commit.
+   committed under `preparations/` for that repository. The command is still
+   the README's, at the pinned commit.
+
+A preparation comes in two sizes. With an `environment`, the installation is
+STRhub's steps. Without one, the installation is the README's own commands,
+unchanged, and the preparation only names the inputs the documented command
+leaves to its reader (`preparations/hipstr.yml`). The report says which
+(`preparation.installation`: `strhub` or `repository`) and labels the second
+"Runs as documented, on STRhub's inputs".
 
 A report says which step produced it and, for step 2, why step 1 was not
 enough (`preparation.without_preparation`).

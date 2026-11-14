@@ -205,8 +205,12 @@ def _build(proposal: dict, slug: str, submitted_by: str = "third_party",
         dockerfile_text = prepared["carrier_dockerfile"]
         env = dict(preparation.ENVIRONMENT)
         cwd = "."
-        caveat_items.append(f"Environment: prepared by STRhub by hand ({prepared['file']}); every step is listed in "
-                            "the report. The command is the repository's own.")
+        if prepared.get("installed_by") == "repository":
+            caveat_items.append("Environment: STRhub transcribed the documented installation commands unchanged into its "
+                                f"own carrier; its preparation ({prepared['file']}) supplies the inputs only.")
+        else:
+            caveat_items.append(f"Environment: prepared by STRhub by hand ({prepared['file']}); every step is listed in "
+                                "the report. The command is the repository's own.")
     elif source_plan["ready"]:
         # One generic transcript: no tool names, prior results or package guesses.
         dockerfile_text = source_plan["carrier_dockerfile"]

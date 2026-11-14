@@ -22,27 +22,28 @@ def _valid(manifest_yml, tmp_path):
     return _manifest.load(str(p))  # raises on schema violation
 
 
-def test_hipstr_proposal_preserves_the_read_list_and_mounts_only_the_reference(tmp_path):
+def test_hipstr_runs_its_documented_install_and_command_on_strhub_s_inputs(tmp_path):
+    """HipSTR's README installs fine and its command names files the reader
+    brings: four BAMs, a genome, a regions BED. Step 1 cannot run that; the
+    committed preparation supplies the inputs and nothing else."""
     r = pm.build(_proposal("hipstr"), "hipstr-trial")
     m = _valid(r["manifest_yml"], tmp_path)
+    assert r["without_preparation"]["blocker"] == "missing_file"
+    install = r["procedure"]["installation"]
     # The install is the README's own two lines, in STRhub's carrier.
-    assert m["environment"]["source"] == "documented"
+    assert m["environment"]["source"] == "prepared" and install["installed_by"] == "repository"
+    assert install["steps"] == ["apt install make g++ zlib1g-dev libhts-dev libbz2-dev liblzma-dev", "make"]
     assert "apt install make g++ zlib1g-dev libhts-dev libbz2-dev liblzma-dev\\nmake\\n" in r["dockerfile"]
-    assert r["procedure"]["install_ready"] and not r["procedure"]["may_say_runs"]
-    assert m["inputs"]["type"] == "illumina-bam-hg38"
-    assert "run1.bam,run2.bam,run3.bam,run4.bam" in m["run"]["cmd"]
-    # The reference genome the README names is STRhub's to supply; the
-    # regions file is not, and stays as written.
-    assert "--fasta /data/ref/hg38.fa" in " ".join(m["run"]["cmd"].split())
-    assert "str_regions.bed" in m["run"]["cmd"]
-    assert "documented_file_missing" in r["limitations"]
-    assert not any("genome.fa" in c for c in m["caveats"]["items"] if c.startswith("File:"))
-    # From the root of the checkout, where the documented `make` leaves ./HipSTR.
-    assert m["run"]["cmd"].startswith("cd '.' && touch /tmp/.strhub_mark")
+    assert r["procedure"]["install_ready"] and r["procedure"]["may_say_runs"]
+    assert m["inputs"] == {"type": "illumina-bam-hg38", "regions": "hipstr"}
+    # The command is the README's, written over four lines there; only paths changed.
+    cited = r["procedure"]["command_review"]["citations"][0]
+    assert cited["verified"] and cited["continued"] and (cited["line"], cited["end_line"]) == (69, 72)
+    assert " ".join(m["run"]["cmd"].split()).startswith(
+        "cd '.' && touch /tmp/.strhub_mark && ( ./HipSTR --bams /data/in/input.bam --fasta /data/ref/hg38.fa "
+        "--regions /data/in/regions.bed --str-vcf str_calls.vcf.gz )")
+    assert [s["role"] for s in r["procedure"]["command_review"]["substitutions"]] == ["read_path", "reference_path", "regions_path"]
     assert m["outputs"][0] == {"path": "**/*.vcf*", "format": "vcf", "min_records": 1}
-    assert "regions" not in m["inputs"]
-    assert "install_profile_unsupported" not in r["limitations"]
-    assert m["caveats"]["source"] == "detect_recipe"
     assert "example" not in m  # README shows placeholders, not shipped data
 
 

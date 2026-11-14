@@ -19,7 +19,7 @@ every line of `why` is a recommendation to the tool's author.
     repo: https://github.com/owner/tool
     dataset: illumina-bam-hg38        # which registered sample the run reads
     regions: hipstr                   # optional: which layout of its loci
-    environment:
+    environment:                      # optional; see below
       conda: false                    # true adds Miniforge to the base
       activate: null                  # optional: conda environment left active
       steps:                          # shell lines, run in the checkout, in order
@@ -31,6 +31,11 @@ every line of `why` is a recommendation to the tool's author.
           ...
     why:                              # what the README does not say
       - The README lists zlib as a requirement and gives no command that installs it.
+
+Without `environment`, the installation is the repository's own, transcribed
+literally (harness/documented_install.py), and the preparation only supplies
+inputs. That is the right file for a tool whose README installs fine and
+whose example command names files the reader is expected to bring.
 """
 from __future__ import annotations
 
@@ -56,7 +61,7 @@ REGION_FORMATS = ["hipstr", "gangstr", "strsearch", "bed4", "motif", "eh_catalog
 FILE_SCHEMA = {
     "type": "object",
     "additionalProperties": False,
-    "required": ["schema", "repo", "dataset", "environment", "why"],
+    "required": ["schema", "repo", "dataset", "why"],
     "properties": {
         "schema": {"const": SCHEMA},
         "repo": {"type": "string", "pattern": r"^https://github\.com/[\w.-]+/[\w.-]+$"},
@@ -97,7 +102,7 @@ def load(path: pathlib.Path) -> dict:
         jsonschema.validate(data, FILE_SCHEMA)
     except (OSError, yaml.YAMLError, jsonschema.ValidationError) as exc:
         raise ValueError(f"{path}: not a preparation ({str(exc).splitlines()[0]})") from exc
-    for step in data["environment"]["steps"]:
+    for step in (data.get("environment") or {}).get("steps") or []:
         if "\n" in step or "\r" in step:
             raise ValueError(f"{path}: a step is one line")
     for item in data.get("files") or []:
@@ -121,18 +126,26 @@ def find(repo: str, root: pathlib.Path | None = None) -> tuple[str, dict] | None
     return found[0] if found else None
 
 
-def carrier(prep: dict) -> str:
-    """The evaluator's envelope: its declared base, the checkout, the steps in
-    one shell that stops at the first failure, then the files."""
+def _file_lines(prep: dict) -> list[str]:
+    # The content travels as an argument, so nothing in it is read by a shell.
+    return ["RUN " + json.dumps(["bash", "-c", 'mkdir -p "$(dirname "$1")" && printf %s "$2" > "$1"',
+                                 "write", item["path"], item["content"]]) for item in prep.get("files") or []]
+
+
+def carrier(prep: dict, documented: dict | None = None) -> str:
+    """The evaluator's envelope. With an `environment`: its declared base, the
+    checkout, the steps in one shell that stops at the first failure, then
+    the files. Without one: the carrier of the repository's own documented
+    installation, with the files written before its entrypoint."""
+    if documented is not None:
+        lines = documented["carrier_dockerfile"].rstrip("\n").split("\n")
+        return "\n".join(lines[:-1] + _file_lines(prep) + lines[-1:]) + "\n"
     env = prep["environment"]
     lines = ["# Evaluator carrier: strhub-prepared-environment/1; written by STRhub, not an upstream Dockerfile."]
     lines += documented_install.base_lines(bool(env.get("conda")))
     lines += ['COPY [".", "/opt/tool"]', "WORKDIR /opt/tool"]
     lines.append("RUN " + json.dumps(["bash", "-lc", "set -eo pipefail\n" + "\n".join(env["steps"]) + "\n"]))
-    for item in prep.get("files") or []:
-        # The content travels as an argument, so nothing in it is read by a shell.
-        lines.append("RUN " + json.dumps(["bash", "-c", 'mkdir -p "$(dirname "$1")" && printf %s "$2" > "$1"',
-                                           "write", item["path"], item["content"]]))
+    lines += _file_lines(prep)
     if env.get("activate"):
         lines.append("RUN " + json.dumps(["bash", "-c",
                                            f"echo 'conda activate {env['activate']}' > /etc/profile.d/zz-strhub-env.sh"]))
@@ -140,7 +153,7 @@ def carrier(prep: dict) -> str:
     return "\n".join(lines) + "\n"
 
 
-def discover(proposal: dict, root: pathlib.Path | None = None) -> dict:
+def discover(proposal: dict, root: pathlib.Path | None = None, documented: dict | None = None) -> dict:
     result = {"profile": PROFILE, "ready": False, "method": (proposal.get("build") or {}).get("method", "unknown"),
               "reason": "STRhub has not prepared an environment for this repository.", "gap": "strhub"}
     repo, ref = proposal.get("repo"), str(proposal.get("ref") or "")
@@ -155,23 +168,45 @@ def discover(proposal: dict, root: pathlib.Path | None = None) -> dict:
         return result
     path, prep = found
     tree = set(proposal.get("tree_paths") or [])
-    dockerfile = carrier(prep)
-    env = prep["environment"]
+    env = prep.get("environment")
+    if env is None:
+        # No environment of STRhub's: the installation is the repository's
+        # own, as it documents it, and has to be one the evaluator can follow.
+        if documented is None:
+            import fidelity
+            documented = fidelity.install_plan(proposal)
+        if not documented.get("ready"):
+            result["reason"] = ("STRhub's preparation for this repository supplies inputs only, and its documented "
+                                "installation cannot be followed literally: " + (documented.get("reason") or ""))
+            return result
+        steps = [c["text"] for c in documented["commands"]]
+        base, activate = documented["base_condition"], documented.get("conda_environment")
+        dockerfile = carrier(prep, documented)
+    else:
+        documented = None
+        steps, activate = list(env["steps"]), env.get("activate")
+        base = {"image": documented_install.BASE_IMAGE,
+                "description": documented_install.BASE_CONDA if env.get("conda") else documented_install.BASE_PLAIN,
+                "role": "evaluator base environment"}
+        dockerfile = carrier(prep)
     result.pop("gap")
     result.update(
         ready=True, repo=repo, ref=ref, file=path, preparation_sha256=digest(json.dumps(prep, sort_keys=True)),
         dataset=prep["dataset"], regions=prep.get("regions"),
-        steps=list(env["steps"]), conda_environment=env.get("activate"),
+        # Whose the installation is: the repository's own commands, or STRhub's steps.
+        installed_by="repository" if documented is not None else "strhub",
+        steps=steps, conda_environment=activate,
         # Whether each file replaces one the repository ships (a configuration
         # the README says to edit) or is new: a reader needs to know which.
         files=[{"path": f["path"], "sha256": digest(f["content"]), "bytes": len(f["content"].encode("utf-8")),
                 "replaces": f["path"] in tree} for f in prep.get("files") or []],
-        why=list(prep["why"]),
-        base_condition={"image": documented_install.BASE_IMAGE,
-                        "description": documented_install.BASE_CONDA if env.get("conda") else documented_install.BASE_PLAIN,
-                        "role": "evaluator base environment"},
+        why=list(prep["why"]), base_condition=base,
         carrier_dockerfile=dockerfile, carrier_sha256=digest(dockerfile),
-        reason="STRhub prepared the environment by hand, in a committed file; the command is the repository's own.")
+        reason=("The installation is the repository's own, as documented; STRhub's preparation supplies the inputs. "
+                if documented is not None else
+                "STRhub prepared the environment by hand, in a committed file. ") + "The command is the repository's own.")
+    if documented is not None:
+        result["documented_installation"] = documented
     return result
 
 
@@ -194,10 +229,19 @@ def verify_checkout(root, install: dict) -> None:
     if not install.get("ready") or install.get("profile") != PROFILE:
         raise ValueError("no prepared environment")
     root = pathlib.Path(root)
+    documented = install.get("documented_installation")
+    if documented is not None:
+        # The repository's own installation is held to the checkout as it
+        # would be without a preparation.
+        import fidelity
+        module = fidelity.install_profiles().get(documented.get("profile"))
+        if module is None or module is __import__("preparation"):
+            raise ValueError("the documented installation behind STRhub's preparation is not one the evaluator admits")
+        module.verify_checkout(root, documented)
     tree = sorted(p.relative_to(root).as_posix() for p in root.rglob("*")
                   if ".git" not in p.relative_to(root).parts and (p.is_file() or p.is_symlink()))
     again = discover({"repo": install.get("repo"), "ref": install.get("ref"),
-                      "build": {"method": install.get("method")}, "tree_paths": tree})
+                      "build": {"method": install.get("method")}, "tree_paths": tree}, documented=documented)
     if again != install:
         raise ValueError("STRhub's preparation does not match the one that was reviewed")
 

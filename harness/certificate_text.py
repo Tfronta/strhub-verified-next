@@ -23,6 +23,10 @@ AS_IS_HEADING = "As it is in the repository"
 #: README's, the installation is not.
 PREPARED_RUNS = "Documented command runs, with STRhub's preparation"
 PREPARED_FAILS = "Documented command fails, with STRhub's preparation"
+#: The label of a run installed with the README's own commands, where STRhub
+#: supplied only the inputs the documented command leaves to its reader.
+INPUTS_RUNS = "Runs as documented, on STRhub's inputs"
+INPUTS_FAILS = "Does not run as documented, on STRhub's inputs"
 #: The label of a report on gh-pages that is not a run of this instrument.
 NOT_DOCUMENTED = "Not verified as documented"
 
@@ -273,9 +277,11 @@ def headline(report: dict) -> tuple[str, str]:
     # A run STRhub prepared says so in the label itself: the badge travels
     # alone, and "as documented" would claim the installation for the README.
     if report.get("preparation"):
+        own_install = report["preparation"].get("installation") == "repository"
+        ran, failed = (INPUTS_RUNS, INPUTS_FAILS) if own_install else (PREPARED_RUNS, PREPARED_FAILS)
         if runs:
-            return (PREPARED_RUNS + " (errors reported)", "yellow") if errors_reported(report) else (PREPARED_RUNS, "green")
-        return PREPARED_FAILS, "red"
+            return (ran + " (errors reported)", "yellow") if errors_reported(report) else (ran, "green")
+        return failed, "red"
     if runs:
         if errors_reported(report):
             return "Runs as documented (errors reported)", "yellow"
