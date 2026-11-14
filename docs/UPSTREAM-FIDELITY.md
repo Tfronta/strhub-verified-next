@@ -17,8 +17,11 @@ upstream commit. Repository and commit must match the actual manifest. Wiki
 pages, truncated quote snippets, `origin: proposed`, submitter identity and a
 cached `may_say_runs: true` do not establish a procedure.
 
-Only explicit shell line continuations are accepted when establishing the
-citation. Separate flag lines are never joined to manufacture a command, and
+A command is one line, a line continued with a backslash, or a line followed
+by indented lines that each begin with an option (the way READMEs lay out a
+long command). Those are joined by one space and the citation records the
+line range (`end_line`, `continued`). A following line that is not indented,
+or does not begin with an option, is never joined to manufacture a command, and
 a `Usage:` prefix is not removed to turn a synopsis into an executable line.
 
 The closed table permits one standalone read-file argument after `--in`,

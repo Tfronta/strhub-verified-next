@@ -47,6 +47,34 @@ def literal_lines(text: str) -> list[tuple[int, str]]:
     return result
 
 
+CONTINUATION = re.compile(r"^[ \t]+--?[A-Za-z]")
+
+
+def continued_lines(text: str) -> list[tuple[int, int, str]]:
+    """Commands a document writes over several lines without a backslash: a
+    line followed by indented lines that each begin with an option.
+
+        ./tool --bams   sample.bam
+               --fasta  genome.fa
+
+    is one command, read the way its reader reads it. (start, end, command),
+    the continuation lines joined by one space with their indentation
+    dropped. A following line that does not begin with an option is not
+    joined, so two commands are never read as one."""
+    rows = text.splitlines()
+    out = []
+    for i, raw in enumerate(rows):
+        if CONTINUATION.match(raw) or not raw.strip():
+            continue
+        j = i + 1
+        while j < len(rows) and CONTINUATION.match(rows[j]):
+            j += 1
+        if j > i + 1:
+            head = re.sub(r"^\$ ", "", raw.strip())
+            out.append((i + 1, j, " ".join([head] + [r.strip() for r in rows[i + 1:j]])))
+    return out
+
+
 def tokens(command: str) -> list[str]:
     matches = list(TOKEN.finditer(command))
     end = 0
@@ -196,6 +224,12 @@ def cite(proposal: dict, candidate: dict) -> dict:
                for n, line in literal_lines(text)):
             out.update(verified=True, document_sha256=digest(text), command_sha256=digest(candidate["cmd"]))
             return out
+        for start, end, joined in continued_lines(text):
+            if start == candidate.get("line") and joined == candidate.get("cmd"):
+                # Written over several lines; say so, with where it ends.
+                out.update(verified=True, end_line=end, continued=True,
+                           document_sha256=digest(text), command_sha256=digest(candidate["cmd"]))
+                return out
     out["reason"] = "the complete command is not established at the cited repository line"
     return out
 

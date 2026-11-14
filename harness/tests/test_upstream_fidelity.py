@@ -165,11 +165,16 @@ def test_a_mount_path_in_an_unrelated_argument_is_not_input_evidence():
     assert not review(p, m)["may_say_runs"]
 
 
-def test_citation_does_not_join_flag_lines_without_a_shell_continuation():
+def test_citation_joins_only_indented_option_lines_or_a_shell_continuation():
     p, _ = case()
-    p["source_documents"][0]["text"] = "```\ntool\n --reads x.bam\n```\n"
     candidate = {"cmd": "tool --reads x.bam", "file": "README.md", "line": 2}
-    assert not fidelity.cite(p, candidate)["verified"]
+    # Not indented, or not an option: another line, never part of the command.
+    for text in ("```\ntool\n--reads x.bam\n```\n", "```\ntool\n x.bam\n```\n"):
+        p["source_documents"][0]["text"] = text
+        assert not fidelity.cite(p, {**candidate, "cmd": "tool " + text.splitlines()[2].strip()})["verified"]
+    p["source_documents"][0]["text"] = "```\ntool\n --reads x.bam\n```\n"
+    cited = fidelity.cite(p, candidate)
+    assert cited["verified"] and cited["continued"] and cited["end_line"] == 3
     p["source_documents"][0]["text"] = "```\ntool \\\n --reads x.bam\n```\n"
     assert fidelity.cite(p, candidate)["verified"]
 
@@ -227,7 +232,7 @@ def test_local_trial_requested_with_docker_does_not_execute_an_unsupported_recip
             pytest.fail("an unsupported recipe must not reach Git, Docker or the STR runner")
         return original(args, *a, **kwargs)
     monkeypatch.setattr(local_trial.subprocess, "run", guarded)
-    result = local_trial.build_local_trial("https://github.com/tfwillems/HipSTR", "", "",
+    result = local_trial.build_local_trial("https://github.com/unique379r/strspy", "", "",
         tmp_path / "trial", prefer_offline=True, run_docker=True)
     assert not result["gates"]["installs"] and not result["gates"]["runs"]
     assert result["verdict"]["code"] == "undetermined"
