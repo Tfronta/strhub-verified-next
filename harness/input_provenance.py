@@ -42,7 +42,7 @@ def _sha256(path, unpack=False):
     return digest.hexdigest()
 
 
-def _plan(root, input_type):
+def _plan(root, input_type, regions=None):
     commit = _git(root, "rev-parse", "HEAD")
     index = _tracked(root, commit, INDEX)
     dataset = json.loads(index.read_bytes())["datasets"].get(input_type)
@@ -56,6 +56,13 @@ def _plan(root, input_type):
     if dataset["format"] == "bam":
         index_path = _tracked(root, commit, dataset["bam_index"])
         files.append((index_path, canonical + ".bai", False))
+    if regions:
+        # The dataset's own loci in the layout a preparation named, under one name.
+        source = (dataset.get("regions") or {}).get(regions)
+        if not source:
+            raise ValueError("the shared dataset registers no regions file in that layout")
+        path = _tracked(root, commit, source)
+        files.append((path, "regions" + path.suffix, False))
     return commit, dataset, files
 
 
@@ -91,9 +98,9 @@ def _reference_receipt(work, genome):
             "transformation": "gunzip; samtools faidx"}
 
 
-def stage(root, work, input_type):
+def stage(root, work, input_type, regions=None):
     """Copy the exact registered data into a new directory; never overlay it."""
-    _, dataset, files = _plan(root, input_type)
+    _, dataset, files = _plan(root, input_type, regions)
     mount = _paths.destination(work, "in_external")
     mount.mkdir(parents=True, exist_ok=False)
     for source, name, unpack in files:
@@ -111,7 +118,7 @@ def verify(root, work, manifest, review, command):
     if not checked.valid or not checked.review["may_say_runs"] or command != manifest["run"]["cmd"]:
         raise ValueError("the launch command has no matching approved upstream procedure")
     input_type = manifest["inputs"]["type"]
-    commit, dataset, files = _plan(root, input_type)
+    commit, dataset, files = _plan(root, input_type, manifest["inputs"].get("regions"))
     mount = _paths.destination(work, "in_external")
     if {p.name for p in mount.iterdir()} != {name for _, name, _ in files}:
         raise ValueError("the input mount has missing or undeclared files")

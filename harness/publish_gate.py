@@ -5,6 +5,8 @@ reviewer, a user who cannot get the tool running at home, and the tool's owner
 all came for, and hiding it would make the catalogue a list of green badges.
 What is never published:
 
+  - a failure obtained in an environment STRhub prepared, until a control
+    run exists: the same preparation, with the code corrected, running;
   - a run nobody asked to publish: the dispatch says `publish: true` or the
     result stays the run's artifact (the web always sends `false`);
   - a run whose verdict is not about the tool (out of scope, or STRhub's own
@@ -78,6 +80,12 @@ def decide(report: dict, *, slug: str, publish_requested: bool, index: dict | No
     checked = validated_finding(report)
     if not checked.valid:
         return False, "mandatory procedure evidence rejected: " + checked.reason
+    if code == "fails" and report.get("preparation") and not (report.get("preparation") or {}).get("control"):
+        # A failure in an environment STRhub prepared could be the preparation's.
+        # It is a finding about the tool only once the same preparation, with
+        # the code corrected, has been seen to run.
+        return False, ("a failure obtained with STRhub's preparation is not published without a control run "
+                       "(the same preparation, with the code corrected, running)")
     if not slug:
         return False, "the report has no slug to file it under"
     if index is None:

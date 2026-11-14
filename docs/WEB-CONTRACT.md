@@ -123,10 +123,19 @@ are for:
   claim was read in the repository, openable at the pinned ref. `claim`
   includes `fallback_environment` (the published image the README names;
   evidence, not a plan B).
+- `preparation`: present only when STRhub prepared the environment by hand
+  because the repository's own instructions were not enough
+  (`docs/PREPARATION.md`): `{ file, dataset, regions?, base, steps[],
+  files[] ({ path, replaces }), why[], without_preparation ({ blocker,
+  basis, reason }), control? }`. The command is still the README's. The
+  report's label then reads "Documented command runs, with STRhub's
+  preparation" or "Documented command fails, with STRhub's preparation",
+  and the same card carries it. `environment.source` is `prepared`.
+  **The web does not render it yet.**
 - `recommendations[]`: `{ code, text }`, what the README or the repository
   could add, on every report whatever the verdict (never what stopped the
   run: that is `verdict.readme_gaps` and `verdict.blockers`). Codes:
-  `example_data`, `reference_assembly`, and the README gap items (`readme`,
+  `example_data`, `reference_assembly`, `preparation_<n>` (one per thing a preparation had to do), and the README gap items (`readme`,
   `install`, `command`, `command_input`, `input`, `output`). Absent when
   there is none. **The web does not render it yet.**
 - `mounted_inputs`: what the external leg was given, verified before launch:

@@ -284,8 +284,22 @@ def _resolve(here: pathlib.PurePosixPath, name: str) -> pathlib.PurePosixPath | 
 def carrier(commands: list[dict], uses_conda: bool, environment: str | None) -> str:
     """The evaluator's envelope around the literal commands. Everything that
     is not one of them is the declared base environment."""
-    lines = ["# Evaluator carrier: strhub-documented-install/1; not an upstream Dockerfile.",
-             "FROM " + BASE_IMAGE,
+    lines = ["# Evaluator carrier: strhub-documented-install/1; not an upstream Dockerfile."]
+    lines += base_lines(uses_conda)
+    lines += ['COPY [".", "/opt/tool"]', "WORKDIR /opt/tool"]
+    # One shell, so `cd` and `conda activate` carry from one documented line
+    # to the next as they would in the reader's terminal; the first failure stops it.
+    script = "set -eo pipefail\n" + "\n".join(c["text"] for c in commands) + "\n"
+    lines.append("RUN " + json.dumps(["bash", "-lc", script]))
+    if environment:
+        lines.append("RUN " + json.dumps(["bash", "-c", f"echo 'conda activate {environment}' > /etc/profile.d/zz-strhub-env.sh"]))
+    lines.append('ENTRYPOINT ["/bin/bash", "-lc"]')
+    return "\n".join(lines) + "\n"
+
+
+def base_lines(uses_conda: bool) -> list[str]:
+    """The declared base environment every carrier starts from."""
+    lines = ["FROM " + BASE_IMAGE,
              "ENV DEBIAN_FRONTEND=noninteractive",
              "RUN " + json.dumps(["bash", "-c", "echo 'APT::Get::Assume-Yes \"true\";' > /etc/apt/apt.conf.d/90strhub "
                                               "&& apt-get update"])]
@@ -297,15 +311,7 @@ def carrier(commands: list[dict], uses_conda: bool, environment: str | None) -> 
                                        "echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/00-strhub-conda.sh && "
                                        "ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh"]),
                   "ENV PATH=/opt/conda/bin:$PATH"]
-    lines += ['COPY [".", "/opt/tool"]', "WORKDIR /opt/tool"]
-    # One shell, so `cd` and `conda activate` carry from one documented line
-    # to the next as they would in the reader's terminal; the first failure stops it.
-    script = "set -eo pipefail\n" + "\n".join(c["text"] for c in commands) + "\n"
-    lines.append("RUN " + json.dumps(["bash", "-lc", script]))
-    if environment:
-        lines.append("RUN " + json.dumps(["bash", "-c", f"echo 'conda activate {environment}' > /etc/profile.d/zz-strhub-env.sh"]))
-    lines.append('ENTRYPOINT ["/bin/bash", "-lc"]')
-    return "\n".join(lines) + "\n"
+    return lines
 
 
 def installation(proposal: dict, manifest: dict) -> dict:

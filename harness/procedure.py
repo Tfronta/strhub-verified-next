@@ -99,12 +99,13 @@ def classify(proposal: dict, manifest: dict, limitations: list[str],
     if commands:
         cited = commands[0].get("cmd") or ""
     rewritten, _cwd = unwrap_example((manifest.get("run") or {}).get("cmd") or "")
-    transformation = fidelity.rewrite(cited, (manifest.get("inputs") or {}).get("type"))
+    transformation = fidelity.rewrite_for(manifest, cited)
+    prepared = source == "prepared"
     expected = transformation["command"]
     citations = [fidelity.cite(proposal, commands[0])] if commands else []
     if commands and commands[0].get("prerequisite"):
         prerequisite = commands[0]["prerequisite"]
-        pre_review = fidelity.rewrite(prerequisite["cmd"], (manifest.get("inputs") or {}).get("type"))
+        pre_review = fidelity.rewrite_for(manifest, prerequisite["cmd"])
         citations.append(fidelity.cite(proposal, prerequisite))
         transformation["limitations"] += pre_review["limitations"]
         transformation["prerequisite"] = pre_review
@@ -130,9 +131,11 @@ def classify(proposal: dict, manifest: dict, limitations: list[str],
     inputs = manifest.get("inputs") or {}
     input_evidence = proposal.get("input_type") or {}
     declared_type = input_evidence.get("best")
-    if declared_type and inputs.get("type") != declared_type:
+    # In a run STRhub prepared, the dataset is the one its preparation names,
+    # by hand and in the open: it was not swapped or counted by a heuristic.
+    if declared_type and inputs.get("type") != declared_type and not prepared:
         amendments.append({"code": "input_swapped", "what": "The effective input type differs from the one selected from the original documentation."})
-    if inputs.get("type") and input_evidence.get("platform_how") == "counted":
+    if inputs.get("type") and input_evidence.get("platform_how") == "counted" and not prepared:
         amendments.append({"code": "input_platform_unproven", "what": "Counting platform mentions does not establish which shared dataset this procedure reads."})
     signals = input_evidence.get("signals") or {}
     if (re.search(r"-hg38(?:-|$)", inputs.get("type") or "") and signals.get("hg19") and not signals.get("hg38")):

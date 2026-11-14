@@ -42,7 +42,9 @@ IMAGE = "toolimg:ci"
 #: (harness/documented_install.py).
 SOURCE_INSTALL_PROFILE = "strhub-source-install/1"
 DOCUMENTED_INSTALL_PROFILE = "strhub-documented-install/1"
-CARRIER_PROFILES = (SOURCE_INSTALL_PROFILE, DOCUMENTED_INSTALL_PROFILE)
+#: And the environment STRhub prepared by hand (harness/preparation.py).
+PREPARED_PROFILE = "strhub-prepared-environment/1"
+CARRIER_PROFILES = (SOURCE_INSTALL_PROFILE, DOCUMENTED_INSTALL_PROFILE, PREPARED_PROFILE)
 SOURCE_INSTALL_DOCKERFILE = "source-install.Dockerfile"
 
 

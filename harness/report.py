@@ -139,6 +139,10 @@ def recommendations_for(report: dict, proposal: dict | None) -> list[dict]:
                         "reproduce the run without outside data."})
         else:
             out.append({"code": item, "text": gap.get("text") or ""})
+    # Everything STRhub had to do that the README does not say is, as it
+    # stands, a recommendation to its author.
+    for number, line in enumerate((report.get("preparation") or {}).get("why") or [], 1):
+        out.append({"code": f"preparation_{number}", "text": line})
     reference = (report.get("mounted_inputs") or {}).get("reference")
     signals = (proposal.get("input_type") or {}).get("signals") or {}
     if reference and not signals.get("hg38"):
@@ -147,6 +151,27 @@ def recommendations_for(report: dict, proposal: dict | None) -> list[dict]:
                     "which assembly it expects. STRhub mounted hg38; stating the assembly would "
                     "remove the guess."})
     return [r for r in out if r["text"]]
+
+
+PREPARATION_HEADING = "What STRhub did to get it ready"
+PREPARATION_LEAD = ("The repository's own instructions were not enough to install and run the tool as written. "
+                    "STRhub prepared the environment by hand, as a user would have to, and then ran the "
+                    "command the README shows without changing it. Nothing below is part of that command.")
+
+
+def _preparation_lines(prep: dict) -> list[str]:
+    """What the preparation did, one line each, for both prose copies."""
+    without = prep.get("without_preparation") or {}
+    lines = []
+    if without.get("reason"):
+        lines.append(f"Without it: {without['reason']}")
+    lines.append(f"Base: {prep.get('base')}.")
+    lines += [f"Step: {step}" for step in prep.get("steps") or []]
+    lines += [f"File {'replaced' if f.get('replaces') else 'added'}: {f['path']}" for f in prep.get("files") or []]
+    lines.append(f"Sample: STRhub's {prep.get('dataset')} reference data"
+                 + (f", with its loci in the {prep['regions']} layout." if prep.get("regions") else "."))
+    lines.append(f"Recorded in {prep.get('file')}.")
+    return lines
 
 
 def _verdict_md(report: dict) -> list[str]:
@@ -290,6 +315,10 @@ def _summary_md(report: dict, slug: str) -> str:
     if run.get("cmd"):
         heading, lead = command_presentation(run)
         lines += ["", f"### {heading}", "", lead, "", "```", run.get("effective_cmd", run["cmd"]), "```"]
+    # Right under the command it ran: what STRhub did before it could.
+    if report.get("preparation"):
+        lines += ["", f"### {PREPARATION_HEADING}", "", PREPARATION_LEAD, ""]
+        lines += [f"- {line}" for line in _preparation_lines(report["preparation"])]
     for leg, fname in (report.get("logs") or {}).items():
         lines.append(f"- Log ({leg}): [`{fname}`]({fname})")
 
@@ -471,6 +500,11 @@ def _summary_html(report: dict, slug: str) -> str:
             "about their own software.</p>" + quotes)
 
     recs = report.get("recommendations") or []
+    preparation_block = ""
+    if report.get("preparation"):
+        prep_items = "".join("<li>" + esc(line) + "</li>" for line in _preparation_lines(report["preparation"]))
+        preparation_block = (f"<h3>{esc(PREPARATION_HEADING)}</h3><p>{esc(PREPARATION_LEAD)}</p>"
+                             f"<ul class='stats'>{prep_items}</ul>")
     rec_items = "".join("<li>" + esc(r["text"]) + "</li>" for r in recs)
     recommendations_block = (
         f"<h3>{esc(RECOMMENDATIONS_HEADING)}</h3><p>{esc(RECOMMENDATIONS_LEAD)}</p>"
@@ -701,8 +735,9 @@ def _summary_html(report: dict, slug: str) -> str:
 {install_block}
 {errors_block}
 {known_block}
-{recommendations_block}
 {run_block}
+{preparation_block}
+{recommendations_block}
 {logs_block}
 <h2>Run details</h2>
 <ul class="meta">
@@ -1176,6 +1211,19 @@ def main() -> int:
         procedure=procedure,
         manifest=m,
     )
+
+    # What STRhub did to get the tool ready, when the repository's own
+    # instructions were not enough: every step, every file, every input.
+    installed = procedure.get("installation") or {}
+    if review_validation.valid and installed.get("profile") == "strhub-prepared-environment/1" and installed.get("ready"):
+        report["preparation"] = {
+            "file": installed["file"], "dataset": installed["dataset"], "regions": installed.get("regions"),
+            "base": (installed.get("base_condition") or {}).get("description"),
+            "steps": installed["steps"],
+            "files": [{"path": f["path"], "replaces": f["replaces"]} for f in installed.get("files") or []],
+            "why": installed["why"],
+            "without_preparation": (proposal or {}).get("without_preparation"),
+        }
 
     # What the README or the repository could add, whatever the verdict.
     recommendations = recommendations_for(report, proposal)

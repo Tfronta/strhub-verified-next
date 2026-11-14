@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import pathlib
 import re
 import shlex
 
@@ -58,7 +59,12 @@ def tokens(command: str) -> list[str]:
     return [m.group() for m in matches]
 
 
-def rewrite(command: str, input_type: str | None) -> dict:
+REGION_FLAGS = {"--regions", "--region", "--loci", "--repeats", "--variant-catalog", "--catalog",
+                "--ref_bed", "--ref-bed", "--bed", "--targets", "-l"}
+REGION_PATH = re.compile(r"[\w./-]+\.(?:bed|json|tsv|txt)(?:\.gz)?\Z", re.I)
+
+
+def rewrite(command: str, input_type: str | None, regions: str | None = None, one_sample: bool = False) -> dict:
     """Only standalone read paths, the reference genome the registered dataset
     is aligned to, and explicit output placeholders.
 
@@ -81,6 +87,11 @@ def rewrite(command: str, input_type: str | None) -> dict:
     canonical = (ds or {}).get("canonical_input")
     reference_mount = ((ds or {}).get("reference_genome") or {}).get("mount_path")
     reference_used = False
+    # The regions file a preparation named: the dataset's own loci, in the
+    # layout the tool reads, mounted beside the sample. Never without one.
+    regions_source = ((ds or {}).get("regions") or {}).get(regions or "")
+    regions_mount = ("/data/in/regions" + pathlib.PurePosixPath(regions_source).suffix) if regions_source else None
+    regions_used = False
     if ((ds or {}).get("reference") == "hg38"
             and re.search(r"(?:hg19|grch37|hg18|ncbi36|t2t|chm13)(?![a-z0-9])", command, re.I)):
         result["limitations"].append("the command names a different assembly from the registered hg38 dataset")
@@ -107,8 +118,17 @@ def rewrite(command: str, input_type: str | None) -> dict:
                 target, role = f"/data/in/{canonical}", "read_path"
             else:
                 result["limitations"].append("the declared sample does not have the documented read-file kind")
+        elif previous in INPUT_FLAGS and "," in value and one_sample and canonical \
+                and all(READ_PATH.fullmatch(part) for part in value.split(",")):
+            # A documented list of the reader's own files, in a run STRhub
+            # prepared: the one registered sample stands in for it, and says so.
+            target, role = f"/data/in/{canonical}", "read_path"
         elif previous in INPUT_FLAGS and "," in value:
             result["limitations"].append("input list cardinality is not changed to fit one available sample")
+        elif regions_mount and previous in REGION_FLAGS and (REGION_PATH.fullmatch(value) or angle) \
+                and not value.startswith("/data/"):
+            target, role = regions_mount, "regions_path"
+            regions_used = True
         elif previous in OUTPUT_FLAGS and angle and re.search(r"output|prefix|directory", value, re.I):
             target, role = "sample", "output_placeholder"
         elif ds and i and previous not in OUTPUT_FLAGS and not value.startswith("/data/") and (
@@ -135,7 +155,8 @@ def rewrite(command: str, input_type: str | None) -> dict:
             changes.append((m.start(), m.end(), replacement))
             result["substitutions"].append({"token": i, "original": raw,
                 "replacement": replacement, "role": role, "basis": {"output_placeholder": "explicit output-path placeholder",
-                                                         "reference_path": "registered reference genome mount"}.get(role, "declared dataset mount")})
+                                                         "reference_path": "registered reference genome mount",
+                                                         "regions_path": f"registered regions file ({regions})"}.get(role, "declared dataset mount")})
     if len(result["read_bindings"]) > 1:
         result["limitations"].append("multiple read inputs cannot be mapped to a single shared sample")
         return result
@@ -148,6 +169,8 @@ def rewrite(command: str, input_type: str | None) -> dict:
         declared_paths.add(f"/data/in/{canonical}.bai")
     if reference_used:
         declared_paths.add(reference_mount)
+    if regions_used:
+        declared_paths.add(regions_mount)
     mounted_paths = set(re.findall(r"/data/(?:in|ref)(?:/[\w./-]+)?", rewritten))
     if mounted_paths - declared_paths:
         result["limitations"].append("the command requires a runner input outside the shared dataset; no catalog, regions file or configuration is supplied to fill that path")
@@ -196,14 +219,32 @@ def install_profiles() -> dict:
     they are tried. Each one builds a carrier the evaluator writes around
     commands the repository documents; none builds a file the repository ships."""
     import documented_install
+    import preparation
     import source_install
-    return {source_install.PROFILE: source_install, documented_install.PROFILE: documented_install}
+    return {source_install.PROFILE: source_install, documented_install.PROFILE: documented_install,
+            preparation.PROFILE: preparation}
+
+
+def literal_profiles() -> list:
+    """The profiles that install from the repository's documentation alone."""
+    import documented_install
+    import source_install
+    return [source_install, documented_install]
+
+
+def rewrite_for(manifest: dict, command: str) -> dict:
+    """`rewrite` with what the effective manifest says about the run: its
+    dataset, the regions layout a preparation named, and whether STRhub
+    prepared it (one sample then stands in for a documented list)."""
+    inputs = manifest.get("inputs") or {}
+    prepared = (manifest.get("environment") or {}).get("source") == "prepared"
+    return rewrite(command, inputs.get("type"), regions=inputs.get("regions"), one_sample=prepared)
 
 
 def install_plan(proposal: dict) -> dict:
     """The first profile that can transcribe the repository's installation."""
     plan = {}
-    for module in install_profiles().values():
+    for module in literal_profiles():
         plan = module.discover(proposal)
         if plan.get("ready"):
             break
@@ -222,9 +263,12 @@ def installation(proposal: dict, manifest: dict) -> dict:
     environment setting we might add.
     """
     env, build = manifest.get("environment") or {}, proposal.get("build") or {}
+    if env.get("source") == "prepared":
+        import preparation
+        return preparation.installation(proposal, manifest)
     if env.get("source") == "documented":
         result = {}
-        for module in install_profiles().values():
+        for module in literal_profiles():
             result = module.installation(proposal, manifest)
             if result.get("ready"):
                 break

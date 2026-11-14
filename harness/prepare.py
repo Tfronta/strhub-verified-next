@@ -175,7 +175,7 @@ def main() -> int:
     reference = {}
     if procedure_ready and input_type:
         try:
-            ds = input_provenance.stage(ROOT, work, input_type)
+            ds = input_provenance.stage(ROOT, work, input_type, inputs.get("regions"))
             external_ready = True
             dataset_name = ds["name"]
             supported_loci = ds.get("supported_loci", "")

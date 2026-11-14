@@ -55,7 +55,7 @@
           "items": { "type": "string" },
           "description": "OS targets the attestation is scoped to, e.g. ['ubuntu-22.04']. Honesty matters: only claim what you test."
         },
-        "source": { "type": "string", "enum": ["generated", "documented"], "description": "Where the container definition came from: 'documented' for the fixed evaluator carrier transcribing a separately verified, complete source-installation block; 'generated' for a descriptor with no proven installation (never built). A Dockerfile shipped in the repository is never built. A source label alone never authorizes execution." }
+        "source": { "type": "string", "enum": ["generated", "documented", "prepared"], "description": "Where the container definition came from: 'documented' for the fixed evaluator carrier transcribing a separately verified, complete source-installation block; 'generated' for a descriptor with no proven installation (never built). A Dockerfile shipped in the repository is never built. A source label alone never authorizes execution." }
       }
     },
     "run": {
@@ -74,6 +74,7 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
+        "regions": { "type": "string", "enum": ["hipstr", "gangstr", "strsearch", "bed4", "motif", "eh_catalog", "trgt"], "description": "Only in a run STRhub prepared: which layout of the dataset's own loci is mounted beside the sample, as its preparation names it. Never chosen from a program's name." },
         "type": {
           "type": "string",
           "description": "Assay/input type used to match a compatible external reference dataset (e.g. 'illumina-str-fastq'). See datasets/index.json. The external matrix leg is N/A if no dataset matches."
