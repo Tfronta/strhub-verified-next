@@ -11,7 +11,10 @@ What the evaluator does around them, and says it does:
 
   - the base is Ubuntu 22.04 with its package lists refreshed and apt set to
     answer yes; Miniforge (conda, python, pip) is added only when a command
-    uses conda, pip or python;
+    uses conda, pip or python; a minimal generic build toolchain
+    (build-essential, and cmake when cmake is invoked) is added only when a
+    command invokes make, configure or cmake without already installing them
+    via apt, and never includes tool-specific libraries;
   - a leading `sudo` is dropped (the build runs as root), and so are the
     `git clone` of this very repository and the `cd` into it: the build
     already stands in a checkout of the pinned commit;
@@ -69,6 +72,9 @@ PATTERNS = [
 ]
 ADMITTED = re.compile("|".join(f"(?:{p})" for p in PATTERNS))
 USES_CONDA = re.compile(r"^(?:conda|mamba|source activate|pip3?|python3?)\b")
+_USES_BUILD_ESSENTIAL = re.compile(r"^(?:make|\./configure|cmake)\b")
+_USES_CMAKE = re.compile(r"^cmake\b")
+_APT_INSTALL = re.compile(r"^apt(?:-get)? install\b(.*)$")
 #: A file a command reads, by the option that names it.
 FILE_OPTION = re.compile(r"(?:^| )(?:-f|--file|-r)[ =](\S+)")
 
@@ -154,6 +160,44 @@ def _documents(proposal: dict) -> list[dict]:
     return [d for d in proposal.get("source_documents") or []
             if d.get("origin") != "wiki" and isinstance(d.get("text"), str) and d.get("file")
             and "<!--" not in d["text"] and "-->" not in d["text"]]
+
+
+def _has_compiler_and_make(apt_pkgs: set[str]) -> bool:
+    if "build-essential" in apt_pkgs:
+        return True
+    has_make = "make" in apt_pkgs
+    has_compiler = any(
+        p in ("gcc", "g++", "clang") or p.startswith(("gcc-", "g++-", "clang-"))
+        for p in apt_pkgs
+    )
+    return has_make and has_compiler
+
+
+def _minimal_toolchain(commands: list[dict]) -> list[str]:
+    """Generic compiler/build-system packages supplied only when a documented
+    command invokes make, ./configure or cmake without an earlier apt install
+    of them. Never includes tool-specific libraries."""
+    apt_pkgs: set[str] = set()
+    need_build_essential = False
+    need_cmake = False
+    for cmd in commands:
+        text = cmd["text"]
+        apt_match = _APT_INSTALL.match(text)
+        if apt_match:
+            for tok in apt_match[1].split():
+                if not tok.startswith("-"):
+                    apt_pkgs.add(tok)
+            continue
+        if _USES_BUILD_ESSENTIAL.match(text) and not _has_compiler_and_make(apt_pkgs):
+            need_build_essential = True
+        if _USES_CMAKE.match(text) and "cmake" not in apt_pkgs:
+            need_cmake = True
+    out: list[str] = []
+    if need_build_essential:
+        out.append("build-essential")
+    if need_cmake:
+        out.append("cmake")
+    return out
 
 
 def discover(proposal: dict) -> dict:
@@ -247,16 +291,22 @@ def discover(proposal: dict) -> dict:
                 return result
 
     uses_conda = any(USES_CONDA.match(c["text"]) for c in commands)
+    toolchain = _minimal_toolchain(commands)
     activated = [c["argv"][-1] for c in commands if re.match(r"(?:conda|source) activate\b", c["text"])]
     environment = activated[-1] if activated else None
-    dockerfile = carrier(commands, uses_conda, environment)
+    dockerfile = carrier(commands, uses_conda, environment, toolchain)
+    base_desc = BASE_CONDA if uses_conda else BASE_PLAIN
+    if toolchain:
+        base_desc += f", plus minimal build toolchain ({', '.join(toolchain)}; no tool-specific libraries)"
     first = commands[0]
     result.pop("gap")
     result.update(
         ready=True, repo=repo, ref=ref, documents=documents, commands=commands,
         published_alternatives=published, conda_environment=environment,
-        base_condition={"image": BASE_IMAGE, "description": BASE_CONDA if uses_conda else BASE_PLAIN,
-                        "role": "evaluator base environment"},
+        base_condition={"image": BASE_IMAGE, "description": base_desc,
+                        "role": "evaluator base environment",
+                        "added_packages": list(toolchain),
+                        "miniforge": uses_conda},
         citation={"repo": repo, "ref": ref, "path": first["file"], "line": first["line"],
                   "end_line": commands[-1]["line"], "verified": True,
                   "document_sha256": next(d["sha256"] for d in documents if d["path"] == first["file"])},
@@ -281,11 +331,12 @@ def _resolve(here: pathlib.PurePosixPath, name: str) -> pathlib.PurePosixPath | 
     return pathlib.PurePosixPath(*parts) if parts else pathlib.PurePosixPath(".")
 
 
-def carrier(commands: list[dict], uses_conda: bool, environment: str | None) -> str:
+def carrier(commands: list[dict], uses_conda: bool, environment: str | None,
+            toolchain: list[str] | tuple[str, ...] = ()) -> str:
     """The evaluator's envelope around the literal commands. Everything that
     is not one of them is the declared base environment."""
     lines = ["# Evaluator carrier: strhub-documented-install/1; not an upstream Dockerfile."]
-    lines += base_lines(uses_conda)
+    lines += base_lines(uses_conda, toolchain)
     lines += ['COPY [".", "/opt/tool"]', "WORKDIR /opt/tool"]
     # One shell, so `cd` and `conda activate` carry from one documented line
     # to the next as they would in the reader's terminal; the first failure stops it.
@@ -297,12 +348,14 @@ def carrier(commands: list[dict], uses_conda: bool, environment: str | None) -> 
     return "\n".join(lines) + "\n"
 
 
-def base_lines(uses_conda: bool) -> list[str]:
+def base_lines(uses_conda: bool, toolchain: list[str] | tuple[str, ...] = ()) -> list[str]:
     """The declared base environment every carrier starts from."""
     lines = ["FROM " + BASE_IMAGE,
              "ENV DEBIAN_FRONTEND=noninteractive",
              "RUN " + json.dumps(["bash", "-c", "echo 'APT::Get::Assume-Yes \"true\";' > /etc/apt/apt.conf.d/90strhub "
                                               "&& apt-get update"])]
+    if toolchain:
+        lines.append("RUN " + json.dumps(["bash", "-c", "apt-get install --no-install-recommends " + " ".join(toolchain)]))
     if uses_conda:
         lines += ["RUN " + json.dumps(["bash", "-c", "apt-get install curl ca-certificates bzip2 && "
                                        f"curl -fsSL {MINIFORGE_URL} -o /tmp/miniforge.sh && "

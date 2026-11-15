@@ -251,6 +251,19 @@ def _provenance_groups(prov: dict | None) -> tuple[list[str], list[str], list[st
         )
     if hc.get("regions_layout"):
         hc_lines.append(f"Regions file mounted: `{hc['regions_layout']}`")
+    be = hc.get("base_environment") or {}
+    if be.get("image") or be.get("description"):
+        pkgs = be.get("added_packages") or []
+        extras = []
+        if be.get("miniforge"):
+            extras.append("Miniforge (conda, python, pip)")
+        if pkgs:
+            extras.append("minimal build toolchain: " + ", ".join(pkgs) + " (no tool-specific libraries)")
+        extra_str = (
+            "; added beyond plain Ubuntu: " + "; ".join(extras)
+            if extras else "; no extra packages added by STRhub"
+        )
+        hc_lines.append(f"Base environment supplied by STRhub: `{be.get('image') or 'ubuntu:22.04'}`{extra_str}")
     return up_lines, der_lines, hc_lines
 
 
@@ -1294,6 +1307,15 @@ def main() -> int:
     report["procedure_review"] = procedure
     if procedure.get("provenance"):
         report["provenance"] = procedure["provenance"]
+    base_desc = ((procedure.get("installation") or {}).get("base_condition") or {}).get("description")
+    if env_source == "documented" and base_desc and report.get("needed_beyond_repo"):
+        report["needed_beyond_repo"] = [
+            f"A base environment for the documented installation: STRhub ran the repository's "
+            f"install commands unchanged on {base_desc}. Base-image and package versions are not frozen by the commands."
+            if item.startswith("A base environment for the documented installation:")
+            else item
+            for item in report["needed_beyond_repo"]
+        ]
     report["procedure_validation"] = {"schema": authorization.SCHEMA, "valid": review_validation.valid,
                                       "reason": review_validation.reason}
     if args.mounted_inputs and args.runs in ("success", "failure", "pass", "fail"):

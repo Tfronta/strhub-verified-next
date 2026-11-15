@@ -405,6 +405,7 @@ def classify(proposal: dict, manifest: dict, limitations: list[str],
                                     if plat_how in ("stated", "multi_stated") and input_evidence.get("platform") else []))
     subs = transformation.get("substitutions") or []
     ss_subs = [s for s in subs if s.get("role") == "read_path" and "," in s.get("original", "")]
+    base_cond = installation.get("base_condition") or {}
     provenance = {
         "from_upstream": {
             "install": {"method": method, "evidence_source": inst_es},
@@ -468,6 +469,12 @@ def classify(proposal: dict, manifest: dict, limitations: list[str],
                          if ds_assembly and not asm_declared else None),
             } if ds_assembly or asm_declared else None,
             "regions_layout": inputs.get("regions"),
+            "base_environment": {
+                "image": base_cond.get("image"),
+                "description": base_cond.get("description"),
+                "added_packages": list(base_cond.get("added_packages") or []),
+                "miniforge": bool(base_cond.get("miniforge")),
+            } if base_cond else None,
         },
     }
 
