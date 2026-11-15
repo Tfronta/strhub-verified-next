@@ -190,7 +190,11 @@ def _build(proposal: dict, slug: str, submitted_by: str = "third_party",
                 quote = re.sub(r"[*_`]+", "", rec["text"])[:90]
                 input_note += (f" The author recommends {rec['kind'].upper()} "
                                f"(line {rec['line']}: \"{quote}\").")
-        else:
+        if it.get("platform_how") == "multi_stated" and input_note:
+            plats = ", ".join(p["platform"] for p in (it.get("supported_platforms") or []))
+            if plats:
+                input_note += f" Supported platforms documented: {plats}; STRhub selected {it.get('platform')} for this trial."
+        if not input_note:
             input_note = (f"Input: no sentence in the README says what the tool takes; "
                           f"{input_type} is only a guess from mentions; it is not authorization to execute.")
             limitations.append("input_type_guessed")

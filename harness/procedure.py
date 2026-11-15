@@ -138,8 +138,10 @@ def classify(proposal: dict, manifest: dict, limitations: list[str],
     if inputs.get("type") and input_evidence.get("platform_how") == "counted" and not prepared:
         amendments.append({"code": "input_platform_unproven", "what": "Counting platform mentions does not establish which shared dataset this procedure reads."})
     signals = input_evidence.get("signals") or {}
-    if (re.search(r"-hg38(?:-|$)", inputs.get("type") or "") and signals.get("hg19") and not signals.get("hg38")):
-        amendments.append({"code": "input_assembly_mismatch", "what": "The documentation names hg19 without establishing compatibility with the registered hg38 dataset."})
+    asm = input_evidence.get("assembly") or {}
+    if (re.search(r"-hg38(?:-|$)", inputs.get("type") or "")
+            and (asm.get("incompatible_with_hg38") or (signals.get("hg19") and not signals.get("hg38")))):
+        amendments.append({"code": "input_assembly_mismatch", "what": "The documentation names hg19/GRCh37 or declares hg38 incompatibility without establishing compatibility with the registered hg38 dataset."})
     installation = fidelity.installation(proposal, manifest)
     citable = installation["ready"]
     if installation["ready"] and not fidelity.image_invocation_supported(proposal, installation):
@@ -222,25 +224,60 @@ def classify(proposal: dict, manifest: dict, limitations: list[str],
                if c0.get("verified") else {}),
         },
     }
+    upstream_inputs = (input_evidence.get("statements") or {}).get("inputs") or []
+    upstream_kind = upstream_inputs[0]["kind"] if upstream_inputs else (
+        "bam" if "bam" in (inputs.get("type") or "") else "fastq" if "fastq" in (inputs.get("type") or "") else None
+    )
     if inputs.get("type"):
         if prepared:
             inferences["input_type"] = {
                 "evidence_source": installation.get("file") or "preparation",
                 "verified": bool(installation.get("ready")),
+                "upstream_input_kind": upstream_kind,
+                "selected_dataset": inputs.get("type"),
             }
         elif input_evidence.get("how") == "counted" or "input_type_guessed" in limitations:
             inferences["input_type"] = {"evidence_source": None, "verified": False}
         elif input_evidence.get("evidence_source"):
             ver = fidelity.verify_evidence_source(proposal, input_evidence.get("evidence_source"))
-            inferences["input_type"] = ver
+            inferences["input_type"] = {
+                **ver,
+                "upstream_input_kind": upstream_kind,
+                "selected_dataset": inputs.get("type"),
+            }
         elif c0.get("verified") and transformation["read_bindings"]:
             inferences["input_type"] = {
                 "verified": True, "kind": "doc", "path": c0["path"], "line": c0["line"],
                 "document_sha256": c0.get("document_sha256"),
                 "evidence_source": f"{c0['path']}:L{c0['line']}",
+                "upstream_input_kind": upstream_kind,
+                "selected_dataset": inputs.get("type"),
             }
         else:
             inferences["input_type"] = {"evidence_source": None, "verified": False}
+    plat_how = input_evidence.get("platform_how")
+    sup_plats = input_evidence.get("supported_platforms") or []
+    if inputs.get("type") and not prepared and plat_how in ("stated", "multi_stated"):
+        selected_plat = input_evidence.get("platform")
+        plat_es = input_evidence.get("platform_evidence_source") or next(
+            (p.get("evidence_source") for p in sup_plats if p.get("platform") == selected_plat), None
+        )
+        ver_p = fidelity.verify_evidence_source(proposal, plat_es) if plat_es else {"verified": False, "evidence_source": None}
+        inferences["platform"] = {
+            **ver_p,
+            "selected": selected_plat,
+            "selection_basis": "harness_choice_from_supported" if plat_how == "multi_stated" else "upstream_single_platform",
+            "supported_platforms": [p["platform"] for p in sup_plats] if sup_plats else ([selected_plat] if selected_plat else []),
+        }
+    reg = proposal.get("regions") or {}
+    cmd_uses_regions = any(t in fidelity.REGION_FLAGS or (t.split("=", 1)[0] in fidelity.REGION_FLAGS if "=" in t else False)
+                           for t in cited.split())
+    if reg.get("ambiguous") and (inputs.get("regions") or cmd_uses_regions) and not prepared:
+        cand_names = ", ".join(c["format"] for c in (reg.get("candidates") or []) if c.get("format"))
+        amendments.append({
+            "code": "ambiguous_regions_schema",
+            "what": f"The repository documents multiple conflicting region schemas ({cand_names}); STRhub cannot deterministically pick one.",
+        })
     if inputs.get("regions"):
         if prepared:
             inferences["regions"] = {
@@ -248,7 +285,6 @@ def classify(proposal: dict, manifest: dict, limitations: list[str],
                 "verified": bool(installation.get("ready")),
             }
         else:
-            reg = proposal.get("regions") or {}
             ver = fidelity.verify_evidence_source(proposal, reg.get("evidence_source"), reg.get("text"))
             inferences["regions"] = {
                 **ver,
@@ -308,6 +344,8 @@ def classify(proposal: dict, manifest: dict, limitations: list[str],
         blocker, basis = "install_not_copyable", "recipe"
     elif not installation["ready"] and method != "unknown":
         blocker, basis = "install_profile_unsupported", "strhub"
+    elif any(a["code"] == "ambiguous_regions_schema" for a in amendments):
+        blocker, basis = "ambiguous_regions_schema", "recipe"
     elif "documented_file_missing" in limitations:
         blocker, basis = "missing_file", "recipe"
     elif any(a["code"] == "input_not_substituted" for a in amendments):
@@ -328,7 +366,8 @@ def classify(proposal: dict, manifest: dict, limitations: list[str],
         status_code = "VERIFIED_PROCEDURE_READY"
     elif blocker in ("command_profile_unsupported", "synopsis_trimmed", "flag_injected", "flag_dropped",
                      "command_changed", "prerequisite_profile_unsupported", "working_directory_changed",
-                     "capture_wrapper_missing", "capture_wrapper_changed", "input_not_substituted"):
+                     "capture_wrapper_missing", "capture_wrapper_changed", "input_not_substituted",
+                     "ambiguous_regions_schema"):
         status_code = "FAILED_AMBIGUOUS_CLI"
     else:
         status_code = "UNVERIFIED_INSUFFICIENT_DOCS"
@@ -356,6 +395,82 @@ def classify(proposal: dict, manifest: dict, limitations: list[str],
         reason = " ".join(dict.fromkeys(_sentence(a["what"]) for a in ordered))
         attribution = "strhub"
 
+    asm_declared = asm.get("declared")
+    if asm_declared is None and (signals.get("hg38") or signals.get("hg19")):
+        asm_declared = "both" if (signals.get("hg38") and signals.get("hg19")) else ("hg38" if signals.get("hg38") else "hg19_only")
+    dataset_id = inputs.get("type")
+    ds_assembly = "hg38" if dataset_id and re.search(r"-hg38(?:-|$)", dataset_id) else None
+    plat_list = ([{"platform": p["platform"], "evidence_source": p.get("evidence_source")} for p in sup_plats]
+                 if sup_plats else ([{"platform": input_evidence.get("platform"), "evidence_source": input_evidence.get("platform_evidence_source")}]
+                                    if plat_how in ("stated", "multi_stated") and input_evidence.get("platform") else []))
+    subs = transformation.get("substitutions") or []
+    ss_subs = [s for s in subs if s.get("role") == "read_path" and "," in s.get("original", "")]
+    provenance = {
+        "from_upstream": {
+            "install": {"method": method, "evidence_source": inst_es},
+            "command": {"value": cited, "evidence_source": cmd_es} if cited else None,
+            "input_kind": {
+                "value": upstream_kind,
+                "evidence_source": (inferences.get("input_type") or {}).get("evidence_source"),
+            } if upstream_kind else None,
+            "supported_platforms": plat_list,
+            "assembly": {
+                "declared": asm_declared,
+                "evidence_source": asm.get("evidence_source"),
+            },
+            "regions_schema": {
+                "format": reg.get("format"),
+                "evidence_source": reg.get("evidence_source"),
+            } if reg.get("format") else None,
+            "output_format": {
+                "glob": glob,
+                "evidence_source": (inferences.get("output") or {}).get("evidence_source"),
+            } if glob not in ("**/*", "**/*.*", None) else None,
+        },
+        "derived": {
+            "command_rewrites": [
+                {"role": s.get("role"), "original": s.get("original"), "replacement": s.get("replacement"), "basis": s.get("basis")}
+                for s in subs
+            ],
+            "regions_layout_binding": {
+                "documented_schema": reg.get("format"),
+                "evidence_source": reg.get("evidence_source"),
+                "strhub_regions_layout": inputs.get("regions"),
+            } if inputs.get("regions") else None,
+            "single_sample_adaptation": {
+                "applied": True,
+                "original": ss_subs[0]["original"],
+                "replacement": ss_subs[0]["replacement"],
+                "evidence_source": (inferences.get("single_sample_bams") or {}).get("evidence_source"),
+                "note": "STRhub trial mounted one compatible sample for the documented multi-file placeholder list",
+            } if ss_subs else None,
+        },
+        "harness_choices": {
+            "dataset": {
+                "selected": dataset_id,
+                "reason": (f"STRhub selected '{dataset_id}' as compatible with upstream input '{upstream_kind}'"
+                           + (f" and platform '{input_evidence.get('platform')}'" if input_evidence.get("platform") else ""))
+                          if dataset_id else None,
+            } if dataset_id else None,
+            "platform": {
+                "selected": input_evidence.get("platform"),
+                "basis": ("harness_choice_from_supported" if plat_how == "multi_stated"
+                          else "upstream_single_platform" if plat_how == "stated"
+                          else "counted_unproven"),
+                "supported_platforms": [p["platform"] for p in plat_list],
+            } if input_evidence.get("platform") else None,
+            "assembly": {
+                "selected": ds_assembly,
+                "basis": ("upstream_stated" if asm_declared in ("hg38", "both")
+                          else "harness_choice_unstated" if ds_assembly and not asm_declared
+                          else "incompatible"),
+                "note": ("Upstream did not specify an assembly; STRhub supplied an internally coherent hg38 BAM, FASTA and regions set"
+                         if ds_assembly and not asm_declared else None),
+            } if ds_assembly or asm_declared else None,
+            "regions_layout": inputs.get("regions"),
+        },
+    }
+
     return {
         "may_say_runs": may_say_runs,
         "status_code": status_code,
@@ -366,6 +481,7 @@ def classify(proposal: dict, manifest: dict, limitations: list[str],
         "amendments": amendments,
         "inferences": inferences,
         "unbacked_inferences": unbacked_inferences,
+        "provenance": provenance,
         "install_method": method,
         "citable_install": citable,
         "input_type": (manifest.get("inputs") or {}).get("type"),

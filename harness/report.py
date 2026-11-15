@@ -180,6 +180,80 @@ def _preparation_lines(prep: dict) -> list[str]:
     return lines
 
 
+def _provenance_groups(prov: dict | None) -> tuple[list[str], list[str], list[str]]:
+    """Split trial provenance into three plain lists for reviewers:
+    what came from upstream, what was mechanically derived, and what STRhub selected."""
+    if not prov:
+        return [], [], []
+    up = prov.get("from_upstream") or {}
+    der = prov.get("derived") or {}
+    hc = prov.get("harness_choices") or {}
+    up_lines: list[str] = []
+    inst = up.get("install") or {}
+    if inst.get("evidence_source"):
+        up_lines.append(f"Install ({inst.get('method', '?')}): `{inst['evidence_source']}`")
+    cmd = up.get("command") or {}
+    if cmd.get("evidence_source"):
+        up_lines.append(f"Command: `{cmd['evidence_source']}`")
+    ik = up.get("input_kind") or {}
+    if ik.get("value"):
+        cite = f" (`{ik['evidence_source']}`)" if ik.get("evidence_source") else " (not explicitly stated)"
+        up_lines.append(f"Input format: `{ik['value']}`{cite}")
+    plats = up.get("supported_platforms") or []
+    if plats:
+        ps = ", ".join(f"{p['platform']} (`{p['evidence_source']}`)" if p.get("evidence_source") else p["platform"]
+                       for p in plats)
+        up_lines.append(f"Supported platforms: {ps}")
+    asm = up.get("assembly") or {}
+    if asm.get("declared"):
+        cite = f" (`{asm['evidence_source']}`)" if asm.get("evidence_source") else ""
+        up_lines.append(f"Reference assembly: `{asm['declared']}`{cite}")
+    else:
+        up_lines.append("Reference assembly: not specified in repository documentation")
+    reg = up.get("regions_schema") or {}
+    if reg.get("format"):
+        up_lines.append(f"Regions schema: `{reg['format']}` (`{reg['evidence_source']}`)")
+
+    der_lines: list[str] = []
+    for s in der.get("command_rewrites") or []:
+        der_lines.append(f"`{s.get('original')}` -> `{s.get('replacement')}` ({s.get('basis')})")
+    rlb = der.get("regions_layout_binding") or {}
+    if rlb.get("strhub_regions_layout"):
+        der_lines.append(
+            f"Regions layout `{rlb['strhub_regions_layout']}` matched `{rlb.get('documented_schema')}` "
+            f"(`{rlb.get('evidence_source')}`)"
+        )
+    ssa = der.get("single_sample_adaptation") or {}
+    if ssa.get("applied"):
+        der_lines.append(
+            f"Single-sample trial mount: `{ssa.get('original')}` -> `{ssa.get('replacement')}` "
+            f"(`{ssa.get('evidence_source')}`)"
+        )
+
+    hc_lines: list[str] = []
+    ds = hc.get("dataset") or {}
+    if ds.get("selected"):
+        hc_lines.append(f"Dataset selected by STRhub: `{ds['selected']}` — {ds.get('reason', '')}")
+    pl = hc.get("platform") or {}
+    if pl.get("selected"):
+        if pl.get("basis") == "harness_choice_from_supported":
+            hc_lines.append(
+                f"Platform chosen by STRhub: `{pl['selected']}` from documented platforms "
+                f"({', '.join(pl.get('supported_platforms') or [])})"
+            )
+        elif pl.get("basis") == "upstream_single_platform":
+            hc_lines.append(f"Platform used: `{pl['selected']}` (single documented platform)")
+    ha = hc.get("assembly") or {}
+    if ha.get("selected") and ha.get("basis") == "harness_choice_unstated":
+        hc_lines.append(
+            f"Assembly chosen by STRhub: `{ha['selected']}` (upstream unspecified; STRhub staged coherent "
+            "BAM, FASTA and regions on hg38)"
+        )
+    if hc.get("regions_layout"):
+        hc_lines.append(f"Regions file mounted: `{hc['regions_layout']}`")
+    return up_lines, der_lines, hc_lines
+
+
 def _verdict_md(report: dict) -> list[str]:
     v = report.get("verdict")
     if not v:
@@ -406,6 +480,19 @@ def _summary_md(report: dict, slug: str) -> str:
             # most needs entire, since the run may have gone against it.
             txt = f": `{e['text']}`" if e.get("text") and e["kind"] in ("readme", "doc", "wiki") else ""
             lines.append(f"- {CLAIM_LABELS.get(e['claim'], e['claim'])}: [{where}]({e['url']}){txt}")
+
+    up_lines, der_lines, hc_lines = _provenance_groups(report.get("provenance"))
+    if up_lines or der_lines or hc_lines:
+        lines += ["", "## Provenance of this trial (upstream vs. STRhub choices)"]
+        if up_lines:
+            lines += ["", "### From upstream documentation", ""]
+            lines += [f"- {i}" for i in up_lines]
+        if der_lines:
+            lines += ["", "### Mechanically derived bindings", ""]
+            lines += [f"- {i}" for i in der_lines]
+        if hc_lines:
+            lines += ["", "### Selected by STRhub for this trial", ""]
+            lines += [f"- {i}" for i in hc_lines]
 
     needed = report.get("needed_beyond_repo") or []
     if needed:
@@ -677,6 +764,20 @@ def _summary_html(report: dict, slug: str) -> str:
         evidence_block = (f"<h2>Evidence</h2><p>{esc(EVIDENCE_LEAD)}</p>"
                           f"<ul class='stats'>{''.join(items)}</ul>")
 
+    provenance_block = ""
+    up_lines, der_lines, hc_lines = _provenance_groups(report.get("provenance"))
+    if up_lines or der_lines or hc_lines:
+        parts = ["<h2>Provenance of this trial (upstream vs. STRhub choices)</h2>"]
+        for heading, group in (
+            ("From upstream documentation", up_lines),
+            ("Mechanically derived bindings", der_lines),
+            ("Selected by STRhub for this trial", hc_lines),
+        ):
+            if group:
+                lis = "".join(f"<li>{esc(i)}</li>" for i in group)
+                parts.append(f"<h3>{heading}</h3><ul class='stats'>{lis}</ul>")
+        provenance_block = "".join(parts)
+
     needed_block = ""
     needed = report.get("needed_beyond_repo") or []
     if needed:
@@ -759,6 +860,7 @@ def _summary_html(report: dict, slug: str) -> str:
 {content_block}
 {matrix_block}
 {evidence_block}
+{provenance_block}
 {needed_block}
 {caveats_block}
 <h2>Out of scope</h2>
@@ -1190,6 +1292,8 @@ def main() -> int:
             review_validation = authorization.Validation(False, "The mandatory procedure review could not be read.")
             procedure = authorization.refusal(review_validation.reason)
     report["procedure_review"] = procedure
+    if procedure.get("provenance"):
+        report["provenance"] = procedure["provenance"]
     report["procedure_validation"] = {"schema": authorization.SCHEMA, "valid": review_validation.valid,
                                       "reason": review_validation.reason}
     if args.mounted_inputs and args.runs in ("success", "failure", "pass", "fail"):

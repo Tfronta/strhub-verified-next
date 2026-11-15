@@ -104,7 +104,7 @@ INPUT_SIGNALS = {
     "ont": re.compile(r"\bnanopore\b|\bont\b|\bminimap2\b|\blong[- ]reads?\b|\bR9\.4|\bR10\b|\bguppy\b|\bdorado\b", re.I),
     "illumina": re.compile(r"\billumina\b|\bmiseq\b|\bnextseq\b|\bforenseq\b|\bpowerseq\b|\bshort[- ]reads?\b|\bamplicon\b|\bpaired[- ]end\b", re.I),
     "hg38": re.compile(r"\bhg38\b|\bgrch38\b", re.I),
-    "hg19": re.compile(r"\bhg19\b|\bgrch37\b", re.I),
+    "hg19": re.compile(r"\bhg19\b|\bgrch37\b|\bb37\b|\bhs37d5\b|\bncbi37\b", re.I),
     "ystr": re.compile(r"\by-?strs?\b|\bDYS\d{3}", re.I),
     "snp": re.compile(r"\bsnps?\b|\bisnp\b|\bphenotypic\b|\bancestry\b", re.I),
     "ce": re.compile(r"\.fsa\b|\.hid\b|\bcapillary\b|\belectropherogram\b", re.I),
@@ -1284,6 +1284,45 @@ def _type_for(kind: str, platform: str, ystr: bool) -> str | None:
     return None
 
 
+def _supported_platforms(statements: dict, statements_file: str | None = None,
+                         readme_name: str | None = None) -> list[dict]:
+    """Return all explicitly supported sequencing platforms from statements,
+    each with its documentary citation (`evidence_source`)."""
+    plats = [p for p in (statements.get("platform") or []) if p["platform"] in ("ont", "pacbio", "illumina")]
+    current = [p for p in plats if not p.get("historical")]
+    pool = current or plats
+    rn = readme_name or "README.md"
+    pf = statements["platform_file"] or rn if "platform_file" in statements else (statements_file or rn)
+    seen: set[str] = set()
+    out: list[dict] = []
+    for p in pool:
+        pl = p["platform"]
+        if pl in seen:
+            continue
+        seen.add(pl)
+        out.append({
+            "platform": pl,
+            "line": p.get("line"),
+            "text": p.get("text", ""),
+            "historical": bool(p.get("historical")),
+            "evidence_source": f"{pf}:L{p['line']}" if p.get("line") else None,
+        })
+    return out
+
+
+def _select_platform(supported: list[dict], kinds: list[str], ystr: bool) -> str | None:
+    """Deterministically choose one platform from `supported` that has a
+    compatible STRhub dataset for `kinds`, keeping nanopore > pacbio > illumina."""
+    names = [p["platform"] for p in supported]
+    ordered = [pl for pl in ("ont", "pacbio", "illumina") if pl in names]
+    if not ordered:
+        return None
+    for pl in ordered:
+        if any(_type_for(k, pl, ystr) for k in kinds):
+            return pl
+    return ordered[0]
+
+
 def _stated_platform(statements: dict) -> str | None:
     """The platform the documentation says the tool is FOR now. A current
     statement beats a historical one; long reads beat Illumina. When a tool
@@ -1297,6 +1336,73 @@ def _stated_platform(statements: dict) -> str | None:
         if pl in pool:
             return pl
     return None
+
+
+_ASSEMBLY_AGAINST_RE = re.compile(
+    r"\b(?:do not|don'?t|not)\s+(?:recommend|use|support)|\bnot\s+(?:supported|compatible)\b"
+    r"|\bunavailable\b|\bunsupported\b|\bavoid\b|\bonly\s+(?:supports?|for|works\s+on)\s+(?:hg19|grch37|b37|hs37d5)\b",
+    re.I,
+)
+
+
+def detect_assembly(readme: str, docs: list[dict] | None = None,
+                    readme_name: str | None = None) -> dict:
+    """Scan README and secondary non-wiki repository docs for assembly mentions
+    (hg38/GRCh38 vs hg19/GRCh37/b37/hs37d5/ncbi37) and explicit incompatibilities."""
+    rn = readme_name or "README.md"
+    sources: list[tuple[str, str]] = [(rn, readme)]
+    for d in docs or []:
+        if d.get("origin") != "wiki" and d.get("path") and d.get("text"):
+            sources.append((d["path"], d["text"]))
+    hg38_hits = 0
+    hg19_hits = 0
+    hg38_cite = None
+    hg19_cite = None
+    hg38_against = None
+    for file_path, text in sources:
+        for idx, line in enumerate(text.splitlines(), 1):
+            m38 = INPUT_SIGNALS["hg38"].findall(line)
+            if m38:
+                hg38_hits += len(m38)
+                if hg38_cite is None:
+                    hg38_cite = {"evidence_source": f"{file_path}:L{idx}", "text": line.strip()[:200]}
+                if _ASSEMBLY_AGAINST_RE.search(line) and hg38_against is None:
+                    hg38_against = {"evidence_source": f"{file_path}:L{idx}", "text": line.strip()[:200]}
+            m19 = INPUT_SIGNALS["hg19"].findall(line)
+            if m19:
+                hg19_hits += len(m19)
+                if hg19_cite is None:
+                    hg19_cite = {"evidence_source": f"{file_path}:L{idx}", "text": line.strip()[:200]}
+    if hg38_against:
+        declared = "incompatible_with_hg38"
+        incompatible = True
+        es = hg38_against["evidence_source"]
+    elif hg19_hits and hg38_hits:
+        declared = "both"
+        incompatible = False
+        es = (hg38_cite or {}).get("evidence_source")
+    elif hg38_hits:
+        declared = "hg38"
+        incompatible = False
+        es = (hg38_cite or {}).get("evidence_source")
+    elif hg19_hits:
+        declared = "hg19_only"
+        incompatible = True
+        es = (hg19_cite or {}).get("evidence_source")
+    else:
+        declared = None
+        incompatible = False
+        es = None
+    return {
+        "declared": declared,
+        "incompatible_with_hg38": incompatible,
+        "hg38_hits": hg38_hits,
+        "hg19_hits": hg19_hits,
+        "evidence_source": es,
+        "hg38_evidence_source": (hg38_cite or {}).get("evidence_source"),
+        "hg19_evidence_source": (hg19_cite or {}).get("evidence_source"),
+        "against_hg38": hg38_against,
+    }
 
 
 #: An option, or a redirection, that names what a command WRITES.
@@ -1324,7 +1430,7 @@ def kind_from_command(cmd: str) -> str | None:
 
 
 def detect_input_type(readme: str, examples: list[dict], docs: list[dict] | None = None,
-                      command: str | None = None) -> dict:
+                      command: str | None = None, readme_name: str | None = None) -> dict:
     """Which of STRhub's input types the tool can be run as, by READING what
     the README states (read_input_statements) and only failing that by
     counting mentions — and saying which of the two it was.
@@ -1334,6 +1440,9 @@ def detect_input_type(readme: str, examples: list[dict], docs: list[dict] | None
     there is one, cited, and the rest in the order the README documents them.
     """
     hits = {k: len(rx.findall(readme)) for k, rx in INPUT_SIGNALS.items()}
+    assembly = detect_assembly(readme, docs, readme_name)
+    hits["hg38"] = assembly["hg38_hits"]
+    hits["hg19"] = assembly["hg19_hits"]
     kinds = {e["kind"] for e in examples}
     statements = read_input_statements(readme)
     statements_file = None
@@ -1352,8 +1461,11 @@ def detect_input_type(readme: str, examples: list[dict], docs: list[dict] | None
                 break
     ystr = hits["ystr"] >= 3
     warnings: list[str] = []
-    if hits["hg19"] and not hits["hg38"]:
-        warnings.append("README mentions hg19/GRCh37 only; STRhub reference BAMs are hg38")
+    if assembly["incompatible_with_hg38"]:
+        if assembly.get("against_hg38"):
+            warnings.append("Documentation declares incompatibility with hg38/GRCh38")
+        else:
+            warnings.append("Documentation mentions hg19/GRCh37 only; STRhub reference BAMs are hg38")
 
     # What the documented command itself takes, when no sentence names reads:
     # vamos's README only says that its helper, tryvamos, reads VCFs, and
@@ -1362,10 +1474,11 @@ def detect_input_type(readme: str, examples: list[dict], docs: list[dict] | None
     only_aux = statements["determined"] and all(i["kind"] in ("vcf", "signal") for i in statements["inputs"])
     not_reads = cmd_kind in ("maf", "vcf")
     cohort_only = bool(re.search(r"\bSTRs are not genotyped\b", readme, re.I))
+    supported_platforms = _supported_platforms(statements, statements_file, readme_name)
     if cohort_only:
-        stated = _stated_platform(statements)
+        stated = _select_platform(supported_platforms, [], ystr)
         platform = stated or ("ont" if hits["ont"] > hits["illumina"] else "illumina")
-        platform_how = "stated" if stated else "counted"
+        platform_how = ("multi_stated" if len(supported_platforms) > 1 else "stated") if stated else "counted"
         ranked = []
         how = "read"
     elif not_reads:
@@ -1374,29 +1487,30 @@ def detect_input_type(readme: str, examples: list[dict], docs: list[dict] | None
         # and its README's "the read sequences (in fastq or fasta)" is the
         # input of the lastal step before it. Handing it reads would stage a
         # file its command never opens.
-        stated = _stated_platform(statements)
+        stated = _select_platform(supported_platforms, [], ystr)
         platform = stated or ("ont" if hits["ont"] > hits["illumina"] else "illumina")
-        platform_how = "stated" if stated else "counted"
+        platform_how = ("multi_stated" if len(supported_platforms) > 1 else "stated") if stated else "counted"
         ranked = []
         how = "command"
     elif cmd_kind and (not statements["determined"] or only_aux):
-        stated = _stated_platform(statements)
+        stated = _select_platform(supported_platforms, [cmd_kind], ystr)
         platform = stated or ("ont" if hits["ont"] > hits["illumina"] else "illumina")
-        platform_how = "stated" if stated else "counted"
+        platform_how = ("multi_stated" if len(supported_platforms) > 1 else "stated") if stated else "counted"
         ranked = [t for t in [_type_for(cmd_kind, platform, ystr)] if t]
         how = "command"
     elif statements["determined"]:
         # The platform the README states the tool is for; a count of platform
         # words decides only when no sentence does.
-        stated = _stated_platform(statements)
-        if stated:
-            platform, platform_how = stated, "stated"
-        else:
-            platform, platform_how = ("ont" if hits["ont"] > hits["illumina"] else "illumina"), "counted"
         documented = [i["kind"] for i in statements["inputs"]]
         rec = statements["recommendation"]
         order = ([rec["kind"]] if rec and rec["kind"] in documented else []) + \
                 [k for k in documented if not (rec and k == rec["kind"])]
+        stated = _select_platform(supported_platforms, order, ystr)
+        if stated:
+            platform = stated
+            platform_how = "multi_stated" if len(supported_platforms) > 1 else "stated"
+        else:
+            platform, platform_how = ("ont" if hits["ont"] > hits["illumina"] else "illumina"), "counted"
         ranked = [t for t in (_type_for(k, platform, ystr) for k in order) if t]
         how = "read"
     else:
@@ -1433,6 +1547,7 @@ def detect_input_type(readme: str, examples: list[dict], docs: list[dict] | None
             # How the answer was reached, and the sentences it rests on, so a
             # report can cite them — or say that nothing was there to cite.
             "how": how, "platform": platform, "platform_how": platform_how,
+            "supported_platforms": supported_platforms, "assembly": assembly,
             "statements": statements}
 
 
@@ -1471,19 +1586,21 @@ MULTI_SAMPLE_MAPPING_FLAG_RE = re.compile(
 def detect_regions_format(readme: str, docs: list[dict] | None = None,
                           readme_name: str | None = None) -> dict:
     """Detect the regions/catalog format when the repository's own documentation
-    explicitly specifies the column or JSON schema. Returns the format and its
-    exact documentary citation (`evidence_source`), or None when undocumented."""
+    explicitly specifies a unique column or JSON schema. Returns the format and
+    its exact documentary citation (`evidence_source`), marks `ambiguous: True`
+    when two incompatible schemas match, or returns None when undocumented."""
     rn = readme_name or "README.md"
     sources: list[tuple[str, str]] = [(rn, readme)]
     for d in docs or []:
         if d.get("origin") != "wiki" and d.get("path") and d.get("text"):
             sources.append((d["path"], d["text"]))
+    found: dict[str, dict] = {}
     for file_path, text in sources:
         lines = text.splitlines()
         for idx, line in enumerate(lines):
             line_no = idx + 1
             for fmt, rx in REGION_SCHEMA_PATTERNS:
-                if not rx.search(line):
+                if fmt in found or not rx.search(line):
                     continue
                 if fmt == "eh_catalog":
                     window = "\n".join(lines[max(0, idx - 15):min(len(lines), idx + 16)])
@@ -1499,7 +1616,7 @@ def detect_regions_format(readme: str, docs: list[dict] | None = None,
                         start_line = back + 1
                         break
                 cite = f"{file_path}:L{start_line}-L{line_no}" if start_line != line_no else f"{file_path}:L{line_no}"
-                return {
+                found[fmt] = {
                     "format": fmt,
                     "file": file_path,
                     "line": start_line,
@@ -1507,8 +1624,18 @@ def detect_regions_format(readme: str, docs: list[dict] | None = None,
                     "text": line.strip()[:300],
                     "evidence_source": cite,
                 }
+    if len(found) == 1:
+        only = next(iter(found.values()))
+        return {**only, "ambiguous": False, "candidates": [only]}
+    if len(found) > 1:
+        return {
+            "format": None, "file": None, "line": None, "end_line": None,
+            "text": None, "evidence_source": None,
+            "ambiguous": True, "candidates": list(found.values()),
+        }
     return {"format": None, "file": None, "line": None, "end_line": None,
-            "text": None, "evidence_source": None}
+            "text": None, "evidence_source": None,
+            "ambiguous": False, "candidates": []}
 
 
 def detect_single_sample_bams(readme: str, docs: list[dict] | None = None,
@@ -1845,7 +1972,7 @@ def detect(slug: str, ref: str, tree_resp: dict, readme: str, readme_name: str |
     examples = detect_example_data(tree)
     names = sorted(set(tool_names(slug, tree)) | set(pkg["executables"]))
     commands = detect_commands(readme, names, docs, readme_name, pkg["executables"])
-    input_type = detect_input_type(readme, examples, docs, commands[0]["cmd"] if commands else None)
+    input_type = detect_input_type(readme, examples, docs, commands[0]["cmd"] if commands else None, readme_name)
     commands = attach_prerequisite(prefer_input_kind(commands, _kind_of_type(input_type.get("best"))), set(paths))
     for c in commands:
         c_file = c.get("file") or rn
@@ -1862,9 +1989,14 @@ def detect(slug: str, ref: str, tree_resp: dict, readme: str, readme_name: str |
         input_type["evidence_source"] = f"{c0.get('file') or rn}:L{c0['line']}"
     else:
         input_type["evidence_source"] = None
-    if input_type.get("platform_how") == "stated" and st.get("platform"):
-        pf = st["platform_file"] or rn if "platform_file" in st else sf
-        input_type["platform_evidence_source"] = f"{pf}:L{st['platform'][0]['line']}"
+    if input_type.get("platform_how") in ("stated", "multi_stated") and st.get("platform"):
+        sup = input_type.get("supported_platforms") or []
+        sel = next((p for p in sup if p["platform"] == input_type.get("platform")), None)
+        if sel and sel.get("evidence_source"):
+            input_type["platform_evidence_source"] = sel["evidence_source"]
+        else:
+            pf = st["platform_file"] or rn if "platform_file" in st else sf
+            input_type["platform_evidence_source"] = f"{pf}:L{st['platform'][0]['line']}"
     elif input_type.get("platform_how") == "implied_by_kind":
         input_type["platform_evidence_source"] = input_type["evidence_source"]
     else:

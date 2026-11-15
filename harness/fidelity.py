@@ -121,7 +121,7 @@ def rewrite(command: str, input_type: str | None, regions: str | None = None, on
     regions_mount = ("/data/in/regions" + pathlib.PurePosixPath(regions_source).suffix) if regions_source else None
     regions_used = False
     if ((ds or {}).get("reference") == "hg38"
-            and re.search(r"(?:hg19|grch37|hg18|ncbi36|t2t|chm13)(?![a-z0-9])", command, re.I)):
+            and re.search(r"(?:hg19|grch37|b37|hs37d5|ncbi37|hg18|ncbi36|t2t|chm13)(?![a-z0-9])", command, re.I)):
         result["limitations"].append("the command names a different assembly from the registered hg38 dataset")
         return result
     changes = []
@@ -312,6 +312,8 @@ def documented_regions(proposal: dict | None) -> str | None:
     if not proposal:
         return None
     reg = proposal.get("regions") or {}
+    if reg.get("ambiguous"):
+        return None
     fmt = reg.get("format")
     if not fmt:
         return None
