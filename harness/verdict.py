@@ -345,6 +345,20 @@ def _decide(gates: dict, diagnostics: dict[str, list[dict]] | None = None,
             "readme_gaps": gaps}
 
 
+def _status_code(verdict_dict: dict, procedure: dict | None) -> str:
+    code = verdict_dict.get("code")
+    if code == "runs":
+        return "PASSED"
+    if code == "out_of_scope":
+        return "OUT_OF_SCOPE"
+    if code == "fails":
+        return "FAILED_EXECUTION"
+    proc_status = procedure.get("status_code") if isinstance(procedure, dict) else None
+    if proc_status in ("FAILED_AMBIGUOUS_CLI", "UNVERIFIED_INSUFFICIENT_DOCS"):
+        return proc_status
+    return "UNVERIFIED_INSUFFICIENT_DOCS"
+
+
 def decide(gates: dict, diagnostics: dict[str, list[dict]] | None = None,
            recipe_proposal: dict | None = None,
            declared_compatibility: dict | None = None,
@@ -353,6 +367,7 @@ def decide(gates: dict, diagnostics: dict[str, list[dict]] | None = None,
     """The verdict, plus the blockers a reader can act on when it is not 'runs'."""
     v = _decide(gates, diagnostics, recipe_proposal, declared_compatibility,
                 strhub_fault, procedure, manifest)
+    v["status_code"] = _status_code(v, procedure)
     if v.get("basis") == "strhub":
         v["blockers"] = []
         return v

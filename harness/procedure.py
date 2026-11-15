@@ -99,13 +99,13 @@ def classify(proposal: dict, manifest: dict, limitations: list[str],
     if commands:
         cited = commands[0].get("cmd") or ""
     rewritten, _cwd = unwrap_example((manifest.get("run") or {}).get("cmd") or "")
-    transformation = fidelity.rewrite_for(manifest, cited)
+    transformation = fidelity.rewrite_for(manifest, cited, proposal)
     prepared = source == "prepared"
     expected = transformation["command"]
     citations = [fidelity.cite(proposal, commands[0])] if commands else []
     if commands and commands[0].get("prerequisite"):
         prerequisite = commands[0]["prerequisite"]
-        pre_review = fidelity.rewrite_for(manifest, prerequisite["cmd"])
+        pre_review = fidelity.rewrite_for(manifest, prerequisite["cmd"], proposal)
         citations.append(fidelity.cite(proposal, prerequisite))
         transformation["limitations"] += pre_review["limitations"]
         transformation["prerequisite"] = pre_review
@@ -191,6 +191,113 @@ def classify(proposal: dict, manifest: dict, limitations: list[str],
                            "what": "The install named here is a published image or package. That is a claim "
                                    "about the image, not about this commit, and it was not counted as the commit running."})
 
+    # Mandatory traceability (`evidence_source`) for every parameter inferred or applied.
+    inst_cite = (installation.get("citation")
+                 or (installation.get("documented_installation") or {}).get("citation") or {})
+    if inst_cite.get("path"):
+        inst_start = inst_cite.get("start_line") or inst_cite.get("line")
+        inst_end = inst_cite.get("end_line") or inst_start
+        inst_es = (f"{inst_cite['path']}:L{inst_start}-L{inst_end}"
+                   if inst_start and inst_end and inst_start != inst_end
+                   else f"{inst_cite['path']}:L{inst_start}" if inst_start else f"repo_file:{inst_cite['path']}")
+    elif installation.get("file"):
+        inst_es = installation["file"]
+    else:
+        inst_es = build.get("evidence_source")
+
+    c0 = citations[0] if citations else {}
+    cmd_es = (f"{c0['path']}:L{c0['line']}-L{c0['end_line']}" if c0.get("end_line")
+              else f"{c0['path']}:L{c0['line']}") if c0.get("verified") else (
+              commands[0].get("evidence_source") if commands else None)
+
+    inferences: dict[str, dict] = {
+        "install": {
+            "evidence_source": inst_es,
+            "verified": bool(installation.get("ready") and inst_es),
+        },
+        "run_command": {
+            "evidence_source": cmd_es,
+            "verified": bool(citations and all(c.get("verified") for c in citations)),
+            **({"kind": "doc", "path": c0["path"], "document_sha256": c0.get("document_sha256")}
+               if c0.get("verified") else {}),
+        },
+    }
+    if inputs.get("type"):
+        if prepared:
+            inferences["input_type"] = {
+                "evidence_source": installation.get("file") or "preparation",
+                "verified": bool(installation.get("ready")),
+            }
+        elif input_evidence.get("how") == "counted" or "input_type_guessed" in limitations:
+            inferences["input_type"] = {"evidence_source": None, "verified": False}
+        elif input_evidence.get("evidence_source"):
+            ver = fidelity.verify_evidence_source(proposal, input_evidence.get("evidence_source"))
+            inferences["input_type"] = ver
+        elif c0.get("verified") and transformation["read_bindings"]:
+            inferences["input_type"] = {
+                "verified": True, "kind": "doc", "path": c0["path"], "line": c0["line"],
+                "document_sha256": c0.get("document_sha256"),
+                "evidence_source": f"{c0['path']}:L{c0['line']}",
+            }
+        else:
+            inferences["input_type"] = {"evidence_source": None, "verified": False}
+    if inputs.get("regions"):
+        if prepared:
+            inferences["regions"] = {
+                "evidence_source": installation.get("file") or "preparation",
+                "verified": bool(installation.get("ready")),
+            }
+        else:
+            reg = proposal.get("regions") or {}
+            ver = fidelity.verify_evidence_source(proposal, reg.get("evidence_source"), reg.get("text"))
+            inferences["regions"] = {
+                **ver,
+                "verified": bool(ver.get("verified") and reg.get("format") == inputs.get("regions")),
+            }
+            if not inferences["regions"]["verified"]:
+                amendments.append({
+                    "code": "unbacked_inference",
+                    "what": "The declared regions layout lacks a verified documentary citation in the repository.",
+                })
+    if any(s.get("role") == "read_path" and "," in s.get("original", "")
+           for s in transformation.get("substitutions") or []):
+        if prepared:
+            inferences["single_sample_bams"] = {
+                "evidence_source": installation.get("file") or "preparation",
+                "verified": bool(installation.get("ready")),
+            }
+        else:
+            ss = proposal.get("single_sample_bams") or {}
+            ver = fidelity.verify_evidence_source(proposal, ss.get("evidence_source"), ss.get("text"))
+            inferences["single_sample_bams"] = {
+                **ver,
+                "verified": bool(ver.get("verified") and ss.get("allowed")),
+            }
+            if not inferences["single_sample_bams"]["verified"]:
+                amendments.append({
+                    "code": "unbacked_inference",
+                    "what": "Single-sample substitution of a comma-separated input list lacks a verified documentary citation in the repository.",
+                })
+    out_info = proposal.get("output") or {}
+    if out_info.get("evidence_source"):
+        inferences["output"] = fidelity.verify_evidence_source(proposal, out_info.get("evidence_source"))
+    elif glob not in ("**/*", "**/*.*", None) and c0.get("verified"):
+        inferences["output"] = {
+            "verified": True, "kind": "doc", "path": c0["path"], "line": c0["line"],
+            "document_sha256": c0.get("document_sha256"),
+            "evidence_source": f"{c0['path']}:L{c0['line']}",
+        }
+    else:
+        inferences["output"] = {"evidence_source": None, "verified": False}
+
+    unbacked_inferences = sorted(k for k, v in inferences.items() if not v.get("verified"))
+    if unbacked_inferences and not amendments:
+        amendments.append({
+            "code": "unbacked_inference",
+            "what": "Inferred parameters lack a verified documentary citation in the repository: "
+                    + ", ".join(unbacked_inferences) + ".",
+        })
+
     # One lead, in the order a reviewer should read it. The first match is
     # why we will not call a red result the tool's.
     if not proposal:
@@ -218,6 +325,15 @@ def classify(proposal: dict, manifest: dict, limitations: list[str],
 
     may_say_runs = blocker == "ready"
     if may_say_runs:
+        status_code = "VERIFIED_PROCEDURE_READY"
+    elif blocker in ("command_profile_unsupported", "synopsis_trimmed", "flag_injected", "flag_dropped",
+                     "command_changed", "prerequisite_profile_unsupported", "working_directory_changed",
+                     "capture_wrapper_missing", "capture_wrapper_changed", "input_not_substituted"):
+        status_code = "FAILED_AMBIGUOUS_CLI"
+    else:
+        status_code = "UNVERIFIED_INSUFFICIENT_DOCS"
+
+    if may_say_runs:
         reason = ("The repository states how to install (" + method + ") and STRhub holds the sample. "
                   "The container is that install, packaged. If the documented command then fails, "
                   "the failure is that command's.")
@@ -242,11 +358,14 @@ def classify(proposal: dict, manifest: dict, limitations: list[str],
 
     return {
         "may_say_runs": may_say_runs,
+        "status_code": status_code,
         "basis": basis,
         "attribution": attribution,
         "blocker": blocker,
         "reason": reason,
         "amendments": amendments,
+        "inferences": inferences,
+        "unbacked_inferences": unbacked_inferences,
         "install_method": method,
         "citable_install": citable,
         "input_type": (manifest.get("inputs") or {}).get("type"),

@@ -1442,18 +1442,115 @@ NOT_OUTPUT_FILES = re.compile(r"\b(?:requirements|CMakeLists|LICENSE|README|CHAN
 #: Order among equals: the format the Content gate reads best first.
 OUTPUT_PRIORITY = {"vcf": 0, "tsv": 1, "csv": 2, "json": 3}
 
+#: Explicit region/catalog schema specifications in repository documentation.
+#: Matched strictly on documented column/field layouts, never on tool names.
+REGION_SCHEMA_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
+    ("hipstr", re.compile(r"\bCHROM\s*\|\s*START\s*\|\s*END\s*\|\s*MOTIF_LEN\s*\|\s*NUM_COPIES\b", re.I)),
+    ("gangstr", re.compile(r"\bCHROM\*{0,2}\s*\|\s*\*{0,2}START\*{0,2}\s*\|\s*\*{0,2}END\*{0,2}\s*\|\s*\*{0,2}MOTIF_LEN\*{0,2}\s*\|\s*\*{0,2}MOTIF\b", re.I)),
+    ("strsearch", re.compile(r"\|\s*Chr\s*\|\s*Start\s*\|\s*End\s*\|\s*Period\s*\|\s*Reference allele\s*\|\s*Marker\s*\|\s*STR\s*\|\s*STR sequence structure\b", re.I)),
+    ("trgt", re.compile(r"\bID=[^;\s]+;MOTIFS=[^;\s]+;STRUC=", re.I)),
+    ("eh_catalog", re.compile(r'"LocusStructure"\s*:', re.I)),
+    ("motif", re.compile(
+        r"\bCHROM\s*\|\s*START\s*\|\s*END\s*\|\s*MOTIF\b(?!_LEN)"
+        r"|\bfour\s+required\s+columns\s*:\s*`?chromosome`?\s*,\s*`?start_position`?\s*,\s*`?end_position`?\s*,\s*`?repeat_unit_sequence`?"
+        r"|\b4[- ]col(?:umn)?\s+BED\s+format\s*:\s*chromosome\s+start\s+end\s+(?:repeat|motif)\b"
+        r"|\b4-col\b[^\n]*?\bmotif\s+as\s+last\s+column\b"
+        r"|\|\s*4\s*\|\s*Motifs?\s+of\s+the\s+locus\b", re.I)),
+    ("bed4", re.compile(r"\b4[- ]col(?:umn)?\s+BED\s+format\s*:\s*(?:chrom(?:osome)?|chr)\s+start\s+end\s+(?:name|id|locus)\b", re.I)),
+]
 
-def detect_output(readme: str, commands: list[dict], docs: list[dict] | None = None) -> dict:
+REGION_SECTION_HEADING = re.compile(
+    r"^(?:#{1,4}\s+.*\b(?:bed|regions?|loci|catalog|repeat)\b|\*{1,2}Format\s+of\b[^\n]*\bBED\b)", re.I)
+
+SINGLE_SAMPLE_BAM_LIST_RE = re.compile(
+    r"(?:`?--?bams?`?|\*\*bams?\*\*)\s*:\s*a?\s*comma[- ]separated\s+list\s+of\s+(?:\[?BAM\]?[^\n]*?\s+)?files\b", re.I)
+MULTI_SAMPLE_MAPPING_FLAG_RE = re.compile(
+    r"(?:^|\s)--bam-(?:samps|libs)(?:\s+|=)\S*,\S*", re.I)
+
+
+def detect_regions_format(readme: str, docs: list[dict] | None = None,
+                          readme_name: str | None = None) -> dict:
+    """Detect the regions/catalog format when the repository's own documentation
+    explicitly specifies the column or JSON schema. Returns the format and its
+    exact documentary citation (`evidence_source`), or None when undocumented."""
+    rn = readme_name or "README.md"
+    sources: list[tuple[str, str]] = [(rn, readme)]
+    for d in docs or []:
+        if d.get("origin") != "wiki" and d.get("path") and d.get("text"):
+            sources.append((d["path"], d["text"]))
+    for file_path, text in sources:
+        lines = text.splitlines()
+        for idx, line in enumerate(lines):
+            line_no = idx + 1
+            for fmt, rx in REGION_SCHEMA_PATTERNS:
+                if not rx.search(line):
+                    continue
+                if fmt == "eh_catalog":
+                    window = "\n".join(lines[max(0, idx - 15):min(len(lines), idx + 16)])
+                    if '"ReferenceRegion"' not in window:
+                        continue
+                if fmt == "motif" and re.search(r"\|\s*4\s*\|\s*Motifs?\s+of\s+the\s+locus\b", line, re.I):
+                    window = "\n".join(lines[max(0, idx - 15):idx + 1])
+                    if not re.search(r"\|\s*1\s*\|\s*Chromosome.*\|\s*2\s*\|\s*Start.*\|\s*3\s*\|\s*End", window, re.I | re.S):
+                        continue
+                start_line = line_no
+                for back in range(idx - 1, max(-1, idx - 20), -1):
+                    if REGION_SECTION_HEADING.search(lines[back].strip()):
+                        start_line = back + 1
+                        break
+                cite = f"{file_path}:L{start_line}-L{line_no}" if start_line != line_no else f"{file_path}:L{line_no}"
+                return {
+                    "format": fmt,
+                    "file": file_path,
+                    "line": start_line,
+                    "end_line": line_no,
+                    "text": line.strip()[:300],
+                    "evidence_source": cite,
+                }
+    return {"format": None, "file": None, "line": None, "end_line": None,
+            "text": None, "evidence_source": None}
+
+
+def detect_single_sample_bams(readme: str, docs: list[dict] | None = None,
+                              readme_name: str | None = None,
+                              command: str | None = None) -> dict:
+    """Check whether the documentation explicitly defines `--bams`/`--bam` as a
+    comma-separated list of sample BAMs and the command does not bind multiple
+    sample/library labels via `--bam-samps` or `--bam-libs`."""
+    if command and MULTI_SAMPLE_MAPPING_FLAG_RE.search(command):
+        return {"allowed": False, "file": None, "line": None, "text": None, "evidence_source": None}
+    rn = readme_name or "README.md"
+    sources: list[tuple[str, str]] = [(rn, readme)]
+    for d in docs or []:
+        if d.get("origin") != "wiki" and d.get("path") and d.get("text"):
+            sources.append((d["path"], d["text"]))
+    for file_path, text in sources:
+        for line_no, line in enumerate(text.splitlines(), 1):
+            if SINGLE_SAMPLE_BAM_LIST_RE.search(line):
+                return {
+                    "allowed": True,
+                    "file": file_path,
+                    "line": line_no,
+                    "text": line.strip()[:300],
+                    "evidence_source": f"{file_path}:L{line_no}",
+                }
+    return {"allowed": False, "file": None, "line": None, "text": None, "evidence_source": None}
+
+
+def detect_output(readme: str, commands: list[dict], docs: list[dict] | None = None,
+                  readme_name: str | None = None) -> dict:
     """The output format the documentation describes: the README, the
     documents it links (ExpansionHunter describes its VCF and JSON outputs in
     docs/05_OutputJsonFiles.md and 06_OutputVcfFiles.md) and the commands. A
     file a README names that is not an output (requirements.txt) is not a
     vote for TSV; that is how ExpansionHunter's VCF was looked for as a table."""
+    rn = readme_name or "README.md"
     text = readme + "\n" + "\n".join(d["text"] for d in docs or []) + "\n" + "\n".join(c["cmd"] for c in commands)
     text = NOT_OUTPUT_FILES.sub(" ", text)
     scores = [(fmt, len(rx.findall(text))) for fmt, rx in OUTPUT_SIGNALS]
     scores.sort(key=lambda x: (-x[1], OUTPUT_PRIORITY.get(x[0], 9)))
     best = scores[0][0] if scores and scores[0][1] else None
+    evidence_source: str | None = None
     # The command writes a file with an extension, or the documentation states
     # an explicit output glob (`logbam/RepBAM_*.log`): that settles it.
     if commands:
@@ -1461,9 +1558,27 @@ def detect_output(readme: str, commands: list[dict], docs: list[dict] | None = N
                       commands[0]["cmd"], re.I)
         if m:
             best = m.group(1).lower()
+            c0 = commands[0]
+            if c0.get("line"):
+                evidence_source = f"{c0.get('file') or rn}:L{c0['line']}"
     if best is None and re.search(r"[\w./-]+/[\w.*-]*\*[\w.-]*\.(?:log|txt|tsv)\b", text, re.I):
         best = "tsv"
-    return {"format": best, "signals": dict(scores)}
+    if best and not evidence_source:
+        rx = dict(OUTPUT_SIGNALS).get(best)
+        sources = [(rn, readme)] + [(d["path"], d["text"]) for d in (docs or []) if d.get("path") and d.get("text")]
+        for file_path, doc_text in sources:
+            for line_no, ln in enumerate(doc_text.splitlines(), 1):
+                cleaned = NOT_OUTPUT_FILES.sub(" ", ln)
+                if (rx and rx.search(cleaned)) or (
+                        best == "tsv" and re.search(r"[\w./-]+/[\w.*-]*\*[\w.-]*\.(?:log|txt|tsv)\b", cleaned, re.I)):
+                    evidence_source = f"{file_path}:L{line_no}"
+                    break
+            if evidence_source:
+                break
+        if not evidence_source and commands and commands[0].get("line"):
+            c0 = commands[0]
+            evidence_source = f"{c0.get('file') or rn}:L{c0['line']}"
+    return {"format": best, "signals": dict(scores), "evidence_source": evidence_source}
 
 
 #: Headings under which an author writes down what they already know is wrong
@@ -1570,8 +1685,11 @@ def propose_example(commands: list[dict], tree_paths: list[str], examples: list[
         if any(t not in tree and t.lstrip("./") not in tree for t in reads):
             continue
         if any(r.lstrip("./") in example_paths for r in refs):
+            inputs_in_repo = sorted({r.lstrip("./") for r in refs})
+            cite = (f"{c.get('file') or 'README.md'}:L{c['line']}" if c.get("line")
+                    else f"example_file:{inputs_in_repo[0]}")
             return {"cmd": c["cmd"], "cwd": "/opt/tool", "source": "detected",
-                    "inputs_in_repo": sorted({r.lstrip("./") for r in refs})}
+                    "inputs_in_repo": inputs_in_repo, "evidence_source": cite}
     # Second pass: commands written relative to an example directory in the
     # repository (e.g. ExpansionHunterDenovo's quickstart run from
     # examples/case-control/ on bamlets/sample1.bam and reference.fasta).
@@ -1594,8 +1712,11 @@ def propose_example(commands: list[dict], tree_paths: list[str], examples: list[
                 refs_sub = [f"{sub}/{t.lstrip('./')}" for t in tokens if f"{sub}/{t.lstrip('./')}" in tree]
                 if any(p in example_paths for p in refs_sub):
                     cmd_clean = re.sub(r"^(?:\./)?/?path/to/", "", c["cmd"], flags=re.I)
+                    inputs_in_repo = sorted(set(refs_sub))
+                    cite = (f"{c.get('file') or 'README.md'}:L{c['line']}" if c.get("line")
+                            else f"example_file:{inputs_in_repo[0]}")
                     return {"cmd": cmd_clean, "cwd": f"/opt/tool/{sub}", "source": "detected",
-                            "inputs_in_repo": sorted(set(refs_sub))}
+                            "inputs_in_repo": inputs_in_repo, "evidence_source": cite}
     return None
 
 
@@ -1701,6 +1822,7 @@ def detect(slug: str, ref: str, tree_resp: dict, readme: str, readme_name: str |
     """The proposal. `extras` is the rest of what gather() / load_snapshot()
     read: linked documents, build files, what is published elsewhere."""
     extras = extras or {}
+    rn = readme_name or "README.md"
     tree = tree_resp["tree"]
     paths = [e["path"] for e in tree]
     docs = extras.get("docs") or []
@@ -1709,17 +1831,64 @@ def detect(slug: str, ref: str, tree_resp: dict, readme: str, readme_name: str |
     docs_text = "\n".join(d["text"] for d in docs)
     build = detect_build(paths, readme, files, docs_text,
                          (extras.get("published") or {}).get("release"), slug)
+    if build.get("readme_line"):
+        build["evidence_source"] = f"{rn}:L{build['readme_line']}"
+    elif build.get("file"):
+        build["evidence_source"] = f"repo_file:{build['file']}"
+    elif build.get("method") == "release_binary" and build.get("asset"):
+        build["evidence_source"] = f"release_asset:{build['asset']}"
+    elif build.get("method") == "readme":
+        first_inst = next((no for no, ln in _code_lines_numbered(readme) if INSTALL_RE.search(ln)), None)
+        build["evidence_source"] = f"{rn}:L{first_inst}" if first_inst else None
+    else:
+        build["evidence_source"] = None
     examples = detect_example_data(tree)
     names = sorted(set(tool_names(slug, tree)) | set(pkg["executables"]))
     commands = detect_commands(readme, names, docs, readme_name, pkg["executables"])
     input_type = detect_input_type(readme, examples, docs, commands[0]["cmd"] if commands else None)
     commands = attach_prerequisite(prefer_input_kind(commands, _kind_of_type(input_type.get("best"))), set(paths))
-    output = detect_output(readme, commands, docs)
+    for c in commands:
+        c_file = c.get("file") or rn
+        c["evidence_source"] = f"{c_file}:L{c['line']}" if c.get("line") else None
+        if c.get("prerequisite") and c["prerequisite"].get("line"):
+            pre_file = c["prerequisite"].get("file") or rn
+            c["prerequisite"]["evidence_source"] = f"{pre_file}:L{c['prerequisite']['line']}"
+    st = input_type.get("statements") or {}
+    sf = input_type.get("statements_file") or rn
+    if input_type.get("how") == "read" and st.get("inputs"):
+        input_type["evidence_source"] = f"{sf}:L{st['inputs'][0]['line']}"
+    elif input_type.get("how") == "command" and commands and commands[0].get("line"):
+        c0 = commands[0]
+        input_type["evidence_source"] = f"{c0.get('file') or rn}:L{c0['line']}"
+    else:
+        input_type["evidence_source"] = None
+    if input_type.get("platform_how") == "stated" and st.get("platform"):
+        pf = st["platform_file"] or rn if "platform_file" in st else sf
+        input_type["platform_evidence_source"] = f"{pf}:L{st['platform'][0]['line']}"
+    elif input_type.get("platform_how") == "implied_by_kind":
+        input_type["platform_evidence_source"] = input_type["evidence_source"]
+    else:
+        input_type["platform_evidence_source"] = None
+    regions = detect_regions_format(readme, docs, readme_name)
+    single_sample_bams = detect_single_sample_bams(readme, docs, readme_name,
+                                                   commands[0]["cmd"] if commands else None)
+    output = detect_output(readme, commands, docs, readme_name)
     rd = readme_gaps(readme_name, build, commands, input_type, output, examples)
     known = author_known_issues(readme)
     # Each known-issue quote carries the URL of the line it was read from.
     for k in known:
-        k["url"] = blob_url(slug, ref, readme_name or "README.md", k["line"])
+        k["url"] = blob_url(slug, ref, rn, k["line"])
+    example = propose_example(commands, paths, examples)
+    inferences = {
+        "build": build.get("evidence_source"),
+        "run_command": commands[0].get("evidence_source") if commands else None,
+        "input_type": input_type.get("evidence_source"),
+        "platform": input_type.get("platform_evidence_source"),
+        "regions": regions.get("evidence_source"),
+        "single_sample_bams": single_sample_bams.get("evidence_source"),
+        "output": output.get("evidence_source"),
+        "example": example.get("evidence_source") if example else None,
+    }
     return {
         "schema": "strhub-verified/recipe-proposal/1",
         "repo": f"https://github.com/{slug}",
@@ -1747,7 +1916,10 @@ def detect(slug: str, ref: str, tree_resp: dict, readme: str, readme_name: str |
         "upstream_files": ({build["file"]: files[build["file"]]}
                            if build.get("method") in ("dockerfile", "make") and files.get(build.get("file")) else {}),
         "input_type": input_type,
+        "regions": regions,
+        "single_sample_bams": single_sample_bams,
         "output": output,
+        "inferences": inferences,
         "readme": rd,
         # The first part of the README and linked docs travel with the proposal.
         "readme_text": readme[:20_000],
@@ -1759,7 +1931,7 @@ def detect(slug: str, ref: str, tree_resp: dict, readme: str, readme_name: str |
         # The claims above, each with the file, line and URL it rests on.
         "evidence": evidence_for(slug, ref, readme, readme_name, build, commands, examples, known, input_type,
                                  docs),
-        "example": propose_example(commands, paths, examples),
+        "example": example,
         "dockerfile": generate_dockerfile(slug, ref, build, files=files),
     }
 

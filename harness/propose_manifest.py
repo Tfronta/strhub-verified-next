@@ -230,14 +230,21 @@ def _build(proposal: dict, slug: str, submitted_by: str = "third_party",
 
     # --- the command
     best = commands[0]["cmd"] if commands else ""
+    doc_regions = None if prepared else fidelity.documented_regions(proposal)
+    doc_one_sample = False if prepared else fidelity.documented_single_sample(proposal, best)
+    eff_regions = (prepared or {}).get("regions") or doc_regions
+    eff_one_sample = bool(prepared) or doc_one_sample
+    used_regions = (prepared or {}).get("regions")
     if input_note:
         caveat_items.append(input_note)
     if not best:
         limitations.append("no_command")
         run_cmd = "true  # no command found in the README; nothing to run"
     else:
-        rewritten, notes = rewrite_for_strhub(best, input_type, regions=(prepared or {}).get("regions"),
-                                              one_sample=bool(prepared))
+        rewritten, notes = rewrite_for_strhub(best, input_type, regions=eff_regions,
+                                              one_sample=eff_one_sample)
+        if not prepared and doc_regions and "/data/in/regions." in rewritten:
+            used_regions = doc_regions
         pre = commands[0].get("prerequisite")
         if pre:
             notes.append("Evaluator limitation: a possible prerequisite was discovered but was not automatically chained.")
@@ -273,7 +280,7 @@ def _build(proposal: dict, slug: str, submitted_by: str = "third_party",
         "report": {"slug": catalogue_slug(name, input_type)},
         "environment": env,
         "run": {"cmd": run_cmd, "timeout_minutes": 20},
-        "inputs": ({"type": input_type, **({"regions": prepared["regions"]} if (prepared or {}).get("regions") else {})}
+        "inputs": ({"type": input_type, **({"regions": used_regions} if used_regions else {})}
                    if input_type else {}),
         "outputs": outputs,
     }

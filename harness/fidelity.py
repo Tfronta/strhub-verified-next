@@ -266,13 +266,87 @@ def literal_profiles() -> list:
     return [source_install, documented_install]
 
 
-def rewrite_for(manifest: dict, command: str) -> dict:
+def verify_evidence_source(proposal: dict | None, cite_str: str | None,
+                           quoted_text: str | None = None) -> dict:
+    """Verify that an `evidence_source` citation (e.g. `README.md:L308-L322`,
+    `README.md:L75`, `repo_file:Makefile`, `example_file:test/sample.bam`)
+    points to real, non-wiki repository content in `proposal`."""
+    out = {"verified": False, "evidence_source": cite_str}
+    if not proposal or not cite_str or not isinstance(cite_str, str):
+        return out
+    if cite_str.startswith(("repo_file:", "example_file:")):
+        path = cite_str.split(":", 1)[1]
+        if path and path in set(proposal.get("tree_paths") or []):
+            return {"verified": True, "kind": "tree", "path": path, "evidence_source": cite_str}
+        return out
+    m = re.fullmatch(r"(?P<path>[^:]+):L(?P<start>\d+)(?:-L(?P<end>\d+))?", cite_str)
+    if not m:
+        return out
+    path = m.group("path")
+    start = int(m.group("start"))
+    end = int(m.group("end") or start)
+    for doc in proposal.get("source_documents") or []:
+        if doc.get("file") != path or doc.get("origin") == "wiki":
+            continue
+        raw_text = doc.get("text") or ""
+        lines = raw_text.splitlines()
+        if 1 <= start <= end <= len(lines):
+            span = "\n".join(lines[start - 1:end])
+            if quoted_text is not None and (not quoted_text or quoted_text not in span):
+                return out
+            return {
+                "verified": True,
+                "kind": "doc",
+                "path": path,
+                "line": start,
+                "end_line": end,
+                "document_sha256": digest(raw_text),
+                "evidence_source": cite_str,
+            }
+    return out
+
+
+def documented_regions(proposal: dict | None) -> str | None:
+    """The regions layout documented in the repository, when backed by a
+    verified citation in `source_documents`."""
+    if not proposal:
+        return None
+    reg = proposal.get("regions") or {}
+    fmt = reg.get("format")
+    if not fmt:
+        return None
+    check = verify_evidence_source(proposal, reg.get("evidence_source"), reg.get("text"))
+    return fmt if check["verified"] else None
+
+
+def documented_single_sample(proposal: dict | None, command: str = "") -> bool:
+    """Whether the repository's documentation explicitly establishes that
+    `--bams`/`--bam` is a comma-separated list of sample BAMs and the command
+    does not bind multiple sample/library names."""
+    if not proposal:
+        return False
+    ss = proposal.get("single_sample_bams") or {}
+    if not ss.get("allowed"):
+        return False
+    if command and re.search(r"(?:^|\s)--bam-(?:samps|libs)(?:\s+|=)\S*,\S*", command, re.I):
+        return False
+    check = verify_evidence_source(proposal, ss.get("evidence_source"), ss.get("text"))
+    return bool(check["verified"])
+
+
+def rewrite_for(manifest: dict, command: str, proposal: dict | None = None) -> dict:
     """`rewrite` with what the effective manifest says about the run: its
-    dataset, the regions layout a preparation named, and whether STRhub
-    prepared it (one sample then stands in for a documented list)."""
+    dataset, the regions layout a preparation or verified repository
+    documentation named, and whether one sample stands in for a documented
+    list."""
     inputs = manifest.get("inputs") or {}
-    prepared = (manifest.get("environment") or {}).get("source") == "prepared"
-    return rewrite(command, inputs.get("type"), regions=inputs.get("regions"), one_sample=prepared)
+    env_source = (manifest.get("environment") or {}).get("source")
+    prepared = env_source == "prepared"
+    doc_ok = env_source == "documented" and proposal is not None
+    req_regions = inputs.get("regions")
+    regions = req_regions if (prepared or (doc_ok and req_regions and req_regions == documented_regions(proposal))) else None
+    one_sample = prepared or (doc_ok and documented_single_sample(proposal, command))
+    return rewrite(command, inputs.get("type"), regions=regions, one_sample=one_sample)
 
 
 def install_plan(proposal: dict) -> dict:
@@ -342,6 +416,11 @@ def verify_checkout(root, review: dict, manifest: dict | None = None) -> None:
     module.verify_checkout(root, install)
     citations = (review.get("command_review") or {}).get("citations") or []
     checks = [(c.get("path"), c.get("document_sha256")) for c in citations]
+    for inf in (review.get("inferences") or {}).values():
+        if isinstance(inf, dict) and inf.get("kind") == "doc" and inf.get("path") and inf.get("document_sha256"):
+            pair = (inf["path"], inf["document_sha256"])
+            if pair not in checks:
+                checks.append(pair)
     example = (example_citation(review["evidence"]["proposal"], manifest)
                if review["may_say_runs"] or review.get("example_ready") else None)
     if example:

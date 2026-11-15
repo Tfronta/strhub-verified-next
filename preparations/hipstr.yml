@@ -1,7 +1,0 @@
-schema: strhub-verified/preparation/1
-repo: https://github.com/tfwillems/HipSTR
-dataset: illumina-bam-hg38
-regions: hipstr
-why:
-  - The README's example command reads four BAM files and a regions BED that are not in the repository. A small example a new user can run would let the documented command be tried exactly as written.
-  - The README sends the reader to another site for the regions BED and ships none for hg38.

@@ -23,18 +23,24 @@ def _valid(manifest_yml, tmp_path):
 
 
 def test_hipstr_runs_its_documented_install_and_command_on_strhub_s_inputs(tmp_path):
-    """HipSTR's README installs fine and its command names files the reader
-    brings: four BAMs, a genome, a regions BED. Step 1 cannot run that; the
-    committed preparation supplies the inputs and nothing else."""
+    """HipSTR's README documents its installation, its command, its `--bams`
+    comma-separated sample list (line 75), and its 6-column BED schema
+    (lines 308-322). Step 1 infers those directly with full documentary
+    citations (`evidence_source`), needing no manual preparation."""
     r = pm.build(_proposal("hipstr"), "hipstr-trial")
     m = _valid(r["manifest_yml"], tmp_path)
-    assert r["without_preparation"]["blocker"] == "missing_file"
+    assert "without_preparation" not in r
     install = r["procedure"]["installation"]
     # The install is the README's own two lines, in STRhub's carrier.
-    assert m["environment"]["source"] == "prepared" and install["installed_by"] == "repository"
-    assert install["steps"] == ["apt install make g++ zlib1g-dev libhts-dev libbz2-dev liblzma-dev", "make"]
+    assert m["environment"]["source"] == "documented"
+    assert [c["text"] for c in install["commands"]] == [
+        "apt install make g++ zlib1g-dev libhts-dev libbz2-dev liblzma-dev", "make"]
     assert "apt install make g++ zlib1g-dev libhts-dev libbz2-dev liblzma-dev\\nmake\\n" in r["dockerfile"]
     assert r["procedure"]["install_ready"] and r["procedure"]["may_say_runs"]
+    assert r["procedure"]["status_code"] == "VERIFIED_PROCEDURE_READY"
+    assert r["procedure"]["unbacked_inferences"] == []
+    assert r["procedure"]["inferences"]["regions"]["evidence_source"] == "README.md:L308-L322"
+    assert r["procedure"]["inferences"]["single_sample_bams"]["evidence_source"] == "README.md:L75"
     assert m["inputs"] == {"type": "illumina-bam-hg38", "regions": "hipstr"}
     # The command is the README's, written over four lines there; only paths changed.
     cited = r["procedure"]["command_review"]["citations"][0]

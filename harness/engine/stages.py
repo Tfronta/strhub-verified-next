@@ -211,6 +211,14 @@ def installs(ctx: Ctx, available_result: StageResult) -> StageResult:
 
 # --- Run legs ----------------------------------------------------------------
 
+def _repo_dir(ctx: Ctx) -> pathlib.Path:
+    """The cloned repository directory on the host, mounted read-only at /app:ro."""
+    repo = str(ctx.plan.get("repo") or "").removesuffix(".git")
+    name = os.path.basename(repo) if repo else ""
+    src = ctx.work / "ctx" / name if name else ctx.work / "ctx"
+    return ctx.root / src if not src.is_absolute() else src
+
+
 def _run_leg(ctx: Ctx, name: str, cmd: str, in_dir: pathlib.Path | None,
              out_dir: pathlib.Path, log: pathlib.Path, ref_dir: pathlib.Path | None = None) -> tuple[int, list[str]]:
     """One container run, the reviewed command, on one leg's mounts."""
@@ -220,7 +228,7 @@ def _run_leg(ctx: Ctx, name: str, cmd: str, in_dir: pathlib.Path | None,
     # dropped, so its root has no CAP_DAC_OVERRIDE and cannot write to a
     # directory the runner user owns (PR #19).
     out_abs.chmod(0o777)
-    mounts: list[str] = []
+    mounts: list[str] = ["-v", f"{_repo_dir(ctx)}:/app:ro"]
     if in_dir is not None:
         in_abs = ctx.root / in_dir if not in_dir.is_absolute() else in_dir
         mounts += ["-v", f"{in_abs}:/data/in:ro"]
