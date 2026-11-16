@@ -1578,9 +1578,23 @@ REGION_SECTION_HEADING = re.compile(
     r"^(?:#{1,4}\s+.*\b(?:bed|regions?|loci|catalog|repeat)\b|\*{1,2}Format\s+of\b[^\n]*\bBED\b)", re.I)
 
 SINGLE_SAMPLE_BAM_LIST_RE = re.compile(
-    r"(?:`?--?bams?`?|\*\*bams?\*\*)\s*:\s*a?\s*comma[- ]separated\s+list\s+of\s+(?:\[?BAM\]?[^\n]*?\s+)?files\b", re.I)
+    r"(?:\*\*--?bams?\*\*|\*\*bams?\*\*|`?--?bams?`?)\s*:\s*a?\s*comma[- ]separated\s+list\s+of\s+(?:\[?BAM\]?[^\n]*?\s+)?files\b",
+    re.I,
+)
 MULTI_SAMPLE_MAPPING_FLAG_RE = re.compile(
-    r"(?:^|\s)--bam-(?:samps|libs)(?:\s+|=)\S*,\S*", re.I)
+    r"(?:^|\s)--(?:bam-(?:samps|libs)|samp-sex)(?:\s+|=)\S*,\S*",
+    re.I,
+)
+POSITIONAL_SAMPLE_FLAG_RES = {
+    "--bam-samps": re.compile(
+        r"(?:\*\*|`?--?)bam-samps(?:\*\*|`?)[^\n]*\bcomma[- ]separated\s+list\s+of\s+sample(?:s|\s+IDs)\b[^\n]*(?:\bin\s+(?:the\s+)?same\s+order\s+as\s+(?:the\s+)?BAM|\bfor\s+--?bams?\b)",
+        re.I,
+    ),
+    "--bam-libs": re.compile(
+        r"(?:\*\*|`?--?)bam-libs(?:\*\*|`?)[^\n]*\bcomma[- ]separated\s+list\s+of\s+librar(?:y|ies)\b[^\n]*(?:\bin\s+(?:the\s+)?same\s+order\s+as\s+(?:the\s+)?BAM|\bfor\s+--?bams?\b)",
+        re.I,
+    ),
+}
 
 
 def detect_regions_format(readme: str, docs: list[dict] | None = None,
@@ -1638,30 +1652,101 @@ def detect_regions_format(readme: str, docs: list[dict] | None = None,
             "ambiguous": False, "candidates": []}
 
 
+def _comma_flag_values(command: str) -> dict[str, list[str]]:
+    """Extract comma-separated values for input and positional sample-mapping flags."""
+    if not command:
+        return {}
+    toks = command.split()
+    out: dict[str, list[str]] = {}
+    targets = {"--bams", "--bam", "-b", "--bam-samps", "--bam-libs", "--samp-sex"}
+    i = 0
+    while i < len(toks):
+        tok = toks[i]
+        flag, val = None, None
+        if "=" in tok:
+            k, v = tok.split("=", 1)
+            if k.lower() in targets:
+                flag, val = k.lower(), v
+        elif tok.lower() in targets and i + 1 < len(toks):
+            flag, val = tok.lower(), toks[i + 1]
+            i += 1
+        if flag and val and "," in val:
+            out[flag] = val.strip("'\"").split(",")
+        i += 1
+    return out
+
+
 def detect_single_sample_bams(readme: str, docs: list[dict] | None = None,
                               readme_name: str | None = None,
                               command: str | None = None) -> dict:
     """Check whether the documentation explicitly defines `--bams`/`--bam` as a
-    comma-separated list of sample BAMs and the command does not bind multiple
-    sample/library labels via `--bam-samps` or `--bam-libs`."""
-    if command and MULTI_SAMPLE_MAPPING_FLAG_RE.search(command):
-        return {"allowed": False, "file": None, "line": None, "text": None, "evidence_source": None}
+    comma-separated list of sample BAMs. When the command also supplies
+    positional sample/library mapping lists (`--bam-samps`, `--bam-libs`),
+    allow single-sample reduction only if every present mapping flag has
+    explicit documentary backing aligning it 1-to-1 with BAM files and the exact
+    same comma-separated cardinality."""
+    blocked = {"allowed": False, "file": None, "line": None, "text": None,
+               "evidence_source": None, "paired_flags": []}
     rn = readme_name or "README.md"
     sources: list[tuple[str, str]] = [(rn, readme)]
     for d in docs or []:
         if d.get("origin") != "wiki" and d.get("path") and d.get("text"):
             sources.append((d["path"], d["text"]))
+
+    bam_hit = None
     for file_path, text in sources:
         for line_no, line in enumerate(text.splitlines(), 1):
             if SINGLE_SAMPLE_BAM_LIST_RE.search(line):
-                return {
+                bam_hit = {
                     "allowed": True,
                     "file": file_path,
                     "line": line_no,
                     "text": line.strip()[:300],
                     "evidence_source": f"{file_path}:L{line_no}",
+                    "paired_flags": [],
                 }
-    return {"allowed": False, "file": None, "line": None, "text": None, "evidence_source": None}
+                break
+        if bam_hit:
+            break
+    if not bam_hit:
+        return blocked
+
+    if command and MULTI_SAMPLE_MAPPING_FLAG_RE.search(command):
+        flag_vals = _comma_flag_values(command)
+        bam_items = next((flag_vals[f] for f in ("--bams", "--bam", "-b") if f in flag_vals), None)
+        if not bam_items or len(bam_items) < 2:
+            return blocked
+        if "--samp-sex" in flag_vals:
+            return blocked
+        paired: list[dict] = []
+        for flag in ("--bam-samps", "--bam-libs"):
+            if flag not in flag_vals:
+                continue
+            if len(flag_vals[flag]) != len(bam_items):
+                return blocked
+            rx = POSITIONAL_SAMPLE_FLAG_RES[flag]
+            hit = None
+            for file_path, text in sources:
+                for line_no, line in enumerate(text.splitlines(), 1):
+                    if rx.search(line):
+                        hit = {
+                            "flag": flag,
+                            "file": file_path,
+                            "line": line_no,
+                            "text": line.strip()[:300],
+                            "evidence_source": f"{file_path}:L{line_no}",
+                        }
+                        break
+                if hit:
+                    break
+            if not hit:
+                return blocked
+            paired.append(hit)
+        if not paired:
+            return blocked
+        bam_hit["paired_flags"] = paired
+
+    return bam_hit
 
 
 def detect_output(readme: str, commands: list[dict], docs: list[dict] | None = None,

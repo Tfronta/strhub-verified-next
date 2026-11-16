@@ -328,3 +328,87 @@ def test_minimal_toolchain_for_make_and_cmake_only_and_declared_in_report(tmp_pa
     html = (tmp_path / "reports" / f"{manifest_data['report']['slug']}.html").read_text()
     assert "minimal build toolchain: build-essential (no tool-specific libraries)" in md
     assert "minimal build toolchain: build-essential (no tool-specific libraries)" in html
+
+
+def test_paired_sample_and_library_lists_reduce_consistently_with_evidence():
+    readme = (
+        "Long-read genotyping for Oxford Nanopore sequencing data.\n\n"
+        "## Installation\n\n```\nmake\n```\n\n"
+        "## Options\n\n"
+        "* **--bams** : a comma-separated list of [BAM/CRAM](#bams) files\n"
+        "| **bam-samps** list | Comma separated list of samples in same order as BAM files. |\n"
+        "| **bam-libs** list | Comma separated list of libraries in same order as BAM files. |\n\n"
+        "## Usage\n\n```\n"
+        "./tool --bams run1.bam,run2.bam,run3.bam,run4.cram "
+        "--fasta genome.fa --regions tr_regions.bed --tr-vcf calls.vcf.gz "
+        "--bam-samps SAMPLE1,SAMPLE1,SAMPLE2,SAMPLE3 --bam-libs LIB1,LIB2,LIB3,LIB4\n"
+        "```\n\n"
+        "### BED\n\n"
+        "CHROM | START | END | MOTIF\n"
+        "chr1 | 100 | 200 | ACGT\n"
+    )
+    prop = _synthetic_repo(readme)
+    ss = prop["single_sample_bams"]
+    assert ss["allowed"] is True
+    assert ss["evidence_source"] == "README.md:L11"
+    assert [p["flag"] for p in ss["paired_flags"]] == ["--bam-samps", "--bam-libs"]
+    assert [p["evidence_source"] for p in ss["paired_flags"]] == ["README.md:L12", "README.md:L13"]
+
+    built = pm.build(prop, "paired-sample-lists")
+    review = built["procedure"]
+    assert review["may_say_runs"] is True
+    assert review["status_code"] == "VERIFIED_PROCEDURE_READY"
+    cmd_exec = review["command_review"]["executed"]
+    assert "--bams /data/in/input.bam" in cmd_exec
+    assert "--bam-samps SAMPLE1 " in cmd_exec
+    assert "--bam-libs LIB1" in cmd_exec
+
+    ssa = review["provenance"]["derived"]["single_sample_adaptation"]
+    assert ssa["applied"] is True
+    assert ssa["original"] == "run1.bam,run2.bam,run3.bam,run4.cram"
+    assert ssa["replacement"] == "/data/in/input.bam"
+    assert ssa["paired_substitutions"] == [
+        {"role": "sample_list", "original": "SAMPLE1,SAMPLE1,SAMPLE2,SAMPLE3", "replacement": "SAMPLE1"},
+        {"role": "library_list", "original": "LIB1,LIB2,LIB3,LIB4", "replacement": "LIB1"},
+    ]
+    assert ssa["paired_evidence_sources"] == ["README.md:L12", "README.md:L13"]
+
+    fake_report = {
+        "tool": built["manifest"]["tool"],
+        "level": "content",
+        "gates": dict.fromkeys(("available", "installs", "runs", "io", "content"), True),
+        "source": {**built["manifest"]["source"], "ref_resolved": built["manifest"]["source"]["ref"]},
+        "environment": built["manifest"]["environment"],
+        "generated": "2026-11-16T00:00:00Z",
+        "scope": "Test scope.",
+        "verdict": verdict.decide(
+            dict.fromkeys(("available", "installs", "runs", "io", "content"), True),
+            procedure=review,
+            manifest=built["manifest"],
+        ),
+        "provenance": copy.deepcopy(review["provenance"]),
+    }
+    md = report._summary_md(fake_report, "paired-sample-lists")
+    assert "SAMPLE1,SAMPLE1,SAMPLE2,SAMPLE3` -> `SAMPLE1`" in md
+    assert "LIB1,LIB2,LIB3,LIB4` -> `LIB1`" in md
+
+    # Negative 1: arity mismatch -> blocked as FAILED_AMBIGUOUS_CLI.
+    readme_mismatch = readme.replace("SAMPLE1,SAMPLE1,SAMPLE2,SAMPLE3", "SAMPLE1,SAMPLE2")
+    built_mismatch = pm.build(_synthetic_repo(readme_mismatch), "mismatch-lists")
+    assert built_mismatch["procedure"]["may_say_runs"] is False
+    assert built_mismatch["procedure"]["status_code"] == "FAILED_AMBIGUOUS_CLI"
+
+    # Negative 2: missing documentary backing for --bam-libs -> blocked as FAILED_AMBIGUOUS_CLI.
+    readme_missing_doc = "\n".join(line for line in readme.splitlines() if "bam-libs" not in line or "--bam-libs" in line)
+    built_missing = pm.build(_synthetic_repo(readme_missing_doc), "missing-doc-lists")
+    assert built_missing["procedure"]["may_say_runs"] is False
+    assert built_missing["procedure"]["status_code"] == "FAILED_AMBIGUOUS_CLI"
+
+    # Negative 3: unsupported multi-sample flag like --samp-sex -> blocked.
+    readme_sex = readme.replace(
+        "--bam-libs LIB1,LIB2,LIB3,LIB4",
+        "--bam-libs LIB1,LIB2,LIB3,LIB4 --samp-sex M,M,F,F",
+    )
+    built_sex = pm.build(_synthetic_repo(readme_sex), "samp-sex-blocked")
+    assert built_sex["procedure"]["may_say_runs"] is False
+    assert built_sex["procedure"]["status_code"] == "FAILED_AMBIGUOUS_CLI"

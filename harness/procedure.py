@@ -305,9 +305,25 @@ def classify(proposal: dict, manifest: dict, limitations: list[str],
         else:
             ss = proposal.get("single_sample_bams") or {}
             ver = fidelity.verify_evidence_source(proposal, ss.get("evidence_source"), ss.get("text"))
+            paired_flags = ss.get("paired_flags") or []
+            paired_ok = True
+            paired_sources = []
+            reduced_roles = {s.get("role") for s in transformation.get("substitutions") or []}
+            for req_role, req_flag in (("sample_list", "--bam-samps"), ("library_list", "--bam-libs")):
+                if req_role not in reduced_roles:
+                    continue
+                entry = next((p for p in paired_flags if p.get("flag") == req_flag), None)
+                pver = fidelity.verify_evidence_source(
+                    proposal, (entry or {}).get("evidence_source"), (entry or {}).get("text")
+                )
+                if not entry or not pver.get("verified"):
+                    paired_ok = False
+                else:
+                    paired_sources.append(entry["evidence_source"])
             inferences["single_sample_bams"] = {
                 **ver,
-                "verified": bool(ver.get("verified") and ss.get("allowed")),
+                "verified": bool(ver.get("verified") and ss.get("allowed") and paired_ok),
+                **({"paired_evidence_sources": paired_sources} if paired_sources else {}),
             }
             if not inferences["single_sample_bams"]["verified"]:
                 amendments.append({
@@ -405,6 +421,7 @@ def classify(proposal: dict, manifest: dict, limitations: list[str],
                                     if plat_how in ("stated", "multi_stated") and input_evidence.get("platform") else []))
     subs = transformation.get("substitutions") or []
     ss_subs = [s for s in subs if s.get("role") == "read_path" and "," in s.get("original", "")]
+    ss_paired = [s for s in subs if s.get("role") in ("sample_list", "library_list")]
     base_cond = installation.get("base_condition") or {}
     provenance = {
         "from_upstream": {
@@ -443,6 +460,11 @@ def classify(proposal: dict, manifest: dict, limitations: list[str],
                 "original": ss_subs[0]["original"],
                 "replacement": ss_subs[0]["replacement"],
                 "evidence_source": (inferences.get("single_sample_bams") or {}).get("evidence_source"),
+                **({"paired_substitutions": [
+                    {"role": s["role"], "original": s["original"], "replacement": s["replacement"]}
+                    for s in ss_paired
+                ], "paired_evidence_sources": (inferences.get("single_sample_bams") or {}).get("paired_evidence_sources") or []}
+                   if ss_paired else {}),
                 "note": "STRhub trial mounted one compatible sample for the documented multi-file placeholder list",
             } if ss_subs else None,
         },

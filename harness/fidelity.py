@@ -124,6 +124,29 @@ def rewrite(command: str, input_type: str | None, regions: str | None = None, on
             and re.search(r"(?:hg19|grch37|b37|hs37d5|ncbi37|hg18|ncbi36|t2t|chm13)(?![a-z0-9])", command, re.I)):
         result["limitations"].append("the command names a different assembly from the registered hg38 dataset")
         return result
+    def _read_kind(path: str) -> str:
+        if re.search(r"\.f(?:ast)?q(?:\.gz)?$", path, re.I):
+            return "fastq"
+        if re.search(r"\.cram(?:\.gz)?$", path, re.I):
+            return "cram"
+        return "bam"
+
+    collapsed_list_len = None
+    if one_sample and canonical:
+        list_lens = []
+        for idx in range(1, len(toks)):
+            if toks[idx - 1] in INPUT_FLAGS:
+                raw_tok = toks[idx]
+                val_tok = raw_tok[1:-1] if len(raw_tok) > 1 and raw_tok[0] == raw_tok[-1] and raw_tok[0] in "'\"" else raw_tok
+                if "," in val_tok:
+                    parts = val_tok.split(",")
+                    if (all(READ_PATH.fullmatch(part) for part in parts)
+                            and _read_kind(parts[0]) == _read_kind(canonical)
+                            and parts[0].endswith(".gz") == canonical.endswith(".gz")):
+                        list_lens.append(len(parts))
+        if len(list_lens) == 1 and list_lens[0] >= 2:
+            collapsed_list_len = list_lens[0]
+
     changes = []
     for i, m in enumerate(TOKEN.finditer(command)):
         raw = m.group()
@@ -136,23 +159,31 @@ def rewrite(command: str, input_type: str | None, regions: str | None = None, on
         angle = value.startswith("<") and value.endswith(">")
         read_placeholder = angle and bool(re.search(r"bam|cram|fastq|reads|input", value, re.I))
         if previous in INPUT_FLAGS and canonical and (READ_PATH.fullmatch(value) or read_placeholder):
-            kind = lambda path: "fastq" if re.search(r"\.f(?:ast)?q(?:\.gz)?$", path, re.I) else "cram" if re.search(r"\.cram(?:\.gz)?$", path, re.I) else "bam"
             compatible = (not READ_PATH.fullmatch(value) or
-                          (kind(value) == kind(canonical) and value.endswith(".gz") == canonical.endswith(".gz")))
+                          (_read_kind(value) == _read_kind(canonical) and value.endswith(".gz") == canonical.endswith(".gz")))
             if angle:
                 names = re.findall(r"bam|cram|fastq", value, re.I)
-                compatible = not names or kind(canonical) in [n.lower() for n in names]
+                compatible = not names or _read_kind(canonical) in [n.lower() for n in names]
             if compatible:
                 target, role = f"/data/in/{canonical}", "read_path"
             else:
                 result["limitations"].append("the declared sample does not have the documented read-file kind")
         elif previous in INPUT_FLAGS and "," in value and one_sample and canonical \
                 and all(READ_PATH.fullmatch(part) for part in value.split(",")):
-            # A documented list of the reader's own files, in a run STRhub
-            # prepared: the one registered sample stands in for it, and says so.
-            target, role = f"/data/in/{canonical}", "read_path"
+            parts = value.split(",")
+            if _read_kind(parts[0]) == _read_kind(canonical) and parts[0].endswith(".gz") == canonical.endswith(".gz"):
+                # A documented list of the reader's own files, in a run STRhub
+                # prepared: the one registered sample stands in for it, and says so.
+                target, role = f"/data/in/{canonical}", "read_path"
+            else:
+                result["limitations"].append("the declared sample does not have the documented read-file kind")
         elif previous in INPUT_FLAGS and "," in value:
             result["limitations"].append("input list cardinality is not changed to fit one available sample")
+        elif one_sample and collapsed_list_len and previous in ("--bam-samps", "--bam-libs") and "," in value:
+            parts = value.split(",")
+            if len(parts) == collapsed_list_len and all(re.fullmatch(r"[\w.-]+", part) for part in parts):
+                target = parts[0]
+                role = "sample_list" if previous == "--bam-samps" else "library_list"
         elif regions_mount and previous in REGION_FLAGS and (REGION_PATH.fullmatch(value) or angle) \
                 and not value.startswith("/data/"):
             target, role = regions_mount, "regions_path"
@@ -181,10 +212,19 @@ def rewrite(command: str, input_type: str | None, regions: str | None = None, on
         if target and target != value:
             replacement = raw[0] + target + raw[-1] if raw[0] in "'\"" else target
             changes.append((m.start(), m.end(), replacement))
-            result["substitutions"].append({"token": i, "original": raw,
-                "replacement": replacement, "role": role, "basis": {"output_placeholder": "explicit output-path placeholder",
-                                                         "reference_path": "registered reference genome mount",
-                                                         "regions_path": f"registered regions file ({regions})"}.get(role, "declared dataset mount")})
+            result["substitutions"].append({
+                "token": i,
+                "original": raw,
+                "replacement": replacement,
+                "role": role,
+                "basis": {
+                    "output_placeholder": "explicit output-path placeholder",
+                    "reference_path": "registered reference genome mount",
+                    "regions_path": f"registered regions file ({regions})",
+                    "sample_list": "positional sample list aligned with single-sample BAM",
+                    "library_list": "positional library list aligned with single-sample BAM",
+                }.get(role, "declared dataset mount"),
+            })
     if len(result["read_bindings"]) > 1:
         result["limitations"].append("multiple read inputs cannot be mapped to a single shared sample")
         return result
@@ -321,19 +361,66 @@ def documented_regions(proposal: dict | None) -> str | None:
     return fmt if check["verified"] else None
 
 
+def _command_comma_flags(command: str) -> dict[str, list[str]]:
+    if not command:
+        return {}
+    toks = command.split()
+    out: dict[str, list[str]] = {}
+    targets = INPUT_FLAGS | {"--bam-samps", "--bam-libs", "--samp-sex"}
+    i = 0
+    while i < len(toks):
+        tok = toks[i]
+        flag, val = None, None
+        if "=" in tok:
+            k, v = tok.split("=", 1)
+            if k.lower() in targets:
+                flag, val = k.lower(), v
+        elif tok.lower() in targets and i + 1 < len(toks):
+            flag, val = tok.lower(), toks[i + 1]
+            i += 1
+        if flag and val and "," in val:
+            out[flag] = val.strip("'\"").split(",")
+        i += 1
+    return out
+
+
 def documented_single_sample(proposal: dict | None, command: str = "") -> bool:
     """Whether the repository's documentation explicitly establishes that
-    `--bams`/`--bam` is a comma-separated list of sample BAMs and the command
-    does not bind multiple sample/library names."""
+    `--bams`/`--bam` is a comma-separated list of sample BAMs and, when
+    positional `--bam-samps`/`--bam-libs` lists appear, every such flag has
+    verified 1-to-1 documentary backing and matching cardinality."""
     if not proposal:
         return False
     ss = proposal.get("single_sample_bams") or {}
     if not ss.get("allowed"):
         return False
-    if command and re.search(r"(?:^|\s)--bam-(?:samps|libs)(?:\s+|=)\S*,\S*", command, re.I):
-        return False
     check = verify_evidence_source(proposal, ss.get("evidence_source"), ss.get("text"))
-    return bool(check["verified"])
+    if not check["verified"]:
+        return False
+    if command and re.search(r"(?:^|\s)--(?:bam-(?:samps|libs)|samp-sex)(?:\s+|=)\S*,\S*", command, re.I):
+        flag_vals = _command_comma_flags(command)
+        if "--samp-sex" in flag_vals:
+            return False
+        bam_items = next((flag_vals[f] for f in ("--bams", "--bam", "-b") if f in flag_vals), None)
+        if not bam_items or len(bam_items) < 2:
+            return False
+        paired = ss.get("paired_flags") or []
+        seen_paired = 0
+        for req_flag in ("--bam-samps", "--bam-libs"):
+            if req_flag not in flag_vals:
+                continue
+            if len(flag_vals[req_flag]) != len(bam_items):
+                return False
+            entry = next((p for p in paired if p.get("flag") == req_flag), None)
+            if not entry:
+                return False
+            pcheck = verify_evidence_source(proposal, entry.get("evidence_source"), entry.get("text"))
+            if not pcheck["verified"]:
+                return False
+            seen_paired += 1
+        if not seen_paired:
+            return False
+    return True
 
 
 def rewrite_for(manifest: dict, command: str, proposal: dict | None = None) -> dict:

@@ -139,13 +139,24 @@ def test_hard_rule_2_unbacked_or_ambiguous_parameters_fail_cleanly_with_status_c
     assert v_no_ss["code"] == "undetermined"
     assert v_no_ss["status_code"] == "FAILED_AMBIGUOUS_CLI"
 
-    # 4. Multi-sample `--bam-samps` flag in command prevents collapsing `--bams` to one sample.
+    # 4. Multi-sample `--bam-samps` prevents collapsing `--bams` when arity mismatches
+    #    or when the README lacks explicit 1-to-1 ordering documentation.
+    mismatch_cmd = (
+        "./HipSTR --bams run1.bam,run2.bam --bam-samps S1,S2,S3 "
+        "--fasta genome.fa --regions str_regions.bed --str-vcf str_calls.vcf.gz"
+    )
+    ss_mismatch = dr.detect_single_sample_bams(prop["readme_text"], [], "README.md", mismatch_cmd)
+    assert ss_mismatch["allowed"] is False and ss_mismatch["evidence_source"] is None
+
     multi_samp_cmd = (
         "./HipSTR --bams run1.bam,run2.bam --bam-samps S1,S2 "
         "--fasta genome.fa --regions str_regions.bed --str-vcf str_calls.vcf.gz"
     )
-    ss_multi = dr.detect_single_sample_bams(prop["readme_text"], [], "README.md", multi_samp_cmd)
-    assert ss_multi["allowed"] is False and ss_multi["evidence_source"] is None
+    readme_no_samps_doc = "\n".join(
+        line for line in prop["readme_text"].splitlines() if "bam-samps" not in line
+    )
+    ss_undoc = dr.detect_single_sample_bams(readme_no_samps_doc, [], "README.md", multi_samp_cmd)
+    assert ss_undoc["allowed"] is False and ss_undoc["evidence_source"] is None
 
 
 def test_hard_rule_3_zero_ai_or_llm_calls_in_harness():

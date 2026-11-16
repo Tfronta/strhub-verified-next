@@ -225,9 +225,15 @@ def _provenance_groups(prov: dict | None) -> tuple[list[str], list[str], list[st
         )
     ssa = der.get("single_sample_adaptation") or {}
     if ssa.get("applied"):
+        paired_txt = "".join(
+            f"; `{p['original']}` -> `{p['replacement']}`"
+            for p in (ssa.get("paired_substitutions") or [])
+        )
+        cites = [ssa.get("evidence_source"), *(ssa.get("paired_evidence_sources") or [])]
+        cite_str = ", ".join(f"`{c}`" for c in cites if c)
         der_lines.append(
-            f"Single-sample trial mount: `{ssa.get('original')}` -> `{ssa.get('replacement')}` "
-            f"(`{ssa.get('evidence_source')}`)"
+            f"Single-sample trial mount: `{ssa.get('original')}` -> `{ssa.get('replacement')}`"
+            f"{paired_txt} ({cite_str})"
         )
 
     hc_lines: list[str] = []
