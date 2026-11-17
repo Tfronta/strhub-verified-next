@@ -38,7 +38,7 @@ def literal_lines(text: str) -> list[tuple[int, str]]:
     result = []
     for number, raw in enumerate(text.splitlines(), 1):
         line = raw.strip()
-        line = re.sub(r"^\$ ", "", line)
+        line = re.sub(r"^(?:\$\s+|usage:\s*)", "", line, flags=re.I)
         if result and result[-1][1].endswith("\\") and all(result[-1][1].count(q) % 2 == 0 for q in "'\""):
             start, previous = result.pop()
             result.append((start, previous[:-1].rstrip() + " " + line))
@@ -70,7 +70,7 @@ def continued_lines(text: str) -> list[tuple[int, int, str]]:
         while j < len(rows) and CONTINUATION.match(rows[j]):
             j += 1
         if j > i + 1:
-            head = re.sub(r"^\$ ", "", raw.strip())
+            head = re.sub(r"^(?:\$\s+|usage:\s*)", "", raw.strip(), flags=re.I)
             out.append((i + 1, j, " ".join([head] + [r.strip() for r in rows[i + 1:j]])))
     return out
 

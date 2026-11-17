@@ -43,7 +43,7 @@ BASE_PLAIN = "Ubuntu 22.04, package lists refreshed, apt answering yes"
 BASE_CONDA = BASE_PLAIN + ", plus Miniforge (conda, python, pip)"
 
 #: Headings under which a code block is read as installation.
-SECTION = re.compile(r"install|build|compil|set ?up|requirement|prerequisite|dependenc|getting started|quick ?start", re.I)
+SECTION = re.compile(r"install|build|compil|set ?up|requirement|prerequisite|dependenc|getting started|quick ?start|environment\b", re.I)
 #: A code line that is an installation step of some kind, admitted or not.
 LOOKS_LIKE_INSTALL = re.compile(
     r"(?:^|[\s;&|=])(?:apt|apt-get|conda|mamba|pip3?|python3? -m pip|python3? setup\.py|make|cmake|\./configure|cargo|"

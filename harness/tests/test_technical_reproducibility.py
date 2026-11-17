@@ -412,3 +412,31 @@ def test_paired_sample_and_library_lists_reduce_consistently_with_evidence():
     built_sex = pm.build(_synthetic_repo(readme_sex), "samp-sex-blocked")
     assert built_sex["procedure"]["may_say_runs"] is False
     assert built_sex["procedure"]["status_code"] == "FAILED_AMBIGUOUS_CLI"
+
+
+def test_environment_heading_names_exact_outside_line_and_usage_prefix_cites_cleanly():
+    import fidelity
+
+    readme = (
+        "# EnvAndUsage\n\nDesigned for Oxford Nanopore reads.\n\n"
+        "### Create an environment\n\n"
+        "```bash\n"
+        "bash setup/install_env.sh\n"
+        "conda activate env\n"
+        "```\n\n"
+        "## Run\n\n"
+        "```bash\n"
+        "USAGE: ./tool --bam reads.bam --fasta genome.fa --out calls.vcf\n"
+        "```\n"
+    )
+    prop = _synthetic_repo(readme)
+    built = pm.build(prop, "env-and-usage")
+    rev = built["procedure"]
+    # Install fails with the exact offending line cited rather than "no install found".
+    assert rev["blocker"] == "install_not_copyable"
+    assert "outside this profile" in rev["reason"]
+    assert "README.md, line 8: `bash setup/install_env.sh`" in rev["reason"]
+    # `USAGE: ` stripped by detect_recipe still verifies against literal README line.
+    assert rev["inferences"]["run_command"]["verified"] is True
+    assert rev["inferences"]["run_command"]["evidence_source"] == "README.md:L15"
+    assert fidelity.cite(prop, prop["commands"][0])["verified"] is True
