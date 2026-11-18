@@ -473,3 +473,16 @@ def test_standalone_inline_backtick_install_and_usage_lines_apply_generically():
     assert built_out["procedure"]["blocker"] == "install_not_copyable"
     assert "README.md, line 7: `wget https://example.org/Miniconda3.sh`" in built_out["procedure"]["reason"]
     assert built_out["procedure"]["inferences"]["run_command"]["verified"] is True
+    assert [a["code"] for a in built_out["procedure"]["amendments"]] == ["install_not_copyable"]
+
+
+def test_unready_install_with_documented_regions_has_no_spurious_command_or_cwd_amendments():
+    import pathlib
+
+    src = dr.load_snapshot(pathlib.Path("harness/testdata/benchmark/gangstr"))
+    slug, ref = dr.repo_slug(src["tree_resp"]["repo"]), src["tree_resp"].get("ref", "HEAD")
+    prop = dr.detect(slug, ref, src["tree_resp"], src["readme"], src["readme_name"], extras=src)
+    built = pm.build(prop, "gangstr")
+    codes = [a["code"] for a in built["procedure"]["amendments"]]
+    assert codes == ["install_profile_unsupported"]
+    assert built["procedure"]["reason"] == "The repository uses submodules, which this profile does not fetch."

@@ -256,13 +256,21 @@ def check(manifest_path: str, out_dir: str, regions_path=None, panel_path=None) 
             ok = False
             results.append(entry)
             continue
-        f = matches[0]
-        entry["resolved"] = str(f.relative_to(out))
         if auto:
-            entry.update(_auto_entry(f, spec.get("format", "tsv"), content_spec,
-                                     pathlib.Path(regions_path) if regions_path else None, panel_names,
-                                     pathlib.Path(panel_path) if panel_path else None))
+            reg_p = pathlib.Path(regions_path) if regions_path else None
+            pan_p = pathlib.Path(panel_path) if panel_path else None
+            best_f, best_auto = None, None
+            for cand_f in matches:
+                cand_auto = _auto_entry(cand_f, spec.get("format", "tsv"), content_spec, reg_p, panel_names, pan_p)
+                st = cand_auto.get("stats") or {}
+                key = (cand_auto["passed"], st.get("distinct_loci", 0), st.get("total_reads", 0), st.get("rows", 0))
+                if best_auto is None or key > best_key:
+                    best_f, best_auto, best_key = cand_f, cand_auto, key
+            entry["resolved"] = str(best_f.relative_to(out))
+            entry.update(best_auto)
         else:
+            f = matches[0]
+            entry["resolved"] = str(f.relative_to(out))
             entry.update(_check_one(f, content_spec))
         ok = ok and entry["passed"]
         results.append(entry)

@@ -226,7 +226,7 @@ def _build(proposal: dict, slug: str, submitted_by: str = "third_party",
         # Non-runnable: never infer dependencies, interpreters or library paths.
         dockerfile_text = "# Installation profile not established; must not be built.\nFROM scratch\n"
         env = {"dockerfile": "Dockerfile", "os": ["ubuntu-22.04"], "source": "generated"}
-        cwd = "/opt/tool"
+        cwd = "."
         limitations.append("install_method_unknown" if build_info.get("method") == "unknown"
                            else "install_profile_unsupported")
         caveat_items.append("Environment: no proven installation profile; STRhub did not manufacture installation steps."

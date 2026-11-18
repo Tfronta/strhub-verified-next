@@ -442,7 +442,7 @@ def rewrite_for(manifest: dict, command: str, proposal: dict | None = None) -> d
     inputs = manifest.get("inputs") or {}
     env_source = (manifest.get("environment") or {}).get("source")
     prepared = env_source == "prepared"
-    doc_ok = env_source == "documented" and proposal is not None
+    doc_ok = env_source in ("documented", "generated") and proposal is not None
     req_regions = inputs.get("regions")
     regions = req_regions if (prepared or (doc_ok and req_regions and req_regions == documented_regions(proposal))) else None
     one_sample = prepared or (doc_ok and documented_single_sample(proposal, command))

@@ -156,29 +156,33 @@ def check(manifest_path: str, out_dir: str) -> dict:
             checks.append(entry)
             continue
 
-        f = matches[0]
-        entry["resolved"] = str(f.relative_to(out))
-        nonempty = f.stat().st_size > 0
-        entry["checks"]["non_empty"] = nonempty
-
-        try:
-            n = _count_records(f, spec["format"])
-            parses = True
-        except Exception as exc:  # noqa: BLE001
-            n, parses = 0, False
-            entry["parse_error"] = str(exc)
-        entry["checks"]["parses_as_" + spec["format"]] = parses
-        entry["records"] = n
-        entry["checks"]["min_records"] = n >= spec.get("min_records", 1)
-
-        if spec.get("must_contain"):
-            blob = _read_text(f)
-            missing = [s for s in spec["must_contain"] if s not in blob]
-            entry["checks"]["must_contain"] = not missing
-            if missing:
-                entry["missing"] = missing
-
-        entry["passed"] = all(entry["checks"].values())
+        best_entry = None
+        for f in matches:
+            cand = {"resolved": str(f.relative_to(out)), "checks": dict(entry["checks"])}
+            nonempty = f.stat().st_size > 0
+            cand["checks"]["non_empty"] = nonempty
+            try:
+                n = _count_records(f, spec["format"])
+                parses = True
+            except Exception as exc:  # noqa: BLE001
+                n, parses = 0, False
+                cand["parse_error"] = str(exc)
+            cand["checks"]["parses_as_" + spec["format"]] = parses
+            cand["records"] = n
+            cand["checks"]["min_records"] = n >= spec.get("min_records", 1)
+            if spec.get("must_contain"):
+                blob = _read_text(f)
+                missing = [s for s in spec["must_contain"] if s not in blob]
+                cand["checks"]["must_contain"] = not missing
+                if missing:
+                    cand["missing"] = missing
+            cand["passed"] = all(cand["checks"].values())
+            if best_entry is None or (
+                (cand["passed"], cand["records"], cand["checks"]["non_empty"])
+                > (best_entry["passed"], best_entry["records"], best_entry["checks"]["non_empty"])
+            ):
+                best_entry = cand
+        entry.update(best_entry)
         ok = ok and entry["passed"]
         checks.append(entry)
 

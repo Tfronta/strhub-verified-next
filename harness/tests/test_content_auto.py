@@ -211,3 +211,36 @@ def test_expansionhunter_and_trgt_vcf_depths_are_extracted(tmp_path):
     assert st["depth_source"] == "FORMAT/ADSP+ADFL+ADIR, FORMAT/SD, FORMAT/LC"
 
 
+def test_multi_file_glob_selects_genotype_table_over_auxiliary_files(tmp_path):
+    import check_io
+
+    out = tmp_path / "out"
+    (out / "GenomicMappingStats").mkdir(parents=True)
+    (out / "Countings").mkdir(parents=True)
+    # Alphabetically earlier auxiliary/empty files must not mask the real genotype table.
+    (out / "Countings" / "00_empty.txt").write_text("")
+    (out / "GenomicMappingStats" / "MappingStats.txt").write_text("TotalReads\tMapped\n1000\t950\n")
+    (out / "Results_Summary.tsv").write_text(
+        "Locus\tAllele\tRawCounts\tNormalizedCounts\n"
+        "TH01\t9.3\t42\t1.0\n"
+        "TPOX\t8\t35\t1.0\n"
+        "vWA\t16\t28\t1.0\n"
+        "FGA\t21\t31\t1.0\n"
+    )
+    mf = tmp_path / "m.yml"
+    mf.write_text(
+        "tool: {name: x, version: '1'}\nsource: {repo: 'https://github.com/a/b', ref: abc}\n"
+        "environment: {dockerfile: Dockerfile}\nrun: {cmd: x}\n"
+        "outputs:\n  - {path: '**/*.t[sx][vt]', format: tsv, min_records: 1}\n"
+    )
+    io_res = check_io.check(str(mf), str(out))
+    assert io_res["passed"] is True
+    assert io_res["outputs"][0]["resolved"] == "Results_Summary.tsv"
+
+    c_res = check_content.check(str(mf), str(out))
+    assert c_res["passed"] is True
+    assert c_res["outputs"][0]["resolved"] == "Results_Summary.tsv"
+    assert c_res["outputs"][0]["stats"]["distinct_str_loci"] == 4
+
+
+
