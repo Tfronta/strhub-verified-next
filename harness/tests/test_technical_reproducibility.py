@@ -440,3 +440,36 @@ def test_environment_heading_names_exact_outside_line_and_usage_prefix_cites_cle
     assert rev["inferences"]["run_command"]["verified"] is True
     assert rev["inferences"]["run_command"]["evidence_source"] == "README.md:L15"
     assert fidelity.cite(prop, prop["commands"][0])["verified"] is True
+
+
+def test_standalone_inline_backtick_install_and_usage_lines_apply_generically():
+    import fidelity
+
+    # 1. Tool whose install & run commands are single-line inline backticks passes cleanly.
+    readme_pass = (
+        "# AnyTool\n\nDesigned for Oxford Nanopore reads.\n\n"
+        "## Installation\n\n"
+        "`pip install -e .`\n\n"
+        "## Run\n\n"
+        "`USAGE: ./tool --bam reads.bam --fasta genome.fa --out calls.vcf`\n"
+    )
+    prop_pass = _synthetic_repo(readme_pass)
+    prop_pass["files"] = ["README.md", "setup.py", "tool", "pyproject.toml"]
+    built_pass = pm.build(prop_pass, "inline-backtick-pass")
+    assert built_pass["procedure"]["may_say_runs"] is True
+    assert built_pass["procedure"]["inferences"]["run_command"]["verified"] is True
+    assert fidelity.cite(prop_pass, prop_pass["commands"][0])["verified"] is True
+
+    # 2. Inline backtick outside step under environment heading cites the exact line.
+    readme_outside = (
+        "# AnyTool\n\nDesigned for Oxford Nanopore reads.\n\n"
+        "### Conda under linux environment\n\n"
+        "`wget https://example.org/Miniconda3.sh`\n\n"
+        "## Run\n\n"
+        "`USAGE: ./tool --bam reads.bam --fasta genome.fa --out calls.vcf`\n"
+    )
+    prop_out = _synthetic_repo(readme_outside)
+    built_out = pm.build(prop_out, "inline-backtick-outside")
+    assert built_out["procedure"]["blocker"] == "install_not_copyable"
+    assert "README.md, line 7: `wget https://example.org/Miniconda3.sh`" in built_out["procedure"]["reason"]
+    assert built_out["procedure"]["inferences"]["run_command"]["verified"] is True

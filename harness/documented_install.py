@@ -83,12 +83,15 @@ def digest(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
+_STANDALONE_BACKTICK = re.compile(r"^`{1,3}([^`\s][^`]*\s[^`]*)`{1,3}$")
+
+
 def _blocks(text: str) -> list[dict]:
-    """Every code block of a document (fenced, or indented by four spaces or a
-    tab), with the heading it sits under and the line of each of its rows."""
+    """Every code block of a document (fenced, indented, or standalone inline-code
+    command lines), with the heading it sits under and the line of each of its rows."""
     out, heading, current, fence = [], "", None, None
     for number, row in enumerate(text.splitlines(), 1):
-        marker = re.match(r"^\s*(`{3,}|~{3,})(.*)$", row)
+        marker = re.match(r"^\s*(`{3,}|~{3,})([^`]*)$", row)
         if fence:
             # Closed only by a fence of the same character, at least as long,
             # with nothing after it: a document quoted inside a longer fence
@@ -97,6 +100,14 @@ def _blocks(text: str) -> list[dict]:
                 fence, current = None, None
             else:
                 current["rows"].append((number, row))
+            continue
+        m_bt = _STANDALONE_BACKTICK.match(row.strip())
+        if m_bt:
+            # Standalone inline-code line (`pip install -e .`): treat as a code block row.
+            if current is None:
+                current = {"heading": heading, "rows": []}
+                out.append(current)
+            current["rows"].append((number, m_bt.group(1).strip()))
             continue
         if marker:
             fence = (marker[1][0], len(marker[1]))

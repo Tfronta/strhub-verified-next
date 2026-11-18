@@ -33,12 +33,23 @@ def digest(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
+_STANDALONE_BACKTICK = re.compile(r"^`{1,3}([^`\s][^`]*\s[^`]*)`{1,3}$")
+
+
+def _clean_doc_line(raw: str) -> str:
+    """Strip single-line inline-code backticks, shell `$ `, and `USAGE:` prefix."""
+    line = raw.strip()
+    m_bt = _STANDALONE_BACKTICK.match(line)
+    if m_bt:
+        line = m_bt.group(1).strip()
+    return re.sub(r"^(?:\$\s+|usage:\s*)", "", line, flags=re.I)
+
+
 def literal_lines(text: str) -> list[tuple[int, str]]:
     """Only explicit unquoted shell continuations, never inferred flag lines."""
     result = []
     for number, raw in enumerate(text.splitlines(), 1):
-        line = raw.strip()
-        line = re.sub(r"^(?:\$\s+|usage:\s*)", "", line, flags=re.I)
+        line = _clean_doc_line(raw)
         if result and result[-1][1].endswith("\\") and all(result[-1][1].count(q) % 2 == 0 for q in "'\""):
             start, previous = result.pop()
             result.append((start, previous[:-1].rstrip() + " " + line))
@@ -70,7 +81,7 @@ def continued_lines(text: str) -> list[tuple[int, int, str]]:
         while j < len(rows) and CONTINUATION.match(rows[j]):
             j += 1
         if j > i + 1:
-            head = re.sub(r"^(?:\$\s+|usage:\s*)", "", raw.strip(), flags=re.I)
+            head = _clean_doc_line(raw)
             out.append((i + 1, j, " ".join([head] + [r.strip() for r in rows[i + 1:j]])))
     return out
 
