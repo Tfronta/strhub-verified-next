@@ -1,117 +1,98 @@
-# Step 1: what a commit needs to state so a stranger can run the tool
+# Documentation Requirements for Automated Verification (Step 1)
 
-STRhub Verified tests one thing first, before anything about forensic STR panels:
+STRhub Verified tests one question first, before evaluating forensic STR panels:
 
-> At the pinned commit, can a third party install the tool and run it end to end by following
-> only what that commit writes, and get the output file the command names?
+> At the pinned commit, can a third party install the tool and run it end to end by following only what that commit documents, and obtain the declared output file?
 
-Nothing is invented to fill a gap. STRhub does not write the install for you, does not add a
-flag that your command does not carry, and does not guess a file layout. If a step is missing,
-the report says which one, and the run is not attempted. That is why this page exists: it is the
-whole contract, and it is four blocks long.
+STRhub does not guess missing steps, invent command flags, or silently patch your setup. If a required piece is missing, the report names the exact gap and does not run the tool.
 
-This is not a style guide and it is not a review of your software. A tool can be excellent and
-still fail step 1, because step 1 is about the commit, not about the code.
+**A tool that stops or returns "could not be determined" is not being judged as broken.** It means the documentation at that commit does not yet contain a complete, copyable procedure for an automated clean-environment run.
 
 ---
 
-## The four blocks
+## Quick checklist (4 blocks)
 
-### 1. Installation, copyable
+For automated verification to run from your `README.md`, include:
 
-The commands, in a code block, under a heading about installing. STRhub runs them exactly as
-written, in order, on a clean Ubuntu 22.04 (with conda, python and pip when a command uses
-them), and adds nothing: no package, no option, no missing step.
+1. **Copyable installation commands** in a code block under an installation heading.
+2. **One concrete example command** (not an abstract usage synopsis).
+3. **Declared input format and file path** (and reference assembly, if used).
+4. **Declared output file or extension** written by that command.
+
+---
+
+## The four blocks in detail
+
+### 1. Copyable installation
+
+Put the exact install commands in a code block under an installation heading (such as `## Installation`, `## Setup`, `## Build`, or `### Create an environment`). STRhub runs them in order on a clean Ubuntu 22.04 container.
 
 ```bash
-# good: plain commands, and every file they name is in the commit
+# Example: plain commands where every referenced file exists in the commit
 conda env create -f environment.yml
 conda activate mytool
 pip install .
 ```
 
-What it can follow: `apt install`, `conda create` / `conda env create` / `conda install` /
-`conda activate`, `pip install .` / `pip install -r requirements.txt`, `python setup.py install`,
-`make`, `cmake`, `./configure`, `cargo build --release`, `mkdir`, `cd`, and `&&` between them.
-The full list is in [DOCUMENTED-INSTALLATION.md](DOCUMENTED-INSTALLATION.md).
+**Base environment provided automatically (and declared in the report):**
+- Clean Ubuntu 22.04 with refreshed `apt` package lists (`apt` answering yes).
+- Miniforge (`conda`, `python`, `pip`) when your commands use Conda or Python/pip.
+- Minimal generic build toolchain (`build-essential`, and `cmake` when `cmake` is invoked) when compiling with `make`, `./configure`, or `cmake`. No tool-specific libraries are added.
 
-What it cannot follow, and reports as missing with the line that stopped it:
+**Commands STRhub can execute literally:**
+`apt install`, `conda create`, `conda env create`, `conda install`, `conda activate`, `pip install .`, `pip install -r requirements.txt`, `python setup.py install`, `make`, `cmake`, `./configure`, `cargo build --release`, `mkdir`, `cd`, and `&&` chaining between them. See [DOCUMENTED-INSTALLATION.md](DOCUMENTED-INSTALLATION.md) for the complete grammar.
 
-- prose that has to be interpreted ("install the usual dependencies and compile");
-- a list of library names without the command that installs them: on a clean machine `make`
-  has no compiler unless a line installs one;
-- a download or an archive to unpack (`wget`, `curl`, `tar`), a script, a pipe, a variable, a
-  glob or a placeholder such as `mytool-X.X.tar.gz`;
-- a link to an external wiki: the wiki is not in the commit;
-- a `Dockerfile`: one shipped in the repository is never built.
-
-A line that installs a published copy (`pip install mytool`, a Bioconda package, a Docker
-image) is not the commit under test. It is listed in the report and not run.
-
-### 2. One command
-
-The command for a single sample, in a code block, with no synopsis brackets.
-
-```bash
-# good
-mytool --bam sample.bam --ref hg38.fa --regions panel.bed --out sample.vcf
-
-# not a command: this is a usage synopsis
-mytool --bam <in.bam> [--regions FILE] [--threads N] ...
-```
-
-A synopsis is not a command. Dropping the optional arguments to turn it into one is a change to
-your procedure, so STRhub will not do it: it reports that no command was found. If your README
-has a synopsis for reference, add a worked example line as well.
-
-### 3. The declared input
-
-The file the command names, plus one line saying what kind of file it is (BAM, CRAM, FASTQ,
-other). The file is either in the commit or an explicit placeholder: `<sample.bam>`,
-`path/to/sample.bam`, `$BAM`.
-
-**The reference genome.** If the command reads one, name it in the command and say which
-assembly it is (hg19, hg38, T2T):
-
-```bash
-# good: the flag says it is the reference, the name says which one
-mytool --bam sample.bam --fasta hg38.fa --out sample.vcf
-```
-
-You do not ship the genome and you are not asked to. When the command names a reference after a
-flag such as `--fasta`, `--ref`, `--reference` or `--genome`, or names a file called `hg38` or
-`GRCh38`, STRhub mounts the public UCSC hg38 FASTA (uncompressed, with its `.fai` index) in its
-place and says so in the report. What STRhub cannot stand in for: a compressed (`.fa.gz`) or
-`.2bit` reference, another assembly, or a reference passed with no flag under a name that does
-not say what it is. Those are reported as a limitation of STRhub's, not as a gap of yours.
-
-**Any other file the command reads** (a regions BED, a catalog, a model, a config): ship it in
-the commit, or document the step that fetches it. STRhub does not write or supply one. If it is
-missing, the report says which file and the run is not attempted.
-
-**The strongest thing you can do here is commit a small example**, and show a command that
-runs on it. A slice of a few megabytes turns step 1 into something any user, reviewer or editor
-can reproduce in seconds. When the README has a command whose input files are in the commit,
-that command is the result STRhub reports: it runs it as written, on your data, with nothing of
-its own. The run on STRhub's reference sample is then a second, separate observation.
-
-### 4. The declared output
-
-The file the command writes, by name.
-
-```markdown
-Writes `sample.vcf` in the output directory.
-```
-
-If the documentation does not name an output, STRhub has no way to tell your result from any
-stray file the run left behind, so it will not claim the output appeared. A directory name plus
-the extension is enough (`out/*.vcf`), as long as it is stated.
+**What cannot be executed automatically (and is reported with the exact line):**
+- Prose descriptions ("install the usual dependencies and compile").
+- Lists of library names without the `apt install` / `conda` command that installs them.
+- Downloads, archive extraction, or custom setup scripts (`wget`, `curl`, `tar`, `bash setup.sh`), pipes, variables, or placeholders like `mytool-X.X.tar.gz`.
+- Instructions hosted only on an external wiki or website outside the commit.
+- A repository `Dockerfile` (never built as the evaluator container) or repositories requiring git submodules (`.gitmodules`).
+- Published packages or images (`pip install mytool`, `conda install -c bioconda mytool`, `docker pull ...`): these test a pre-published artifact rather than the pinned commit, so they are listed as context and not run.
 
 ---
 
-## A section you can copy
+### 2. One runnable command
 
-Everything above, as one README section. Replace the names; keep the shape.
+Provide a concrete single-sample command in a code block, without synopsis brackets (`[...]`) or shell variables (`$VAR`). Multi-line commands using `\` or indented option lines are supported.
+
+```bash
+# Good: concrete command
+mytool --bam sample.bam --fasta hg38.fa --regions panel.bed --out sample.vcf
+
+# Not a runnable command: abstract synopsis
+mytool --bam <in.bam> [--regions FILE] [--threads N] ...
+```
+
+If your README includes a synopsis for reference, keep it and add one concrete worked example right below it.
+
+---
+
+### 3. Declared input
+
+State in the README what input format (BAM, CRAM, or FASTQ) and sequencing platform (e.g., Illumina, Oxford Nanopore, PacBio) the tool reads.
+
+In the example command, pass the input **file** (not a directory) after a standard flag such as `--bam`, `--bams`, `--reads`, `--fastq`, `--in`, `--input`, `-i`, or `-b`, using a concrete filename or angle-bracket placeholder (`sample.bam`, `path/to/sample.bam`, `<sample.bam>`). Avoid shell variables such as `$BAM`.
+
+- **Reference genome:** If your command reads a reference FASTA, pass it with a standard flag (`--fasta`, `--ref`, `--reference`, `--genome`, `-r`, `-f`, `-g`) and state the assembly (`hg38`/`GRCh38`). STRhub mounts an uncompressed public UCSC `hg38` FASTA with its `.fai` index automatically (`.fa.gz` and `.2bit` are not mounted).
+- **Regions / catalog files:** Either ship the file in the commit, or document the exact columns/layout of the regions file in the README so STRhub can mount the matching reference panel BED.
+- **Best option: commit a tiny example dataset.** A small test slice of a few megabytes lets any user, reviewer, or editor reproduce your tool in seconds using your own files.
+
+---
+
+### 4. Declared output
+
+State the output file name or extension produced by the command so STRhub can verify that the expected output appeared.
+
+```markdown
+Writes `sample.vcf` (or `results/*.tsv`) in the output directory.
+```
+
+---
+
+## Copy-and-paste README template
+
+Replace the names and keep this structure:
 
 ````markdown
 ## Installation
@@ -124,56 +105,32 @@ pip install .
 
 ## Example
 
-Reads `example/sample.bam` (BAM, aligned to hg38) and writes `example/out.vcf`.
+Reads aligned ONT/Illumina BAM files (`hg38`) and writes `out.vcf`.
 
 ```bash
-mytool --bam example/sample.bam --fasta hg38.fa --out example/out.vcf
+mytool --bam sample.bam --fasta hg38.fa --out out.vcf
 ```
 ````
 
-With that section and `example/sample.bam` in the commit, anyone can paste the repository's
-link into STRhub Verified and get an answer. If you are submitting a manuscript, run it
-yourself first and cite the result's link: your reviewers only have to open it.
+---
 
-## What STRhub does with this
-
-It packages exactly the install you declared into a container and runs exactly the command you
-wrote, on the files that command names. Packaging your `Makefile` or your `environment.yml` into
-an image is wrapping your own instructions, not a second recipe. Adding a dependency you did not
-list, rewriting your build, or swapping your input kind for one we happen to hold would be a
-different procedure, and a result from it says nothing about your commit, so it is not published
-as one.
-
-Three outcomes, and none of them is a judgement about your software:
+## Reading the outcomes
 
 | Outcome | What it means |
 |---|---|
-| **As documented, it runs.** | The install ran, the command finished, and the output file you named appeared. Nothing is claimed about genotype accuracy or fitness for casework. |
-| **As documented, it does not run.** | The procedure was executed without amendment and stopped. This does not mean the tool does not work. It means a third party following the README at this commit did not reach the end. The log is linked. |
-| **A third party cannot tell how to run it.** | Nothing was executed, because one of the four blocks is missing. The report names the block. |
+| **As documented, it runs.** | The install succeeded, the documented command ran end to end, and the declared output appeared. |
+| **As documented, it does not run.** | The procedure was executed without modification and stopped at install or runtime. **This does not mean the tool does not work.** The full log is linked so the failing step can be fixed. |
+| **A third party cannot tell how to run it.** | Nothing was executed because one of the four blocks above is missing or outside the automated profile. |
+| **STRhub could not attempt the run (our limitation).** | STRhub does not hold a reference sample of that kind or cannot fetch a required feature (e.g., submodules). This is never reported as a fault of your tool. |
 
-There is also a fourth case that is **ours, not yours**: STRhub may not hold a sample of the kind
-your command reads, or may hold slices of other coordinates. The report says so in those words.
-It is a limitation of our reference data and it is never reported as your tool failing.
+---
 
-## Recommendations in the report
+## Manual verification option
 
-Whatever the outcome, the report ends with what the README or the repository could add. They do
-not change the result. Typical ones: the repository ships no example data; the README does not
-say which reference assembly the command expects; the README does not describe the output.
+If automated verification is not possible for your repository (for example, legacy documentation, complex setup, or unsupported input layouts), you can request **manual verification by the STRhub team** (response time: **3 to 5 business days**).
 
-## Trying again
+---
 
-Fix the block the report names, then submit the link again on the new commit. Verification is
-pinned to a commit, so a new attempt is a new commit. There is no form where STRhub writes the
-missing piece for you, on purpose: the value of the attestation is that nobody filled the gap.
+## Scope
 
-## What step 1 does not say
-
-It does not say the genotypes are correct, that the tool agrees with capillary electrophoresis,
-or that it is fit for casework. Those need a truth set, and phase 1 does not have one. Step 1 is
-reproducibility of installation and execution, and the report says so on its first page.
-
-The run on STRhub's data uses one public hg38 reference sample per input type (slices over the
-CODIS and expanded panels), mounted read-only, and nothing else beyond the reference genome
-described above.
+Step 1 evaluates reproducible installation, execution, and output plausibility in a clean environment on one public hg38 reference sample per input type (CODIS and expanded forensic panels). It does **not** evaluate genotype concordance against truth sets, accuracy, or fitness for forensic casework.

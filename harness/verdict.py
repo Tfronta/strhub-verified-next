@@ -110,7 +110,7 @@ BLOCKERS = {
                     "installation as plain commands in one code block (apt, conda, pip, make or cmake, with "
                     "the files they name in the repository) lets a new user, a reviewer and STRhub install "
                     "the tool by copying it. The forms it can follow are listed in the guide: "
-                    "https://github.com/Tfronta/strhub-verified/blob/main/docs/GUIA-PASO-1.md",
+                    "https://github.com/Tfronta/strhub-verified-next/blob/main/docs/GUIA-PASO-1.md",
         },
     },
     "build_failed": {
