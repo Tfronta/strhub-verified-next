@@ -265,6 +265,8 @@ def _provenance_groups(prov: dict | None) -> tuple[list[str], list[str], list[st
             extras.append("Miniforge (conda, python, pip)")
         if pkgs:
             extras.append("minimal build toolchain: " + ", ".join(pkgs) + " (no tool-specific libraries)")
+        if be.get("submodules"):
+            extras.append("git submodules initialized")
         extra_str = (
             "; added beyond plain Ubuntu: " + "; ".join(extras)
             if extras else "; no extra packages added by STRhub"

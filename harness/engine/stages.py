@@ -201,6 +201,11 @@ def installs(ctx: Ctx, available_result: StageResult) -> StageResult:
             outputs["failed_check"] = os.path.basename(argv[1])
             return st.finish(rc, argv, **outputs)
     outputs["source_evidence"] = "verified"
+    if (ctx.root / src / ".gitmodules").exists():
+        argv_sub = ["git", "-C", str(src), "submodule", "update", "--init", "--recursive"]
+        rc = ctx.exe.run(argv_sub, log=log, cwd=ctx.root)
+        if rc != 0:
+            return st.finish(rc, argv_sub, **outputs)
     # record_terminal.sh keeps the exact argv and the build's output in
     # work/log_build.txt.terminal, and the output alone in work/log_build.txt.
     argv = ["bash", ctx.harness("record_terminal.sh"), str(ctx.work / "log_build.txt"),

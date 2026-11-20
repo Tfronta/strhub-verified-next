@@ -1170,7 +1170,11 @@ AGAINST_CUE = re.compile(r"\b(?:do not|don'?t|not) recommend|\bnot (?:supported|
 PLATFORM_WORDS = {
     "ont": re.compile(r"\b(?:oxford )?nanopore\b|\bont\b|\bminion\b|\bpromethion\b|\blong[- ]reads?\b", re.I),
     "pacbio": re.compile(r"\bpacbio\b|\bpacific biosciences\b|\bhifi\b", re.I),
-    "illumina": re.compile(r"\billumina\b|\bshort[- ]reads?\b|\bmiseq\b|\bnextseq\b|\bforenseq\b|\bpowerseq\b", re.I),
+    "illumina": re.compile(
+        r"\billumina\b|\bshort[- ]reads?\b|\bpaired[- ]end\b|\bpcr[- ]free\s+(?:wgs|whole[- ]genome)\b"
+        r"|\bmiseq\b|\bnextseq\b|\bhiseq\b|\bnovaseq\b|\bforenseq\b|\bpowerseq\b",
+        re.I,
+    ),
     "ce": re.compile(r"\bcapillary electrophoresis\b|\bgenemapper\b", re.I),
 }
 #: A sentence that states what the tool is FOR — not one that merely mentions
@@ -1178,7 +1182,7 @@ PLATFORM_WORDS = {
 PLATFORM_CUE = re.compile(r"\bdesigned\b|\bintended\b|\btakes?\b|\binputs?\b|\baccepts?\b"
                           r"|\btechnology\b|\bplatforms?\b|\bsequencing data\b|\btailored\b"
                           r"|\bspecifically\b|\boptimi[sz]ed\b|\bbuilt for\b|\bworks (?:with|on)\b"
-                          r"|\bsupports?\b|\bfrom (?:\w+ ){0,3}data\b|\bgenotyping\b", re.I)
+                          r"|\bsupports?\b|\bfrom (?:[\w-]+ ){0,4}(?:data|reads|samples?)\b|\bgenotyping\b", re.I)
 #: A sentence about where the tool CAME from, not what it is for now:
 #: LongTR's README says HipSTR "was initially designed for ... Illumina" and
 #: then that LongTR is "tailored ... for long reads". The first read won.
@@ -1458,6 +1462,12 @@ def detect_input_type(readme: str, examples: list[dict], docs: list[dict] | None
                 statements, statements_file = st, d["path"]
                 if readme_platform:
                     statements = {**st, "platform": readme_platform, "platform_file": None}
+                break
+    if not statements["platform"]:
+        for d in docs or []:
+            st = read_input_statements(d["text"])
+            if st["platform"]:
+                statements = {**statements, "platform": st["platform"], "platform_file": d["path"]}
                 break
     ystr = hits["ystr"] >= 3
     warnings: list[str] = []

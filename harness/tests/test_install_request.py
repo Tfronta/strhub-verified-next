@@ -36,7 +36,7 @@ def test_a_download_piped_to_a_shell_is_asked_of_the_author_with_its_line():
 
 
 def test_a_limit_of_the_evaluator_s_asks_nothing_of_the_author():
-    review, v = decided(block("pip install ."), change=lambda p: p["tree_paths"].append(".gitmodules"))
+    review, v = decided(block("pip install ."), change=lambda p: p["tree_paths"].append(".dockerignore"))
     assert (review["blocker"], review["basis"]) == ("install_profile_unsupported", "strhub")
     assert v["basis"] == "strhub" and v["blockers"] == []
     assert ct.step1_says({"verdict": v, "procedure_review": review})["code"] == "ours"

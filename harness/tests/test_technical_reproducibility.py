@@ -266,11 +266,11 @@ def test_minimal_toolchain_for_make_and_cmake_only_and_declared_in_report(tmp_pa
     built_make = pm.build(prop_make, "make-only")
     inst = built_make["procedure"]["installation"]
     assert inst["ready"] is True
-    assert inst["base_condition"]["added_packages"] == ["build-essential"]
+    assert inst["base_condition"]["added_packages"] == ["build-essential", "git", "ca-certificates"]
     assert inst["base_condition"]["miniforge"] is False
     assert "build-essential" in inst["base_condition"]["description"]
     assert "no tool-specific libraries" in inst["base_condition"]["description"]
-    assert "apt-get install --no-install-recommends build-essential" in built_make["dockerfile"]
+    assert "apt-get install --no-install-recommends build-essential git ca-certificates" in built_make["dockerfile"]
     for lib in ("zlib1g-dev", "libhts-dev", "libbz2-dev", "liblzma-dev", "libgtest-dev", "cmake"):
         assert lib not in built_make["dockerfile"]
 
@@ -278,26 +278,30 @@ def test_minimal_toolchain_for_make_and_cmake_only_and_declared_in_report(tmp_pa
     prov = built_make["procedure"]["provenance"]
     be = prov["harness_choices"]["base_environment"]
     assert be["image"] == "ubuntu:22.04"
-    assert be["added_packages"] == ["build-essential"]
+    assert be["added_packages"] == ["build-essential", "git", "ca-certificates"]
     assert be["miniforge"] is False
 
-    # cmake + make without apt gets build-essential + cmake (and still zero libs).
+    # cmake + make without apt gets build-essential + cmake + git + ca-certificates (still zero libs).
     readme_cmake = readme_make.replace("```\nmake\n```", "```\ncmake .\nmake\n```")
     built_cmake = pm.build(_synthetic_repo(readme_cmake), "cmake-make")
-    assert built_cmake["procedure"]["installation"]["base_condition"]["added_packages"] == ["build-essential", "cmake"]
-    assert "apt-get install --no-install-recommends build-essential cmake" in built_cmake["dockerfile"]
+    assert built_cmake["procedure"]["installation"]["base_condition"]["added_packages"] == [
+        "build-essential", "cmake", "git", "ca-certificates"
+    ]
+    assert "apt-get install --no-install-recommends build-essential cmake git ca-certificates" in built_cmake["dockerfile"]
 
-    # apt install make g++ + cmake .. + make gets ONLY cmake (no redundant build-essential).
+    # apt install make g++ + cmake .. + make gets cmake + git + ca-certificates (no redundant build-essential).
     readme_apt_cmake = readme_make.replace(
         "```\nmake\n```",
         "```\napt install make g++\nmkdir build\ncd build\ncmake ..\nmake\n```",
     )
     built_apt_cmake = pm.build(_synthetic_repo(readme_apt_cmake), "apt-cmake")
-    assert built_apt_cmake["procedure"]["installation"]["base_condition"]["added_packages"] == ["cmake"]
+    assert built_apt_cmake["procedure"]["installation"]["base_condition"]["added_packages"] == [
+        "cmake", "git", "ca-certificates"
+    ]
 
     # HipSTR already installs make + g++ via apt: no build-essential or cmake injected.
     built_hip = pm.build(_hipstr_proposal(), "hipstr-check")
-    assert built_hip["procedure"]["installation"]["base_condition"]["added_packages"] == []
+    assert built_hip["procedure"]["installation"]["base_condition"]["added_packages"] == ["git", "ca-certificates"]
     assert "build-essential" not in built_hip["dockerfile"]
 
     # Report renders the exact minimal toolchain in needed_beyond_repo, summary.md, and summary.html.
@@ -326,8 +330,8 @@ def test_minimal_toolchain_for_make_and_cmake_only_and_declared_in_report(tmp_pa
                for item in rep.get("needed_beyond_repo") or [])
     md = (tmp_path / "reports" / f"{manifest_data['report']['slug']}.summary.md").read_text()
     html = (tmp_path / "reports" / f"{manifest_data['report']['slug']}.html").read_text()
-    assert "minimal build toolchain: build-essential (no tool-specific libraries)" in md
-    assert "minimal build toolchain: build-essential (no tool-specific libraries)" in html
+    assert "minimal build toolchain: build-essential, git, ca-certificates (no tool-specific libraries)" in md
+    assert "minimal build toolchain: build-essential, git, ca-certificates (no tool-specific libraries)" in html
 
 
 def test_paired_sample_and_library_lists_reduce_consistently_with_evidence():
@@ -485,4 +489,16 @@ def test_unready_install_with_documented_regions_has_no_spurious_command_or_cwd_
     built = pm.build(prop, "gangstr")
     codes = [a["code"] for a in built["procedure"]["amendments"]]
     assert codes == ["install_profile_unsupported"]
-    assert built["procedure"]["reason"] == "The repository uses submodules, which this profile does not fetch."
+    assert "command_changed" not in codes and "working_directory_changed" not in codes
+
+
+def test_expansionhunter_and_ehdn_pass_procedure_review_without_custom_recipes():
+    import pathlib
+
+    for tool_name in ("expansionhunter", "expansionhunterdenovo"):
+        src = dr.load_snapshot(pathlib.Path(f"harness/testdata/benchmark/{tool_name}"))
+        slug, ref = dr.repo_slug(src["tree_resp"]["repo"]), src["tree_resp"].get("ref", "HEAD")
+        prop = dr.detect(slug, ref, src["tree_resp"], src["readme"], src["readme_name"], extras=src)
+        built = pm.build(prop, tool_name)
+        assert built["procedure"]["may_say_runs"] is True, (tool_name, built["procedure"].get("amendments"))
+        assert built["procedure"]["amendments"] == []

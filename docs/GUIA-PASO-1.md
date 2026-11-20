@@ -37,17 +37,18 @@ pip install .
 **Base environment provided automatically (and declared in the report):**
 - Clean Ubuntu 22.04 with refreshed `apt` package lists (`apt` answering yes).
 - Miniforge (`conda`, `python`, `pip`) when your commands use Conda or Python/pip.
-- Minimal generic build toolchain (`build-essential`, and `cmake` when `cmake` is invoked) when compiling with `make`, `./configure`, or `cmake`. No tool-specific libraries are added.
+- Minimal generic build toolchain (`build-essential`, `git`, `ca-certificates`, plus `cmake`, `autoconf`/`automake`/`libtool`/`pkg-config`, or `cargo` only when those commands are invoked). No tool-specific or bioinformatics libraries are added.
+- Automatic initialization of pinned git submodules when `.gitmodules` is present.
 
 **Commands STRhub can execute literally:**
-`apt install`, `conda create`, `conda env create`, `conda install`, `conda activate`, `pip install .`, `pip install -r requirements.txt`, `python setup.py install`, `make`, `cmake`, `./configure`, `cargo build --release`, `mkdir`, `cd`, and `&&` chaining between them. See [DOCUMENTED-INSTALLATION.md](DOCUMENTED-INSTALLATION.md) for the complete grammar.
+`apt install`, `conda create`, `conda env create`, `conda install`, `conda activate`, `pip install .`, `pip install -r requirements.txt`, `python setup.py install`, `make`, `cmake`, `autoreconf`, `./configure`, `cargo build --release`, `cargo install --path .`, `mkdir`, `cd`, and `&&` chaining between them. See [DOCUMENTED-INSTALLATION.md](DOCUMENTED-INSTALLATION.md) for the complete grammar.
 
 **What cannot be executed automatically (and is reported with the exact line):**
 - Prose descriptions ("install the usual dependencies and compile").
 - Lists of library names without the `apt install` / `conda` command that installs them.
 - Downloads, archive extraction, or custom setup scripts (`wget`, `curl`, `tar`, `bash setup.sh`), pipes, variables, or placeholders like `mytool-X.X.tar.gz`.
 - Instructions hosted only on an external wiki or website outside the commit.
-- A repository `Dockerfile` (never built as the evaluator container) or repositories requiring git submodules (`.gitmodules`).
+- A repository `Dockerfile` (never built as the evaluator container) or repositories shipping a `.dockerignore`.
 - Published packages or images (`pip install mytool`, `conda install -c bioconda mytool`, `docker pull ...`): these test a pre-published artifact rather than the pinned commit, so they are listed as context and not run.
 
 ---

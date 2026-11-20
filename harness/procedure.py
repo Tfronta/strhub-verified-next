@@ -496,6 +496,7 @@ def classify(proposal: dict, manifest: dict, limitations: list[str],
                 "description": base_cond.get("description"),
                 "added_packages": list(base_cond.get("added_packages") or []),
                 "miniforge": bool(base_cond.get("miniforge")),
+                "submodules": bool(base_cond.get("submodules")),
             } if base_cond else None,
         },
     }

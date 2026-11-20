@@ -12,9 +12,11 @@ What the evaluator does around them, and says it does:
   - the base is Ubuntu 22.04 with its package lists refreshed and apt set to
     answer yes; Miniforge (conda, python, pip) is added only when a command
     uses conda, pip or python; a minimal generic build toolchain
-    (build-essential, and cmake when cmake is invoked) is added only when a
-    command invokes make, configure or cmake without already installing them
-    via apt, and never includes tool-specific libraries;
+    (build-essential, git/ca-certificates, cmake, autotools/pkg-config, or
+    cargo, each only when invoked without already being installed via apt)
+    never includes tool-specific libraries;
+  - when the repository declares `.gitmodules`, its pinned submodules are
+    initialized during checkout;
   - a leading `sudo` is dropped (the build runs as root), and so are the
     `git clone` of this very repository and the `cd` into it: the build
     already stands in a checkout of the pinned commit;
@@ -23,7 +25,7 @@ What the evaluator does around them, and says it does:
 
 What stays outside, and makes the plan not ready rather than approximate: a
 command with shell operators, globs, variables or placeholders; a download; a
-file the command names that the commit does not hold; submodules; and two
+file the command names that the commit does not hold; and two
 installations of which STRhub would have to pick one. A block that installs a
 PUBLISHED copy of the tool (PyPI, Bioconda, a Docker image) is an alternative
 to building this commit and is left out, by name, in the plan.
@@ -46,8 +48,19 @@ BASE_CONDA = BASE_PLAIN + ", plus Miniforge (conda, python, pip)"
 SECTION = re.compile(r"install|build|compil|set ?up|requirement|prerequisite|dependenc|getting started|quick ?start|environment\b", re.I)
 #: A code line that is an installation step of some kind, admitted or not.
 LOOKS_LIKE_INSTALL = re.compile(
-    r"(?:^|[\s;&|=])(?:apt|apt-get|conda|mamba|pip3?|python3? -m pip|python3? setup\.py|make|cmake|\./configure|cargo|"
+    r"(?:^|[\s;&|=])(?:apt|apt-get|conda|mamba|pip3?|python3? -m pip|python3? setup\.py|make|cmake|\./configure|autoreconf|cargo|"
     r"wget|curl|tar|unzip|docker|git clone|bash|sh|Rscript|nimble|go|source activate)(?:\s|$)")
+#: Indented (non-fenced) blocks must start with an install command so tab-indented
+#: prose paragraphs mentioning `apt-get` or `make` are not misread as shell blocks.
+_LEADING_INSTALL = re.compile(
+    r"^(?:apt|apt-get|conda|mamba|pip3?|python3? -m pip|python3? setup\.py|make|cmake|\./configure|autoreconf|cargo|"
+    r"wget|curl|tar|unzip|docker|git clone|bash|sh|Rscript|nimble|go|source activate)(?:\s|$)")
+#: Documents whose filename identifies them as the repository's main or
+#: installation documentation (checked before auxiliary docs like annotation guides).
+_PRIMARY_INSTALL_DOC = re.compile(
+    r"(?:^|/)(?:readme(?:\.[^/]+)?|\d*[-_ ]*(?:install(?:ation)?|build(?:ing)?|setup|getting[-_ ]?started|quick[-_ ]?start)[^/]*)$",
+    re.I,
+)
 TOK = r"[\w./=:+,-]+"
 #: A package, a channel, a path or a name: never an option. The options a
 #: step may carry are the ones spelled out in its pattern, so nothing like
@@ -67,13 +80,17 @@ PATTERNS = [
     rf"cmake(?: (?:-D{WORD}|\.\.?|\.\./{WORD}|{WORD}))+",
     rf"mkdir(?: -p)? {WORD}",
     rf"cd (?:\.\.|{WORD})",
+    r"autoreconf(?: -[a-zA-Z]+)*",
     rf"\./configure(?: --{WORD})*",
-    r"cargo build --release",
+    r"cargo build(?: --release)?(?: --locked)?",
+    r"cargo install(?: --locked)? --path \.",
 ]
 ADMITTED = re.compile("|".join(f"(?:{p})" for p in PATTERNS))
 USES_CONDA = re.compile(r"^(?:conda|mamba|source activate|pip3?|python3?)\b")
-_USES_BUILD_ESSENTIAL = re.compile(r"^(?:make|\./configure|cmake)\b")
+_USES_BUILD_ESSENTIAL = re.compile(r"^(?:make|\./configure|autoreconf|cmake)\b")
 _USES_CMAKE = re.compile(r"^cmake\b")
+_USES_AUTOTOOLS = re.compile(r"^(?:\./configure|autoreconf)\b")
+_USES_CARGO = re.compile(r"^cargo\b")
 _APT_INSTALL = re.compile(r"^apt(?:-get)? install\b(.*)$")
 #: A file a command reads, by the option that names it.
 FILE_OPTION = re.compile(r"(?:^| )(?:-f|--file|-r)[ =](\S+)")
@@ -105,13 +122,13 @@ def _blocks(text: str) -> list[dict]:
         if m_bt:
             # Standalone inline-code line (`pip install -e .`): treat as a code block row.
             if current is None:
-                current = {"heading": heading, "rows": []}
+                current = {"heading": heading, "rows": [], "indented": False}
                 out.append(current)
             current["rows"].append((number, m_bt.group(1).strip()))
             continue
         if marker:
             fence = (marker[1][0], len(marker[1]))
-            current = {"heading": heading, "rows": []}
+            current = {"heading": heading, "rows": [], "indented": False}
             out.append(current)
             continue
         if re.match(r"^#{1,6}\s", row):
@@ -119,7 +136,7 @@ def _blocks(text: str) -> list[dict]:
             continue
         if row.startswith("    ") or row.startswith("\t"):
             if current is None:
-                current = {"heading": heading, "rows": []}
+                current = {"heading": heading, "rows": [], "indented": True}
                 out.append(current)
             current["rows"].append((number, row))
         elif row.strip():
@@ -147,6 +164,13 @@ def _kind(command: str, repo_slug: str) -> str:
     if clone:
         return "given" if clone[1].lower() == name else "outside"
     if re.fullmatch(rf"cd {re.escape(name)}/?", lowered):
+        return "given"
+    # A bare self-invocation of the tool's own binary/script (with no args or
+    # --help/--version) inside an install block is a usage check, not a build step.
+    if re.fullmatch(
+        rf"(?:python3? )?(?:\./)?{re.escape(name)}(?:\.py)?(?: (?:-h|--help|-v|--version))?",
+        lowered,
+    ):
         return "given"
     if re.match(r"docker (?:pull|run|build)\b", command):
         return "published"
@@ -186,11 +210,15 @@ def _has_compiler_and_make(apt_pkgs: set[str]) -> bool:
 
 def _minimal_toolchain(commands: list[dict]) -> list[str]:
     """Generic compiler/build-system packages supplied only when a documented
-    command invokes make, ./configure or cmake without an earlier apt install
-    of them. Never includes tool-specific libraries."""
+    command invokes make, ./configure, autoreconf, cmake or cargo without an
+    earlier apt install of them. Never includes tool-specific libraries."""
     apt_pkgs: set[str] = set()
     need_build_essential = False
+    need_git = False
+    need_ca = False
     need_cmake = False
+    need_autotools = False
+    need_cargo = False
     for cmd in commands:
         text = cmd["text"]
         apt_match = _APT_INSTALL.match(text)
@@ -199,16 +227,70 @@ def _minimal_toolchain(commands: list[dict]) -> list[str]:
                 if not tok.startswith("-"):
                     apt_pkgs.add(tok)
             continue
-        if _USES_BUILD_ESSENTIAL.match(text) and not _has_compiler_and_make(apt_pkgs):
-            need_build_essential = True
+        if _USES_BUILD_ESSENTIAL.match(text):
+            if not _has_compiler_and_make(apt_pkgs):
+                need_build_essential = True
+            if "git" not in apt_pkgs:
+                need_git = True
+            if "ca-certificates" not in apt_pkgs:
+                need_ca = True
         if _USES_CMAKE.match(text) and "cmake" not in apt_pkgs:
             need_cmake = True
+        if _USES_AUTOTOOLS.match(text):
+            need_autotools = True
+        if _USES_CARGO.match(text):
+            if "cargo" not in apt_pkgs and "rustc" not in apt_pkgs:
+                need_cargo = True
+            if "ca-certificates" not in apt_pkgs:
+                need_ca = True
     out: list[str] = []
     if need_build_essential:
         out.append("build-essential")
     if need_cmake:
         out.append("cmake")
+    if need_autotools:
+        for pkg in ("autoconf", "automake", "libtool", "pkg-config"):
+            if pkg not in apt_pkgs:
+                out.append(pkg)
+    if need_cargo:
+        out.append("cargo")
+    if need_git:
+        out.append("git")
+    if need_ca:
+        out.append("ca-certificates")
     return out
+
+
+def _scan_docs(docs: list[dict], slug: str) -> tuple[list[dict], list[dict], list[dict], str | None]:
+    """Scan a group of documents for installation blocks."""
+    commands, published, scanned = [], [], []
+    for doc in docs:
+        scanned.append({"path": doc["file"], "sha256": digest(doc["text"])})
+        for block in _blocks(doc["text"]):
+            if not SECTION.search(block["heading"]):
+                continue
+            # An indented list (`* Python 2.7`) is prose, not a code block.
+            if any(re.match(r"\s*(?:[*+-]|\d+[.)])\s", r) for _, r in block["rows"]):
+                continue
+            rows = [(n, step) for n, r in block["rows"] for step in _steps(r) if step and not step.startswith("#")]
+            matcher = _LEADING_INSTALL.match if block.get("indented") else LOOKS_LIKE_INSTALL.search
+            if not any(matcher(c) for _, c in rows):
+                continue
+            kinds = [_kind(c, slug) for _, c in rows]
+            if "published" in kinds:
+                # An alternative to building this commit: named, never run.
+                published += [{"file": doc["file"], "line": n, "text": c}
+                              for (n, c), k in zip(rows, kinds) if k == "published"]
+                continue
+            if "outside" in kinds:
+                n, c = next((row for row, k in zip(rows, kinds) if k == "outside"))
+                return commands, published, scanned, (
+                    f"An installation step is outside this profile ({doc['file']}, line {n}: `{c}`); "
+                    "STRhub does not interpret, complete or skip it."
+                )
+            commands += [{"file": doc["file"], "line": n, "text": c, "argv": c.split()}
+                         for (n, c), k in zip(rows, kinds) if k == "step"]
+    return commands, published, scanned, None
 
 
 def discover(proposal: dict) -> dict:
@@ -226,10 +308,7 @@ def discover(proposal: dict) -> dict:
         return result
     slug = match[1]
     files = set(proposal.get("tree_paths") or [])
-    if ".gitmodules" in files:
-        result["reason"] = "The repository uses submodules, which this profile does not fetch."
-        result["gap"] = "strhub"
-        return result
+    has_submodules = ".gitmodules" in files
     if ".dockerignore" in files:
         # The carrier copies the checkout whole; a .dockerignore would decide what it copies.
         result["reason"] = "The repository ships a .dockerignore, which would change what the evaluator's carrier copies."
@@ -237,35 +316,24 @@ def discover(proposal: dict) -> dict:
         return result
     directories = {str(parent) for f in files for parent in pathlib.PurePosixPath(f).parents if str(parent) != "."}
 
-    commands, published, documents = [], [], []
-    if not _documents(proposal):
+    all_docs = _documents(proposal)
+    if not all_docs:
         # Nothing was read: that is this evaluator's lack of evidence, not a gap in the documentation.
         result["gap"] = "strhub"
         return result
-    for doc in _documents(proposal):
-        documents.append({"path": doc["file"], "sha256": digest(doc["text"])})
-        for block in _blocks(doc["text"]):
-            if not SECTION.search(block["heading"]):
-                continue
-            # An indented list (`* Python 2.7`) is prose, not a code block.
-            if any(re.match(r"\s*(?:[*+-]|\d+[.)])\s", r) for _, r in block["rows"]):
-                continue
-            rows = [(n, step) for n, r in block["rows"] for step in _steps(r) if step and not step.startswith("#")]
-            if not any(LOOKS_LIKE_INSTALL.search(c) for _, c in rows):
-                continue
-            kinds = [_kind(c, slug) for _, c in rows]
-            if "published" in kinds:
-                # An alternative to building this commit: named, never run.
-                published += [{"file": doc["file"], "line": n, "text": c}
-                              for (n, c), k in zip(rows, kinds) if k == "published"]
-                continue
-            if "outside" in kinds:
-                n, c = next((row for row, k in zip(rows, kinds) if k == "outside"))
-                result["reason"] = (f"An installation step is outside this profile ({doc['file']}, line {n}: `{c}`); "
-                                    "STRhub does not interpret, complete or skip it.")
-                return result
-            commands += [{"file": doc["file"], "line": n, "text": c, "argv": c.split()}
-                         for (n, c), k in zip(rows, kinds) if k == "step"]
+    primary_docs = [d for d in all_docs if _PRIMARY_INSTALL_DOC.search(d["file"])]
+    other_docs = [d for d in all_docs if not _PRIMARY_INSTALL_DOC.search(d["file"])]
+
+    commands, published, documents, err = _scan_docs(primary_docs, slug)
+    if err:
+        result["reason"] = err
+        return result
+    if not commands and not published and other_docs:
+        commands, published, other_scanned, err = _scan_docs(other_docs, slug)
+        documents += other_scanned
+        if err:
+            result["reason"] = err
+            return result
     if not commands:
         return result
     builders = [c["text"] for c in commands if not re.match(r"(?:cd|mkdir|conda activate|source activate)\b", c["text"])]
@@ -309,6 +377,8 @@ def discover(proposal: dict) -> dict:
     base_desc = BASE_CONDA if uses_conda else BASE_PLAIN
     if toolchain:
         base_desc += f", plus minimal build toolchain ({', '.join(toolchain)}; no tool-specific libraries)"
+    if has_submodules:
+        base_desc += ", with git submodules initialized"
     first = commands[0]
     result.pop("gap")
     result.update(
@@ -317,7 +387,8 @@ def discover(proposal: dict) -> dict:
         base_condition={"image": BASE_IMAGE, "description": base_desc,
                         "role": "evaluator base environment",
                         "added_packages": list(toolchain),
-                        "miniforge": uses_conda},
+                        "miniforge": uses_conda,
+                        "submodules": has_submodules},
         citation={"repo": repo, "ref": ref, "path": first["file"], "line": first["line"],
                   "end_line": commands[-1]["line"], "verified": True,
                   "document_sha256": next(d["sha256"] for d in documents if d["path"] == first["file"])},

@@ -95,7 +95,6 @@ def test_what_cannot_be_transcribed_literally_is_refused_and_named(lines, why):
 
 
 @pytest.mark.parametrize("change", [
-    lambda p: p["tree_paths"].append(".gitmodules"),
     lambda p: p["tree_paths"].append(".dockerignore"),
     lambda p: p.update(ref="main"),
     lambda p: p.update(tree_truncated=True),
@@ -106,6 +105,48 @@ def test_evidence_that_is_not_a_pinned_plain_repository_document_admits_nothing(
     p = proposal(CONDA)
     change(p)
     assert not di.discover(p)["ready"]
+
+
+def test_submodules_autotools_cargo_and_cleaner_doc_filtering():
+    # Submodules (.gitmodules) are now supported and declared in base_condition.
+    p_sub = proposal(CONDA)
+    p_sub["tree_paths"].append(".gitmodules")
+    plan_sub = di.discover(p_sub)
+    assert plan_sub["ready"]
+    assert plan_sub["base_condition"]["submodules"] is True
+    assert "git submodules initialized" in plan_sub["base_condition"]["description"]
+
+    # Autotools (./configure) adds build-essential + autotools + git + ca-certificates.
+    plan_auto = di.discover(proposal(block("autoreconf -fi", "./configure", "make")))
+    assert plan_auto["ready"]
+    assert plan_auto["base_condition"]["added_packages"] == [
+        "build-essential", "autoconf", "automake", "libtool", "pkg-config", "git", "ca-certificates"
+    ]
+
+    # Cargo adds cargo + ca-certificates (no build-essential needed).
+    plan_cargo = di.discover(proposal(block("cargo build --release")))
+    assert plan_cargo["ready"]
+    assert plan_cargo["base_condition"]["added_packages"] == ["cargo", "ca-certificates"]
+
+    # Tab-indented prose paragraph mentioning apt-get is ignored, not rejected.
+    prose = "\tIf you are on Linux you can use apt-get or yum to get g++.\n\n" + block("make")
+    plan_prose = di.discover(proposal(prose))
+    assert plan_prose["ready"] and [c["text"] for c in plan_prose["commands"]] == ["make"]
+
+    # Bare self-invocation (./tool.py) inside an install block is treated as a usage check.
+    plan_self = di.discover(proposal(block("conda env create -f environment.yml", "conda activate tool", "./tool.py")))
+    assert plan_self["ready"]
+    assert [c["text"] for c in plan_self["commands"]] == ["conda env create -f environment.yml", "conda activate tool"]
+
+    # Auxiliary doc (documentation/08_Annotation.md) does not poison a valid install doc.
+    p_aux = proposal(block("make"))
+    p_aux["source_documents"].append({
+        "file": "documentation/08_Annotation.md",
+        "origin": "repo",
+        "text": "# Annotate\n\n## Setup ANNOVAR\n\n```bash\ntar xvfz annovar.latest.tar.gz\n```\n",
+    })
+    plan_aux = di.discover(p_aux)
+    assert plan_aux["ready"] and [c["text"] for c in plan_aux["commands"]] == ["make"]
 
 
 def test_prose_lists_and_usage_blocks_are_not_installation():

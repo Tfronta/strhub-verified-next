@@ -140,7 +140,6 @@ def test_no_multiple_plans_or_quoted_document(document):
     lambda p: p.update(tree_truncated=True),
     lambda p: p["source_documents"][0].update(origin="wiki"),
     lambda p: p.update(source_documents=[]),
-    lambda p: p["tree_paths"].append(".gitmodules"),
     lambda p: p["tree_paths"].append(".dockerignore"),
 ])
 def test_incomplete_or_unsupported_source_evidence_does_not_authorize_installation(mutate):
