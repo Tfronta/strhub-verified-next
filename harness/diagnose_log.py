@@ -360,6 +360,25 @@ _rule(
 )
 
 _rule(
+    r"Could NOT find (\w+) \(missing:\s*([^)]+)\)",
+    "error", "cmake_package_missing",
+    "CMake could not find a required system library: {0}",
+    "CMake searched for the '{0}' development files ({1}) and they were not "
+    "installed in the container after running the documented steps. This happens "
+    "when the corresponding '-dev' package (such as zlib1g-dev, libbz2-dev or "
+    "liblzma-dev) was omitted or only the runtime package (such as zlib1g) was installed.",
+)
+
+_rule(
+    r"(?:ld|collect2)[^\n]*?:\s+cannot find -l([\w+-]+)",
+    "error", "missing_library",
+    "The C/C++ linker could not find library: -l{0}",
+    "The linker could not find '-l{0}' while building the binary because the "
+    "corresponding system development package (such as lib{0}-dev, or zlib1g-dev "
+    "for -lz) was not installed by the documented build steps.",
+)
+
+_rule(
     r"(?:COPY failed|ADD failed)[^\n]*|failed to compute cache key[^\n]*not found",
     "error", "build_file_missing",
     "The build referenced a file that is not in the build context",
@@ -409,6 +428,16 @@ _rule(
 )
 
 _rule(
+    r"(?:file DOWNLOAD HASH mismatch|Download failed\.\s+Status:\s+\d+[^\n]*)",
+    "error", "build_download_failed",
+    "A download in the build failed: {0}",
+    "During compilation, the build tried to fetch an external dependency from "
+    "'{0}', and the server returned an HTTP error (dead link or retired hosting "
+    "service such as dl.bintray.com, which shut down in May 2021). Building this "
+    "commit from source on a clean machine fails unless that URL is updated.",
+)
+
+_rule(
     # Docker Hub's anonymous pull quota is shared by every job on a runner IP.
     # Hitting it says nothing about the image or the tool.
     r"(?:toomanyrequests|You have reached your (?:unauthenticated )?pull rate limit)",
@@ -452,6 +481,9 @@ _HELP_LINE = re.compile(r"^(?:usage:|options?:|arguments?:|-{1,2}[a-z])", re.IGN
 _WARN_LINE = re.compile(r"^\W*warn(?:ing)?\b", re.IGNORECASE)
 
 
+_DOWNLOADING_URL = re.compile(r"\bDownloading\b[^\n]*?\bfrom\s+(https?://\S+)", re.IGNORECASE)
+
+
 def diagnose(log_text: str) -> list[dict]:
     """Return a list of diagnostic issues found in the log text.
 
@@ -462,11 +494,15 @@ def diagnose(log_text: str) -> list[dict]:
     """
     order: list[str] = []
     by_rule: dict[str, dict] = {}
+    last_download_url: str | None = None
 
     for line in log_text.splitlines():
         line = line.strip()
         if not line or _HELP_LINE.match(line):
             continue
+        m_dl = _DOWNLOADING_URL.search(line)
+        if m_dl:
+            last_download_url = _clean(m_dl.group(1))
         warned = bool(_WARN_LINE.match(line))
         for pattern, severity, rid, title_tmpl, observation_tmpl in _RULES:
             m = pattern.search(line)
@@ -475,6 +511,8 @@ def diagnose(log_text: str) -> list[dict]:
             groups = tuple(_clean(g) if isinstance(g, str) else g for g in m.groups())
             if rid == _CMD_NOT_FOUND_FOLD:
                 groups = (next((g for g in groups if g), ""),)
+            elif rid == "build_download_failed" and not groups:
+                groups = (last_download_url or "external URL",)
             sev = "warning" if warned and severity == "error" else severity
             entry = by_rule.get(rid)
             if entry is None:
@@ -563,6 +601,8 @@ REVIEW_LABELS = {
     "oom": "Ran out of memory",
     "run_timeout": "Did not finish in time",
     "build_download_failed": "A download in the build failed",
+    "cmake_package_missing": "CMake could not find a required system library",
+    "missing_library": "C/C++ linker could not find a required library",
     "python_exception": "The tool raised a Python exception",
     "permission_denied": "Permission denied",
     "cmd_not_found": "Command not found",
@@ -610,7 +650,8 @@ AUTHOR_FIXABLE = {"bad_option", "cmd_not_found", "missing_module", "import_error
                   # Build failures that live in what the submission declared:
                   # its pins, its package names, its own Dockerfile lines.
                   "pip_unresolvable", "apt_no_package", "conda_unsatisfiable",
-                  "missing_header", "build_file_missing", "checkout_failed",
+                  "missing_header", "cmake_package_missing", "missing_library",
+                  "build_file_missing", "checkout_failed",
                   # The build the repository itself declares runs autoconf
                   # without `-i` (GangSTR's CMakeLists does this to htslib), so
                   # the failure is in those steps and the fix is one flag.

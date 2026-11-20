@@ -152,3 +152,34 @@ def test_a_python_exception_the_tool_raised_is_named():
     assert ids == {"missing_module"}
     # "Error: ..." alone is how many tools print, not a Python exception.
     assert "python_exception" not in {i["id"] for i in d.diagnose("Error: could not open file x\n")}
+
+
+def test_cmake_missing_package_bintray_download_and_linker_missing_library():
+    # ExpansionHunter: CMake FindZLIB fails when zlib1g-dev is missing.
+    eh_log = (
+        "#11 0.448 CMake Error at /usr/share/cmake-3.22/Modules/FindPackageHandleStandardArgs.cmake:230 (message):\n"
+        "#11 0.448   Could NOT find ZLIB (missing: ZLIB_LIBRARY ZLIB_INCLUDE_DIR)\n"
+    )
+    eh_got = ids(eh_log)
+    assert "cmake_package_missing" in eh_got
+    assert eh_got["cmake_package_missing"]["examples"] == ["ZLIB"]
+    assert "zlib1g-dev" in eh_got["cmake_package_missing"]["suggestion"]
+    assert d.fault_of("cmake_package_missing") == "author"
+
+    # ExpansionHunterDenovo: CMake download from retired dl.bintray.com fails.
+    ehdn_log = (
+        "#11 2.360 -- Downloading Boost from https://dl.bintray.com/boostorg/release/1.67.0/source/boost_1_67_0.tar.bz2\n"
+        "#11 2.512   file DOWNLOAD HASH mismatch\n"
+        "#11 2.512   Download failed.  Status: 22 \"HTTP response code said error\"\n"
+    )
+    ehdn_got = ids(ehdn_log)
+    assert "build_download_failed" in ehdn_got
+    assert "https://dl.bintray.com/boostorg/release/1.67.0/source/boost_1_67_0.tar.bz2" in ehdn_got["build_download_failed"]["examples"]
+    assert "dl.bintray.com" in ehdn_got["build_download_failed"]["suggestion"]
+
+    # Linker missing -lhts / -lz.
+    ld_log = "/usr/bin/ld: cannot find -lhts: No such file or directory\ncollect2: error: ld returned 1 exit status\n"
+    ld_got = ids(ld_log)
+    assert "missing_library" in ld_got
+    assert ld_got["missing_library"]["examples"] == ["hts"]
+    assert d.fault_of("missing_library") == "author"

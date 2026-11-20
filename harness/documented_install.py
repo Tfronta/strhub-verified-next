@@ -100,7 +100,7 @@ def digest(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
-_STANDALONE_BACKTICK = re.compile(r"^`{1,3}([^`\s][^`]*\s[^`]*)`{1,3}$")
+_STANDALONE_BACKTICK = re.compile(r"^(?:(?:[*+-]|\d+[.)])\s+)?`{1,3}([^`\s][^`]*\s[^`]*)`{1,3}$")
 
 
 def _blocks(text: str) -> list[dict]:
@@ -120,8 +120,9 @@ def _blocks(text: str) -> list[dict]:
             continue
         m_bt = _STANDALONE_BACKTICK.match(row.strip())
         if m_bt:
-            # Standalone inline-code line (`pip install -e .`): treat as a code block row.
-            if current is None:
+            # Standalone inline-code line (`pip install -e .` or `- `apt install ...``):
+            # treat as a code block row separate from surrounding indented list items.
+            if current is None or current.get("indented"):
                 current = {"heading": heading, "rows": [], "indented": False}
                 out.append(current)
             current["rows"].append((number, m_bt.group(1).strip()))
@@ -135,7 +136,7 @@ def _blocks(text: str) -> list[dict]:
             heading, current = row.strip(), None
             continue
         if row.startswith("    ") or row.startswith("\t"):
-            if current is None:
+            if current is None or not current.get("indented"):
                 current = {"heading": heading, "rows": [], "indented": True}
                 out.append(current)
             current["rows"].append((number, row))
@@ -164,6 +165,10 @@ def _kind(command: str, repo_slug: str) -> str:
     if clone:
         return "given" if clone[1].lower() == name else "outside"
     if re.fullmatch(rf"cd {re.escape(name)}/?", lowered):
+        return "given"
+    # Non-Ubuntu OS package managers (CentOS yum/dnf, macOS brew) listed alongside
+    # Ubuntu instructions do not apply to the declared Ubuntu 22.04 base image.
+    if re.match(r"(?:yum|dnf|brew)\s+install\b", lowered):
         return "given"
     # A bare self-invocation of the tool's own binary/script (with no args or
     # --help/--version) inside an install block is a usage check, not a build step.
