@@ -93,7 +93,8 @@ PATTERNS = [
     r"cargo install(?: --locked)? --path \.",
 ]
 ADMITTED = re.compile("|".join(f"(?:{p})" for p in PATTERNS))
-USES_CONDA = re.compile(r"^(?:conda|mamba|source activate|pip3?|python3?)\b")
+USES_CONDA = re.compile(r"^(?:conda|mamba|source activate)\b")
+_USES_PYTHON = re.compile(r"^(?:pip3?|python3?)\b")
 _USES_BUILD_ESSENTIAL = re.compile(r"^(?:make|\./configure|autoreconf|cmake)\b")
 _USES_CMAKE = re.compile(r"^cmake\b")
 _USES_AUTOTOOLS = re.compile(r"^(?:\./configure|autoreconf)\b")
@@ -226,10 +227,10 @@ def _has_compiler_and_make(apt_pkgs: set[str]) -> bool:
     return has_make and has_compiler
 
 
-def _minimal_toolchain(commands: list[dict]) -> list[str]:
-    """Generic compiler/build-system packages supplied only when a documented
-    command invokes make, ./configure, autoreconf, cmake or cargo without an
-    earlier apt install of them. Never includes tool-specific libraries."""
+def _minimal_toolchain(commands: list[dict], uses_conda: bool = False) -> list[str]:
+    """Generic compiler/build-system and system Python packages supplied only
+    when a documented command invokes them without an earlier apt install.
+    Never includes tool-specific libraries."""
     apt_pkgs: set[str] = set()
     need_build_essential = False
     need_git = False
@@ -237,6 +238,7 @@ def _minimal_toolchain(commands: list[dict]) -> list[str]:
     need_cmake = False
     need_autotools = False
     need_cargo = False
+    need_python = False
     for cmd in commands:
         text = cmd["text"]
         apt_match = _APT_INSTALL.match(text)
@@ -261,6 +263,10 @@ def _minimal_toolchain(commands: list[dict]) -> list[str]:
                 need_cargo = True
             if "ca-certificates" not in apt_pkgs:
                 need_ca = True
+        if not uses_conda and _USES_PYTHON.match(text):
+            need_python = True
+            if "ca-certificates" not in apt_pkgs:
+                need_ca = True
     out: list[str] = []
     if need_build_essential:
         out.append("build-essential")
@@ -272,6 +278,10 @@ def _minimal_toolchain(commands: list[dict]) -> list[str]:
                 out.append(pkg)
     if need_cargo:
         out.append("cargo")
+    if need_python:
+        for pkg in ("python3", "python3-venv", "python3-pip", "python-is-python3"):
+            if pkg not in apt_pkgs:
+                out.append(pkg)
     if need_git:
         out.append("git")
     if need_ca:
@@ -412,7 +422,7 @@ def discover(proposal: dict) -> dict:
                 return result
 
     uses_conda = any(USES_CONDA.match(c["text"]) for c in commands)
-    toolchain = _minimal_toolchain(commands)
+    toolchain = _minimal_toolchain(commands, uses_conda=uses_conda)
     activated = [c["argv"][-1] for c in commands if re.match(r"(?:conda|source) activate\b", c["text"])]
     environment = activated[-1] if activated else None
     dockerfile = carrier(commands, uses_conda, environment, toolchain, venv_activate)

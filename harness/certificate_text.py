@@ -51,12 +51,12 @@ COLOR_HEX = {"brightgreen": "#16a34a", "green": "#22a722", "yellow": "#d4a017",
 #: the executive summary, in the closing sections, and — since the report
 #: carries the block below — on the web page. Policy about STRhub's scope,
 #: not findings about any tool.
-PURPOSE = "Verify that the tool installs, runs end-to-end, and produces structurally valid output."
-EXEC_SCOPE = "Installation, execution, and output structure verification."
+PURPOSE = "Evaluate whether the tool installs, runs end-to-end, and produces structurally valid output."
+EXEC_SCOPE = "Installation, execution, and output structure evaluation."
 NOT_EVALUATED = ["Genotype accuracy", "Concordance", "Forensic validity", "Regulatory compliance"]
-SCOPE_STATEMENT = ("Independent automated verification of reproducible execution. It confirms "
-                   "the tool installs, runs end-to-end, and produces structurally valid output "
-                   "in a standardized environment.")
+SCOPE_STATEMENT = ("Independent automated evaluation of reproducible execution. It checks "
+                   "whether the tool installs, runs end-to-end, and produces structurally valid "
+                   "output in a standardized environment.")
 SCOPE_NOT = ("This is not an analytical validation. Genotype accuracy, concordance, forensic "
              "suitability, and regulatory compliance are out of scope.")
 DISCLAIMER = ("Each result is a dated snapshot, verified on the tool's public repository at a "
@@ -91,6 +91,38 @@ def display_name(m: dict) -> str:
     return repo_name if repo_name.lower() == raw.lower() else raw.title()
 
 
+def stage_states(gates: dict | None, *, execution_established: bool | None = True) -> list[dict]:
+    """Single source of truth for the four cover verification capabilities.
+
+    A stage downstream of a failed or unestablished gate is always
+    `NOT ATTEMPTED` (never `PASS` and never `FAIL`), preventing the cover or
+    summary from contradicting the gate ladder.
+    """
+    g = dict(gates or {})
+    avail = bool(g.get("available"))
+    inst = bool(g.get("installs"))
+    runs = bool(g.get("runs"))
+    out = bool(g.get("io") or g.get("content"))
+
+    if execution_established is False:
+        return [
+            {"key": "available", "label": "Source available", "status": "PASS" if avail else "FAIL"},
+            {"key": "installs", "label": "Installation", "status": "NOT ATTEMPTED"},
+            {"key": "runs", "label": "End-to-end execution", "status": "NOT ATTEMPTED"},
+            {"key": "output", "label": "Output generated", "status": "NOT ATTEMPTED"},
+        ]
+
+    return [
+        {"key": "available", "label": "Source available", "status": "PASS" if avail else "FAIL"},
+        {"key": "installs", "label": "Installation",
+         "status": "NOT ATTEMPTED" if not avail else ("PASS" if inst else "FAIL")},
+        {"key": "runs", "label": "End-to-end execution",
+         "status": "NOT ATTEMPTED" if not inst else ("PASS" if runs else "FAIL")},
+        {"key": "output", "label": "Output generated",
+         "status": "NOT ATTEMPTED" if not runs else ("PASS" if out else "FAIL")},
+    ]
+
+
 def certificate_for(report: dict, cfg: dict) -> dict:
     """The certificate's own words, as data in the report: the label and the
     rung, the executive summary, the closing lists and the conclusion — so
@@ -114,6 +146,7 @@ def certificate_for(report: dict, cfg: dict) -> dict:
         "schema": CERTIFICATE_SCHEMA,
         "label": label,
         "reached": reached,
+        "stages": stage_states(gates, execution_established=cfg.get("execution_finding_established")),
         "summary": {
             "purpose": PURPOSE,
             "result": label,
@@ -307,20 +340,26 @@ def is_documented_run(report: dict) -> bool:
 
 
 def test_data_item(cfg: dict, ds_name: str) -> tuple[str, str]:
-    """What the run used for input, and — only on evidence — whether the
-    repository ships any of its own.
+    """What the run used (or selected, when installation stopped before execution)
+    for input, and — only on evidence — whether the repository ships any of its own."""
+    gates = dict(cfg.get("gates") or {})
+    attempted = bool(gates.get("installs"))
+    td = cfg.get("repo_test_data") or {}
+    if not attempted:
+        selected = (f"STRhub Verified selected {ds_name} as the reference dataset, "
+                    "but it was not processed because the installation did not complete.")
+        if not td.get("known"):
+            return ("Reference dataset selected (not executed)", selected)
+        if td.get("present"):
+            n = td.get("count") or 0
+            return ("Repository test data not used",
+                    f"The repository ships example data ({n} file(s)), which was not used. {selected}")
+        return ("No bundled demo data",
+                f"{cfg['tool_name']} ships no test or demo data of its own. {selected}")
 
-    "This tool does not include its own demo or test data" was printed for
-    every tool, whatever the repository held. It is false for STRsearch, which
-    ships 35 files including example/test_data/test.bam. Absence of test data
-    is a finding about somebody's work and needs to be established, not
-    assumed: only a run whose recipe was proposed from the repository has read
-    the tree, and only that run may say so.
-    """
     used = (f"STRhub Verified supplied {ds_name} as the reference input for this "
             "verification run. Users replicating this result should use the same or "
             "equivalent publicly available reference material.")
-    td = cfg.get("repo_test_data") or {}
     if not td.get("known"):
         return ("Reference input", used)
     if td.get("present"):
@@ -429,30 +468,39 @@ def conclusion_items_for(cfg: dict) -> list[tuple[str, str]]:
     # The one sentence the web leads with, in the certificate too.
     if verdict.get("title") and verdict.get("reason"):
         items.append((f"Verdict: {verdict['title']}", verdict["reason"]))
+    if gates.get("installs"):
+        repro = (
+            "Repeatability of this verification run",
+            "The pinned commit, declared base environment, executed installation and "
+            "analysis commands, reference input metadata, and CI logs recorded in this "
+            "report document the procedure attempted. Base image and unpinned package "
+            "versions can change over time, so exact reproduction requires matching "
+            "those dependency versions.",
+        )
+    else:
+        repro = (
+            "Repeatability of this build attempt",
+            "The pinned commit, declared base environment, executed installation "
+            "commands, carrier Dockerfile, and CI build log recorded in this report "
+            "document the build attempt. Because base image and system package versions "
+            "are not pinned by the commands, exact long-term reproduction is not "
+            "guaranteed; the documented analysis command was not executed.",
+        )
+
     items += [
         test_data_item(cfg, ds_name),
-        ("Reproducibility statement",
-         "The exact command reported in Section 3, executed at the pinned "
-         "commit in the described environment, is sufficient to reproduce "
-         "this verification result independently."),
+        repro,
     ]
     return items
 
 
 def install_meaning(faults: list[str]) -> list[tuple[str, str]]:
-    """What a failed build means for each reader, in their own terms.
-
-    Three readers open a certificate — someone about to run the tool, a
-    reviewer holding a manuscript, its maintainer — and each needs one
-    sentence in their own terms. The maintainer's is the fault sentence, which
-    already says whose side the cause is on; the other two claim only what
-    the run established: that a build from source stopped.
-    """
-    run = ("A build from source at this commit fails in a clean environment; the "
-           "cause, as the build log states it, is below.")
+    """What a failed build means for each reader, in their own terms."""
+    run = ("A build from source at this commit stopped in a clean environment; the "
+           "observed build log lines are cited below.")
     review = ("Nothing ran, so this says nothing about the software's output. It "
-              "records that this attempt to build it stopped, and whose side the "
-              "cause is on.")
+              "records that this build attempt stopped at the Installs stage and "
+              "cites the observed build log lines below.")
     return [("If you are trying to run it", run),
             ("If you are reviewing a paper", review),
             ("If you maintain it", diagnose_log.install_fault_sentence(faults))]

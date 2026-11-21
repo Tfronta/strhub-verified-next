@@ -363,19 +363,32 @@ _rule(
     r"Could NOT find (\w+) \(missing:\s*([^)]+)\)",
     "error", "cmake_package_missing",
     "CMake could not find a required system library: {0}",
-    "CMake searched for the '{0}' development files ({1}) and they were not "
-    "installed in the container after running the documented steps. This happens "
-    "when the corresponding '-dev' package (such as zlib1g-dev, libbz2-dev or "
-    "liblzma-dev) was omitted or only the runtime package (such as zlib1g) was installed.",
+    "Observed: CMake reported missing '{0}' development components ({1}) after "
+    "running the executed installation steps. Inferred: installing the "
+    "corresponding system '-dev' package (such as zlib1g-dev, libbz2-dev, or "
+    "liblzma-dev, rather than only a runtime package like zlib1g) may resolve "
+    "this build stop. Not determined automatically: whether the omission sits in "
+    "the upstream documentation, an implicit system prerequisite, or the base environment.",
 )
 
 _rule(
     r"(?:ld|collect2)[^\n]*?:\s+cannot find -l([\w+-]+)",
     "error", "missing_library",
     "The C/C++ linker could not find library: -l{0}",
-    "The linker could not find '-l{0}' while building the binary because the "
-    "corresponding system development package (such as lib{0}-dev, or zlib1g-dev "
-    "for -lz) was not installed by the documented build steps.",
+    "Observed: the linker reported missing '-l{0}' while building the binary. "
+    "Inferred: the corresponding system development package (such as lib{0}-dev, "
+    "or zlib1g-dev for -lz) was not present during the build. Not determined "
+    "automatically: whether the dependency was omitted from the documentation or "
+    "assumed preinstalled.",
+)
+
+_rule(
+    r"Package '([^']+)' requires a different Python:\s*([^\n]+)",
+    "error", "python_version_mismatch",
+    "Python version mismatch for package {0}: {1}",
+    "Observed: pip reported that package '{0}' requires a different Python "
+    "version ({1}). Inferred: the Python interpreter active in the container "
+    "does not satisfy the package's declared version constraint.",
 )
 
 _rule(
@@ -431,10 +444,11 @@ _rule(
     r"(?:file DOWNLOAD HASH mismatch|Download failed\.\s+Status:\s+\d+[^\n]*)",
     "error", "build_download_failed",
     "A download in the build failed: {0}",
-    "During compilation, the build tried to fetch an external dependency from "
-    "'{0}', and the server returned an HTTP error (dead link or retired hosting "
-    "service such as dl.bintray.com, which shut down in May 2021). Building this "
-    "commit from source on a clean machine fails unless that URL is updated.",
+    "Observed: during compilation, CMake attempted to fetch an external "
+    "dependency from '{0}' and received an HTTP or hash-mismatch error. "
+    "Inferred: the remote URL may be unavailable or hosted on a retired service "
+    "(such as dl.bintray.com, which shut down in May 2021). Not determined "
+    "automatically: whether the outage is transient or permanent.",
 )
 
 _rule(
@@ -707,10 +721,12 @@ def install_fault_sentence(faults: list[str]) -> str:
         return ("At least one cause is a ceiling of the free automated "
                 "environment rather than a fault in the tool.")
     if "author" in faults:
-        return ("Every cause identified sits in this run's configuration: the "
-                "pinned versions, package names or build steps it declared. They "
-                "are faults in how the tool was set up here rather than in the "
-                "software. Re-verifying after correcting them is free.")
+        return ("Observed in the build log: the build stopped on missing "
+                "packages, headers, or declared build steps during the executed "
+                "install sequence. Whether the omission originates in the "
+                "upstream documentation, an implicit dependency, or environment "
+                "differences is not automatically determined from the log alone. "
+                "Re-verifying after updating the repository is free.")
     return ("The cause could not be classified automatically. The full build "
             "output is linked below.")
 

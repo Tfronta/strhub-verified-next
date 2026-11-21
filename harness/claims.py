@@ -65,7 +65,7 @@ REGISTER: dict[str, tuple[str, str]] = {
     # diagnostic now states what the log establishes, in STRhub's own voice).
     "a1ac00cc3c30": ("diagnose_log", "log"),  # A COPY/ADD line names a file the build context does not hold. The context is the repository checkout…
     "86baeea971be": ("diagnose_log", "run"),  # At least one cause is STRhub's, not the tool's: the container recipe for a generated environmen
-    "fbfdadb79781": ("diagnose_log", "manifest"),  # Every cause identified sits in this run's configuration — the pinned versions, package names or buil
+    "24a749985c9f": ("diagnose_log", "log"),  # Observed in the build log: the build stopped on missing packages, headers, or declared build steps d
     "dc6dbb4a5df8": ("generate_pdf", "tree"),  # Recorded automatically from the tool's public files when this run was configured. Not verified 
     "6b4450723321": ("generate_pdf", "tree"),  # This tool ships no demo or test data of its own. STRhub ran the verification using the public r
     "c3b2bcd382dc": ("propose_manifest", "readme"),  # Planned command, subject to full source citation and procedure review.

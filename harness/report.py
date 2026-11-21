@@ -1137,13 +1137,16 @@ def main() -> int:
     # tool it is the practical question — what will this cost me to run.
     needed = []
     if any(d.get("leg") == "external" and d.get("available") for d in (datasets or [])):
-        # Says what we know, not what we would have to have checked: the
-        # external leg ran on STRhub's sample. It does not establish that the
-        # repository ships no data of its own (STRsearch ships some, for hg19).
-        needed.append(
-            "Test data: no sample from the repository was used, so a public "
-            "reference sample stood in."
-        )
+        if gates.get("installs"):
+            needed.append(
+                "Test data: no sample from the repository was used, so a public "
+                "reference sample stood in."
+            )
+        else:
+            needed.append(
+                "Test data: a public reference sample was selected, but was not "
+                "executed because installation did not complete."
+            )
     proposal = None
     if args.recipe_proposal and pathlib.Path(args.recipe_proposal).exists():
         try:

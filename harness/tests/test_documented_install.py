@@ -168,6 +168,12 @@ def test_submodules_autotools_cargo_and_cleaner_doc_filtering():
     ]
     assert [a["text"] for a in plan_venv["published_alternatives"]] == ["pip install ./tool-1.0.0-py3-none-any.whl"]
     assert "source /opt/tool/tool-env/bin/activate' >> /etc/profile.d/zz-strhub-env.sh" in plan_venv["carrier_dockerfile"]
+    # Plain venv/pip without Conda uses Ubuntu 22.04 native python3 (3.10), not Miniforge.
+    assert plan_venv["base_condition"]["miniforge"] is False
+    assert "miniforge" not in plan_venv["carrier_dockerfile"].lower()
+    assert plan_venv["base_condition"]["added_packages"] == [
+        "python3", "python3-venv", "python3-pip", "python-is-python3", "ca-certificates"
+    ]
 
 
 def test_prose_lists_and_usage_blocks_are_not_installation():

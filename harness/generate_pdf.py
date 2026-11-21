@@ -28,6 +28,7 @@ import diagnose_log  # noqa: E402
 from command_record import presentation as command_presentation  # noqa: E402
 from certificate_text import (  # noqa: E402
     conclusion_items_for, install_meaning, headline, execution_finding_established,
+    stage_states,
     AS_IS_HEADING, NOT_DOCUMENTED, display_name,
     PURPOSE, EXEC_SCOPE, NOT_EVALUATED, SCOPE_STATEMENT, SCOPE_NOT, DISCLAIMER, OUT_OF_SCOPE, LIMITATIONS,
 )
@@ -407,14 +408,22 @@ def build_cover(cfg):
                   leftIndent=8, spaceAfter=2)))
         return out
 
-    v_col = col_block(
-        ["Source available", "Installation successful",
-         "End-to-end execution", "Output generated"],
-        TEAL, "WHAT WAS VERIFIED")
-    nv_col = col_block(
-        ["Genotype accuracy", "Concordance",
-         "Forensic validity", "Regulatory compliance"],
-        GRAY, "NOT VERIFIED")
+    stages = stage_states(
+        cfg.get("gates"),
+        execution_established=cfg.get("execution_finding_established"),
+    )
+    status_colors = {
+        "PASS": "#00909c",
+        "FAIL": "#dc2626",
+        "NOT ATTEMPTED": "#6b7280",
+    }
+    status_items = [
+        f'{st["label"]}: <font color="{status_colors.get(st["status"], "#6b7280")}"><b>{st["status"]}</b></font>'
+        for st in stages
+    ]
+
+    v_col = col_block(status_items, TEAL, "VERIFICATION STATUS")
+    nv_col = col_block(list(NOT_EVALUATED), GRAY, "NOT EVALUATED")
 
     half = CW / 2
     els.append(boxed([Paragraph(scope_text, ST["body"])]))
@@ -829,25 +838,32 @@ def build_body(cfg):
     els.append(dst)
 
     # §8 Verification Matrix
-    # The reference-data row used to read PASS whatever happened on that leg,
-    # so a run that produced nothing still showed a green matrix.
+    # Stage independence: a failed installation blocks downstream execution and
+    # must never be reported as FAIL on a dataset that was never processed.
+    gates = dict(cfg.get("gates") or {})
     ext = next((d for d in (cfg.get("datasets") or [])
                 if d.get("leg") == "external"), {}) or {}
-    if ext.get("passed"):
+    if not gates.get("installs"):
+        ext_tag = '<font color="#9ca3af"><b>NOT ATTEMPTED</b></font>'
+        ext_label = "Reference dataset (not executed: installation failed)"
+    elif ext.get("passed"):
         ext_tag = '<font color="#00909c"><b>PASS</b></font>'
+        ext_label = "Run on reference dataset"
     elif ext.get("available"):
         ext_tag = '<font color="#ef4444"><b>FAIL</b></font>'
+        ext_label = "Run on reference dataset"
     else:
         ext_tag = '<font color="#9ca3af"><b>N/A</b></font>'
+        ext_label = "Run on reference dataset"
 
-    matrix_rows = [(ext_tag, "Run on reference dataset", ds.get("name", "—"))]
+    matrix_rows = [(ext_tag, ext_label, ds.get("name", "—"))]
     tdata = []
     for tag, label, val in matrix_rows:
         tag_p = Paragraph(tag if tag else "", ST["tbl_cell"])
         tdata.append([tag_p, Paragraph(label, ST["tbl_cell"]),
                       Paragraph(val, ST["tbl_cell"])])
-    C2 = CW * 0.52
-    mt = Table(tdata, colWidths=[16*mm, C2, CW - 16*mm - C2])
+    C2 = CW * 0.46
+    mt = Table(tdata, colWidths=[28*mm, C2, CW - 28*mm - C2])
     mt.setStyle(TableStyle([
         ("VALIGN",        (0,0),(-1,-1), "MIDDLE"),
         ("LEFTPADDING",   (0,0),(-1,-1), 10),

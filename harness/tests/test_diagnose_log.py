@@ -99,7 +99,7 @@ def test_a_build_that_runs_autoconf_without_install_is_the_repositorys_to_fix():
            "#10 33.44 configure.ac:   try running autoreconf --install\n")
     assert "autotools_aux_missing" in ids(log)
     assert d.fault_of("autotools_aux_missing") == "author"
-    assert "Re-verifying after correcting them is free" in d.install_fault_sentence(["author"])
+    assert "Re-verifying after updating the repository is free" in d.install_fault_sentence(["author"])
 
 
 def test_a_file_the_build_reads_but_the_commit_lacks_is_named_and_is_the_repositorys():
