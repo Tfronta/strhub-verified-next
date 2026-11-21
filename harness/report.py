@@ -538,7 +538,8 @@ def _summary_md(report: dict, slug: str) -> str:
     lines += ["", "## Out of scope", "", "This report does not evaluate any of the following:", ""]
     lines += [f"- {i}" for i in OUT_OF_SCOPE]
     lines += ["", "## Limitations", ""]
-    lines += [f"- {i}" for i in LIMITATIONS]
+    lim_items = (report.get("certificate") or {}).get("limitations") or LIMITATIONS
+    lines += [f"- {i}" for i in lim_items]
     lines += [
         "",
         "## Scope (read this)",
@@ -888,7 +889,7 @@ def _summary_html(report: dict, slug: str) -> str:
 <p>This report does not evaluate any of the following:</p>
 <ul class="stats">{''.join(f'<li>{esc(i)}</li>' for i in OUT_OF_SCOPE)}</ul>
 <h2>Limitations</h2>
-<ul class="stats">{''.join(f'<li>{esc(i)}</li>' for i in LIMITATIONS)}</ul>
+<ul class="stats">{''.join(f'<li>{esc(i)}</li>' for i in ((report.get('certificate') or {}).get('limitations') or LIMITATIONS))}</ul>
 <h2>Scope</h2>
 <p class="scope">{esc(report['scope'])}<br><br>
 This is <b>not</b> a claim that the genotypes are correct, nor that the tool is
@@ -910,23 +911,30 @@ def _certificate_cfg(report: dict, m: dict) -> dict:
     declared = (m.get("outputs") or [{}])[0]
     outs = (report.get("content_detail") or {}).get("outputs") or []
     stats = outs[0].get("stats") or {} if outs and isinstance(outs[0], dict) else {}
-    ds_name = next((d.get("dataset") for d in (report.get("datasets") or [])
-                    if d.get("leg") == "external" and d.get("dataset")), None)
-    if not ds_name:
+    input_type = ((m.get("inputs") or {}).get("type")
+                  or (report.get("procedure_review") or {}).get("input_type")
+                  or "")
+    ds_entry: dict = {}
+    if input_type:
         try:
             index = json.loads((ROOT / "datasets" / "index.json").read_text())
-            ds_name = (index.get("datasets", {}).get((m.get("inputs") or {}).get("type", "")) or {}).get("name")
+            ds_entry = dict(index.get("datasets", {}).get(input_type) or {})
         except (OSError, json.JSONDecodeError):
-            ds_name = None
+            ds_entry = {}
+    ds_name = next((d.get("dataset") for d in (report.get("datasets") or [])
+                    if d.get("leg") == "external" and d.get("dataset")), None)
+    if ds_name and not ds_entry.get("name"):
+        ds_entry["name"] = ds_name
     return {
         "tool_display": f"{name} {m['tool'].get('version', '')}".strip(),
         "tool_name": name,
+        "input_type": input_type,
         "gates": report.get("gates") or {},
         "verdict": report.get("verdict") or {},
         "execution_finding_established": execution_finding_established(report),
         "stats": stats,
         "declared_format": (declared.get("format") or "—").upper(),
-        "dataset": {"name": ds_name} if ds_name else {},
+        "dataset": ds_entry,
         "repo_test_data": report.get("repo_test_data") or {},
     }
 

@@ -74,7 +74,7 @@ def test_a_passing_run_still_reports_its_evidence():
     )
     text = " ".join(_conclusion(cfg))
     assert "Runs end-to-end" in text and "executes without error" in text
-    assert "24 target forensic STR loci" in text
+    assert "24 distinct recognizable loci (target forensic STR loci)" in text
     assert "Verdict: Runs" in text
 
 

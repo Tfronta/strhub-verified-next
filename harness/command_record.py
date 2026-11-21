@@ -3,9 +3,13 @@
 
 def presentation(run: dict | None) -> tuple[str, str]:
     outcome = (run or {}).get("step_outcome")
-    if outcome in ("success", "failure"):
+    if outcome == "success":
         return ("Command submitted to runner",
-                f"The run step reported {outcome}. This is the configured command submitted "
+                "The run step reported success. This is the configured command submitted "
+                "to that step; the step exit status alone does not prove the program started.")
+    if outcome == "failure":
+        return ("Command submitted to runner",
+                "The run step reported failure. This is the configured command submitted "
                 "to that step; a failed step alone does not prove the program started.")
     if outcome == "skipped":
         return "Planned command", "The run step was skipped. This command was not executed by that step."

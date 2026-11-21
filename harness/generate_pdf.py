@@ -28,7 +28,7 @@ import diagnose_log  # noqa: E402
 from command_record import presentation as command_presentation  # noqa: E402
 from certificate_text import (  # noqa: E402
     conclusion_items_for, install_meaning, headline, execution_finding_established,
-    stage_states,
+    stage_states, limitations_for,
     AS_IS_HEADING, NOT_DOCUMENTED, display_name,
     PURPOSE, EXEC_SCOPE, NOT_EVALUATED, SCOPE_STATEMENT, SCOPE_NOT, DISCLAIMER, OUT_OF_SCOPE, LIMITATIONS,
 )
@@ -706,6 +706,15 @@ def build_body(cfg):
     # a run that stops where the README says it stops is not news.
     known = cfg.get("author_known_issues") or []
     if known:
+        # Skip a parent section quote whose body only starts with the immediately
+        # following child subsection heading (avoids duplicate adjacent boxes).
+        deduped = []
+        for idx, k in enumerate(known):
+            nxt = known[idx + 1] if idx + 1 < len(known) else None
+            txt_clean = (k.get("text") or "").strip()
+            if nxt and re.match(rf"^#+\s*{re.escape(nxt.get('heading') or '')}\b", txt_clean, re.I):
+                continue
+            deduped.append(k)
         els.append(section_num(str(sec), "What the Author Documents as a Known Issue"))
         sec += 1
         els.append(Paragraph(
@@ -713,10 +722,12 @@ def build_body(cfg):
             "establish any of this by running the tool; it is the author's own note about "
             "their own software.", ST["body"]))
         els.append(vspace(3))
-        for k in known:
+        for k in deduped:
             els.append(Paragraph(f"<b>{esc(k['heading'])}</b> (Official README line {k['line']})",
                                  S("kih", fontSize=8.5, textColor=INK, leading=12, spaceAfter=2)))
-            quote = esc(k["text"]) + ("…" if k.get("truncated") else "")
+            raw_quote = re.sub(r"\|[\s:-]+(?:\|[\s:-]+)+\|?", "", k["text"] or "")
+            raw_quote = re.sub(r"\s{2,}", " ", raw_quote).strip()
+            quote = esc(raw_quote) + ("…" if k.get("truncated") else "")
             els.append(boxed([Paragraph(quote, S("kiq", fontSize=8, textColor=GRAY, leading=12))]))
             els.append(vspace(3))
 
@@ -828,14 +839,19 @@ def build_body(cfg):
     ref_assembly = ds.get("reference") or "—"
     src = ds.get("source", "")
     src_display = (src[:60] + "…") if len(src) > 60 else src
-    loci_list = cfg.get("loci_list", [])
-    loci_val = ("  ·  ".join(loci_list)) if loci_list else "—"
+    panel_loci = cfg.get("panel_loci") or []
+    if panel_loci:
+        loci_val = (f"{len(panel_loci)} loci: " + "  ·  ".join(panel_loci))
+        if not installs_passed:
+            loci_val = f"{len(panel_loci)} loci in selected panel (not executed)"
+    else:
+        loci_val = "—"
     ds_rows = [
-        ("Dataset",     ds.get("name", "—")),
-        ("Source",      link(src, src_display) if src else "—"),
-        ("License",     ds.get("license", "—")),
-        ("Aligned to",  ref_assembly),
-        ("Loci tested", loci_val),
+        ("Dataset",              ds.get("name", "—")),
+        ("Source",               link(src, src_display) if src else "—"),
+        ("License",              ds.get("license", "—")),
+        ("Aligned to",           ref_assembly),
+        ("Reference panel loci", loci_val),
     ]
 
     tdata = [[Paragraph(k, ST["meta_label"]),
@@ -946,7 +962,12 @@ def build_body(cfg):
     # Scope and Limitations (consolidated)
     els.append(section_num(str(sec), "Scope and Limitations"))
     sec += 1
-    lim_items = LIMITATIONS
+    cert = cfg.get("certificate") or {}
+    lim_items = cert.get("limitations") or limitations_for(
+        cfg.get("dataset"),
+        input_type=cfg.get("input_type"),
+        executed=bool((cfg.get("gates") or {}).get("installs")),
+    )
     lim = [Paragraph(
         "Concerns reproducible execution only; no claim of genotype accuracy, "
         "concordance, forensic casework suitability, or regulatory validation.",
@@ -1202,6 +1223,25 @@ def load_config(manifest_path: str, datasets_path: str | None = None,
     if not dataset and report.get("dataset"):
         dataset = report["dataset"]
 
+    # Reference panel loci from the dataset's own supported_loci BED (distinct
+    # from the tool's output loci, so Verification Data describes the dataset).
+    panel_loci: list[str] = []
+    panel_rel = dataset.get("supported_loci")
+    if panel_rel:
+        for base_dir in (ds_file.resolve().parent.parent, pathlib.Path(__file__).resolve().parent.parent):
+            cand = base_dir / panel_rel
+            if cand.is_file():
+                seen_pl: set[str] = set()
+                for ln in cand.read_text(errors="replace").splitlines():
+                    s = ln.strip()
+                    if not s or s.startswith("#"):
+                        continue
+                    cols = s.split("\t") if "\t" in s else s.split()
+                    if len(cols) >= 4 and cols[3] not in seen_pl:
+                        seen_pl.add(cols[3])
+                        panel_loci.append(cols[3])
+                break
+
     # Terminal failure excerpt from log if the run stopped
     failure_excerpt = report.get("failure_excerpt", "")
     if not failure_excerpt:
@@ -1265,12 +1305,14 @@ def load_config(manifest_path: str, datasets_path: str | None = None,
         "cmd_lines":      cmd_lines,
         "command_presentation": command_presentation(recorded_run),
         "container_os":   (m.get("environment", {}).get("os") or ["ubuntu-22.04"])[0],
+        "input_type":     input_type,
         "panel":          PANEL_MAP.get(input_type, input_type or "STR"),
         "stats":          stats,
         "declared_output": declared_output,
         "declared_format": declared_format,
         "loci_with_depth":loci_with_depth,
         "loci_list":      stats.get("str_loci", []),
+        "panel_loci":     panel_loci,
         "dataset":        dataset,
         # Per-leg outcomes (external / example), so the matrix reports
         # what each leg did instead of asserting a pass.

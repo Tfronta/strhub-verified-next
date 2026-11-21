@@ -222,3 +222,38 @@ def test_10_generic_catalog_panel_matching_medical_vs_forensic():
         {"data/loci.hg19.bed"},
     )
     assert res_hg19 is None
+
+
+def test_11_technology_aware_limitations_and_medical_conclusion():
+    # ONT and PacBio HiFi must never emit short-read limitations.
+    ont_lims = ct.limitations_for(input_type="ont-bam-hg38-med", executed=True)
+    assert not any("short-read" in x.lower() for x in ont_lims)
+    assert any("long-read" in x.lower() for x in ont_lims)
+
+    hifi_lims = ct.limitations_for(input_type="pacbio-hifi-bam-hg38", executed=True)
+    assert not any("short-read" in x.lower() for x in hifi_lims)
+    assert any("long-read" in x.lower() for x in hifi_lims)
+
+    # Illumina short-read retains short-read limitations.
+    ill_lims = ct.limitations_for(input_type="illumina-bam-hg38", executed=True)
+    assert any("short-read" in x.lower() for x in ill_lims)
+
+    # Unexecuted run (failed build) emits neither short-read nor long-read limitations.
+    not_run_lims = ct.limitations_for(input_type="ont-bam-hg38", executed=False)
+    assert not any("short-read" in x.lower() or "long-read" in x.lower() for x in not_run_lims)
+    assert any("no sequencing data were processed" in x.lower() for x in not_run_lims)
+
+    # Medical panel conclusion never labels loci as forensic and avoids claiming every locus has valid genotypes.
+    gates = {"available": True, "installs": True, "runs": True, "io": True, "content": True}
+    rep, cfg = _base_report(gates, level="content", verdict_code="runs",
+                            verdict_reason="The tool installed and its run produced its documented output.")
+    cfg["input_type"] = "ont-bam-hg38-med"
+    cfg["dataset"] = {"name": "1000 Genomes ONT, hg38 medical STR slice (R10 SUP)",
+                      "panel_label": "disease-associated STR loci"}
+    cfg["stats"] = {"distinct_str_loci": 74}
+    cert = ct.certificate_for(rep, cfg)
+    produced = next(c["body"] for c in cert["conclusion"] if c["title"] == "Produces plausible output")
+    assert "disease-associated STR loci" in produced
+    assert "forensic" not in produced.lower()
+    assert "not genotype validity" in produced.lower()
+    assert not any("short-read" in x.lower() for x in cert["limitations"])

@@ -69,14 +69,44 @@ OUT_OF_SCOPE = [
     "Regulatory compliance or ISO accreditation",
     "Multi-laboratory or multi-dataset reproducibility",
 ]
-LIMITATIONS = [
+BASE_LIMITATIONS = [
     "Single reference dataset per input type",
     "Single containerized environment (Docker / ubuntu-22.04)",
     "No truth-set comparison or ground-truth genotypes",
     "No accuracy or concordance assessment",
-    "No forensic validation of results",
-    "Short-read limitations apply (very long STR alleles may not span reads)",
+    "No forensic or clinical validation of results",
 ]
+LIMITATIONS = list(BASE_LIMITATIONS)
+
+
+def limitations_for(dataset: dict | None = None, *, input_type: str | None = None,
+                    executed: bool = True) -> list[str]:
+    """Evidence-grounded technical limitations derived from the actual dataset
+    technology and execution state, rather than a fixed short-read assumption."""
+    items = list(BASE_LIMITATIONS)
+    if not executed:
+        items.append("No sequencing data were processed because execution did not complete")
+        return items
+    ds = dataset or {}
+    hint = " ".join(str(x or "") for x in (
+        input_type,
+        ds.get("chemistry"),
+        ds.get("sequencer"),
+        ds.get("name"),
+    )).lower()
+    if any(tok in hint for tok in ("ont", "nanopore", "pacbio", "hifi", "revio", "ccs")):
+        items.append(
+            "Long-read sequencing characteristics apply (basecalling accuracy, homopolymers, "
+            "unphased reads, or extreme repeat expansions can affect allele resolution)"
+        )
+    elif "illumina" in hint:
+        items.append("Short-read limitations apply (very long STR alleles may not span single short reads)")
+    elif any(tok in hint for tok in ("capillary", "fsa", "ce-")):
+        items.append(
+            "Capillary electrophoresis fragment-sizing characteristics apply "
+            "(stutter artifacts and dye-channel calibration are not evaluated)"
+        )
+    return items
 CERTIFICATE_SCHEMA = "strhub-verified/certificate/1"
 
 
@@ -158,7 +188,11 @@ def certificate_for(report: dict, cfg: dict) -> dict:
         },
         "conclusion": [{"title": t, "body": b} for t, b in conclusion_items_for(cfg)],
         "out_of_scope": list(OUT_OF_SCOPE),
-        "limitations": list(LIMITATIONS),
+        "limitations": limitations_for(
+            cfg.get("dataset"),
+            input_type=cfg.get("input_type"),
+            executed=bool(gates.get("installs")),
+        ),
         "scope": {"statement": SCOPE_STATEMENT, "not": SCOPE_NOT, "disclaimer": DISCLAIMER},
     }
 
@@ -206,7 +240,7 @@ STEP1_BLOCKERS = {
 STEP1_RUNS = (
     "A third party installed the tool with the steps this commit states and ran the command it "
     "writes, and the output file that command names appeared. This says nothing about genotypes "
-    "or about the forensic panel."
+    "or about concordance on any reference panel."
 )
 STEP1_DOES_NOT_RUN = (
     "That does not mean the tool does not work. It means a third party following the README at "
@@ -452,10 +486,20 @@ def conclusion_items_for(cfg: dict) -> list[tuple[str, str]]:
                "declared install steps, so nothing further was attempted.")
 
     if gates.get("content"):
-        panel_label = (cfg.get("dataset") or {}).get("panel_label") or "target forensic STR loci"
+        input_type = str(cfg.get("input_type") or "").lower()
+        panel_label = (cfg.get("dataset") or {}).get("panel_label")
+        if not panel_label:
+            if input_type.endswith("-med"):
+                panel_label = "disease-associated STR loci"
+            elif input_type.endswith("-y"):
+                panel_label = "Y-STR loci"
+            else:
+                panel_label = "target forensic STR loci"
         produced = ("Produces plausible output",
-                    f"The tool generated a structurally valid {fmt_label}output file with genotype "
-                    f"calls across {n_loci} {panel_label}.")
+                    f"The tool generated a structurally valid {fmt_label}output file containing "
+                    f"{n_loci} distinct recognizable loci ({panel_label}); structural plausibility "
+                    f"checks verify output format and locus presence, not genotype validity or "
+                    f"completeness across every listed locus.")
     elif gates.get("io"):
         produced = ("Produces output in the declared format",
                     f"The tool wrote a non-empty {fmt_label}file. Whether its contents look like "
