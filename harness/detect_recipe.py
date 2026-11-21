@@ -2026,15 +2026,35 @@ def author_known_issues(readme: str) -> list[dict]:
         if not m or not KNOWN_ISSUE_HEADINGS.search(m.group(2)):
             continue
         depth = len(m.group(1))
-        body: list[str] = []
+        body_lines: list[str] = []
         for nxt in lines[i + 1:]:
-            h = re.match(r"^(#{1,4})\s+", nxt)
-            if h and len(h.group(1)) <= depth:
+            h = re.match(r"^(#{1,4})\s+(.+?)\s*$", nxt)
+            if h:
+                if len(h.group(1)) <= depth:
+                    break
+                # Stop before a child subsection that will be captured on its own
+                # (avoids duplicating parent + child blocks back to back).
+                if KNOWN_ISSUE_HEADINGS.search(h.group(2)):
+                    break
+                continue
+            stripped = nxt.strip()
+            # Stop before raw Markdown tables that would truncate awkwardly in quotes.
+            if stripped.startswith("|") and "|" in stripped[1:]:
                 break
-            body.append(nxt)
-        text = " ".join(" ".join(body).split())
-        if len(text) < 20:
+            if not stripped:
+                continue
+            cleaned = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", stripped)
+            cleaned = re.sub(r"\s+", " ", cleaned)
+            body_lines.append(cleaned)
+        joined = "\n".join(body_lines).strip()
+        if len(joined) < 20:
             continue
+        truncated = len(joined) > 600
+        if truncated:
+            cut = joined[:600].rsplit(" ", 1)[0].rstrip(" ,;:-")
+            text = cut or joined[:600]
+        else:
+            text = joined
         # READMEs write headings with raw HTML in them (STRaitRazor's is
         # "known issues<br>") and with Markdown emphasis; neither is part of
         # the name of the section.
@@ -2046,8 +2066,8 @@ def author_known_issues(readme: str) -> list[dict]:
             # bounded quote so a long troubleshooting chapter cannot take over
             # the report.
             "line": i + 1,
-            "text": text[:600],
-            "truncated": len(text) > 600,
+            "text": text,
+            "truncated": truncated,
         })
         if len(out) >= 4:
             break

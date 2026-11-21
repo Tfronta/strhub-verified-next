@@ -200,7 +200,7 @@ def test_the_author_s_own_known_bug_section_is_carried_out_of_the_readme():
 def test_a_known_issue_quote_is_bounded_and_says_when_it_was_cut():
     long_readme = "## Known issues\n\n" + ("word " * 400)
     out = dr.author_known_issues(long_readme)
-    assert len(out) == 1 and out[0]["truncated"] is True and len(out[0]["text"]) == 600
+    assert len(out) == 1 and out[0]["truncated"] is True and 580 <= len(out[0]["text"]) <= 600
     assert dr.author_known_issues("## Known issues\n\ntiny") == []  # too short to be a finding
 
 

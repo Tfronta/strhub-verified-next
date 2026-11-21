@@ -715,21 +715,49 @@ def build_body(cfg):
             if nxt and re.match(rf"^#+\s*{re.escape(nxt.get('heading') or '')}\b", txt_clean, re.I):
                 continue
             deduped.append(k)
-        els.append(section_num(str(sec), "What the Author Documents as a Known Issue"))
+        els.append(section_num(str(sec), "Author-Documented Warnings and Limitations"))
         sec += 1
         els.append(Paragraph(
-            "Documented by the author in the official repository. Quoted from the repository's README at the verified commit. STRhub did not "
-            "establish any of this by running the tool; it is the author's own note about "
-            "their own software.", ST["body"]))
+            "Quoted from the repository's README at the verified commit. STRhub did not "
+            "establish any of this by running the tool; these are the author's own notes.",
+            ST["body"]))
         els.append(vspace(3))
+        q_style = S("kiq", fontSize=8, textColor=GRAY, leading=12, spaceAfter=2)
+        q_bullet = S("kiqb", fontSize=8, textColor=GRAY, leading=12, leftIndent=10, firstLineIndent=-8, spaceAfter=2)
         for k in deduped:
-            els.append(Paragraph(f"<b>{esc(k['heading'])}</b> (Official README line {k['line']})",
-                                 S("kih", fontSize=8.5, textColor=INK, leading=12, spaceAfter=2)))
-            raw_quote = re.sub(r"\|[\s:-]+(?:\|[\s:-]+)+\|?", "", k["text"] or "")
-            raw_quote = re.sub(r"\s{2,}", " ", raw_quote).strip()
-            quote = esc(raw_quote) + ("…" if k.get("truncated") else "")
-            els.append(boxed([Paragraph(quote, S("kiq", fontSize=8, textColor=GRAY, leading=12))]))
-            els.append(vspace(3))
+            heading_p = Paragraph(f"<b>{esc(k['heading'])}</b> (Official README line {k['line']})",
+                                  S("kih", fontSize=8.5, textColor=INK, leading=12, spaceAfter=2))
+            raw = k.get("text") or ""
+            # Strip raw markdown table tails if present in older saved JSONs.
+            raw = re.split(r"\|\s*[-:]{3,}\s*\|", raw)[0]
+            raw = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", raw)
+            raw = re.sub(r"\s*#{2,4}\s+", "\n", raw)
+            # Split into readable lines (both newline-delimited and legacy inline "- " lists).
+            if "\n" in raw:
+                raw_lines = [ln.strip() for ln in raw.splitlines() if ln.strip()]
+            else:
+                # Split compressed markdown list items (" - Item") onto separate bullets.
+                raw_lines = [p.strip() for p in re.split(r"(?:^|\s+)(?=-\s+[A-Z`])", raw) if p.strip()]
+            # Drop trailing incomplete markdown table header or tiny stub bullet from truncation.
+            while raw_lines and (raw_lines[-1].count("|") >= 2
+                                 or len(re.sub(r"^[-*•\s]+", "", raw_lines[-1])) <= 3):
+                raw_lines.pop()
+            if not raw_lines:
+                raw_lines = [raw.strip()]
+            q_els = []
+            for idx_ln, ln in enumerate(raw_lines):
+                suffix = "…" if (k.get("truncated") and idx_ln == len(raw_lines) - 1) else ""
+                is_bullet = bool(re.match(r"^[-*•]\s+", ln))
+                body_txt = re.sub(r"^[-*•]\s+", "", ln) if is_bullet else ln
+                body_txt = re.sub(r"^#+\s*", "", body_txt)
+                # Render inline backticks cleanly in monospace without raw "`" noise.
+                escaped = esc(body_txt)
+                escaped = re.sub(r"`([^`]+)`", r'<font name="Courier">\1</font>', escaped)
+                if is_bullet:
+                    q_els.append(Paragraph(f'<font color="#9ca3af">–</font>  {escaped}{suffix}', q_bullet))
+                else:
+                    q_els.append(Paragraph(f"{escaped}{suffix}", q_style))
+            els.append(KeepTogether([heading_p, boxed(q_els), vspace(3)]))
 
 
     # §3 Run command
@@ -775,19 +803,88 @@ def build_body(cfg):
     els.append(section_num(str(sec), "Output Content Evidence"))
     sec += 1
     stats = cfg.get("stats", {})
+    io_outputs = (cfg.get("io_detail") or {}).get("outputs") or []
+    io0 = io_outputs[0] if io_outputs and isinstance(io_outputs[0], dict) else {}
+    io_files = io0.get("files") or []
+    io_file0 = io_files[0] if io_files and isinstance(io_files[0], dict) else {}
+    cd_outputs = (cfg.get("content_detail") or {}).get("outputs") or []
+    cd0 = cd_outputs[0] if cd_outputs and isinstance(cd_outputs[0], dict) else {}
     assessed = bool(stats)   # the Content gate ran and produced statistics
     if not assessed:
         els.append(boxed([Paragraph("<i>No output files were generated because the run stopped before completion.</i>", ST["body"])]))
     else:
         called_loci = stats.get("str_loci") or stats.get("loci") or []
         loci_str = " · ".join(called_loci) if called_loci else "—"
+        fmt_val = stats.get("format") or cfg.get("declared_format", "—")
+        vcf_ver = io_file0.get("version")
+        if vcf_ver and str(fmt_val).upper() == "VCF":
+            fmt_display = f"VCF {vcf_ver}"
+        else:
+            fmt_display = str(fmt_val)
+
+        total_rows = stats.get("rows", 0)
+        called_rec = io0.get("called_records")
+        uncalled_rec = io0.get("uncalled_rows")
+        malformed_rows = stats.get("malformed_rows")
+        if isinstance(called_rec, int) and isinstance(uncalled_rec, int):
+            rec_display = f"{total_rows} total ({called_rec} with called genotypes, {uncalled_rec} uncalled"
+            if isinstance(malformed_rows, int):
+                rec_display += f", {malformed_rows} malformed"
+            rec_display += ")"
+        elif isinstance(malformed_rows, int):
+            rec_display = f"{total_rows} ({malformed_rows} malformed)"
+        else:
+            rec_display = str(total_rows)
+
+        # Build the exact list of structural & plausibility checks performed by
+        # the engine (only checks actually recorded as True in io_detail / content_detail).
+        io_checks = io0.get("checks") or {}
+        cd_checks = cd0.get("checks") or {}
+        profile = io0.get("validation_profile")
+        check_labels: list[str] = []
+        if io_checks.get("exists"):
+            check_labels.append("file exists")
+        if io_checks.get("non_empty"):
+            check_labels.append("non-empty")
+        if io_checks.get("confined"):
+            check_labels.append("confined to output directory")
+        for ck, ok in io_checks.items():
+            if ok and ck.startswith("parses_as_"):
+                kind = ck.removeprefix("parses_as_").upper()
+                label = f"parses as {fmt_display if kind == 'VCF' else kind}"
+                if profile:
+                    label += f" ({profile})"
+                check_labels.append(label)
+        if io_checks.get("min_records"):
+            check_labels.append("minimum record count met")
+        if io_checks.get("has_called_genotypes") or cd_checks.get("genotypes_called"):
+            check_labels.append("non-missing genotype fields present")
+        if cd_checks.get("given_loci_recognised"):
+            check_labels.append("reference panel loci recognised")
+        if isinstance(malformed_rows, int) and malformed_rows == 0:
+            check_labels.append("0 malformed rows")
+
         ev_rows = [
-            ("Output file",              stats.get("output_file") or cfg.get("declared_output", "—")),
-            ("Format",                   stats.get("format") or cfg.get("declared_format", "—")),
-            ("Sequence records",         str(stats.get("rows", 0))),
-            ("Distinct STR loci",        str(stats.get("distinct_str_loci", 0))),
-            ("STR loci detected",        loci_str),
+            ("Output file",              stats.get("output_file") or io0.get("resolved") or cfg.get("declared_output", "—")),
+            ("Format",                   fmt_display),
+            ("Records",                  rec_display),
+            ("Distinct loci in output",  str(stats.get("distinct_str_loci", 0))),
         ]
+        regions_given = stats.get("regions_given")
+        regions_hit = stats.get("regions_hit")
+        if isinstance(regions_given, int) and regions_given > 0 and isinstance(regions_hit, int):
+            ev_rows.append(("Reference panel coverage", f"{regions_hit} / {regions_given} reference panel loci hit"))
+        total_reads = stats.get("total_reads")
+        if isinstance(total_reads, int) and total_reads > 0:
+            depth_txt = f"{total_reads:,} total reads"
+            max_d = stats.get("max_sequence_depth")
+            d_src = stats.get("depth_source")
+            if isinstance(max_d, int) and max_d > 0:
+                depth_txt += f" (max {max_d}" + (f", via {d_src}" if d_src else "") + ")"
+            ev_rows.append(("Reported read depth", depth_txt))
+        if check_labels:
+            ev_rows.append(("Checks verified", " · ".join(check_labels)))
+        ev_rows.append(("STR loci detected", loci_str))
         tdata = [[Paragraph(k, ST["meta_label"]),
                   Paragraph(v, ST["tbl_cell"])] for k, v in ev_rows]
         evt = Table(tdata, colWidths=[60*mm, CW - 60*mm])
@@ -802,6 +899,17 @@ def build_body(cfg):
             ("BOX",           (0,0),(-1,-1), 0.5, BORDER),
         ]))
         els.append(evt)
+        if isinstance(regions_given, int) and regions_given > 0 and isinstance(regions_hit, int):
+            n_out = stats.get("distinct_str_loci", 0)
+            els.append(vspace(3))
+            els.append(Paragraph(
+                f"<i>Note on locus counts: the staged reference panel defines {regions_given} target "
+                f"regions ({regions_hit} overlapped by this run's output), whereas the output count "
+                f"({n_out} distinct loci across {total_rows} records) reflects all entries written by "
+                "the tool, which may split complex repeats into sub-regions or include additional "
+                "loci from its own catalog.</i>",
+                ST["body"],
+            ))
 
     # §7 Verification Data
     els.append(section_num(str(sec), "Verification Data"))
@@ -818,21 +926,12 @@ def build_body(cfg):
     if not td.get("known"):
         intro = ref_phrase
     elif td.get("present"):
-        intro = (f"The repository ships example data ({td.get('count', 0)} file(s)); this run did "
-                 f"not use it. {ref_phrase}")
+        intro = (f"The repository ships example data ({td.get('count', 0)} file(s)), which were "
+                 f"not used in this run. {ref_phrase}")
     else:
-        intro = f"This tool ships no demo or test data of its own. {ref_phrase}"
-    # Last, so the sentence above stays next to the dataset it refers to. The
-    # recommendation leads with what a test file gives the tool's own users,
-    # because that is the larger reason and the one an author acts on; being
-    # easier to verify is the smaller, second benefit and reads badly first.
-    intro += (" A small test file in the repository lets a new user run the tool "
-              "on their first day and see it working before trusting it with their "
-              "own data, and it lets a verification run against the author's own "
-              "sample as well as this one. Publishing the output that file should "
-              "produce helps just as much: it shows what the results are meant to "
-              "look like, which is what a reader needs to tell a correct run from "
-              "one that merely finished.")
+        intro = (f"This tool ships no demo or test data of its own. {ref_phrase} "
+                 "Including a small test input and expected output in the repository lets "
+                 "independent users reproduce a run without external datasets.")
     els.append(Paragraph(intro, ST["body"]))
     els.append(vspace(3))
 
@@ -846,8 +945,14 @@ def build_body(cfg):
             loci_val = f"{len(panel_loci)} loci in selected panel (not executed)"
     else:
         loci_val = "—"
-    ds_rows = [
-        ("Dataset",              ds.get("name", "—")),
+    ds_rows = []
+    if cfg.get("input_type"):
+        ds_rows.append(("Dataset ID", cfg["input_type"]))
+    ds_rows.append(("Dataset", ds.get("name", "—")))
+    tech = ds.get("chemistry") or ds.get("sequencer")
+    if tech:
+        ds_rows.append(("Technology", tech))
+    ds_rows += [
         ("Source",               link(src, src_display) if src else "—"),
         ("License",              ds.get("license", "—")),
         ("Aligned to",           ref_assembly),
@@ -1308,6 +1413,8 @@ def load_config(manifest_path: str, datasets_path: str | None = None,
         "input_type":     input_type,
         "panel":          PANEL_MAP.get(input_type, input_type or "STR"),
         "stats":          stats,
+        "io_detail":      report.get("io_detail") or {},
+        "content_detail": report.get("content_detail") or {},
         "declared_output": declared_output,
         "declared_format": declared_format,
         "loci_with_depth":loci_with_depth,

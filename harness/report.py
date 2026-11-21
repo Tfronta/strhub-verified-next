@@ -398,13 +398,14 @@ def _summary_md(report: dict, slug: str) -> str:
 
     known = report.get("author_known_issues") or []
     if known:
-        lines += ["", "### What the author documents as a known issue", "",
+        lines += ["", "### Author-documented warnings and limitations", "",
                   "Quoted from the repository's README at the verified commit. "
                   "STRhub did not establish any of this by running the tool; it is "
                   "the author's own note about their own software."]
         for k in known:
             quote = k["text"] + ("…" if k.get("truncated") else "")
-            lines += ["", f"**{k['heading']}** (README line {k['line']})", "", f"> {quote}"]
+            lines += ["", f"**{k['heading']}** (README line {k['line']})", ""]
+            lines += [f"> {ln}" for ln in quote.splitlines() if ln.strip()]
 
     recs = report.get("recommendations") or []
     if recs:
@@ -607,10 +608,10 @@ def _summary_html(report: dict, slug: str) -> str:
     if known:
         quotes = "".join(
             f"<p><b>{esc(k['heading'])}</b> (README line {esc(k['line'])})</p>"
-            f"<blockquote>{esc(k['text'])}{'…' if k.get('truncated') else ''}</blockquote>"
+            f"<blockquote>{'<br>'.join(esc(ln) for ln in (k['text'] + ('…' if k.get('truncated') else '')).splitlines() if ln.strip())}</blockquote>"
             for k in known)
         known_block = (
-            "<h3>What the author documents as a known issue</h3>"
+            "<h3>Author-documented warnings and limitations</h3>"
             "<p>Quoted from the repository's README at the verified commit. STRhub did "
             "not establish any of this by running the tool; it is the author's own note "
             "about their own software.</p>" + quotes)
