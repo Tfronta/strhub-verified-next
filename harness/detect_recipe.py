@@ -209,6 +209,37 @@ def build_content_paths(paths: list[str]) -> list[str]:
     return out[:14]
 
 
+_NON_HG38_CATALOG_RE = re.compile(
+    r"(?:^|[/_.-])(?:hg19|grch37|b37|hs37d5|hs37|hg18|grch36|t2t|chm13|mm10|mm39|dm6|ce11)(?:$|[/_.-])",
+    re.I,
+)
+_HG38_CATALOG_RE = re.compile(r"(?:^|[/_.-])(?:hg38|grch38)(?:$|[/_.-])", re.I)
+_JSON_CATALOG_NAME_RE = re.compile(r"(?:catalog|loci|repeat|region|panel|str)", re.I)
+
+
+def catalog_content_paths(tree: list[dict], max_bytes: int = 250_000) -> list[str]:
+    """Small repository-shipped hg38 loci catalog files (.bed / catalog .json)
+    outside vendor/test/output directories, used to check coordinate overlap
+    against STRhub's forensic vs medical reference panels."""
+    out: list[str] = []
+    for e in tree:
+        if e.get("type") != "blob":
+            continue
+        size = e.get("size")
+        if size is not None and (size <= 0 or size > max_bytes):
+            continue
+        p = e["path"]
+        if VENDOR_DIRS.search(p) or TEST_DIRS.search(p) or OUTPUT_DIRS.search(p):
+            continue
+        low = p.lower()
+        if _NON_HG38_CATALOG_RE.search(low):
+            continue
+        if low.endswith(".bed") or (low.endswith(".json") and _JSON_CATALOG_NAME_RE.search(pathlib.PurePosixPath(low).name)):
+            out.append(p)
+    out.sort(key=lambda p: (0 if _HG38_CATALOG_RE.search(p) else 1, p.count("/"), p))
+    return out[:6]
+
+
 def linked_docs(readme: str, slug: str, paths: set[str]) -> tuple[list[str], list[str]]:
     """In-repository documents and wiki pages the README links to, in the
     order it links them: ([repo paths], [wiki page names])."""
@@ -394,7 +425,9 @@ def gather(slug: str, ref: str, tag: str = "", token: str | None = None) -> dict
     readme, readme_name = fetch_readme(slug, ref)
     paths = [e["path"] for e in tree_resp["tree"]]
     files = {}
-    for p in build_content_paths(paths):
+    for p in build_content_paths(paths) + catalog_content_paths(tree_resp["tree"]):
+        if p in files:
+            continue
         text = fetch_file(slug, ref, p)
         if text is not None:
             files[p] = text
@@ -1561,6 +1594,171 @@ def detect_input_type(readme: str, examples: list[dict], docs: list[dict] | None
             "statements": statements}
 
 
+def _norm_chrom(chrom: str) -> str:
+    c = chrom.strip().lower()
+    return c[3:] if c.startswith("chr") else c
+
+
+def _parse_catalog_intervals(text: str) -> list[tuple[str, int, int]]:
+    """Parse (norm_chrom, start, end) intervals from a BED or ExpansionHunter-style JSON catalog."""
+    stripped = text.lstrip()
+    if stripped.startswith("["):
+        try:
+            entries = json.loads(stripped)
+        except ValueError:
+            return []
+        out: list[tuple[str, int, int]] = []
+        for entry in entries if isinstance(entries, list) else []:
+            if not isinstance(entry, dict):
+                continue
+            regs = entry.get("ReferenceRegion")
+            for reg in (regs if isinstance(regs, list) else [regs]):
+                m = re.match(r"^([^:\s]+):(\d+)-(\d+)$", str(reg or "").strip())
+                if m:
+                    s, e = int(m.group(2)), int(m.group(3))
+                    if s <= e:
+                        out.append((_norm_chrom(m.group(1)), s, e))
+        return out
+    out = []
+    for ln in text.splitlines():
+        s = ln.strip()
+        if not s or s.startswith(("#", "track", "browser")):
+            continue
+        fields = s.split("\t") if "\t" in s else s.split()
+        if len(fields) >= 3 and fields[1].isdigit() and fields[2].isdigit():
+            start, end = int(fields[1]), int(fields[2])
+            if start <= end:
+                out.append((_norm_chrom(fields[0]), start, end))
+    return out
+
+
+def _read_panel_windows(panel_path: pathlib.Path) -> list[tuple[str, int, int, str]]:
+    if not panel_path.is_file():
+        return []
+    out: list[tuple[str, int, int, str]] = []
+    for ln in panel_path.read_text(errors="replace").splitlines():
+        s = ln.strip()
+        if not s or s.startswith("#"):
+            continue
+        fields = s.split("\t") if "\t" in s else s.split()
+        if len(fields) >= 3 and fields[1].isdigit() and fields[2].isdigit():
+            name = fields[3] if len(fields) > 3 else f"{fields[0]}:{fields[1]}"
+            out.append((_norm_chrom(fields[0]), int(fields[1]), int(fields[2]), name))
+    return out
+
+
+def _count_panel_overlaps(intervals: list[tuple[str, int, int]], panel_path: pathlib.Path) -> int:
+    by_chrom: dict[str, list[tuple[int, int]]] = {}
+    for chrom, start, end in intervals:
+        by_chrom.setdefault(chrom, []).append((start, end))
+    hit_loci: set[str] = set()
+    for pc, ps, pe, name in _read_panel_windows(panel_path):
+        for s, e in by_chrom.get(pc, ()):
+            if s <= pe and e >= ps:
+                hit_loci.add(name)
+                break
+    return len(hit_loci)
+
+
+def _command_regions_info(command: str | None, tree_paths: set[str]) -> tuple[bool, list[str]]:
+    """Inspect whether the command passes an external regions file placeholder
+    (which STRhub substitutes with /data/in/regions.*) or an explicit repo file."""
+    if not command:
+        return False, []
+    try:
+        import fidelity
+        toks = fidelity.tokens(command)
+    except Exception:
+        return False, []
+    takes_external_placeholder = False
+    explicit_repo_files: list[str] = []
+    for i in range(1, len(toks)):
+        prev = toks[i - 1]
+        raw = toks[i]
+        val = raw[1:-1] if len(raw) > 1 and raw[0] == raw[-1] and raw[0] in "'\"" else raw
+        clean = val.lstrip("./")
+        if clean in tree_paths and clean.lower().endswith((".bed", ".json")):
+            explicit_repo_files.append(clean)
+            continue
+        if prev in fidelity.REGION_FLAGS:
+            angle = val.startswith("<") and val.endswith(">")
+            if (fidelity.REGION_PATH.fullmatch(val) or angle) and not val.startswith("/data/"):
+                takes_external_placeholder = True
+    return takes_external_placeholder, explicit_repo_files
+
+
+def detect_panel_from_catalogs(base_type: str | None, files: dict[str, str],
+                               command: str | None, tree_paths: set[str]) -> dict | None:
+    """Coordinate-based panel selection between STRhub's forensic and medical
+    reference slices for the same platform and assembly.
+
+    Applies only when the command does not take an external regions placeholder
+    that STRhub itself supplies, and a repository-shipped hg38 catalog file
+    overlaps 0 loci in STRhub's forensic panel and >= 3 loci in the medical panel.
+    """
+    if not base_type or base_type.endswith("-med"):
+        return None
+    import datasets as datasets_lib
+    med_type = f"{base_type}-med"
+    base_ds = datasets_lib.resolve(base_type)
+    med_ds = datasets_lib.resolve(med_type)
+    if not base_ds or not med_ds:
+        return None
+    base_panel_rel = base_ds.get("supported_loci")
+    med_panel_rel = med_ds.get("supported_loci")
+    if not base_panel_rel or not med_panel_rel:
+        return None
+    base_panel = datasets_lib.ROOT / base_panel_rel
+    med_panel = datasets_lib.ROOT / med_panel_rel
+    if not base_panel.is_file() or not med_panel.is_file():
+        return None
+
+    takes_ext_placeholder, explicit_repo_files = _command_regions_info(command, tree_paths)
+    if takes_ext_placeholder and not explicit_repo_files:
+        return None
+
+    if explicit_repo_files:
+        candidates = [(p, files[p]) for p in explicit_repo_files if p in files]
+    else:
+        candidates = []
+        for p, text in sorted(files.items()):
+            low = p.lower()
+            if VENDOR_DIRS.search(p) or TEST_DIRS.search(p) or OUTPUT_DIRS.search(p):
+                continue
+            if _NON_HG38_CATALOG_RE.search(low):
+                continue
+            if low.endswith(".bed") or (low.endswith(".json") and _JSON_CATALOG_NAME_RE.search(pathlib.PurePosixPath(low).name)):
+                candidates.append((p, text))
+    if not candidates:
+        return None
+
+    best_path: str | None = None
+    best_med = 0
+    for p, text in candidates:
+        intervals = _parse_catalog_intervals(text)
+        if len(intervals) < 3:
+            continue
+        f_ov = _count_panel_overlaps(intervals, base_panel)
+        m_ov = _count_panel_overlaps(intervals, med_panel)
+        if f_ov > 0:
+            # At least one active catalog covers the forensic panel -> keep forensic slice.
+            return None
+        if m_ov > best_med:
+            best_med = m_ov
+            best_path = p
+
+    if best_path and best_med >= 3:
+        return {
+            "panel": "medical",
+            "dataset": med_type,
+            "catalog_file": best_path,
+            "evidence_source": f"repo_file:{best_path}",
+            "forensic_overlap": 0,
+            "medical_overlap": best_med,
+        }
+    return None
+
+
 #: Files a README names that are never what the tool writes.
 NOT_OUTPUT_FILES = re.compile(r"\b(?:requirements|CMakeLists|LICENSE|README|CHANGELOG|NEWS|INSTALL|"
                               r"MANIFEST|environment|setup|package|tsconfig|version)\.(?:txt|json|csv|tsv)\b", re.I)
@@ -2069,6 +2267,17 @@ def detect(slug: str, ref: str, tree_resp: dict, readme: str, readme_name: str |
     commands = detect_commands(readme, names, docs, readme_name, pkg["executables"])
     input_type = detect_input_type(readme, examples, docs, commands[0]["cmd"] if commands else None, readme_name)
     commands = attach_prerequisite(prefer_input_kind(commands, _kind_of_type(input_type.get("best"))), set(paths))
+    panel_match = detect_panel_from_catalogs(
+        input_type.get("best"), files, commands[0]["cmd"] if commands else None, set(paths)
+    )
+    if panel_match:
+        old_best = input_type.get("best")
+        new_best = panel_match["dataset"]
+        input_type["best"] = new_best
+        input_type["candidates"] = [
+            new_best if c == old_best else c for c in (input_type.get("candidates") or [])
+        ] or [new_best]
+        input_type["panel_match"] = panel_match
     for c in commands:
         c_file = c.get("file") or rn
         c["evidence_source"] = f"{c_file}:L{c['line']}" if c.get("line") else None

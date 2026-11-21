@@ -472,7 +472,11 @@ def classify(proposal: dict, manifest: dict, limitations: list[str],
             "dataset": {
                 "selected": dataset_id,
                 "reason": (f"STRhub selected '{dataset_id}' as compatible with upstream input '{upstream_kind}'"
-                           + (f" and platform '{input_evidence.get('platform')}'" if input_evidence.get("platform") else ""))
+                           + (f" and platform '{input_evidence.get('platform')}'" if input_evidence.get("platform") else "")
+                           + (f"; shipped catalog '{input_evidence['panel_match']['catalog_file']}' overlaps "
+                              f"{input_evidence['panel_match']['medical_overlap']} medical panel loci and 0 forensic loci"
+                              if input_evidence.get("panel_match") and dataset_id == input_evidence["panel_match"].get("dataset")
+                              else ""))
                           if dataset_id else None,
             } if dataset_id else None,
             "platform": {

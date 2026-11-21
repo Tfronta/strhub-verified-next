@@ -154,3 +154,71 @@ def test_9_undetermined_after_install_and_run_preserves_passed_stages():
         "runs": "PASS",
         "output": "NOT ESTABLISHED",
     }
+
+
+def test_10_generic_catalog_panel_matching_medical_vs_forensic():
+    import detect_recipe as dr
+
+    # Generic medical BED coordinates overlapping datasets/ont-bam-hg38-med/loci.bed
+    med_bed = "\n".join([
+        "chr4\t3074876\t3074933\tHTT",
+        "chr9\t27573528\t27573546\tC9orf72",
+        "chrX\t147912050\t147912110\tFMR1",
+        "chr6\t16327635\t16327722\tATXN1",
+    ])
+    # Generic forensic CODIS BED coordinates overlapping datasets/ont-bam-hg38/loci.bed
+    forensic_bed = "\n".join([
+        "chr11\t2171088\t2171115\tTH01",
+        "chr2\t1489653\t1489684\tTPOX",
+        "chr5\t150076324\t150076375\tCSF1PO",
+        "chr4\t154587736\t154587823\tFGA",
+    ])
+
+    # 1. Command uses symbolic keyword (--loci hg38) + repo ships hg38 medical BED -> switches to -med.
+    res = dr.detect_panel_from_catalogs(
+        "ont-bam-hg38",
+        {"src/pkg/data/loci.hg38.bed": med_bed},
+        "tool --bam sample.bam --ref reference.fasta --loci hg38 --out out",
+        {"src/pkg/data/loci.hg38.bed"},
+    )
+    assert res is not None
+    assert res["panel"] == "medical"
+    assert res["dataset"] == "ont-bam-hg38-med"
+    assert res["forensic_overlap"] == 0
+    assert res["medical_overlap"] >= 4
+
+    # 2. Command takes an external regions placeholder -> STRhub supplies regions, keep forensic.
+    res_placeholder = dr.detect_panel_from_catalogs(
+        "illumina-bam-hg38",
+        {"catalogs/hg38/loci.bed": med_bed},
+        "tool --reads sample.bam --ref hg38.fa --regions <regions.bed> --out out.vcf",
+        {"catalogs/hg38/loci.bed"},
+    )
+    assert res_placeholder is None
+
+    # 3. Repo catalog overlaps forensic loci -> keep forensic.
+    res_forensic = dr.detect_panel_from_catalogs(
+        "ont-bam-hg38",
+        {"data/codis.hg38.bed": forensic_bed},
+        "tool --bam sample.bam --ref reference.fasta --out out",
+        {"data/codis.hg38.bed"},
+    )
+    assert res_forensic is None
+
+    # 4. Genome-wide / mixed catalog overlapping both forensic and medical -> keep forensic.
+    res_mixed = dr.detect_panel_from_catalogs(
+        "ont-bam-hg38",
+        {"data/all.hg38.bed": med_bed + "\n" + forensic_bed},
+        "tool --bam sample.bam --ref reference.fasta --out out",
+        {"data/all.hg38.bed"},
+    )
+    assert res_mixed is None
+
+    # 5. Non-hg38 catalog filename (hg19) is ignored.
+    res_hg19 = dr.detect_panel_from_catalogs(
+        "ont-bam-hg38",
+        {"data/loci.hg19.bed": med_bed},
+        "tool --bam sample.bam --ref reference.fasta --loci hg38 --out out",
+        {"data/loci.hg19.bed"},
+    )
+    assert res_hg19 is None

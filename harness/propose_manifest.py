@@ -241,6 +241,13 @@ def _build(proposal: dict, slug: str, submitted_by: str = "third_party",
     used_regions = (prepared or {}).get("regions")
     if input_note:
         caveat_items.append(input_note)
+    pm = (proposal.get("input_type") or {}).get("panel_match")
+    if pm and not prepared:
+        caveat_items.append(
+            f"Panel: the shipped loci catalog ({pm['catalog_file']}) overlaps "
+            f"{pm['medical_overlap']} loci in STRhub's medical STR slice and 0 in the "
+            f"forensic slice; this plan selects STRhub's {pm['dataset']} reference data."
+        )
     if not best:
         limitations.append("no_command")
         run_cmd = "true  # no command found in the README; nothing to run"

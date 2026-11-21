@@ -110,6 +110,7 @@ PANEL_MAP = {
     "ont-bam-hg38":        "Autosomal STR (ONT)",
     "pacbio-hifi-bam-hg38": "Autosomal STR (PacBio HiFi)",
     "illumina-bam-hg38-med": "Medical STR",
+    "ont-bam-hg38-med":      "Medical STR (ONT)",
     "pacbio-hifi-bam-hg38-med": "Medical STR (PacBio HiFi)",
     "illumina-str-fastq":  "STR / SNP panel",
 }
@@ -856,15 +857,23 @@ def build_body(cfg):
     # §8 Verification Matrix
     # Stage independence: a failed installation blocks downstream execution and
     # must never be reported as FAIL on a dataset that was never processed.
+    # Likewise, when execution_finding_established is False (undetermined),
+    # an unestablished output gate is NOT ESTABLISHED rather than FAIL.
     gates = dict(cfg.get("gates") or {})
+    exec_established = cfg.get("execution_finding_established", True)
     ext = next((d for d in (cfg.get("datasets") or [])
                 if d.get("leg") == "external"), {}) or {}
     if not gates.get("installs"):
         ext_tag = '<font color="#9ca3af"><b>NOT ATTEMPTED</b></font>'
-        ext_label = "Reference dataset (not executed: installation failed)"
+        ext_label = ("Reference dataset (not executed: installation failed)"
+                     if exec_established is not False
+                     else "Reference dataset (not executed)")
     elif ext.get("passed"):
         ext_tag = '<font color="#00909c"><b>PASS</b></font>'
         ext_label = "Run on reference dataset"
+    elif exec_established is False:
+        ext_tag = '<font color="#9ca3af"><b>NOT ESTABLISHED</b></font>'
+        ext_label = "Run on reference dataset (output validity not established)"
     elif ext.get("available"):
         ext_tag = '<font color="#ef4444"><b>FAIL</b></font>'
         ext_label = "Run on reference dataset"
