@@ -523,11 +523,23 @@ def build_body(cfg):
     sec += 1
     gdata = []
     stopped_found = False
+    exec_established = cfg.get("execution_finding_established", True)
     for key, gate_name, gate_desc in GATE_DISPLAY:
         ok = gates_dict.get(key, False)
         if ok:
             st = "pass"
             desc_text = gate_desc
+        elif exec_established is False:
+            st = "na"
+            if not stopped_found:
+                stopped_found = True
+                if key == "installs":
+                    note = "Not attempted: the documented installation procedure could not be established."
+                else:
+                    note = "Not established from this run."
+            else:
+                note = "Not attempted, because the run had already stopped."
+            desc_text = f'{gate_desc} &nbsp; <font color="#9ca3af"><i>{note}</i></font>'
         elif not stopped_found:
             st = "stopped"
             stopped_found = True
