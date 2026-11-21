@@ -67,7 +67,7 @@ REGISTER: dict[str, tuple[str, str]] = {
     "86baeea971be": ("diagnose_log", "run"),  # At least one cause is STRhub's, not the tool's: the container recipe for a generated environmen
     "24a749985c9f": ("diagnose_log", "log"),  # Observed in the build log: the build stopped on missing packages, headers, or declared build steps d
     "dc6dbb4a5df8": ("generate_pdf", "tree"),  # Recorded automatically from the tool's public files when this run was configured. Not verified 
-    "6b4450723321": ("generate_pdf", "tree"),  # This tool ships no demo or test data of its own. STRhub ran the verification using the public r
+    "d4faa91634f1": ("generate_pdf", "tree"),  # This tool ships no demo or test data of its own.
     "c3b2bcd382dc": ("propose_manifest", "readme"),  # Planned command, subject to full source citation and procedure review.
     "70be7a8f1331": ("propose_manifest", "readme"),  # true # no command found in the README; nothing to run
     "4febb7603b17": ("report", "policy"),  # <br><br> This is <b>not</b> a claim that the genotypes are correct, nor that the tool is fit for cas

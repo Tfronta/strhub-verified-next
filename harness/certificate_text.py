@@ -107,9 +107,10 @@ def stage_states(gates: dict | None, *, execution_established: bool | None = Tru
     if execution_established is False:
         return [
             {"key": "available", "label": "Source available", "status": "PASS" if avail else "FAIL"},
-            {"key": "installs", "label": "Installation", "status": "NOT ATTEMPTED"},
-            {"key": "runs", "label": "End-to-end execution", "status": "NOT ATTEMPTED"},
-            {"key": "output", "label": "Output generated", "status": "NOT ATTEMPTED"},
+            {"key": "installs", "label": "Installation", "status": "PASS" if inst else "NOT ATTEMPTED"},
+            {"key": "runs", "label": "End-to-end execution", "status": "PASS" if runs else "NOT ATTEMPTED"},
+            {"key": "output", "label": "Output generated",
+             "status": "PASS" if out else ("NOT ESTABLISHED" if runs else "NOT ATTEMPTED")},
         ]
 
     return [

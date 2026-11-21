@@ -785,15 +785,19 @@ def build_body(cfg):
     ds = cfg.get("dataset", {})
     # Evidence, not assumption — see certificate_text.test_data_item.
     td = cfg.get("repo_test_data") or {}
+    installs_passed = bool((cfg.get("gates") or {}).get("installs"))
+    if installs_passed:
+        ref_phrase = "STRhub ran the verification using the public reference dataset listed below."
+    else:
+        ref_phrase = ("STRhub selected the public reference dataset listed below, "
+                      "but it was not executed because installation did not complete.")
     if not td.get("known"):
-        intro = "STRhub ran the verification using the public reference dataset listed below."
+        intro = ref_phrase
     elif td.get("present"):
         intro = (f"The repository ships example data ({td.get('count', 0)} file(s)); this run did "
-                 "not use it. STRhub ran the verification using the public reference dataset "
-                 "listed below.")
+                 f"not use it. {ref_phrase}")
     else:
-        intro = ("This tool ships no demo or test data of its own. "
-                 "STRhub ran the verification using the public reference dataset listed below.")
+        intro = f"This tool ships no demo or test data of its own. {ref_phrase}"
     # Last, so the sentence above stays next to the dataset it refers to. The
     # recommendation leads with what a test file gives the tool's own users,
     # because that is the larger reason and the one an author acts on; being

@@ -136,3 +136,21 @@ def test_8_dataset_selected_but_never_processed():
         title, body = ct.test_data_item(cfg, "Illumina BAM (hg38), NA12878")
         assert "ran on" not in body.lower()
         assert "not processed" in body.lower()
+
+
+def test_9_undetermined_after_install_and_run_preserves_passed_stages():
+    # When a tool installs and runs end-to-end, but output validity could not
+    # be established (e.g. basis='strhub' panel mismatch -> undetermined),
+    # stage_states must preserve PASS for the gates that actually passed.
+    gates = {"available": True, "installs": True, "runs": True, "io": False, "content": False}
+    rep, cfg = _base_report(gates, level="runs", verdict_code="undetermined",
+                            verdict_reason="Output VCF contains no called genotypes.",
+                            execution_established=False)
+    cert = ct.certificate_for(rep, cfg)
+    stages = {s["key"]: s["status"] for s in cert["stages"]}
+    assert stages == {
+        "available": "PASS",
+        "installs": "PASS",
+        "runs": "PASS",
+        "output": "NOT ESTABLISHED",
+    }
