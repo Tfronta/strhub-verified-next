@@ -41,7 +41,7 @@ pip install .
 - Automatic initialization of pinned git submodules when `.gitmodules` is present.
 
 **Commands STRhub can execute literally:**
-`apt install`, `conda create`, `conda env create`, `conda install`, `conda activate`, `pip install .`, `pip install -r requirements.txt`, `python setup.py install`, `make`, `cmake`, `autoreconf`, `./configure`, `cargo build --release`, `cargo install --path .`, `mkdir`, `cd`, and `&&` chaining between them. See [DOCUMENTED-INSTALLATION.md](DOCUMENTED-INSTALLATION.md) for the complete grammar.
+`apt install`, `conda create`, `conda env create`, `conda install`, `conda activate`, `python3 -m venv`, `source <venv>/bin/activate`, `pip install .`, `pip install -r requirements.txt`, `python setup.py install`, `make`, `cmake`, `autoreconf`, `./configure`, `cargo build --release`, `cargo install --path .`, `mkdir`, `cd`, and `&&` chaining between them. See [DOCUMENTED-INSTALLATION.md](DOCUMENTED-INSTALLATION.md) for the complete grammar.
 
 **What cannot be executed automatically (and is reported with the exact line):**
 - Prose descriptions ("install the usual dependencies and compile").

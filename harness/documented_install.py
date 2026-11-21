@@ -46,15 +46,17 @@ BASE_CONDA = BASE_PLAIN + ", plus Miniforge (conda, python, pip)"
 
 #: Headings under which a code block is read as installation.
 SECTION = re.compile(r"install|build|compil|set ?up|requirement|prerequisite|dependenc|getting started|quick ?start|environment\b", re.I)
+#: Headings that mention "install" but describe post-install checks, notes or removal.
+_NON_INSTALL_HEADING = re.compile(r"\b(?:verif(?:y|ying|ication)|test(?:ing)?|uninstall|remov(?:e|ing)|troubleshoot|notes?|faq)\b", re.I)
 #: A code line that is an installation step of some kind, admitted or not.
 LOOKS_LIKE_INSTALL = re.compile(
-    r"(?:^|[\s;&|=])(?:apt|apt-get|conda|mamba|pip3?|python3? -m pip|python3? setup\.py|make|cmake|\./configure|autoreconf|cargo|"
-    r"wget|curl|tar|unzip|docker|git clone|bash|sh|Rscript|nimble|go|source activate)(?:\s|$)")
+    r"(?:^|[\s;&|=])(?:apt|apt-get|conda|mamba|pip3?|python3? -m pip|python3? -m venv|python3? setup\.py|make|cmake|\./configure|autoreconf|cargo|"
+    r"wget|curl|tar|unzip|docker|git clone|bash|sh|Rscript|nimble|go|source activate|(?:source|\.) \S+/bin/activate)(?:\s|$)")
 #: Indented (non-fenced) blocks must start with an install command so tab-indented
 #: prose paragraphs mentioning `apt-get` or `make` are not misread as shell blocks.
 _LEADING_INSTALL = re.compile(
-    r"^(?:apt|apt-get|conda|mamba|pip3?|python3? -m pip|python3? setup\.py|make|cmake|\./configure|autoreconf|cargo|"
-    r"wget|curl|tar|unzip|docker|git clone|bash|sh|Rscript|nimble|go|source activate)(?:\s|$)")
+    r"^(?:apt|apt-get|conda|mamba|pip3?|python3? -m pip|python3? -m venv|python3? setup\.py|make|cmake|\./configure|autoreconf|cargo|"
+    r"wget|curl|tar|unzip|docker|git clone|bash|sh|Rscript|nimble|go|source activate|(?:source|\.) \S+/bin/activate)(?:\s|$)")
 #: Documents whose filename identifies them as the repository's main or
 #: installation documentation (checked before auxiliary docs like annotation guides).
 _PRIMARY_INSTALL_DOC = re.compile(
@@ -73,6 +75,11 @@ PATTERNS = [
     rf"(?:conda|mamba) env create(?: (?:-n|--name|-f|--file)[ =]{WORD})+",
     rf"(?:conda|mamba) install(?: -y)?(?: (?:-c {WORD}|{WORD}))*(?: --file[ =]{WORD})?",
     rf"(?:conda|source) activate {WORD}",
+    rf"python3? -m venv {WORD}",
+    rf"(?:source|\.) {WORD}/bin/activate",
+    r"(?:python3? -m )?pip3? install (?:--upgrade|-U) pip",
+    r"(?:python3? -m )?pip3? --version",
+    r"python3? --version",
     r"(?:python3? -m )?pip3? install(?: -e)? \.",
     rf"(?:python3? -m )?pip3? install -r {WORD}",
     r"python3? setup\.py install",
@@ -180,8 +187,14 @@ def _kind(command: str, repo_slug: str) -> str:
     if re.match(r"docker (?:pull|run|build)\b", command):
         return "published"
     package = re.fullmatch(rf"(?:(?:python3? -m )?pip3? install|(?:conda|mamba) install(?: -y)?(?: -c {TOK})*) (\S+)", command)
-    if package and (package[1].lower().split("=")[0].split("[")[0] == name or f"{owner}/{name}" in package[1].lower()):
-        return "published"
+    if package:
+        pkg = package[1].lower()
+        base = pkg.rsplit("/", 1)[-1]
+        norm = name.replace("-", "_")
+        if (pkg.split("=")[0].split("[")[0] == name
+                or f"{owner}/{name}" in pkg
+                or (base.endswith(".whl") and (base.startswith(f"{name}-") or base.startswith(f"{norm}-")))):
+            return "published"
     return "step" if ADMITTED.fullmatch(command) else "outside"
 
 
@@ -272,7 +285,7 @@ def _scan_docs(docs: list[dict], slug: str) -> tuple[list[dict], list[dict], lis
     for doc in docs:
         scanned.append({"path": doc["file"], "sha256": digest(doc["text"])})
         for block in _blocks(doc["text"]):
-            if not SECTION.search(block["heading"]):
+            if not SECTION.search(block["heading"]) or _NON_INSTALL_HEADING.search(block["heading"]):
                 continue
             # An indented list (`* Python 2.7`) is prose, not a code block.
             if any(re.match(r"\s*(?:[*+-]|\d+[.)])\s", r) for _, r in block["rows"]):
@@ -341,7 +354,10 @@ def discover(proposal: dict) -> dict:
             return result
     if not commands:
         return result
-    builders = [c["text"] for c in commands if not re.match(r"(?:cd|mkdir|conda activate|source activate)\b", c["text"])]
+    builders = [
+        c["text"] for c in commands
+        if not re.match(r"(?:cd|mkdir|conda activate|source activate|(?:source|\.) \S+/bin/activate|(?:python3? -m )?pip3? --version|python3? --version)\b", c["text"])
+    ]
     if len(set(builders)) != len(builders):
         result["reason"] = ("More than one installation is documented with the same steps; "
                             "STRhub does not choose between them.")
@@ -349,6 +365,7 @@ def discover(proposal: dict) -> dict:
 
     # Every file and directory a step names is in the commit, from where the step stands.
     here, made = pathlib.PurePosixPath("."), set()
+    venv_activate: str | None = None
     for c in commands:
         text = c["text"]
         named = [m[1] for m in FILE_OPTION.finditer(text)]
@@ -367,6 +384,26 @@ def discover(proposal: dict) -> dict:
             else:
                 made.add(str(target))
             continue
+        m_venv = re.fullmatch(r"python3? -m venv (\S+)", text)
+        if m_venv:
+            target = _resolve(here, m_venv[1])
+            if target is None:
+                result["reason"] = f"An installation step leaves the repository ({c['file']}, line {c['line']}: `{text}`)."
+                return result
+            made.add(str(target))
+            continue
+        m_act = re.fullmatch(r"(?:source|\.) (\S+)/bin/activate", text)
+        if m_act:
+            target = _resolve(here, m_act[1])
+            if target is None:
+                result["reason"] = f"An installation step leaves the repository ({c['file']}, line {c['line']}: `{text}`)."
+                return result
+            if str(target) != "." and str(target) not in directories and str(target) not in made:
+                result["reason"] = (f"An installation step enters a directory the commit does not hold "
+                                    f"({c['file']}, line {c['line']}: `{text}`).")
+                return result
+            venv_activate = f"/opt/tool/{target}/bin/activate"
+            continue
         for name in named:
             target = _resolve(here, name)
             if target is None or str(target) not in files:
@@ -378,7 +415,7 @@ def discover(proposal: dict) -> dict:
     toolchain = _minimal_toolchain(commands)
     activated = [c["argv"][-1] for c in commands if re.match(r"(?:conda|source) activate\b", c["text"])]
     environment = activated[-1] if activated else None
-    dockerfile = carrier(commands, uses_conda, environment, toolchain)
+    dockerfile = carrier(commands, uses_conda, environment, toolchain, venv_activate)
     base_desc = BASE_CONDA if uses_conda else BASE_PLAIN
     if toolchain:
         base_desc += f", plus minimal build toolchain ({', '.join(toolchain)}; no tool-specific libraries)"
@@ -419,18 +456,22 @@ def _resolve(here: pathlib.PurePosixPath, name: str) -> pathlib.PurePosixPath | 
 
 
 def carrier(commands: list[dict], uses_conda: bool, environment: str | None,
-            toolchain: list[str] | tuple[str, ...] = ()) -> str:
+            toolchain: list[str] | tuple[str, ...] = (),
+            venv_activate: str | None = None) -> str:
     """The evaluator's envelope around the literal commands. Everything that
     is not one of them is the declared base environment."""
     lines = ["# Evaluator carrier: strhub-documented-install/1; not an upstream Dockerfile."]
     lines += base_lines(uses_conda, toolchain)
     lines += ['COPY [".", "/opt/tool"]', "WORKDIR /opt/tool"]
-    # One shell, so `cd` and `conda activate` carry from one documented line
-    # to the next as they would in the reader's terminal; the first failure stops it.
+    # One shell, so `cd`, `conda activate` and `source .../bin/activate` carry
+    # from one documented line to the next as they would in the reader's
+    # terminal; the first failure stops it.
     script = "set -eo pipefail\n" + "\n".join(c["text"] for c in commands) + "\n"
     lines.append("RUN " + json.dumps(["bash", "-lc", script]))
     if environment:
         lines.append("RUN " + json.dumps(["bash", "-c", f"echo 'conda activate {environment}' > /etc/profile.d/zz-strhub-env.sh"]))
+    if venv_activate:
+        lines.append("RUN " + json.dumps(["bash", "-c", f"echo 'source {venv_activate}' >> /etc/profile.d/zz-strhub-env.sh"]))
     lines.append('ENTRYPOINT ["/bin/bash", "-lc"]')
     return "\n".join(lines) + "\n"
 

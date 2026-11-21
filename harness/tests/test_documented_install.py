@@ -148,6 +148,27 @@ def test_submodules_autotools_cargo_and_cleaner_doc_filtering():
     plan_aux = di.discover(p_aux)
     assert plan_aux["ready"] and [c["text"] for c in plan_aux["commands"]] == ["make"]
 
+    # Standard Python venv + wheel alternative + Installation Verification section.
+    venv_install = (
+        block("python3 -m venv tool-env", "source tool-env/bin/activate", "python -m pip --version")
+        + "\n\n### Install from wheel\n\n"
+        + block("pip install ./tool-1.0.0-py3-none-any.whl")
+        + "\n\n### Install from source\n\n"
+        + block("python -m pip install .")
+        + "\n\n## Installation Verification\n\n"
+        + block("tar -xzf verify.tar.gz")
+    )
+    plan_venv = di.discover(proposal(venv_install))
+    assert plan_venv["ready"]
+    assert [c["text"] for c in plan_venv["commands"]] == [
+        "python3 -m venv tool-env",
+        "source tool-env/bin/activate",
+        "python -m pip --version",
+        "python -m pip install .",
+    ]
+    assert [a["text"] for a in plan_venv["published_alternatives"]] == ["pip install ./tool-1.0.0-py3-none-any.whl"]
+    assert "source /opt/tool/tool-env/bin/activate' >> /etc/profile.d/zz-strhub-env.sh" in plan_venv["carrier_dockerfile"]
+
 
 def test_prose_lists_and_usage_blocks_are_not_installation():
     install = "Requirements:\n\n    * Python 3\n    * make\n\n" + block("make")
