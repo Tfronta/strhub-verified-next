@@ -452,9 +452,10 @@ def conclusion_items_for(cfg: dict) -> list[tuple[str, str]]:
                "declared install steps, so nothing further was attempted.")
 
     if gates.get("content"):
+        panel_label = (cfg.get("dataset") or {}).get("panel_label") or "target forensic STR loci"
         produced = ("Produces plausible output",
                     f"The tool generated a structurally valid {fmt_label}output file with genotype "
-                    f"calls across {n_loci} target forensic STR loci.")
+                    f"calls across {n_loci} {panel_label}.")
     elif gates.get("io"):
         produced = ("Produces output in the declared format",
                     f"The tool wrote a non-empty {fmt_label}file. Whether its contents look like "
