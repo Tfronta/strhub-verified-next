@@ -1,0 +1,1297 @@
+{
+  "schema": "strhub-verified/1",
+  "mode": "publish",
+  "tool": {
+    "name": "strkit",
+    "version": "v0.25.0",
+    "contact": "https://github.com/davidlougheed/strkit/issues"
+  },
+  "submission": {
+    "by": "third_party"
+  },
+  "source": {
+    "repo": "https://github.com/davidlougheed/strkit",
+    "ref": "c6b6ef1a878cac2fed5f41637553d51caa3403d1",
+    "ref_resolved": "c6b6ef1a878cac2fed5f41637553d51caa3403d1",
+    "committed": "2026-10-27T12:52:14Z"
+  },
+  "environment": {
+    "dockerfile": "Dockerfile",
+    "os": [
+      "ubuntu-22.04"
+    ],
+    "source": "generated"
+  },
+  "generated": "2026-11-22T19:14:23+00:00",
+  "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/45059529334",
+  "run": {
+    "cmd": "strkit call --loci /path/to/catalog --ref /path/to/ref.fa.gz --processes 10 --seed 342 --vcf sample.vcf path/to/sample.bam",
+    "cwd": ".",
+    "effective_cmd": "cd '.' && touch /tmp/.strhub_mark && ( strkit call --loci /path/to/catalog --ref /path/to/ref.fa.gz --processes 10 --seed 342 --vcf sample.vcf path/to/sample.bam ); rc=$?; find . -xdev -type f -newer /tmp/.strhub_mark -size +0 ! -path './.git/*' ! -path './proc/*' ! -path './sys/*' ! -path './dev/*' ! -path './data/*' ! -path '*/__pycache__/*' ! -name '*.pyc' ! -name '*.pyo' 2>/dev/null | head -500 | while IFS= read -r f; do mkdir -p \"/data/out/$(dirname \"$f\")\" && cp \"$f\" \"/data/out/$f\"; done; exit $rc",
+    "step_outcome": "skipped"
+  },
+  "instrument": "documented",
+  "recipe": {
+    "origin": "proposed"
+  },
+  "gates": {
+    "available": true,
+    "installs": false,
+    "runs": false,
+    "io": false,
+    "content": false
+  },
+  "input_contract": {
+    "type": "ont-bam-hg38"
+  },
+  "level": "available",
+  "io_detail": {},
+  "content_detail": {},
+  "example_detail": null,
+  "datasets": [
+    {
+      "leg": "external",
+      "label": "External data",
+      "available": false,
+      "type": "ont-bam-hg38",
+      "dataset": null,
+      "io": false,
+      "content": false,
+      "passed": false
+    },
+    {
+      "leg": "example",
+      "label": "Tool's own example",
+      "available": false,
+      "io": false,
+      "content": null,
+      "passed": false,
+      "matches_expected": null,
+      "produced_count": null
+    }
+  ],
+  "scope": "Assessment of documented execution in the stated environment and output format. Concerns reproducible execution only; no claim of accuracy, casework fitness, or regulatory validation.",
+  "upstream": {
+    "checked": "2026-11-22T19:14:23+00:00",
+    "repo_exists": true,
+    "ref_exists": true,
+    "default_branch": "master",
+    "status": "identical",
+    "behind_by": 0
+  },
+  "evidence": [
+    {
+      "claim": "install_method",
+      "kind": "tree",
+      "path": "pyproject.toml",
+      "text": "pip",
+      "url": "https://github.com/davidlougheed/strkit/blob/c6b6ef1a878cac2fed5f41637553d51caa3403d1/pyproject.toml"
+    },
+    {
+      "claim": "fallback_environment",
+      "kind": "readme",
+      "path": "README.md",
+      "line": 94,
+      "text": "docker pull ghcr.io/davidlougheed/strkit:latest",
+      "url": "https://github.com/davidlougheed/strkit/blob/c6b6ef1a878cac2fed5f41637553d51caa3403d1/README.md#L94"
+    },
+    {
+      "claim": "run_command",
+      "kind": "doc",
+      "path": "docs/caller_usage.md",
+      "line": 151,
+      "text": "strkit call \\",
+      "url": "https://github.com/davidlougheed/strkit/blob/c6b6ef1a878cac2fed5f41637553d51caa3403d1/docs/caller_usage.md#L151"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "tests/data/test_loci.bed",
+      "text": "bed",
+      "url": "https://github.com/davidlougheed/strkit/blob/c6b6ef1a878cac2fed5f41637553d51caa3403d1/tests/data/test_loci.bed"
+    },
+    {
+      "claim": "documented_input",
+      "kind": "readme",
+      "path": "README.md",
+      "line": 111,
+      "text": "/inputs/file.bam \\",
+      "url": "https://github.com/davidlougheed/strkit/blob/c6b6ef1a878cac2fed5f41637553d51caa3403d1/README.md#L111"
+    }
+  ],
+  "repo_test_data": {
+    "known": true,
+    "present": true,
+    "count": 1,
+    "examples": [
+      "tests/data/test_loci.bed"
+    ]
+  },
+  "caveats": {
+    "source": "detect_recipe",
+    "items": [
+      "Environment: no proven installation profile; STRhub did not manufacture installation steps.",
+      "Input: the README documents BAM (line 111); this plan selects STRhub's ont-bam-hg38 reference data. Supported platforms documented: ont, pacbio, illumina; STRhub selected ont for this trial.",
+      "Evaluator limitation: the command reads the reference genome in a form STRhub does not mount (it mounts an uncompressed FASTA with its .fai index).",
+      "Evaluator limitation: a read-file argument is outside the closed input substitution table.",
+      "Run command: the one documented in docs/caller_usage.md (line 151), rewritten to STRhub's mounts; the capture wrapper is planned only if the procedure review passes."
+    ]
+  },
+  "install_detail": {
+    "passed": false,
+    "diagnostics": [],
+    "faults": []
+  },
+  "procedure_review": {
+    "may_say_runs": false,
+    "status_code": "UNVERIFIED_INSUFFICIENT_DOCS",
+    "basis": "recipe",
+    "attribution": "strhub",
+    "blocker": "install_not_copyable",
+    "reason": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub.",
+    "amendments": [
+      {
+        "code": "command_profile_unsupported",
+        "what": "The command reads the reference genome in a form STRhub does not mount (it mounts an uncompressed FASTA with its .fai index). A read-file argument is outside the closed input substitution table."
+      },
+      {
+        "code": "input_not_substituted",
+        "what": "This evaluator cannot establish that the cited command reads the declared reference input; no config or input list was rewritten to make it do so."
+      },
+      {
+        "code": "install_not_copyable",
+        "what": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub."
+      },
+      {
+        "code": "input_not_substituted",
+        "what": "The command still names the repository's own file paths, not STRhub's sample. Running it would not be the reference-sample test."
+      }
+    ],
+    "inferences": {
+      "install": {
+        "evidence_source": "repo_file:pyproject.toml",
+        "verified": false
+      },
+      "run_command": {
+        "evidence_source": "docs/caller_usage.md:L151",
+        "verified": true,
+        "kind": "doc",
+        "path": "docs/caller_usage.md",
+        "document_sha256": "97e11dee7d503b9fb4e33cfd88101fd045a0affde2a6b64962805f5543753c6e"
+      },
+      "input_type": {
+        "verified": true,
+        "kind": "doc",
+        "path": "README.md",
+        "line": 111,
+        "end_line": 111,
+        "document_sha256": "c60877a4f4e1a9d9c2f87584717728e11624753ed55ce1158da8cdf6ab366784",
+        "evidence_source": "README.md:L111",
+        "upstream_input_kind": "bam",
+        "selected_dataset": "ont-bam-hg38"
+      },
+      "platform": {
+        "verified": true,
+        "kind": "doc",
+        "path": "README.md",
+        "line": 1,
+        "end_line": 1,
+        "document_sha256": "c60877a4f4e1a9d9c2f87584717728e11624753ed55ce1158da8cdf6ab366784",
+        "evidence_source": "README.md:L1",
+        "selected": "ont",
+        "selection_basis": "harness_choice_from_supported",
+        "supported_platforms": [
+          "ont",
+          "pacbio",
+          "illumina"
+        ]
+      },
+      "output": {
+        "verified": true,
+        "kind": "doc",
+        "path": "docs/caller_usage.md",
+        "line": 151,
+        "end_line": 151,
+        "document_sha256": "97e11dee7d503b9fb4e33cfd88101fd045a0affde2a6b64962805f5543753c6e",
+        "evidence_source": "docs/caller_usage.md:L151"
+      }
+    },
+    "unbacked_inferences": [
+      "install"
+    ],
+    "provenance": {
+      "from_upstream": {
+        "install": {
+          "method": "pip",
+          "evidence_source": "repo_file:pyproject.toml"
+        },
+        "command": {
+          "value": "strkit call --loci /path/to/catalog --ref /path/to/ref.fa.gz --processes 10 --seed 342 --vcf sample.vcf path/to/sample.bam",
+          "evidence_source": "docs/caller_usage.md:L151"
+        },
+        "input_kind": {
+          "value": "bam",
+          "evidence_source": "README.md:L111"
+        },
+        "supported_platforms": [
+          {
+            "platform": "ont",
+            "evidence_source": "README.md:L1"
+          },
+          {
+            "platform": "pacbio",
+            "evidence_source": "README.md:L5"
+          },
+          {
+            "platform": "illumina",
+            "evidence_source": "README.md:L402"
+          }
+        ],
+        "assembly": {
+          "declared": "both",
+          "evidence_source": "README.md:L250"
+        },
+        "regions_schema": {
+          "format": "motif",
+          "evidence_source": "README.md:L179"
+        },
+        "output_format": {
+          "glob": "**/*.vcf*",
+          "evidence_source": "docs/caller_usage.md:L151"
+        }
+      },
+      "derived": {
+        "command_rewrites": [],
+        "regions_layout_binding": null,
+        "single_sample_adaptation": null
+      },
+      "harness_choices": {
+        "dataset": {
+          "selected": "ont-bam-hg38",
+          "reason": "STRhub selected 'ont-bam-hg38' as compatible with upstream input 'bam' and platform 'ont'"
+        },
+        "platform": {
+          "selected": "ont",
+          "basis": "harness_choice_from_supported",
+          "supported_platforms": [
+            "ont",
+            "pacbio",
+            "illumina"
+          ]
+        },
+        "assembly": {
+          "selected": "hg38",
+          "basis": "upstream_stated",
+          "note": null
+        },
+        "regions_layout": null,
+        "base_environment": null
+      }
+    },
+    "install_method": "pip",
+    "citable_install": false,
+    "input_type": "ont-bam-hg38",
+    "output_glob": "**/*.vcf*",
+    "profile": "strhub-upstream-procedure/1",
+    "install_ready": false,
+    "example_ready": false,
+    "installation": {
+      "profile": "strhub-upstream-procedure/1",
+      "ready": false,
+      "method": "pip",
+      "reason": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub.",
+      "gap": "commit"
+    },
+    "command_review": {
+      "profile": "strhub-upstream-procedure/1",
+      "cited": "strkit call --loci /path/to/catalog --ref /path/to/ref.fa.gz --processes 10 --seed 342 --vcf sample.vcf path/to/sample.bam",
+      "command": "strkit call --loci /path/to/catalog --ref /path/to/ref.fa.gz --processes 10 --seed 342 --vcf sample.vcf path/to/sample.bam",
+      "substitutions": [],
+      "read_bindings": [],
+      "limitations": [
+        "the command reads the reference genome in a form STRhub does not mount (it mounts an uncompressed FASTA with its .fai index)",
+        "a read-file argument is outside the closed input substitution table"
+      ],
+      "expected": "strkit call --loci /path/to/catalog --ref /path/to/ref.fa.gz --processes 10 --seed 342 --vcf sample.vcf path/to/sample.bam",
+      "executed": "strkit call --loci /path/to/catalog --ref /path/to/ref.fa.gz --processes 10 --seed 342 --vcf sample.vcf path/to/sample.bam",
+      "cited_sha256": "bdaf7b74bf194b81050aa694a858056ff444f75f1a00e927b1c15deb513a9923",
+      "executed_sha256": "bdaf7b74bf194b81050aa694a858056ff444f75f1a00e927b1c15deb513a9923",
+      "citations": [
+        {
+          "repo": "https://github.com/davidlougheed/strkit",
+          "ref": "c6b6ef1a878cac2fed5f41637553d51caa3403d1",
+          "path": "docs/caller_usage.md",
+          "line": 151,
+          "verified": true,
+          "document_sha256": "97e11dee7d503b9fb4e33cfd88101fd045a0affde2a6b64962805f5543753c6e",
+          "command_sha256": "bdaf7b74bf194b81050aa694a858056ff444f75f1a00e927b1c15deb513a9923"
+        }
+      ]
+    },
+    "manifest_sha256": "4d759d005af1fd70a15ca6a417993b7113e0b9591ab483f1a8627322bf83587d",
+    "evidence_sha256": "fa1568f6de93177c0db89dd8059e7ee7fe51004af00e0a716513abb5e6a48f7b",
+    "evidence": {
+      "schema": "strhub-procedure-evidence/1",
+      "manifest": {
+        "caveats": {
+          "items": [
+            "Environment: no proven installation profile; STRhub did not manufacture installation steps.",
+            "Input: the README documents BAM (line 111); this plan selects STRhub's ont-bam-hg38 reference data. Supported platforms documented: ont, pacbio, illumina; STRhub selected ont for this trial.",
+            "Evaluator limitation: the command reads the reference genome in a form STRhub does not mount (it mounts an uncompressed FASTA with its .fai index).",
+            "Evaluator limitation: a read-file argument is outside the closed input substitution table.",
+            "Run command: the one documented in docs/caller_usage.md (line 151), rewritten to STRhub's mounts; the capture wrapper is planned only if the procedure review passes."
+          ],
+          "source": "detect_recipe"
+        },
+        "environment": {
+          "dockerfile": "Dockerfile",
+          "os": [
+            "ubuntu-22.04"
+          ],
+          "source": "generated"
+        },
+        "inputs": {
+          "type": "ont-bam-hg38"
+        },
+        "outputs": [
+          {
+            "format": "vcf",
+            "min_records": 1,
+            "path": "**/*.vcf*"
+          }
+        ],
+        "recipe": {
+          "origin": "proposed"
+        },
+        "report": {
+          "slug": "strkit-ont"
+        },
+        "run": {
+          "cmd": "cd '.' && touch /tmp/.strhub_mark && ( strkit call --loci /path/to/catalog --ref /path/to/ref.fa.gz --processes 10 --seed 342 --vcf sample.vcf path/to/sample.bam ); rc=$?; find . -xdev -type f -newer /tmp/.strhub_mark -size +0 ! -path './.git/*' ! -path './proc/*' ! -path './sys/*' ! -path './dev/*' ! -path './data/*' ! -path '*/__pycache__/*' ! -name '*.pyc' ! -name '*.pyo' 2>/dev/null | head -500 | while IFS= read -r f; do mkdir -p \"/data/out/$(dirname \"$f\")\" && cp \"$f\" \"/data/out/$f\"; done; exit $rc",
+          "timeout_minutes": 20
+        },
+        "source": {
+          "ref": "c6b6ef1a878cac2fed5f41637553d51caa3403d1",
+          "repo": "https://github.com/davidlougheed/strkit"
+        },
+        "submission": {
+          "by": "third_party"
+        },
+        "tool": {
+          "contact": "https://github.com/davidlougheed/strkit/issues",
+          "name": "strkit",
+          "version": "v0.25.0"
+        }
+      },
+      "proposal": {
+        "build": {
+          "also_published": {
+            "file": null,
+            "image": "ghcr.io/davidlougheed/strkit:latest",
+            "method": "docker_image",
+            "readme_line": 94
+          },
+          "asset": null,
+          "candidates": [
+            {
+              "file": "pyproject.toml",
+              "method": "pip"
+            },
+            {
+              "file": null,
+              "image": "ghcr.io/davidlougheed/strkit:latest",
+              "method": "docker_image",
+              "readme_line": 94
+            }
+          ],
+          "digest": null,
+          "dir": null,
+          "evidence_source": "repo_file:pyproject.toml",
+          "file": "pyproject.toml",
+          "image": null,
+          "method": "pip",
+          "package": null,
+          "readme_install_lines": [
+            "python -m pip install strkit",
+            "python -m pip install strkit",
+            "docker pull ghcr.io/davidlougheed/strkit:latest",
+            "docker run -it ghcr.io/davidlougheed/strkit --help",
+            "docker run -v inputs:/inputs:ro -v out:/out -it ghcr.io/davidlougheed/strkit call /inputs/file.bam --loci /inputs/loci.bed --ref /inputs/ref.fa --incorporate-snvs /inputs/dbsnp.vcf.gz --vcf /out/calls.vcf"
+          ],
+          "readme_line": null,
+          "spec_list": false,
+          "ssh_urls_in": [],
+          "tag": null,
+          "then": [],
+          "url": null
+        },
+        "commands": [
+          {
+            "cmd": "strkit call --loci /path/to/catalog --ref /path/to/ref.fa.gz --processes 10 --seed 342 --vcf sample.vcf path/to/sample.bam",
+            "entry_point": true,
+            "evidence_source": "docs/caller_usage.md:L151",
+            "file": "docs/caller_usage.md",
+            "has_input_flag": true,
+            "has_output_flag": true,
+            "help_only": false,
+            "invokes": "strkit",
+            "line": 151,
+            "main_verb": true,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 2,
+            "subcommand": "call",
+            "synopsis": false
+          },
+          {
+            "cmd": "strkit call path/to/read/file.bam --realign --ref path/to/reference.fa.gz --loci path/to/loci.bed --annotation-file path/to/reference-annotations.gff.gz --incorporate-snvs path/to/dbsnp/00-common_all.vcf.gz --vcf my-calls.vcf --seed 183 --processes 10 # Starting from a .fa:",
+            "entry_point": true,
+            "evidence_source": "README.md:L175",
+            "file": "README.md",
+            "has_input_flag": true,
+            "has_output_flag": true,
+            "help_only": false,
+            "invokes": "strkit",
+            "line": 175,
+            "main_verb": true,
+            "named_in_tree": true,
+            "needs_external_aux": true,
+            "origin": "readme",
+            "piped": false,
+            "rst": false,
+            "source_rank": 0,
+            "subcommand": "call",
+            "synopsis": false
+          },
+          {
+            "cmd": "strkit --help",
+            "entry_point": true,
+            "evidence_source": "README.md:L83",
+            "file": "README.md",
+            "has_input_flag": false,
+            "has_output_flag": false,
+            "help_only": true,
+            "invokes": "strkit",
+            "line": 83,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "readme",
+            "piped": false,
+            "rst": false,
+            "source_rank": 0,
+            "subcommand": null,
+            "synopsis": false
+          },
+          {
+            "cmd": "strkit mi --caller strkit-vcf --json mi-report.json --mismatch-out-mi seq child-calls.vcf.gz mother-calls.vcf.gz father-calls.vcf.gz",
+            "entry_point": true,
+            "evidence_source": "README.md:L422",
+            "file": "README.md",
+            "has_input_flag": false,
+            "has_output_flag": true,
+            "help_only": true,
+            "invokes": "strkit",
+            "line": 422,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "readme",
+            "piped": false,
+            "rst": false,
+            "source_rank": 0,
+            "subcommand": "mi",
+            "synopsis": false
+          },
+          {
+            "cmd": "strkit convert --in-format trf --out-format trf in_file.trf.dat > out_file.trf.bed",
+            "entry_point": true,
+            "evidence_source": "README.md:L481",
+            "file": "README.md",
+            "has_input_flag": false,
+            "has_output_flag": true,
+            "help_only": true,
+            "invokes": "strkit",
+            "line": 481,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "readme",
+            "piped": false,
+            "rst": false,
+            "source_rank": 0,
+            "subcommand": "convert",
+            "synopsis": false
+          },
+          {
+            "cmd": "strkit convert --in-format trf --out-format bed4 in_file.trf.dat > out_file.bed",
+            "entry_point": true,
+            "evidence_source": "README.md:L489",
+            "file": "README.md",
+            "has_input_flag": false,
+            "has_output_flag": true,
+            "help_only": true,
+            "invokes": "strkit",
+            "line": 489,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "readme",
+            "piped": false,
+            "rst": false,
+            "source_rank": 0,
+            "subcommand": "convert",
+            "synopsis": false
+          },
+          {
+            "cmd": "strkit convert --in-format trf --out-format trgt in_file.trf.bed > out_file.bed",
+            "entry_point": true,
+            "evidence_source": "README.md:L497",
+            "file": "README.md",
+            "has_input_flag": false,
+            "has_output_flag": true,
+            "help_only": true,
+            "invokes": "strkit",
+            "line": 497,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "readme",
+            "piped": false,
+            "rst": false,
+            "source_rank": 0,
+            "subcommand": "convert",
+            "synopsis": false
+          },
+          {
+            "cmd": "strkit convert --in-format trgt --out-format strkit in_file.trgt.bed > out_file.strkit.bed",
+            "entry_point": true,
+            "evidence_source": "README.md:L505",
+            "file": "README.md",
+            "has_input_flag": false,
+            "has_output_flag": true,
+            "help_only": true,
+            "invokes": "strkit",
+            "line": 505,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "readme",
+            "piped": false,
+            "rst": false,
+            "source_rank": 0,
+            "subcommand": "convert",
+            "synopsis": false
+          },
+          {
+            "cmd": "strkit convert --in-format trf --out-format bed4 --sort trf.dat > repeats.bed",
+            "entry_point": true,
+            "evidence_source": "docs/convert_trf_to_bed.md:L15",
+            "file": "docs/convert_trf_to_bed.md",
+            "has_input_flag": false,
+            "has_output_flag": true,
+            "help_only": true,
+            "invokes": "strkit",
+            "line": 15,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 6,
+            "subcommand": "convert",
+            "synopsis": false
+          },
+          {
+            "cmd": "strkit convert --in-format trf --out-format trf --sort trf.dat > trf.bed",
+            "entry_point": true,
+            "evidence_source": "docs/convert_trf_to_bed.md:L21",
+            "file": "docs/convert_trf_to_bed.md",
+            "has_input_flag": false,
+            "has_output_flag": true,
+            "help_only": true,
+            "invokes": "strkit",
+            "line": 21,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 6,
+            "subcommand": "convert",
+            "synopsis": false
+          }
+        ],
+        "dockerfile": null,
+        "docs_read": [
+          {
+            "origin": "repo",
+            "path": "docs/caller_catalog.md"
+          },
+          {
+            "origin": "repo",
+            "path": "docs/caller_usage.md"
+          },
+          {
+            "origin": "repo",
+            "path": "docs/output_formats.md"
+          },
+          {
+            "origin": "repo",
+            "path": "docs/remote_viz.md"
+          },
+          {
+            "origin": "repo",
+            "path": "docs/trio_analyses.md"
+          },
+          {
+            "origin": "repo",
+            "path": "docs/convert_trf_to_bed.md"
+          },
+          {
+            "origin": "repo",
+            "path": "docs/ploidy_configuration.md"
+          }
+        ],
+        "docs_text": "# Caller catalog format & choosing a catalog\n\n## Table of Contents\n\n* [Caller catalog format](#caller-catalog-format)\n  * [Specifying a custom locus ID](#specifying-a-custom-locus-id)\n* [Choosing an existing catalog](#choosing-an-existing-catalog)\n  * [Whole genome catalogs](#whole-genome-catalogs)\n  * [Disease-relevant loci](#disease-relevant-loci)\n\n## Caller catalog format\n\nFor the `--loci` argument, `strkit call` takes a list of loci in a modified BED / TSV format,\nsimilar to methods like Straglr/Tandem-genotypes/GangSTR.\n\nThe file must be structured with a row per locus, where each row looks like one of the following:\n\n```\nchr4    3074876    3074966    [...]    CAG\nchr4    39348424   39348483   [...]    MMRRG\nchrX    147912050  147912110  [...]    ID=FMR1;MOTIF=CGG\n```\n\nThe important requirements here are:\n\n  * The fields are tab-separated\n  * The rows are sorted by contig, and then by starting position\n  * Locus coordinates are 0-based and half-open (start is inclusive, end is exclusive)\n  * The locus motif (either plain, or as part of a [more complex locus description](#specifying-a-custom-locus-id)) \n    must come **last** in the row, but *any number of fields* can separate the end position and the motif.\n\nNote that as with the second locus in this example \n([the CANVAS-causing expansion in RFC1](https://strchive.org/loci/canvas_rfc1/)), motifs can be specified with\n [IUPAC code](https://www.bioinformatics.org/sms/iupac.html), allowing multiple motif matching.\n\nAs a result, STRkit can take myrid different TSV-type catalog formats as input, including\nthose produced from the TRF UCSC browser track, or for GangSTR, or for Straglr.\n\nHere are a few notes on catalogs:\n\n  * Coordinates are used to locate the STR locus in the reference genome, but may be slightly \n    expanded to better encompass the entire locus.\n  * Be wary of using Tandem Repeats Finder output directly as a catalog, as it can output multiple\n    rows for the same locus, or define motifs in a \"compound\" fashion, e.g., `ATATAT` instead of `AT`.\n  * Some disease expansions can contain multiple different motifs, \n    which may be not present in the reference genome at all (for example: \n    [CANVAS](https://pubmed.ncbi.nlm.nih.gov/31230722/), [BAFME2](https://www.nature.com/articles/s41467-019-12671-y)).\n    As such, we provide a mechanism to specify motifs using any \n    [IUPAC code](https://www.bioinformatics.org/sms/iupac.html). \n    Thus, the CANVAS and BAFME2 motifs can be represented as `AARRG` and `AAAWK`, respectively.\n    We also add in a non-IUPAC code, `X`, which behaves like `N` in that it represents any base, \n    but instead of giving a reward of `+2` it neither penalizes nor rewards alignment, \n    and penalizes a gap. We use this internally to represent low-confidence base calls.\n  * Related to the above, this can be important for diseases such as SCA37, where the motif composition \n    (rather than the actual copy number) is associated with disease \n    ([Seixas *et al.* 2017](https://doi.org/10.1016%2Fj.ajhg.2017.06.007)). Here, STRkit's motif-sized k-mer counting\n    function can be used during calling with the `--count-kmers` flag. See the \n    [advanced usage](https://github.com/davidlougheed/strkit/blob/master/docs/caller_usage.md#all-optional-flags) page \n    for more.\n\n\n### Specifying a custom locus ID\n\nThe last column of a STRkit-compatible locus catalog can be either just a motif, or a set of key-value pairs. The \nfollowing are all valid values for the last column of the catalog BED file:\n\n* `CAG` results in `ID=locus#;MOTIF=CAG` where `#` is the line index of the locus (1-indexed).\n* `MOTIF=CAG` results in the same as above.\n* `ID=HTT;MOTIF=CAG` specifies a custom ID alongside the `CAG` motif.\n\nThe locus ID is included in the JSON and VCF outputs, as well as logging output.\n\n\n## Choosing an existing catalog\n\nOther researchers have done extensive work in identifying and cataloguing loci for genotyping. Some of these catalogs \nare for the entire human genome, whereas others are for only disease-relevant loci.\n\n### Whole genome catalogs\n\n  * The Tandem Repeats Finder track for the UCSC browser, available as a \n    [downloadable BED file](https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/latest/hg38.trf.bed.gz),\n    with the caveat that this file includes **overlapping entries**, and TRs may not always be represented in \n    their most 'essential' form (e.g., using the motif `TATATATA` instead of just `TA`). Thus, some work may be\n    required to create a desirable locus catalog.\n  * The researchers behind the [GangSTR](https://github.com/gymreklab/GangSTR) short-read STR genotyping method\n    have prepared [several extensive STR catalogs](https://github.com/gymreklab/GangSTR#gangstr-reference-files) \n    for different human reference genomes, containing motifs up to 20bp in length. However, **these files use\n    1-based closed-interval coordinates**, and should be adjusted (subtracting 1 from all start coordinates) to \n    transform them into the 0-based half-open interval coordinates when using them with STRkit.\n    **IMPORTANT:** Also note that some of these catalogs have an extra column after the motif (e.g., `hg38_ver17`). \n    STRkit requires that the motif is the last column in the BED catalog; use `hg38_ver13` or trim the last column from\n    their file in order to get correct genotypes. \n\n### Disease-relevant loci\n\n  * **[STRchive](https://strchive.org/)** ([Hiatt *et al.* 2025](https://doi.org/10.1186/s13073-025-01454-4)) provides\n    a continually-updated list of disease-causing loci for multiple reference genomes. You can download one of the \n    catalogs in the **STRkit** format from their \n    [GitHub repository](https://github.com/dashnowlab/STRchive/tree/main/data/catalogs). Thank you to the STRchive team\n    for the STRkit-formatted disease-relevant locus catalg!\n\n# Advanced caller usage and configuration\n\n\n## All optional flags\n\n* `--annotation-file [path]` or `--gff [path]` (v0.25.0+): A path to a sorted, Tabix-indexed GFF3 file with genomic \n  annotations. If set, loci in the output will be annotated with overlapping feature(s), if any.\n* `--sample-id example_sample`: Set a sample ID, or override the alignment file sample ID. This will be included in JSON \n  output, but not TSV output.\n* `--min-reads ##`: Minimum total number of supporting reads needed to make a call. This must be greater than or equal\n  to `--min-allele-reads`.  **Default:** 4\n* `--min-allele-reads ##`: Minimum number of supporting reads needed to call a specific allele size. This must be less \n  than or equal to `--min-reads`. **Default:** 2\n* `--max-reads ##`: Maximum number of supporting reads to use for calling a locus. \n  **Default:** 10000 if in targeted mode, 250 otherwise\n* `--min-avg-phred ##`: Minimum average PHRED score for relevant bases (flanking region + tandem repeat).\n  Read segments with average PHRED scores below this (common with a threshold of ~13 and ONT Ultra Long reads, \n  for example) will be skipped. **Default:** 13\n* `--min-read-align-score #.#`: Minimum normalized read alignment score (fractional; `0.0` to `1.0`) needed to include a \n  read in a call. A good value for very pure tandem repeats is 0.9. A good value for much more lenient genotyping is \n  anywhere from 0.0-0.4. **Default:** 0.1\n* `--max-rcn-iters ##`: Maximum number of read copy-number counting iterations to perform. Loci which require a lot of\n  iterations are probably impure tandem repeats, for which the resulting copy number will not be very accurate anyway.\n  **Default:** 50\n* `--max-terrible-reads ##` or `--mtr ##` (v0.25.0+): Maximum number of terribly-aligning reads allowed before a locus \n  is skipped. A low number is good for performance, but may result in undesirable behaviour for specific loci of \n  interest (i.e, unwanted missing calls). **Default:** 2 * `--max-reads` if in targeted mode, 3 otherwise\n* `--flank-size ##`: Size of the flanking region to use on either side of a region to properly anchor reads. \n  **Default:** 70\n* `--allow-only-one-full-flank` or `--aof`: Require only one full flanking region (of size `--flank-size`) for a read\n  rather than both. At minimum, 5' flanking regions will still need to be of size `--vcf-anchor-size`. **Default:** off\n* `--realign` or `-a`: Whether to perform local re-alignment to attempt recovery of soft-clipped reads. Some aligners\n  may soft-clip around large insertions, e.g. with an expansion (I've noticed this with *pbmm2*/*minimap2*). \n  Currently recommended **for HiFi or ONT R10 only**, since this step aggressively filters out realignments with \n  many mismatches or small indels. Enabling this slows down calling, so it may not be suitable for a very large catalog \n  of tandem repeats.\n* `--hq`: **[DEPRECATED]** Whether to treat provided reads as \"high quality\", i.e., fairly close to the actual true \n  sequence. Used when detecting expansions, to skip a smoothing filter that may ignore disparate, rare expansion-like \n  read counts. Use for CCS reads or similar data (e.g., R10 nanopore data) ONLY! **Default:** off\n* `--use-hp`: Whether to incorporate `HP` tags from a haplotagged alignment file. This should speed up runtime and \n  will potentially improve calling results. **This flag is experimental, and has not been tested extensively.**\n* `--use-methyl` or `-m` (v0.25.0+; **EXPERIMENTAL**): Whether to incorporate methylation data from `MM/ML` tags in the \n  alignment file into the output (methylation proportion per-read and per-allele.) **Default:** off\n* `--skip-supplementary` or `--skip-supp`: Skip supplementary alignments. **Default:** off\n* `--skip-secondary` or `--skip-sec`: Skip secondary alignments. **Default:** off\n* `--incorporate-snvs [path]` or `--snv [path]`: A path to a VCF with SNVs to incorporate into the calling process and \n  final output. This file is just used as an SNV loci catalog; STRkit itself will perform the SNV calling. Empirically \n  improves calling quality a small amount, speeds up runtime, and gives nearby SNV calls for downstream analysis.\n  You can find dbSNP VCFs at\n  [`https://ftp.ncbi.nih.gov/snp/organisms/human_9606/VCF/`](https://ftp.ncbi.nih.gov/snp/organisms/human_9606/VCF/).\n  The file for GRCh38 is called `00-common_all.vcf.gz` as of time of writing.\n  **Important note:** This functionality is best for whole-genome STR surveying. If hunting for rare / low-coverage\n  expansions, or using targeted sequencing data, it may be best to **NOT USE** an SNV catalog to avoid discording reads\n  with short flanking regions.\n* `--snv-min-base-qual [int]` or `--min-sbq [int]`: Minimum PHRED quality score for bases of SNVs to use for phasing. \n  **Default:** 20\n* `--significant-clip-threshold ###` (v0.25.0+): Minimum number of bases to consider the end of a read 'significantly' \n  soft-clipped, meaning we should do some read trimming in the SNV-finding process to avoid SNV false positives.\n* `--targeted` or `-t`: Turn on targeted genotyping mode, which re-weights longer reads differently. Use this option if\n  the alignment file contains targeted reads that do not reflect normal mapping patterns, e.g. from PacBio No-Amp \n  Targeted Sequencing. **Default:** off\n* `--respect-ref` or `-e`: Turn off reference TR region 'coordinate extension' from what is specified in the catalog.\n  TR boundaries can be blurry, so by default we give STRkit an opportunity to extend the provided region to improve\n  mapped indel capturing and to be consistent with the approach we use to count repeat copies in non-reference samples.\n  Turning this off should give results closer to other STR callers and produce start/end coordinates closer to the BED \n  catalog file, at the cost of potentially missing variation.\n* `--count-kmers [peak|read|both|none]` or `-k`: Turn on motif-sized k-mer counting at the allele level, with `-k peak`,\n  or at the read level, with `-k read`, or both with `-k both`. If the flag is provided with no value, it will default \n  to `peak.` Note that k-mer counts will only be reported if a `--json` path is specified. This feature can be used to\n  detect motif composition differences between alleles or samples. **Default:** `none`\n* `--consensus` or `-c`: Turn on consensus calculation for alleles. This adds runtime, but gives a better idea of STR \n  structure and is useful for comparing alleles beyond copy number. If `--vcf` is set, this option is forced on. \n  **Default:** off\n* `--poa [spoa|rust-bio]` (v0.25.0+): Specify which POA implementation you wish to use; results vary subtly depending on\n  implementation. The `spoa` option is faster, and is the default as of v0.25.0. **Default:** `spoa` \n* `--large-consensus-length ####`: If the smallest tandem repeat sequence is longer than this, the number of reads used\n  for determining the consensus will be downsampled to `--max-n-large-consensus-reads`. **Default:** 2000\n* `--max-n-large-consensus-reads ##`: When the smallest tandem repeat sequence is longer than\n  `--large-consensus-length`, the number of reads will be downsampled to this value. **Default:** 20\n* `--max-mdn-poa-length ####`: Maximum median STR sequence length before we use a best-representative-read method for \n  the 'consensus' STR sequence rather than partial order alignment (POA) due to computational performance.\n  **Default:** 5000\n* `--vcf-anchor-size #`: Number of bases upstream (5') of the tandem repeat to include in the VCF output. This can include\n  small indels, and having a size above `1` may be beneficial or detrimental to the use case at hand, but is nice for \n  benchmarking and in case of slight misalignment. This is clamped to being in the range of `[1, flank_size]`.\n  **Default:** 5\n* `--num-bootstrap ###` or `-b`: Now many bootstrap re-samplings to perform. **Default:** 100\n* `--force-gm-filter` (v0.25.0+): Whether to force-enable a smoothing filter that removes peaks with low read support \n  called with a Gaussian mixture model (GMM), even for expansion-like reads (i.e., large alleles with copy numbers far \n  above the small allele; see `--gm-filter-expansion-ratio`). This might be useful for messy, old ONT R9 long read data,\n  but *will* result in reduced expansion sensitivity!\n* `--gm-filter-factor #`: Tuning parameter for the copy number Gaussian mixture model (GMM) used for allele calling in\n  some cases. GMM peaks are filtered out when they have a weight lower than `(gm_filter_factor * n_components)` for a\n  given GMM of `n_components`, if they're not deemed to be \"expansion-like\" (see `--gm-filter-expansion-ratio #`) unless \n  the filter is forced on via `--force-gm-filter`. \n  *This filter does not apply when using SNV-based or haplotag peak calling.* **Default:** 3\n* `--gm-filter-expansion-ratio #` (v0.25.0+): Tuning parameter for disabling the above GMM peak filter. When running the\n  GMM for allele calling, peaks with low read support will be filtered out by default (see `--gm-filter-factor`).\n  However, if the largest peak is more than `--gm-filter-expansion-ratio` times the size of the smaller peak, it will be\n  kept (even with low read support.) *This filter does not apply when using SNV-based or haplotag peak calling.* \n  **Default:** 5.0\n* `--sex-chr ??` or `-x`: Sex chromosome configuration. **Without this, loci in sex chromosomes will not be genotyped.**\n  Can be any configuration of Xs and Ys; only count matters. **Default:** *none*\n* `--json [path]` or `-j`: Path to output JSON call data to. JSON call data is more detailed than the `stdout` TSV \n  output. If the value passed is `stdout`, the JSON data will be written to `stdout` instead of a file. \n  **Default:** *none*\n* `--indent-json` or `-i`: If passed alongside `--json [x]`, the JSON output will be indented to be more human-readable\n  but less compact. **Default:** off\n* `--json-read-seq` (v0.25.0+): If passed alongside `--json [x]`, the JSON output will include read-level TR sequence \n  data and 5' anchor sequences.\n* `--vcf [path]`: Path to output VCF-formatted call data to. Setting this option forces the `--consensus` option as \n  well in order to output true REF/ALT values, which slows down runtime somewhat. If the value passed is `stdout`, the \n  VCF data will be written to `stdout` instead of a file. If a `.vcf.gz` path is specified, a bgzipped file will be \n  written automatically. If the value passed is `none`, no VCF data will be written. \n  **Default:** `stdout` (v0.25.0+); `none` (pre-v0.25.0)\n* `--no-tsv`: **[DEPRECATED]** Suppresses TSV output to `stdout`. Without `--json` or `--vcf`, no output will be \n  generated, which isn't very helpful. **Default:** does nothing (v0.25.0+); TSV output on (pre-v0.25.0)\n* `--seed ####`: Seed the random number generator used for all random sampling, Gaussian mixture modeling, etc. \n  Useful for replicability.\n* `--log-level [level]`: Log level. Value must be of `error`, `warning`, `info`, and `debug`. Be careful with the \n  `debug` log level, as it can produce gigabytes of logs for a large run. **Default:** `info`.\n* `--verbose`: Debug log verbosity flag. If `--log-level` is set to `debug`, this will yield many more read-level debug\n  messages (i.e., for each aligned segment from the BAM/CRAM). **Default:** off\n* `--log-progress-interval ##`: How often to log caller progress (INFO logger messages), in seconds. **Default:** 120.\n* `--profile`: Profile function calls for development purposes. **Default:** off\n\n\n## Usage on HPC machines\n\nWe have tested STRkit on three different clusters associated with the \nDigital Research Alliance of Canada (formerly Compute Canada). \n\nUsage is pretty straightforward; for our use cases we set up a Python virtual environment\nwith the `strkit` package installed, and ran a SLURM batch job which looks something like:\n\n```bash\n#!/bin/bash\n#SBATCH --mem=16G\n#SBATCH --ntasks=1\n#SBATCH --cpus-per-task=10\n#SBATCH --time=1-00\n#SBATCH --account=rrg-xxxxx\n\n\nmodule load StdEnv/2023\nmodule load python/3.11 scipy-stack/2025a parasail/2.6.2\n\ncd /home/xxxxx || exit\nsource env/bin/activate\n\nstrkit call \\\n  --loci /path/to/catalog \\\n  --ref /path/to/ref.fa.gz \\\n  --processes 10 \\\n  --seed 342 \\\n  --vcf sample.vcf \\\n  path/to/sample.bam\n\ndeactivate\n\n```\n\n# STRkit output formats\n\nSTRkit can output two different file formats, depending on the set of arguments used:\n\n* [JSON](#json-report): a JSON report, containing the maximum amount of information possible. These files can be quite \n  large, especially if formatted to be human-readable and indented with the `--indent-json` flag.\n* [VCF](#vcf): a [VCF 4.2](https://samtools.github.io/hts-specs/VCFv4.2.pdf) file, with STR and SNV genotypes, including\n  consensus STR sequences. This is the default output format.\n\n## Notes\n\n* In general, the JSON format contains the most information about how STRkit was run, and each locus' called genotype.\n* Adjusted coordinates (`start_adj`/`end_adj` in JSON; standard `POS` field in VCF) are recaculations of locus \n  boundaries done by STRkit. If you want to maintain the original TR boundaries from the locus definition file, you can\n  pass the `--respect-ref` flag to `strkit call`.\n\n\n## JSON report\n\nExample report format:\n\n```javascript\n{\n  \"sample_id\": \"HG002\",\n  \"caller\": {\n    \"name\": \"strkit\",\n    \"version\": \"0.15.0\"\n  },\n  \"parameters\": {\n    \"read_file\": \"HG002.SequelII.ccs.phased.40x.chr4.bam\",\n    \"reference_file\": \"/Users/davidlougheed/git/gt-poc/hg38.analysisSet.fa.gz\",\n    \"loci_file\": \"chr4.f5000.adotto.bed\",\n    \"annotation_file\": \"hg38.knownGene.sorted.gtf.gz\",\n    \"min_reads\": 1,\n    \"min_allele_reads\": 1,\n    \"max_reads\": 250,\n    \"min_avg_phred\": 13,\n    \"rc_method\": \"comp\",\n    \"min_read_align_score\": 0.1,\n    \"max_rcn_iters\": 80,\n    \"max_terrible_reads\": 3,\n    \"num_bootstrap\": 100,\n    \"force_gm_filter\": false,\n    \"gm_filter_factor\": 3,\n    \"gm_filter_expansion_ratio\": 5.0,\n    \"flank_size\": 70,\n    \"sample_id\": \"HG002\",\n    \"allow_only_one_full_flank\": true,\n    \"skip_supplementary\": false,\n    \"skip_secondary\": false,\n    \"sample_id\": null,\n    \"ploidy\": \"diploid_autosomes\",\n    \"realign\": true,\n    \"use_hp\": false,\n    \"use_methyl\": true,\n    \"snv_vcf\": \"00-common_all.vcf.gz\",\n    \"snv_min_base_qual\": 20,\n    \"significant_clip_threshold\": 100,\n    \"targeted\": false,\n    \"respect_ref\": false,\n    \"count_kmers\": \"both\",\n    \"consensus\": true,\n    \"poa\": \"spoa\",\n    \"large_consensus_length\": 2000,\n    \"max_n_large_consensus_reads\": 20,\n    \"max_mdn_poa_length\": 5000,\n    \"vcf_anchor_size\": 5,\n    \"json_read_seq\": true,\n    \"log_level\": 20,\n    \"verbose\": false,\n    \"profile\": false,\n    \"seed\": 1234,\n    \"processes\": 1,\n    \"log_progress_interval\": 15\n  },\n  \"contigs\": [\n    \"chr4\"\n  ],\n  \"catalog\": {\n    \"num_loci\": 5000,\n    \"loci_hash\": \"0b2106349f9e2c62c367c5dbeab231f77aa6ff6030a6b65fb4de36a52dd63d3a\"\n  },\n  \"results\": [\n    {\n      \"locus_index\": 1,\n      \"locus_id\": \"locus1\",\n      \"contig\": \"chr4\",\n      \"start\": 96617,\n      \"end\": 96648,\n      \"start_adj\": 96617,\n      \"end_adj\": 96648,\n      \"motif\": \"AC\",\n      \"annotations\": [],\n      \"ref_cn\": 16,\n      \"ref_start_anchor\": \"t\",\n      \"ref_seq\": \"acacacacacacacacacacacacacacaca\",\n      \"am\": 0.01, // if methylation enabled\n      \"amc\": 1.0, // if methylation enabled\n      \"reads\": {\n        \"m64011_190901_095311/50792740/ccs\": {\n          \"s\": \"-\",\n          \"sc\": 2.0,\n          \"cn\": 15,\n          \"sl\": 31, \n          \"m\": 0.01, // if methylation enabled\n          \"mc\": 1, // if methylation enabled\n          \"w\": 1.0217145751733625,\n          \"snvu\": [\"G\"],\n          \"p\": 0\n        },\n        // ...\n        \"m64012_190921_234837/4523939/ccs\": {\n          \"s\": \"+\",\n          \"sc\": 2.0,\n          \"cn\": 15,\n          \"sl\": 31,\n          \"m\": 0.01, // if methylation enabled\n          \"mc\": 1, // if methylation enabled\n          \"w\": 1.0217145751733625,\n          \"snvu\": [\"A\"],\n          \"p\": 1\n        },\n        // ...\n      },\n      \"snvs\": [\n        {\n          \"id\": \"rs73213545\",\n          \"ref\": \"G\",\n          \"pos\": 94593,\n          \"call\": [\"G\", \"A\"],\n          \"rcs\": [20, 23]\n        }\n      ],\n      \"assign_method\": \"snv+dist\",\n      \"call\": [15, 15],\n      \"call_95_cis\": [\n        [15, 15],\n        [15, 15]\n      ],\n      \"call_99_cis\": [\n        [15, 15],\n        [15, 15]\n      ],\n      \"mean_model_align_score\": 2.0,\n      \"peaks\": {\n        \"means\": [15, 15],\n        \"weights\": [0.5, 0.5],\n        \"stdevs\": [0.31622776601683794, 0.3585309239667531],\n        \"modal_n\": 2,\n        \"n_reads\": [20, 23],\n        \"seqs\": [\n          [\"ACACACACACACACACACACACACACACA\", \"poa\"],\n          [\"ACACACACACACACACACACACACACACA\", \"poa\"]\n        ]\n      },\n      \"read_peaks_called\": true,\n      \"time\": 0.1274\n    },\n    // ...\n  ],\n  \"avg_read_depth\": 37.0,\n  \"avg_read_depths_by_contig\": {\n    \"chr4\": 37.0\n  },\n  \"runtime\": 8.628772\n}\n```\n\n\n## VCF\n\nVCF meta fields (non-exhaustive):\n\n* `source`: always set to `strkit`\n* `phasing`: present and set to `partial` if using SNV/HP phasing\n* `reference`: absolute file URI to FASTA reference (`file://<...>`)\n* `strkitVersion`: STRkit version used to generate the file\n* `strkitCommand`: STRkit subcommand used to generate the VCF (`call`)\n* `strkitCatalogNumLoci`: Number of total loci in the catalog used for genotyping\n* `strkitCatalogHash`: SHA256 hash of the loci loaded from the catalog\n\nVCF records will usually have IDs specified. For STR loci, this will be either `locus<idx>` (e.g., `locus1`) if no ID is \nspecified in the catalog, or a custom value, usually useful if it's a locus of particular significance \n(see [\"Specifying a custom locus ID\"](./caller_catalog.md#specifying-a-custom-locus-id)).\n\nSNVs will copy the ID field from the SNV catalog file.\n\nVCF format fields (i.e., for each variant sample entry):\n\n* `AD`: Read depth for each allele (non-standard vs. common VCF usage, where this is read depth for reference vs. each\n  possible alt.)\n* `AM`: Average methylation level (5-methyl CpG sites) for each allele (if `--use-methyl` is passed).\n* `AMC`: Average number of 5-methyl CpG sites for each allele (if `--use-methyl` is passed).\n* `CONS`: Consensus methods used for each alt (`single`/`poa`/`best_rep`)\n* `DP`: Total read depth\n* `DPS`: Total read depth; only supporting reads (for calls with incorporated SNVs mainly; STR calls only)\n* `GT`: Genotype\n* `MC`: Motif copy number for each allele (STR calls only)\n* `MCCI`: Motif copy number 95% confidence intervals for each allele (STR calls only)\n* `MCRL`: Read-level copy number histogram for each allele. Allele entries are comma-delimited, and copy numbers within \n  an allele's read-set are pipe (`|`)-delimited and formatted as `[copy number]x[reads]`. For example, for two alleles \n  with 8 and 9 copy-number respectively, we may get `7x1|8x10|9x1,8x2|9x12` \u2014 the first allele has one 7-copy read, ten \n  8-copy reads, and one 9-copy read. The second allele has two 8-copy reads and twelve 9-copy reads.\n* `MMAS`: Mean model (candidate TR sequence) alignment score across reads, for this sample. This score, relative to the\n  other locis' scores, represents how well a pure tandem repeat stretch with the catalogued motif and the determined \n  copy number (e.g., `CAGCAGCAG`) aligns to the true sequence.\n* `PS`: Phase set\n* `PM`: Peak-calling method (`dist`/`single`/`snv+dist`/`snv`/`hp`; STR calls only)\n* `SLR`: Read-level TR sequence length histogram for each allele, in the same format as `MCRL`.\n\nVCF info. fields (i.e., for each STR variant record; not present for SNV records):\n\n* `VT`: Variant record type (`str` or `snv`)\n* `MOTIF`: Motif sequence\n* `REFMC`: Motif copy number in the reference genome\n* `BED_START`: Original start position of the locus as defined in the BED catalog (0-based inclusive). \n  *Remember that VCF positions are 1-based for the `POS` column, whereas this is 0-based!*\n* `BED_END`: Original end position of the locus as defined in the BED catalog (0-based exclusive, i.e., 1-based).\n* `ANCH`: 5' anchor size, i.e., size of the prefix of the reference sequence replaced by any of the alts\n* `ANNOT`: Overlapping genome feature annotations from a GFF3 or GTF file, if provided.\n  **Note:** If the feature has an `ID` attribute available, this will be used. Otherwise, an ID will be generated based\n  on a combination of the feature type and the available attributes:\n   * If the feature type is `transcript` and `transcript_id` is set as an attribute, the ID will be constructed as\n     `transcript:<transcript_id>` where `<transcript_id>` is the value of the `transcript_id` attribute. This same \n     pattern holds for `gene` and `exonh` features as well. If `gene_id`/`transcript_id`/`exon_id` cannot be found, the \n     record index is used instead (`gene:0` would be the gene record on line 0, the first record the file.)\n   * If the feature type is something else, the `exon_id` attribute will be used to construct an ID of the same form if \n     possible, with the same fallback as above.\n\n# Using `strkit visualize` remotely\n\nThe `strkit visualize` command starts a local web server in order to make genotyping results data browseable.\nHowever, if you are working in a high-performance computing (HPC) environment such as a Digital Research Alliance of \nCanada (DRAC; f.k.a. Compute Canada) cluster, you will need to do some additional work to access this web interface \nwithout having to copy data to your local machine.\n\n> [!NOTE]\n> This guide assumes that the `visualize` web server will run on port 5011 both locally and on the server. This is the\n> default, but you can specify a custom port using the `--port` option when running `strkit visualize`.\n\n> [!IMPORTANT]\n> While the server is running, others on the machine can access it, as it binds a port on the entire server. Do not do \n> this in an insecure or untrusted environment!\n\nAs an example, let's assume we have some genotyping results data on the \n[Rorqual](https://docs.alliancecan.ca/wiki/Rorqual/en) cluster. We're going to forward the 5011 port to our local \nmachine from whichever login node we sign in to, using the `ssh -L` option (with the syntax \n`<local port>:<remote host>:<remote port>`):\n\n```bash\nssh -L 5011:localhost:5011 <user>@rorqual.alliancecan.ca \ncd path/to/our/results  # navigate to the directory with our genotyping results JSON file and other required files\nsource env/bin/activate  # activate our STRkit Python virtual environment\nstrkit visualize ./path/to/bam --ref hg38 --json my_calls.json\n```\n\nThen, on your local machine, go to http://localhost:5011. While the SSH connection is active and `strkit visualize` is \nrunning, you should be able to interact with the interface.\n\n# Trio analyses with STRkit\n\nTrio datasets include genomic sequence data for a child, their mother, and their father (the \"trio\"). These data\ncan be used to discover de novo mutation (and incidental genotyping errors).\n\nSTRkit includes a Mendelian inheritance (MI) analysis tool, under the sub-command `strkit mi`.\nAfter genotyping the trio with `strkit call`, this command can be used to discover loci which:\n\n1. Do not respect exact MI\n2. Do not respect MI allowing for a \u00b11 repeat unit difference \n   (Note: most true mutation occurs in 1-repeat-unit changes too! \n   See [Ellegren, 2004](https://www.nature.com/articles/nrg1348).)\n3. Do not respect MI under the 95% locus confidence intervals\n4. Look like de novo mutation at a read count distribution level, via a Mann-Whitney *U* test (with tie correction).\n   The alternative hypothesis can be specified as either two-sided or looking for expansion in the offspring. \n   *The requirements for this test are invalidated in cases of mosaicism.*\n5. Look like de novo mutation at a read count distribution level, via a chi-squared independence test,\n   where the contingency table looks like the following:\n\n| Read distribution \\ Copy number | 11   | 12   | 13   |\n|---------------------------------|------|------|------|\n| Parent reads (best peak fit)    | 20   | 10   | 0    |\n| Child reads   ",
+        "evidence": [
+          {
+            "claim": "install_method",
+            "kind": "tree",
+            "path": "pyproject.toml",
+            "text": "pip",
+            "url": "https://github.com/davidlougheed/strkit/blob/c6b6ef1a878cac2fed5f41637553d51caa3403d1/pyproject.toml"
+          },
+          {
+            "claim": "fallback_environment",
+            "kind": "readme",
+            "line": 94,
+            "path": "README.md",
+            "text": "docker pull ghcr.io/davidlougheed/strkit:latest",
+            "url": "https://github.com/davidlougheed/strkit/blob/c6b6ef1a878cac2fed5f41637553d51caa3403d1/README.md#L94"
+          },
+          {
+            "claim": "run_command",
+            "kind": "doc",
+            "line": 151,
+            "path": "docs/caller_usage.md",
+            "text": "strkit call \\",
+            "url": "https://github.com/davidlougheed/strkit/blob/c6b6ef1a878cac2fed5f41637553d51caa3403d1/docs/caller_usage.md#L151"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "tests/data/test_loci.bed",
+            "text": "bed",
+            "url": "https://github.com/davidlougheed/strkit/blob/c6b6ef1a878cac2fed5f41637553d51caa3403d1/tests/data/test_loci.bed"
+          },
+          {
+            "claim": "documented_input",
+            "kind": "readme",
+            "line": 111,
+            "path": "README.md",
+            "text": "/inputs/file.bam \\",
+            "url": "https://github.com/davidlougheed/strkit/blob/c6b6ef1a878cac2fed5f41637553d51caa3403d1/README.md#L111"
+          }
+        ],
+        "example": null,
+        "example_data": [
+          {
+            "in_example_dir": true,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "tests/data/test_loci.bed",
+            "size": 69
+          }
+        ],
+        "inferences": {
+          "build": "repo_file:pyproject.toml",
+          "example": null,
+          "input_type": "README.md:L111",
+          "output": "docs/caller_usage.md:L151",
+          "platform": "README.md:L1",
+          "regions": "README.md:L179",
+          "run_command": "docs/caller_usage.md:L151",
+          "single_sample_bams": null
+        },
+        "input_type": {
+          "assembly": {
+            "against_hg38": null,
+            "declared": "both",
+            "evidence_source": "README.md:L250",
+            "hg19_evidence_source": "README.md:L249",
+            "hg19_hits": 2,
+            "hg38_evidence_source": "README.md:L250",
+            "hg38_hits": 11,
+            "incompatible_with_hg38": false
+          },
+          "best": "ont-bam-hg38",
+          "candidates": [
+            "ont-bam-hg38"
+          ],
+          "evidence_source": "README.md:L111",
+          "how": "read",
+          "platform": "ont",
+          "platform_evidence_source": "README.md:L1",
+          "platform_how": "multi_stated",
+          "signals": {
+            "bam": 10,
+            "ce": 0,
+            "fastq": 0,
+            "hg19": 2,
+            "hg38": 11,
+            "illumina": 1,
+            "ont": 24,
+            "snp": 3,
+            "ystr": 0
+          },
+          "statements": {
+            "against": [],
+            "determined": true,
+            "inputs": [
+              {
+                "kind": "bam",
+                "line": 111,
+                "text": "/inputs/file.bam \\"
+              }
+            ],
+            "platform": [
+              {
+                "historical": false,
+                "line": 1,
+                "platform": "ont",
+                "text": "# STRkit - short tandem repeat genotyping with long reads"
+              },
+              {
+                "historical": false,
+                "line": 5,
+                "platform": "pacbio",
+                "text": "STRkit is a short tandem repeat (STR) genotyping and analysis toolkit for long read sequencing data (both HiFi and ONT)."
+              },
+              {
+                "historical": false,
+                "line": 402,
+                "platform": "illumina",
+                "text": "* Mendelian inheritance % (MI) calculations for many common TR genotyping tools for both long/short reads,"
+              }
+            ],
+            "recommendation": null
+          },
+          "statements_file": null,
+          "supported_platforms": [
+            {
+              "evidence_source": "README.md:L1",
+              "historical": false,
+              "line": 1,
+              "platform": "ont",
+              "text": "# STRkit - short tandem repeat genotyping with long reads"
+            },
+            {
+              "evidence_source": "README.md:L5",
+              "historical": false,
+              "line": 5,
+              "platform": "pacbio",
+              "text": "STRkit is a short tandem repeat (STR) genotyping and analysis toolkit for long read sequencing data (both HiFi and ONT)."
+            },
+            {
+              "evidence_source": "README.md:L402",
+              "historical": false,
+              "line": 402,
+              "platform": "illumina",
+              "text": "* Mendelian inheritance % (MI) calculations for many common TR genotyping tools for both long/short reads,"
+            }
+          ],
+          "unsupported": null,
+          "warnings": []
+        },
+        "known_issues": [],
+        "limitations": [
+          "install_profile_unsupported"
+        ],
+        "output": {
+          "evidence_source": "docs/caller_usage.md:L151",
+          "format": "vcf",
+          "signals": {
+            "csv": 0,
+            "json": 5,
+            "tsv": 2,
+            "vcf": 72
+          }
+        },
+        "packaging": {
+          "executables": [
+            "strkit"
+          ],
+          "packages": [
+            "strkit"
+          ]
+        },
+        "readme": {
+          "gaps": [],
+          "name": "README.md",
+          "sufficient_to_attempt": true
+        },
+        "readme_name": "README.md",
+        "readme_text": "# STRkit - short tandem repeat genotyping with long reads\n\n[![PyPI version](https://badge.fury.io/py/strkit.svg)](https://badge.fury.io/py/strkit)\n\nSTRkit is a short tandem repeat (STR) genotyping and analysis toolkit for long read sequencing data (both HiFi and ONT). \nThe STRkit software package is written in Python and is available in the PyPI package registry or as a Docker container.\n\nSTRkit's main advantages over other callers include:\n* Better performance in some [benchmarking assessments](https://doi.org/10.1101/gr.280766.125) versus other tools;\n* An on-the-fly SNV calling and local phasing step for unphased aligned reads;\n* A license which allows use on any long-read sequencing data, versus TRGT whose \n  [license](https://github.com/PacificBiosciences/trgt/blob/main/LICENSE.md) restricts it to only PacBio data.\n\nSome other useful features include:\n* An interactive [call visualizer](#strkit-visualize-call-visualizer)\n* A locus catalog [converter](#strkit-convert-str-catalog-conversion), which includes a TRF `.dat` to `BED` converter\n* A pre-built Docker image ([`ghcr.io/davidlougheed/strkit`](https://ghcr.io/davidlougheed/strkit))\n\nIf you use STRkit in published work, please cite our paper in *Genome Research*:\n\n> [Read-level genotyping of short tandem repeats using long reads and single-nucleotide variation with STRkit.](https://doi.org/10.1101/gr.280766.125)\n> David R Lougheed, Tomi Pastinen, Guillaume Bourque. *Genome Res*.\n> DOI:&nbsp;[10.1101/gr.280766.125](https://doi.org/10.1101/gr.280766.125)\n\nThe code for the software itself is also available and citeable in Zenodo: https://doi.org/10.5281/zenodo.12689906\n\n<img src=\"./docs/images/strkit_logo_small.png\" alt=\"\" width=\"500\" height=\"324\" />\n\n**Officially-supported platforms:** macOS (aarch64), Linux (amd64/aarch64)\n\n> **Note:** Currently, it is unlikely that STRkit will work on \"plain\" Windows due to upstream dependencies. \n> To run STRkit on Windows, please use [Windows Subsystem for Linux](https://learn.microsoft.com/en-us/windows/wsl/) or\n> use our Docker image (see [Installation as a Docker container](#as-a-docker-container)).\n\n\n## Table of Contents\n\n* [Installation](#installation)\n  * [Via PyPI](#via-pypi)\n  * [As a Docker container](#as-a-docker-container)\n* [Commands](#commands)\n  * [`strkit call`: Genotype caller with bootstrapped confidence intervals](#strkit-call-genotype-caller-with-bootstrapped-confidence-intervals)\n    * [Features](#features)\n    * [Usage](#usage)\n    * [Further documentation on the STRkit caller, including output format](#further-documentation-on-the-strkit-caller-including-output-format)\n  * [`strkit visualize`: Call visualizer](#strkit-visualize-call-visualizer)\n  * [`strkit mi`: Mendelian inheritance analysis](#strkit-mi-mendelian-inheritance-analysis)\n    * [Usage](#usage-1)\n    * [Further documentation](#further-documentation)\n  * [`strkit convert`: STR catalog conversion](#strkit-convert-str-catalog-conversion)\n    * [Usage](#usage-2)\n* [Copyright and License](#copyright-and-license)\n  * [Notice](#notice)\n  * [Exceptions](#exceptions)\n\n\n## Installation\n\n### Via PyPI\n\nSTRkit requires Python 3.11+ and can be installed from PyPI via `pip` \nwith the following command:\n\n```bash\npython -m pip install strkit\n```\n\nYou may need to install the [Rust toolchain](https://www.rust-lang.org/tools/install) (version 1.88.0 or newer)\nand a C compiler (e.g., `gcc`, `clang`), as well as `cmake`, to compile the `strkit_rust_ext` wheel, \nalthough prebuilt wheels for this module are available for some platforms. Compiling the wheel may take quite\na long time (in the tens of minutes).\n\nOn Digital Research Alliance of Canada/Compute Canada clusters, this involves loading a few modules:\n\n```bash\nmodule load rust/1.95.0 clang/18.1.8 python/3.13 scipy-stack/2026a parasail/2.6.2\npython -m pip install strkit\n```\n\nSTRkit should then be available in your Python environment as a command-line tool:\n\n```bash\nstrkit --help\n```\n\n### As a Docker container\n\nSTRkit is also available as a [Docker container](https://github.com/davidlougheed/strkit/pkgs/container/strkit), stored \nin the GitHub Container Registry.\n\nIt can be pulled using the following command:\n\n```bash\ndocker pull ghcr.io/davidlougheed/strkit:latest\n```\n\nThen, STRkit commands can be run mostly as normal using the Docker image:\n\n```bash\ndocker run -it ghcr.io/davidlougheed/strkit --help\n```\n\nFor example, to run the `strkit call` subcommand in Docker, including writing file output (via binding input files and \nmounting a read/writeable folder for outputs):\n\n```bash\ndocker run \\\n  -v inputs:/inputs:ro \\\n  -v out:/out \\\n  -it ghcr.io/davidlougheed/strkit call \\\n  /inputs/file.bam \\\n  --loci /inputs/loci.bed --ref /inputs/ref.fa --incorporate-snvs /inputs/dbsnp.vcf.gz \\\n  --vcf /out/calls.vcf\n```\n\n> [!NOTE]\n> You should not write `strkit` in front of the command when calling it inside a Docker container (see the above \n> example.)\n\nInside the `inputs` directory, STRkit would (given these parameters) expect the following files to be present:\n\n* `file.bam`: A readset for the sample to be called.\n* `file.bam.bai`: A BAI index for the readset.\n* `ref.fa`: The reference genome for the reads in FASTA format.\n* `ref.fa.fai`: A FAIDX-format index for the reference genome.\n* `dbsnp.vcf.gz`: A VCF of SNVs to use as a catalogue for calling SNVs to aid in the STR genotyping process.\n* `dbsnp.vcf.gz.tbi`: A Tabix-format index for the dbSNP VCF.\n* `loci.bed`: A tab-delimited BED-format catalogue of loci (see the \n  [Caller catalog format & choosing a catalog](./docs/caller_catalog.md) document for more information).\n\nFor more information on call parameters, see the below section on `strkit call` and the \n[Advanced caller usage and configuration](./docs/caller_usage.md) document.\n\n\n## Commands\n\n### `strkit call`: Genotype caller with bootstrapped confidence intervals\n\nA Gaussian mixture model tandem repeat genotype caller for long read data.\nSTRkit is tuned specifically for high-fidelity long reads, although other \nlong read data should still work.\n\n![Calling approach flow chart](./docs/images/call_method_flow.png)\n\n#### Features:\n\n* Performant, vectorized (thanks to [parasail](https://github.com/jeffdaily/parasail))\n  estimates of repeat counts from high-fidelity long reads and a supplied \n  catalog of TR loci and motifs.\n* Re-weighting of longer reads, to compensate for their lower likelihood of observation.\n  * Whole-genome and targeted genotyping modes to adjust this re-weighting.\n* Incorporation of single-nucleotide variation (SNVs) for better and faster calling plus \n  additional downstream analysis possibilities.\n  * SNV incorporation is recommended for **HiFi data and ONT R10 data only**. In my testing, this worsens runtime and \n    call quality for ONT ultra-long-read data, but speeds up the tool and improves call quality for HiFi/ONT R10 data. \n  * **Important note:** This functionality is best for whole-genome STR surveying. If hunting for rare / low-coverage\n    expansions, or using targeted sequencing data, it may be best to **NOT USE** an SNV catalog to avoid discarding \n    reads with short flanking regions.\n* Parallelized for faster computing on clusters and for ad-hoc fast analysis of single samples.\n* 95% confidence intervals on calls via a user-configurable optional parametric bootstrapping process.\n* Multiple motif support via [IUPAC code motifs](https://www.bioinformatics.org/sms/iupac.html).\n\n\n#### Usage:\n\nSee all parameters and example usage with a Slurm cluster: \n[Advanced caller usage and configuration](./docs/caller_usage.md)\n\n##### EXAMPLE USAGE\n\n```bash\n# For the dbSNP VCF used below for SNV incorporation, see https://ftp.ncbi.nih.gov/snp/organisms/human_9606/VCF/\n# (00-common_all.vcf.gz)\n\nstrkit call \\\n  path/to/read/file.bam \\  # [REQUIRED] One indexed read file (BAM/CRAM)\n  --realign \\  # If using accurate reads, enable this to enable local realignment / read recovery. Good for detecting expansions, but slows down calling.\n  --ref path/to/reference.fa.gz \\  # [REQUIRED] Indexed FASTA-formatted reference genome\n  --loci path/to/loci.bed \\  # [REQUIRED] TRF-formatted (or 4-col, with motif as last column) sorted list of loci to genotype\n  --annotation-file path/to/reference-annotations.gff.gz \\  # Optional GFF3/GTF file to provide locus annotations (transcript/exon ID)\n  --incorporate-snvs path/to/dbsnp/00-common_all.vcf.gz \\   # If you want, specify a SNV catalogue to help phase STRs & speed up calling with HiFi/ONT R10\n  --vcf my-calls.vcf \\  # Calculate consensus sequences for alleles and output a .vcf (or .vcf.gz) with call data\n  --seed 183 \\  # Fixed random number generator seed for replicability\n  --processes 10 \\  # Number of parallel processes to use; DEFAULT: 1\n```\n\n##### REGARDING ALIGNMENTS\n\nIdeally, you should be using a read file aligned with parameters tuned for tandem repeats. \nPacBio provides a \n[recommended workflow](https://github.com/PacificBiosciences/apps-scripts/tree/master/RepeatAnalysisTools)\nfor CCS alignment in this scenario. However, regular aligned readsets are fine and have been tested\nextensively.\n\n###### WITH ACCURATE READS\n\nIf you're using accurate long reads (e.g., HiFi, ONT R10) as input, **use the `--realign` option**\nto enable re-aligning soft-clipped reads to the reference genome. This will add a bit of \nperformance overhead, but can help recover some reads of interest (e.g., expansions). \n\n*In practice, this option may also aid calling with slightly-less-accurate reads, especially if\nyou are looking for expansions and do not mind slower performance if the reads do not align well \nto the reference genome.*\n\n###### WITH LOW-QUALITY READS\n\nIf you're using low-quality long reads (e.g., older ONT data), some non-default parameters may help\nget the best genotyping performance:\n\n- Reads with tandem repeat + flanking region PHRED quality below 13 are filtered out by default. \n  You may wish to lower this to avoid discarding reads by setting `--min-avg-phred` to a lower \n  value like `5`, or you can effectively disable this filter by setting it to `1`.\n- We have observed some cases of 'false positive' expansion-esque reads with ONT R9 data. The \n  `--force-gm-filter` option can help filter these out, at the cost of reducing STRkit's \n  sensitivity to true expansions.\n\n###### WITH HAPLOTAGGED READS\n\nIf you want to **incorporate haplotagging from an alignment file (`HP` tags)** into the \nprocess, which should speed up runtime and potentially improve calling results, you must pass \nthe `--use-hp` flag.\n\n###### WITH LOW-COVEREAGE ALIGNMENT DATA\n\nIf you're calling STRs using low-coverage alignments, you may want to:\n\n- lower the minimum number of reads per locus (`--min-reads`) to `2` (or even `1` if you're fine \n  with some guaranteed allelic dropout), and\n- lower the minimum number of reads per allele (`--min-allele-reads`) to `1` to avoid dropout as \n  much as possible.\n- potentially, if you desire more calls at the cost of quality, lower the minimum tandem repeat +\n  flanking region PHRED quality required (from its default of 13) via the `--min-avg-phred` \n  parameter.\n- enable the `--allow-only-one-full-flank` option to discard fewer reads by including spanning \n  reads where only one of the two flanking sequences on either side of the repeat are of full \n  length (i.e., are of length `--flank-size` or higher.)\n\n**Note:** `--min-reads` must be greater than or equal to `--min-allele-reads`.\n\n###### WITH TARGETED SEQUENCING DATA\n\nIf you're running STRkit with targeted sequencing data, you should put STRkit in targeted mode with the `--targeted` \nflag, which slightly tweaks read re-sampling behaviour and increases the `--max-reads` default from 250 to 500.\n\n##### LOOKING FOR LARGE EXPANSIONS\n\nIf you're running STRkit for the purpose of finding pathogenic STR expansions or expansions of \ninterest, the STRchive resource provides \n[STRkit-formatted locus catalogs](https://github.com/dashnowlab/STRchive/tree/main/data/catalogs) for the `hg19`, \n`hg38`, and `CHM13-T2Tv2.0` reference genomes. \n\nWhile looking for pathogenic expansions, the following parameters may help increase expansion sensitivity, at the cost \nof computational performance or a potential bias towards heterozygous calls:\n\n* With a catalog of disease loci, make sure to encode all possible locus motifs of the same length \n  via [IUPAC codes](https://www.bioinformatics.org/sms/iupac.html) in the catalog file.\n* Make sure to **NOT** enable `--force-gm-filter`, even if using lower-quality reads. Enabling this\n  option can filter out artifact reads with false-positive expansion-like read counts, but it will \n  also lower sensitivity for true expansions with low read support.\n* Enable `--realign`, *even* with lower-quality reads. Reads containing expansions can be \n  soft-clipped by aligners like `minimap2`; the `--realign` flag can help recover these reads.\n* Tune `--gm-filter-expansion-ratio` to a slightly lower value, like `3.0`. This will keep larger \n  alleles with low read support if they are larger than `--gm-filter-expansion-ratio` times the \n  size of the smaller allele.\n* Enable the `--allow-only-one-full-flank` option to discard fewer reads (especially since \n  expansions often do not have many spanning reads) by including spanning reads where only one of the\n  two flanking sequences on either side of the repeat are of full length (i.e., are of length \n  `--flank-size` or higher.)\n\n##### REGARDING SNV INCORPORATION\n\nIf you want to **incorporate SNV calling** into the process, which speeds up runtime and gives\nmarginally better calling results, you must provide an indexed, `bgzip`-compressed SNV catalog \nVCF which matches your reference genome. You can find dbSNP VCFs at\n[`https://ftp.ncbi.nih.gov/snp/organisms/human_9606/VCF/`](https://ftp.ncbi.nih.gov/snp/organisms/human_9606/VCF/).\nThe file for GRCh38 is called `00-common_all.vcf.gz` as of time of writing.\n**Note that this does not need to be an SNV call file for your sample, specifically**; just one \nwhich has positions, reference/alternate alleles, and the `ID` field populated.\n\n##### REGARDING ANNOTATION\n\nIf you would like to have the IDs of **genome features** (from a `.gff3` or `.gtf` file) which \noverlap STR loci in your `strkit call` output (JSON or VCF), you can pass a sorted, Tabix-indexed\nannotation file path to `strkit call` with the `--annotation-file <path>` flag (replacing `<path>`\nwith the path to the annotation file.) This could be used for downstream analysis to find STR \nvariants that overlap, for example, coding sequences or gene UTRs.\n\nFor more information, see also documentation on the [Output formats](./docs/output_formats.md).\n\n##### REGARDING OUTPUT\n\nIf you want to output a full call report, you can use the `--json output-file.json` argument to\nspecify a path to output a more detailed JSON document to. This document contains 99% CIs, peak\nlabels, and some other information that isn't included in the normal VCF file. If you want this\nfile to be indented and human-readable, use the `--indent-json` flag in addition to `--json ...`.\n\nVCF call information is printed to standard output by default (`--vcf stdout`). If you pass \n`--vcf path/to/file.vcf`, the VCF will be written to a file instead. If you pass `--vcf none`, no\nVCF will be written.\n\nFor more information, see also documentation on the [Output formats](./docs/output_formats.md).\n\n###### Note on output locus coordinates\n\nSTRkit can adjust reference coordinates of STR loci to include regions it thinks should be part of\nthe definition. Thus, output coordinates may not match the original BED catalog definition. This is\ndone for two purposes:\n* To include slightly mismapped indels that may lie outside the catalog-defined region\n* To try to achieve a more consistent absolute copy number between the reference region and the\n  sample data\n\nUsing the `--respect-ref` flag (see [Caller usage](./docs/caller_usage.md)), users may suppress \nthis behaviour.\n\n##### REGARDING REFERENCE GENOMES\n\nThe reference genome provided must be BGZipped and indexed using `samtools faidx`:\n\n```bash\n# Starting from a .fa:\nbgzip my-reference.fa  # Replaces .fa with a .fa.gz file\nsamtools faidx my-reference.fa.gz  # Generates a .fai index file\n```\n\n##### INCORPORATING METHYLATION (v0.25.0+, EXPERIMENTAL)\n\nTo annotate alleles with their average 5mCpG methylation level, use the `--use-methyl` (or `-m`)\nflag and a BAM file with `MM/ML` tags. This will add `am` (average methylation proportion) and \n`amc` (average methylated site count) data per allele peak to JSON and VCF output, as well as \nread-level methylation proportion and count (`m`/`mc`) to the JSON output only.\n\n> [!WARNING]\n> This feature is still experimental and under active development.\n\n##### OTHER PARAMETERS\n\nSee the '[Caller catalog format & choosing a catalog](./docs/caller_catalog.md)' page for more on\nhow to format a locus catalog or choose from existing available catalogs.\n\n\n#### Further documentation on the STRkit caller, including output format:\n\n  * [Advanced caller usage and configuration](./docs/caller_usage.md)\n  * [Caller catalog format & choosing a catalog](./docs/caller_catalog.md)\n  * [Output formats](./docs/output_formats.md)\n\n\n### `strkit visualize`: Call visualizer\n\nSTRkit bundles a call visualization tool which takes as input a BAM file and\na JSON call file from using the `--json` flag with `strkit call`.\n\nIt starts a web server on your local machine; the visualizations can be \ninteracted with in a web browser.\n\nTo use the tool, run the following command:\n\n```bash\nstrkit visualize path/to/my-alignment.bam \\ \n  --ref hg38 \\  # or hg19\n  --json path/to/my-calls.json \\\n  -i 1  # 1-indexed offset in JSON file for locus of interest. Default is 1 if left out.\n```\n\nThis will output something like the following:\n\n```\n * Serving Flask app 'strkit.viz.server' (lazy loading)\n * Environment: production\n   WARNING: This is a development server. Do not use it in a production deployment.\n   Use a production WSGI server instead.\n * Debug mode: on\n * Running on http://localhost:5011 (Press CTRL+C to quit)\n...\n```\n\nYou can then go to the URL listed, `http://localhost:5011`, on your local machine\nto see the visualization tool:\n\n![Browser Histogram](./docs/images/browser_hist.png)\n*STRkit browser histogram, showing an expansion in the HTT gene.*\n\n![igv.js Genome Browser](./docs/images/browser_igv.png)\n*The same expansion, shown in the igv.js browser. Note the insertions on\nthe left-hand side in most reads, and the heterozygous copy number pattern.*\n\nTo exit the tool, press `Ctrl-C` in your command line window as mentioned in \nthe start-up instructions.\n\n\n#### Further documentation on the STRkit web visualization tool:\n\n* [Using `strkit visualize` remotely](./docs/remote_viz.md)\n\n\n\n### `strkit mi`: Mendelian inheritance analysis\n\nUsing trio data, candidate de novo STR mutations (or genotyping errors/dropout rates) can be discovered \nby looking at inheritance patterns. This tool provides a few different ways to do this, via:\n\n* Mendelian inheritance % (MI) calculations for many common TR genotyping tools for both long/short reads, \n  including support for genotyping methods which report confidence intervals.\n* Reports of loci (potentially of interest) which do not respect MI.\n\n#### Usage\n\nFor a basic JSON report on Mendelian inheritance with a trio of STRkit VCFs (compressed and indexed with BGZip), use \nsomething like the following command:\n\n```bash\n# In addition to summary figures on Mendelian inheritance, this tool outputs loci which do not respect MI, which may be \n# useful as candidate de novo mutations. The --mismatch-out-mi flag controls which form of MI metric is used for \n# deciding which loci to output. Options for this flag are:\n#   strict (strict copy number MI),\n#   pm1 (copy number MI \u00b1 1 repeat unit),\n#   ci_95 (copy number 95% confidence interval),\n#   ci_99 (copy number 99% confidence interval),\n#   seq ([allele] sequenc",
+        "ref": "c6b6ef1a878cac2fed5f41637553d51caa3403d1",
+        "regions": {
+          "ambiguous": false,
+          "candidates": [
+            {
+              "end_line": 179,
+              "evidence_source": "README.md:L179",
+              "file": "README.md",
+              "format": "motif",
+              "line": 179,
+              "text": "--loci path/to/loci.bed \\  # [REQUIRED] TRF-formatted (or 4-col, with motif as last column) sorted list of loci to genotype"
+            }
+          ],
+          "end_line": 179,
+          "evidence_source": "README.md:L179",
+          "file": "README.md",
+          "format": "motif",
+          "line": 179,
+          "text": "--loci path/to/loci.bed \\  # [REQUIRED] TRF-formatted (or 4-col, with motif as last column) sorted list of loci to genotype"
+        },
+        "registry": {
+          "bioconda": {},
+          "documented": []
+        },
+        "repo": "https://github.com/davidlougheed/strkit",
+        "schema": "strhub-verified/recipe-proposal/1",
+        "single_sample_bams": {
+          "allowed": false,
+          "evidence_source": null,
+          "file": null,
+          "line": null,
+          "paired_flags": [],
+          "text": null
+        },
+        "source_documents": [
+          {
+            "file": "README.md",
+            "origin": "readme",
+            "text": "# STRkit - short tandem repeat genotyping with long reads\n\n[![PyPI version](https://badge.fury.io/py/strkit.svg)](https://badge.fury.io/py/strkit)\n\nSTRkit is a short tandem repeat (STR) genotyping and analysis toolkit for long read sequencing data (both HiFi and ONT). \nThe STRkit software package is written in Python and is available in the PyPI package registry or as a Docker container.\n\nSTRkit's main advantages over other callers include:\n* Better performance in some [benchmarking assessments](https://doi.org/10.1101/gr.280766.125) versus other tools;\n* An on-the-fly SNV calling and local phasing step for unphased aligned reads;\n* A license which allows use on any long-read sequencing data, versus TRGT whose \n  [license](https://github.com/PacificBiosciences/trgt/blob/main/LICENSE.md) restricts it to only PacBio data.\n\nSome other useful features include:\n* An interactive [call visualizer](#strkit-visualize-call-visualizer)\n* A locus catalog [converter](#strkit-convert-str-catalog-conversion), which includes a TRF `.dat` to `BED` converter\n* A pre-built Docker image ([`ghcr.io/davidlougheed/strkit`](https://ghcr.io/davidlougheed/strkit))\n\nIf you use STRkit in published work, please cite our paper in *Genome Research*:\n\n> [Read-level genotyping of short tandem repeats using long reads and single-nucleotide variation with STRkit.](https://doi.org/10.1101/gr.280766.125)\n> David R Lougheed, Tomi Pastinen, Guillaume Bourque. *Genome Res*.\n> DOI:&nbsp;[10.1101/gr.280766.125](https://doi.org/10.1101/gr.280766.125)\n\nThe code for the software itself is also available and citeable in Zenodo: https://doi.org/10.5281/zenodo.12689906\n\n<img src=\"./docs/images/strkit_logo_small.png\" alt=\"\" width=\"500\" height=\"324\" />\n\n**Officially-supported platforms:** macOS (aarch64), Linux (amd64/aarch64)\n\n> **Note:** Currently, it is unlikely that STRkit will work on \"plain\" Windows due to upstream dependencies. \n> To run STRkit on Windows, please use [Windows Subsystem for Linux](https://learn.microsoft.com/en-us/windows/wsl/) or\n> use our Docker image (see [Installation as a Docker container](#as-a-docker-container)).\n\n\n## Table of Contents\n\n* [Installation](#installation)\n  * [Via PyPI](#via-pypi)\n  * [As a Docker container](#as-a-docker-container)\n* [Commands](#commands)\n  * [`strkit call`: Genotype caller with bootstrapped confidence intervals](#strkit-call-genotype-caller-with-bootstrapped-confidence-intervals)\n    * [Features](#features)\n    * [Usage](#usage)\n    * [Further documentation on the STRkit caller, including output format](#further-documentation-on-the-strkit-caller-including-output-format)\n  * [`strkit visualize`: Call visualizer](#strkit-visualize-call-visualizer)\n  * [`strkit mi`: Mendelian inheritance analysis](#strkit-mi-mendelian-inheritance-analysis)\n    * [Usage](#usage-1)\n    * [Further documentation](#further-documentation)\n  * [`strkit convert`: STR catalog conversion](#strkit-convert-str-catalog-conversion)\n    * [Usage](#usage-2)\n* [Copyright and License](#copyright-and-license)\n  * [Notice](#notice)\n  * [Exceptions](#exceptions)\n\n\n## Installation\n\n### Via PyPI\n\nSTRkit requires Python 3.11+ and can be installed from PyPI via `pip` \nwith the following command:\n\n```bash\npython -m pip install strkit\n```\n\nYou may need to install the [Rust toolchain](https://www.rust-lang.org/tools/install) (version 1.88.0 or newer)\nand a C compiler (e.g., `gcc`, `clang`), as well as `cmake`, to compile the `strkit_rust_ext` wheel, \nalthough prebuilt wheels for this module are available for some platforms. Compiling the wheel may take quite\na long time (in the tens of minutes).\n\nOn Digital Research Alliance of Canada/Compute Canada clusters, this involves loading a few modules:\n\n```bash\nmodule load rust/1.95.0 clang/18.1.8 python/3.13 scipy-stack/2026a parasail/2.6.2\npython -m pip install strkit\n```\n\nSTRkit should then be available in your Python environment as a command-line tool:\n\n```bash\nstrkit --help\n```\n\n### As a Docker container\n\nSTRkit is also available as a [Docker container](https://github.com/davidlougheed/strkit/pkgs/container/strkit), stored \nin the GitHub Container Registry.\n\nIt can be pulled using the following command:\n\n```bash\ndocker pull ghcr.io/davidlougheed/strkit:latest\n```\n\nThen, STRkit commands can be run mostly as normal using the Docker image:\n\n```bash\ndocker run -it ghcr.io/davidlougheed/strkit --help\n```\n\nFor example, to run the `strkit call` subcommand in Docker, including writing file output (via binding input files and \nmounting a read/writeable folder for outputs):\n\n```bash\ndocker run \\\n  -v inputs:/inputs:ro \\\n  -v out:/out \\\n  -it ghcr.io/davidlougheed/strkit call \\\n  /inputs/file.bam \\\n  --loci /inputs/loci.bed --ref /inputs/ref.fa --incorporate-snvs /inputs/dbsnp.vcf.gz \\\n  --vcf /out/calls.vcf\n```\n\n> [!NOTE]\n> You should not write `strkit` in front of the command when calling it inside a Docker container (see the above \n> example.)\n\nInside the `inputs` directory, STRkit would (given these parameters) expect the following files to be present:\n\n* `file.bam`: A readset for the sample to be called.\n* `file.bam.bai`: A BAI index for the readset.\n* `ref.fa`: The reference genome for the reads in FASTA format.\n* `ref.fa.fai`: A FAIDX-format index for the reference genome.\n* `dbsnp.vcf.gz`: A VCF of SNVs to use as a catalogue for calling SNVs to aid in the STR genotyping process.\n* `dbsnp.vcf.gz.tbi`: A Tabix-format index for the dbSNP VCF.\n* `loci.bed`: A tab-delimited BED-format catalogue of loci (see the \n  [Caller catalog format & choosing a catalog](./docs/caller_catalog.md) document for more information).\n\nFor more information on call parameters, see the below section on `strkit call` and the \n[Advanced caller usage and configuration](./docs/caller_usage.md) document.\n\n\n## Commands\n\n### `strkit call`: Genotype caller with bootstrapped confidence intervals\n\nA Gaussian mixture model tandem repeat genotype caller for long read data.\nSTRkit is tuned specifically for high-fidelity long reads, although other \nlong read data should still work.\n\n![Calling approach flow chart](./docs/images/call_method_flow.png)\n\n#### Features:\n\n* Performant, vectorized (thanks to [parasail](https://github.com/jeffdaily/parasail))\n  estimates of repeat counts from high-fidelity long reads and a supplied \n  catalog of TR loci and motifs.\n* Re-weighting of longer reads, to compensate for their lower likelihood of observation.\n  * Whole-genome and targeted genotyping modes to adjust this re-weighting.\n* Incorporation of single-nucleotide variation (SNVs) for better and faster calling plus \n  additional downstream analysis possibilities.\n  * SNV incorporation is recommended for **HiFi data and ONT R10 data only**. In my testing, this worsens runtime and \n    call quality for ONT ultra-long-read data, but speeds up the tool and improves call quality for HiFi/ONT R10 data. \n  * **Important note:** This functionality is best for whole-genome STR surveying. If hunting for rare / low-coverage\n    expansions, or using targeted sequencing data, it may be best to **NOT USE** an SNV catalog to avoid discarding \n    reads with short flanking regions.\n* Parallelized for faster computing on clusters and for ad-hoc fast analysis of single samples.\n* 95% confidence intervals on calls via a user-configurable optional parametric bootstrapping process.\n* Multiple motif support via [IUPAC code motifs](https://www.bioinformatics.org/sms/iupac.html).\n\n\n#### Usage:\n\nSee all parameters and example usage with a Slurm cluster: \n[Advanced caller usage and configuration](./docs/caller_usage.md)\n\n##### EXAMPLE USAGE\n\n```bash\n# For the dbSNP VCF used below for SNV incorporation, see https://ftp.ncbi.nih.gov/snp/organisms/human_9606/VCF/\n# (00-common_all.vcf.gz)\n\nstrkit call \\\n  path/to/read/file.bam \\  # [REQUIRED] One indexed read file (BAM/CRAM)\n  --realign \\  # If using accurate reads, enable this to enable local realignment / read recovery. Good for detecting expansions, but slows down calling.\n  --ref path/to/reference.fa.gz \\  # [REQUIRED] Indexed FASTA-formatted reference genome\n  --loci path/to/loci.bed \\  # [REQUIRED] TRF-formatted (or 4-col, with motif as last column) sorted list of loci to genotype\n  --annotation-file path/to/reference-annotations.gff.gz \\  # Optional GFF3/GTF file to provide locus annotations (transcript/exon ID)\n  --incorporate-snvs path/to/dbsnp/00-common_all.vcf.gz \\   # If you want, specify a SNV catalogue to help phase STRs & speed up calling with HiFi/ONT R10\n  --vcf my-calls.vcf \\  # Calculate consensus sequences for alleles and output a .vcf (or .vcf.gz) with call data\n  --seed 183 \\  # Fixed random number generator seed for replicability\n  --processes 10 \\  # Number of parallel processes to use; DEFAULT: 1\n```\n\n##### REGARDING ALIGNMENTS\n\nIdeally, you should be using a read file aligned with parameters tuned for tandem repeats. \nPacBio provides a \n[recommended workflow](https://github.com/PacificBiosciences/apps-scripts/tree/master/RepeatAnalysisTools)\nfor CCS alignment in this scenario. However, regular aligned readsets are fine and have been tested\nextensively.\n\n###### WITH ACCURATE READS\n\nIf you're using accurate long reads (e.g., HiFi, ONT R10) as input, **use the `--realign` option**\nto enable re-aligning soft-clipped reads to the reference genome. This will add a bit of \nperformance overhead, but can help recover some reads of interest (e.g., expansions). \n\n*In practice, this option may also aid calling with slightly-less-accurate reads, especially if\nyou are looking for expansions and do not mind slower performance if the reads do not align well \nto the reference genome.*\n\n###### WITH LOW-QUALITY READS\n\nIf you're using low-quality long reads (e.g., older ONT data), some non-default parameters may help\nget the best genotyping performance:\n\n- Reads with tandem repeat + flanking region PHRED quality below 13 are filtered out by default. \n  You may wish to lower this to avoid discarding reads by setting `--min-avg-phred` to a lower \n  value like `5`, or you can effectively disable this filter by setting it to `1`.\n- We have observed some cases of 'false positive' expansion-esque reads with ONT R9 data. The \n  `--force-gm-filter` option can help filter these out, at the cost of reducing STRkit's \n  sensitivity to true expansions.\n\n###### WITH HAPLOTAGGED READS\n\nIf you want to **incorporate haplotagging from an alignment file (`HP` tags)** into the \nprocess, which should speed up runtime and potentially improve calling results, you must pass \nthe `--use-hp` flag.\n\n###### WITH LOW-COVEREAGE ALIGNMENT DATA\n\nIf you're calling STRs using low-coverage alignments, you may want to:\n\n- lower the minimum number of reads per locus (`--min-reads`) to `2` (or even `1` if you're fine \n  with some guaranteed allelic dropout), and\n- lower the minimum number of reads per allele (`--min-allele-reads`) to `1` to avoid dropout as \n  much as possible.\n- potentially, if you desire more calls at the cost of quality, lower the minimum tandem repeat +\n  flanking region PHRED quality required (from its default of 13) via the `--min-avg-phred` \n  parameter.\n- enable the `--allow-only-one-full-flank` option to discard fewer reads by including spanning \n  reads where only one of the two flanking sequences on either side of the repeat are of full \n  length (i.e., are of length `--flank-size` or higher.)\n\n**Note:** `--min-reads` must be greater than or equal to `--min-allele-reads`.\n\n###### WITH TARGETED SEQUENCING DATA\n\nIf you're running STRkit with targeted sequencing data, you should put STRkit in targeted mode with the `--targeted` \nflag, which slightly tweaks read re-sampling behaviour and increases the `--max-reads` default from 250 to 500.\n\n##### LOOKING FOR LARGE EXPANSIONS\n\nIf you're running STRkit for the purpose of finding pathogenic STR expansions or expansions of \ninterest, the STRchive resource provides \n[STRkit-formatted locus catalogs](https://github.com/dashnowlab/STRchive/tree/main/data/catalogs) for the `hg19`, \n`hg38`, and `CHM13-T2Tv2.0` reference genomes. \n\nWhile looking for pathogenic expansions, the following parameters may help increase expansion sensitivity, at the cost \nof computational performance or a potential bias towards heterozygous calls:\n\n* With a catalog of disease loci, make sure to encode all possible locus motifs of the same length \n  via [IUPAC codes](https://www.bioinformatics.org/sms/iupac.html) in the catalog file.\n* Make sure to **NOT** enable `--force-gm-filter`, even if using lower-quality reads. Enabling this\n  option can filter out artifact reads with false-positive expansion-like read counts, but it will \n  also lower sensitivity for true expansions with low read support.\n* Enable `--realign`, *even* with lower-quality reads. Reads containing expansions can be \n  soft-clipped by aligners like `minimap2`; the `--realign` flag can help recover these reads.\n* Tune `--gm-filter-expansion-ratio` to a slightly lower value, like `3.0`. This will keep larger \n  alleles with low read support if they are larger than `--gm-filter-expansion-ratio` times the \n  size of the smaller allele.\n* Enable the `--allow-only-one-full-flank` option to discard fewer reads (especially since \n  expansions often do not have many spanning reads) by including spanning reads where only one of the\n  two flanking sequences on either side of the repeat are of full length (i.e., are of length \n  `--flank-size` or higher.)\n\n##### REGARDING SNV INCORPORATION\n\nIf you want to **incorporate SNV calling** into the process, which speeds up runtime and gives\nmarginally better calling results, you must provide an indexed, `bgzip`-compressed SNV catalog \nVCF which matches your reference genome. You can find dbSNP VCFs at\n[`https://ftp.ncbi.nih.gov/snp/organisms/human_9606/VCF/`](https://ftp.ncbi.nih.gov/snp/organisms/human_9606/VCF/).\nThe file for GRCh38 is called `00-common_all.vcf.gz` as of time of writing.\n**Note that this does not need to be an SNV call file for your sample, specifically**; just one \nwhich has positions, reference/alternate alleles, and the `ID` field populated.\n\n##### REGARDING ANNOTATION\n\nIf you would like to have the IDs of **genome features** (from a `.gff3` or `.gtf` file) which \noverlap STR loci in your `strkit call` output (JSON or VCF), you can pass a sorted, Tabix-indexed\nannotation file path to `strkit call` with the `--annotation-file <path>` flag (replacing `<path>`\nwith the path to the annotation file.) This could be used for downstream analysis to find STR \nvariants that overlap, for example, coding sequences or gene UTRs.\n\nFor more information, see also documentation on the [Output formats](./docs/output_formats.md).\n\n##### REGARDING OUTPUT\n\nIf you want to output a full call report, you can use the `--json output-file.json` argument to\nspecify a path to output a more detailed JSON document to. This document contains 99% CIs, peak\nlabels, and some other information that isn't included in the normal VCF file. If you want this\nfile to be indented and human-readable, use the `--indent-json` flag in addition to `--json ...`.\n\nVCF call information is printed to standard output by default (`--vcf stdout`). If you pass \n`--vcf path/to/file.vcf`, the VCF will be written to a file instead. If you pass `--vcf none`, no\nVCF will be written.\n\nFor more information, see also documentation on the [Output formats](./docs/output_formats.md).\n\n###### Note on output locus coordinates\n\nSTRkit can adjust reference coordinates of STR loci to include regions it thinks should be part of\nthe definition. Thus, output coordinates may not match the original BED catalog definition. This is\ndone for two purposes:\n* To include slightly mismapped indels that may lie outside the catalog-defined region\n* To try to achieve a more consistent absolute copy number between the reference region and the\n  sample data\n\nUsing the `--respect-ref` flag (see [Caller usage](./docs/caller_usage.md)), users may suppress \nthis behaviour.\n\n##### REGARDING REFERENCE GENOMES\n\nThe reference genome provided must be BGZipped and indexed using `samtools faidx`:\n\n```bash\n# Starting from a .fa:\nbgzip my-reference.fa  # Replaces .fa with a .fa.gz file\nsamtools faidx my-reference.fa.gz  # Generates a .fai index file\n```\n\n##### INCORPORATING METHYLATION (v0.25.0+, EXPERIMENTAL)\n\nTo annotate alleles with their average 5mCpG methylation level, use the `--use-methyl` (or `-m`)\nflag and a BAM file with `MM/ML` tags. This will add `am` (average methylation proportion) and \n`amc` (average methylated site count) data per allele peak to JSON and VCF output, as well as \nread-level methylation proportion and count (`m`/`mc`) to the JSON output only.\n\n> [!WARNING]\n> This feature is still experimental and under active development.\n\n##### OTHER PARAMETERS\n\nSee the '[Caller catalog format & choosing a catalog](./docs/caller_catalog.md)' page for more on\nhow to format a locus catalog or choose from existing available catalogs.\n\n\n#### Further documentation on the STRkit caller, including output format:\n\n  * [Advanced caller usage and configuration](./docs/caller_usage.md)\n  * [Caller catalog format & choosing a catalog](./docs/caller_catalog.md)\n  * [Output formats](./docs/output_formats.md)\n\n\n### `strkit visualize`: Call visualizer\n\nSTRkit bundles a call visualization tool which takes as input a BAM file and\na JSON call file from using the `--json` flag with `strkit call`.\n\nIt starts a web server on your local machine; the visualizations can be \ninteracted with in a web browser.\n\nTo use the tool, run the following command:\n\n```bash\nstrkit visualize path/to/my-alignment.bam \\ \n  --ref hg38 \\  # or hg19\n  --json path/to/my-calls.json \\\n  -i 1  # 1-indexed offset in JSON file for locus of interest. Default is 1 if left out.\n```\n\nThis will output something like the following:\n\n```\n * Serving Flask app 'strkit.viz.server' (lazy loading)\n * Environment: production\n   WARNING: This is a development server. Do not use it in a production deployment.\n   Use a production WSGI server instead.\n * Debug mode: on\n * Running on http://localhost:5011 (Press CTRL+C to quit)\n...\n```\n\nYou can then go to the URL listed, `http://localhost:5011`, on your local machine\nto see the visualization tool:\n\n![Browser Histogram](./docs/images/browser_hist.png)\n*STRkit browser histogram, showing an expansion in the HTT gene.*\n\n![igv.js Genome Browser](./docs/images/browser_igv.png)\n*The same expansion, shown in the igv.js browser. Note the insertions on\nthe left-hand side in most reads, and the heterozygous copy number pattern.*\n\nTo exit the tool, press `Ctrl-C` in your command line window as mentioned in \nthe start-up instructions.\n\n\n#### Further documentation on the STRkit web visualization tool:\n\n* [Using `strkit visualize` remotely](./docs/remote_viz.md)\n\n\n\n### `strkit mi`: Mendelian inheritance analysis\n\nUsing trio data, candidate de novo STR mutations (or genotyping errors/dropout rates) can be discovered \nby looking at inheritance patterns. This tool provides a few different ways to do this, via:\n\n* Mendelian inheritance % (MI) calculations for many common TR genotyping tools for both long/short reads, \n  including support for genotyping methods which report confidence intervals.\n* Reports of loci (potentially of interest) which do not respect MI.\n\n#### Usage\n\nFor a basic JSON report on Mendelian inheritance with a trio of STRkit VCFs (compressed and indexed with BGZip), use \nsomething like the following command:\n\n```bash\n# In addition to summary figures on Mendelian inheritance, this tool outputs loci which do not respect MI, which may be \n# useful as candidate de novo mutations. The --mismatch-out-mi flag controls which form of MI metric is used for \n# deciding which loci to output. Options for this flag are:\n#   strict (strict copy number MI),\n#   pm1 (copy number MI \u00b1 1 repeat unit),\n#   ci_95 (copy number 95% confidence interval),\n#   ci_99 (copy number 99% confidence interval),\n#   seq ([allele] sequence MI),\n#   sl ([allele] sequence length MI),\n#   sl_pm1 ([allele] sequence length MI \u00b1 1 base pair)\nstrkit mi \\\n  --caller strkit-vcf \\\n  --json mi-report.json \\\n  --mismatch-out-mi seq \\\n  child-calls.vcf.gz \\\n  mother-calls.vcf.gz \\\n  father-calls.vcf.gz\n# This will also output a TSV report to stdout. If this is not desired, use --no-tsv to suppress TSV output.\n```\n\nFor other options and what they do, run `strkit mi` (with no other arguments) or `strkit mi --help`.\n\n#### Further documentation\n\n**For more information on what kind of analyses can be done with this data**, see the\n[Trio analyses with STRkit](./docs/trio_analyses.md) page.\n\n\n### `strkit convert`: STR catalog conversion\n\nSTRkit takes as input a four-or-more-column BED file, structured like one of the following:\n\n```\ncontig  start end [0 or more extraneous columns] NNN\ncontig  start end [0 or more extraneous columns] ID=locus1;MOTIF=NNN\n```\n\nAny extraneous columns are removed, (internally) leaving a four-column STR locus representation. \nSome other tools, e.g., [Straglr](https://github.com/bcgsc/straglr), also take a four-column STR\nBED as locus catalog input. However, other formats representing a catalog of STRs exist:\n\n* [Tandem Repeats Finder](https://github.com/Benson-Genomics-Lab/TRF) outputs a `.dat` file with a lot \n  of information. Once converted to a BED file, this can be used as-is with STRkit, but \n  it's safer for other tools to convert to a four-column BED format.\n  See \"[Converting TRF DAT files to BED](./docs/convert_trf_to_bed.md)\" for more on how to do this.\n* STRkit supports using [IUPAC codes] to specify motifs. Manual post-processing of TRF output would \n  be needed to do this.\n* [TRGT uses a custom repeat definition format](https://github.com/PacificBiosciences/trgt/blob/main/docs/repeat_files.md),\n  which can specify more advanced STR structures.\n* Some tools support multiple motifs (see, e.g., \n  [STRchive catalogs of pathogenic loci](https://strchive.org/loci/#downloads)).\n\n#### Usage\n\nThe `strkit convert` sub-command requires an input format (`bed4`, `trf` or `trgt`), an output \nformat (many, see `strkit convert --help`), and an input file. Output is written to `stdout`.\n\nIf you want the output **sorted** (which many tools prefer or require), use the `--sort` flag.\n\n*Note:* Not all input/output format pairs have available converter functions; an error will be \nprinted to `stderr` if one does not exist.\n\n##### TRF DAT file to TRF BED file (*UCSC-style*)\n\nTo convert from a TRF `.dat` file (as output by the TRF program) to a TRF BED file in the style of\nthe one obtainable from UCSC (e.g., for \n[hg38](https://hgdownload.soe.ucsc.edu/goldenpath/hg38/bigZips/latest/)):\n\n```bash\nstrkit convert --in-format trf --out-format trf in_file.trf.dat > out_file.trf.bed\n```\n\n##### TRF DAT file to 4-column BED file\n\nTo convert from a TRF `.dat` file (as output by the TRF program) to a normal BED file:\n\n```bash\nstrkit convert --in-format trf --out-format bed4 in_file.trf.dat > out_file.bed\n```\n\n##### TRF BED to TRGT repeat definition file\n\nTo convert from a TRF BED to a TRGT repeat definition BED file:\n\n```bash\nstrkit convert --in-format trf --out-format trgt in_file.trf.bed > out_file.bed\n```\n\n##### TRGT repeat definition file to STRkit BED\n\nTo convert from a TRGT repeat definition file to a STRkit BED, including locus IDs if set:\n\n```bash\nstrkit convert --in-format trgt --out-format strkit in_file.trgt.bed > out_file.strkit.bed\n```\n\nWhere possible, multiple motifs will be reconciled using [IUPAC codes](https://www.bioinformatics.org/sms/iupac.html),\nwhich STRkit supports.\n\nNote that TRGT can represent STRs with complex structure that STRkit cannot. In these cases, the first motif in the TRGT \nlocus definition will be used and a message will be logged to `stderr`.\n\n\n## Copyright and License\n\n* 2021-2023: &copy; David Lougheed (DL) and McGill University 2021-2023 (versions up to and including `0.8.0a1`), \n  created during graduate research by DL.\n* 2023+: (versions beyond `0.8.0a1`):\n  * Portions &copy; DL and McGill University 2021-2023\n  * Portions &copy; McGill University 2024-2026\n  * Portions &copy; DL 2024-2026\n\n\n### Notice\n\nThis program is free software: you can redistribute it and/or modify\nit under the terms of the GNU General Public License as published by\nthe Free Software Foundation, either version 3 of the License, or\n(at your option) any later version.\n\nThis program is distributed in the hope that it will be useful,\nbut WITHOUT ANY WARRANTY; without even the implied warranty of\nMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\nGNU General Public License for more details.\n\nYou should have received a copy of the GNU General Public License\nalong with this program.  If not, see <https://www.gnu.org/licenses/>.\n\n### Exceptions\n\n**Some exclusions to this license apply; specifically portions of \n[`strkit/viz/templates/browser.html`](strkit/viz/templates/browser.html) and\nthe STRkit logo files ([./docs/images/strkit_logo_small.png](./docs/images/strkit_logo_small.png)\nand [./strkit/viz/static/logo.png](./strkit/viz/static/logo.png).)**\n\nThe STRkit logo is &copy; David Lougheed 2022, and was designed by Evelyn Lougheed. It is not licensed\nunder the terms of the GPL 3.0; it is instead licensed under the terms of the \n[CC BY-ND 4.0](https://creativecommons.org/licenses/by-nd/4.0/).\n\nPortions of `viz/templates/browser.html` copyright (C) 2021-2022  Observable, Inc.\nUsed under the terms of the ISC license.\n"
+          },
+          {
+            "file": "docs/caller_catalog.md",
+            "origin": "repo",
+            "text": "# Caller catalog format & choosing a catalog\n\n## Table of Contents\n\n* [Caller catalog format](#caller-catalog-format)\n  * [Specifying a custom locus ID](#specifying-a-custom-locus-id)\n* [Choosing an existing catalog](#choosing-an-existing-catalog)\n  * [Whole genome catalogs](#whole-genome-catalogs)\n  * [Disease-relevant loci](#disease-relevant-loci)\n\n## Caller catalog format\n\nFor the `--loci` argument, `strkit call` takes a list of loci in a modified BED / TSV format,\nsimilar to methods like Straglr/Tandem-genotypes/GangSTR.\n\nThe file must be structured with a row per locus, where each row looks like one of the following:\n\n```\nchr4    3074876    3074966    [...]    CAG\nchr4    39348424   39348483   [...]    MMRRG\nchrX    147912050  147912110  [...]    ID=FMR1;MOTIF=CGG\n```\n\nThe important requirements here are:\n\n  * The fields are tab-separated\n  * The rows are sorted by contig, and then by starting position\n  * Locus coordinates are 0-based and half-open (start is inclusive, end is exclusive)\n  * The locus motif (either plain, or as part of a [more complex locus description](#specifying-a-custom-locus-id)) \n    must come **last** in the row, but *any number of fields* can separate the end position and the motif.\n\nNote that as with the second locus in this example \n([the CANVAS-causing expansion in RFC1](https://strchive.org/loci/canvas_rfc1/)), motifs can be specified with\n [IUPAC code](https://www.bioinformatics.org/sms/iupac.html), allowing multiple motif matching.\n\nAs a result, STRkit can take myrid different TSV-type catalog formats as input, including\nthose produced from the TRF UCSC browser track, or for GangSTR, or for Straglr.\n\nHere are a few notes on catalogs:\n\n  * Coordinates are used to locate the STR locus in the reference genome, but may be slightly \n    expanded to better encompass the entire locus.\n  * Be wary of using Tandem Repeats Finder output directly as a catalog, as it can output multiple\n    rows for the same locus, or define motifs in a \"compound\" fashion, e.g., `ATATAT` instead of `AT`.\n  * Some disease expansions can contain multiple different motifs, \n    which may be not present in the reference genome at all (for example: \n    [CANVAS](https://pubmed.ncbi.nlm.nih.gov/31230722/), [BAFME2](https://www.nature.com/articles/s41467-019-12671-y)).\n    As such, we provide a mechanism to specify motifs using any \n    [IUPAC code](https://www.bioinformatics.org/sms/iupac.html). \n    Thus, the CANVAS and BAFME2 motifs can be represented as `AARRG` and `AAAWK`, respectively.\n    We also add in a non-IUPAC code, `X`, which behaves like `N` in that it represents any base, \n    but instead of giving a reward of `+2` it neither penalizes nor rewards alignment, \n    and penalizes a gap. We use this internally to represent low-confidence base calls.\n  * Related to the above, this can be important for diseases such as SCA37, where the motif composition \n    (rather than the actual copy number) is associated with disease \n    ([Seixas *et al.* 2017](https://doi.org/10.1016%2Fj.ajhg.2017.06.007)). Here, STRkit's motif-sized k-mer counting\n    function can be used during calling with the `--count-kmers` flag. See the \n    [advanced usage](https://github.com/davidlougheed/strkit/blob/master/docs/caller_usage.md#all-optional-flags) page \n    for more.\n\n\n### Specifying a custom locus ID\n\nThe last column of a STRkit-compatible locus catalog can be either just a motif, or a set of key-value pairs. The \nfollowing are all valid values for the last column of the catalog BED file:\n\n* `CAG` results in `ID=locus#;MOTIF=CAG` where `#` is the line index of the locus (1-indexed).\n* `MOTIF=CAG` results in the same as above.\n* `ID=HTT;MOTIF=CAG` specifies a custom ID alongside the `CAG` motif.\n\nThe locus ID is included in the JSON and VCF outputs, as well as logging output.\n\n\n## Choosing an existing catalog\n\nOther researchers have done extensive work in identifying and cataloguing loci for genotyping. Some of these catalogs \nare for the entire human genome, whereas others are for only disease-relevant loci.\n\n### Whole genome catalogs\n\n  * The Tandem Repeats Finder track for the UCSC browser, available as a \n    [downloadable BED file](https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/latest/hg38.trf.bed.gz),\n    with the caveat that this file includes **overlapping entries**, and TRs may not always be represented in \n    their most 'essential' form (e.g., using the motif `TATATATA` instead of just `TA`). Thus, some work may be\n    required to create a desirable locus catalog.\n  * The researchers behind the [GangSTR](https://github.com/gymreklab/GangSTR) short-read STR genotyping method\n    have prepared [several extensive STR catalogs](https://github.com/gymreklab/GangSTR#gangstr-reference-files) \n    for different human reference genomes, containing motifs up to 20bp in length. However, **these files use\n    1-based closed-interval coordinates**, and should be adjusted (subtracting 1 from all start coordinates) to \n    transform them into the 0-based half-open interval coordinates when using them with STRkit.\n    **IMPORTANT:** Also note that some of these catalogs have an extra column after the motif (e.g., `hg38_ver17`). \n    STRkit requires that the motif is the last column in the BED catalog; use `hg38_ver13` or trim the last column from\n    their file in order to get correct genotypes. \n\n### Disease-relevant loci\n\n  * **[STRchive](https://strchive.org/)** ([Hiatt *et al.* 2025](https://doi.org/10.1186/s13073-025-01454-4)) provides\n    a continually-updated list of disease-causing loci for multiple reference genomes. You can download one of the \n    catalogs in the **STRkit** format from their \n    [GitHub repository](https://github.com/dashnowlab/STRchive/tree/main/data/catalogs). Thank you to the STRchive team\n    for the STRkit-formatted disease-relevant locus catalg!\n"
+          },
+          {
+            "file": "docs/caller_usage.md",
+            "origin": "repo",
+            "text": "# Advanced caller usage and configuration\n\n\n## All optional flags\n\n* `--annotation-file [path]` or `--gff [path]` (v0.25.0+): A path to a sorted, Tabix-indexed GFF3 file with genomic \n  annotations. If set, loci in the output will be annotated with overlapping feature(s), if any.\n* `--sample-id example_sample`: Set a sample ID, or override the alignment file sample ID. This will be included in JSON \n  output, but not TSV output.\n* `--min-reads ##`: Minimum total number of supporting reads needed to make a call. This must be greater than or equal\n  to `--min-allele-reads`.  **Default:** 4\n* `--min-allele-reads ##`: Minimum number of supporting reads needed to call a specific allele size. This must be less \n  than or equal to `--min-reads`. **Default:** 2\n* `--max-reads ##`: Maximum number of supporting reads to use for calling a locus. \n  **Default:** 10000 if in targeted mode, 250 otherwise\n* `--min-avg-phred ##`: Minimum average PHRED score for relevant bases (flanking region + tandem repeat).\n  Read segments with average PHRED scores below this (common with a threshold of ~13 and ONT Ultra Long reads, \n  for example) will be skipped. **Default:** 13\n* `--min-read-align-score #.#`: Minimum normalized read alignment score (fractional; `0.0` to `1.0`) needed to include a \n  read in a call. A good value for very pure tandem repeats is 0.9. A good value for much more lenient genotyping is \n  anywhere from 0.0-0.4. **Default:** 0.1\n* `--max-rcn-iters ##`: Maximum number of read copy-number counting iterations to perform. Loci which require a lot of\n  iterations are probably impure tandem repeats, for which the resulting copy number will not be very accurate anyway.\n  **Default:** 50\n* `--max-terrible-reads ##` or `--mtr ##` (v0.25.0+): Maximum number of terribly-aligning reads allowed before a locus \n  is skipped. A low number is good for performance, but may result in undesirable behaviour for specific loci of \n  interest (i.e, unwanted missing calls). **Default:** 2 * `--max-reads` if in targeted mode, 3 otherwise\n* `--flank-size ##`: Size of the flanking region to use on either side of a region to properly anchor reads. \n  **Default:** 70\n* `--allow-only-one-full-flank` or `--aof`: Require only one full flanking region (of size `--flank-size`) for a read\n  rather than both. At minimum, 5' flanking regions will still need to be of size `--vcf-anchor-size`. **Default:** off\n* `--realign` or `-a`: Whether to perform local re-alignment to attempt recovery of soft-clipped reads. Some aligners\n  may soft-clip around large insertions, e.g. with an expansion (I've noticed this with *pbmm2*/*minimap2*). \n  Currently recommended **for HiFi or ONT R10 only**, since this step aggressively filters out realignments with \n  many mismatches or small indels. Enabling this slows down calling, so it may not be suitable for a very large catalog \n  of tandem repeats.\n* `--hq`: **[DEPRECATED]** Whether to treat provided reads as \"high quality\", i.e., fairly close to the actual true \n  sequence. Used when detecting expansions, to skip a smoothing filter that may ignore disparate, rare expansion-like \n  read counts. Use for CCS reads or similar data (e.g., R10 nanopore data) ONLY! **Default:** off\n* `--use-hp`: Whether to incorporate `HP` tags from a haplotagged alignment file. This should speed up runtime and \n  will potentially improve calling results. **This flag is experimental, and has not been tested extensively.**\n* `--use-methyl` or `-m` (v0.25.0+; **EXPERIMENTAL**): Whether to incorporate methylation data from `MM/ML` tags in the \n  alignment file into the output (methylation proportion per-read and per-allele.) **Default:** off\n* `--skip-supplementary` or `--skip-supp`: Skip supplementary alignments. **Default:** off\n* `--skip-secondary` or `--skip-sec`: Skip secondary alignments. **Default:** off\n* `--incorporate-snvs [path]` or `--snv [path]`: A path to a VCF with SNVs to incorporate into the calling process and \n  final output. This file is just used as an SNV loci catalog; STRkit itself will perform the SNV calling. Empirically \n  improves calling quality a small amount, speeds up runtime, and gives nearby SNV calls for downstream analysis.\n  You can find dbSNP VCFs at\n  [`https://ftp.ncbi.nih.gov/snp/organisms/human_9606/VCF/`](https://ftp.ncbi.nih.gov/snp/organisms/human_9606/VCF/).\n  The file for GRCh38 is called `00-common_all.vcf.gz` as of time of writing.\n  **Important note:** This functionality is best for whole-genome STR surveying. If hunting for rare / low-coverage\n  expansions, or using targeted sequencing data, it may be best to **NOT USE** an SNV catalog to avoid discording reads\n  with short flanking regions.\n* `--snv-min-base-qual [int]` or `--min-sbq [int]`: Minimum PHRED quality score for bases of SNVs to use for phasing. \n  **Default:** 20\n* `--significant-clip-threshold ###` (v0.25.0+): Minimum number of bases to consider the end of a read 'significantly' \n  soft-clipped, meaning we should do some read trimming in the SNV-finding process to avoid SNV false positives.\n* `--targeted` or `-t`: Turn on targeted genotyping mode, which re-weights longer reads differently. Use this option if\n  the alignment file contains targeted reads that do not reflect normal mapping patterns, e.g. from PacBio No-Amp \n  Targeted Sequencing. **Default:** off\n* `--respect-ref` or `-e`: Turn off reference TR region 'coordinate extension' from what is specified in the catalog.\n  TR boundaries can be blurry, so by default we give STRkit an opportunity to extend the provided region to improve\n  mapped indel capturing and to be consistent with the approach we use to count repeat copies in non-reference samples.\n  Turning this off should give results closer to other STR callers and produce start/end coordinates closer to the BED \n  catalog file, at the cost of potentially missing variation.\n* `--count-kmers [peak|read|both|none]` or `-k`: Turn on motif-sized k-mer counting at the allele level, with `-k peak`,\n  or at the read level, with `-k read`, or both with `-k both`. If the flag is provided with no value, it will default \n  to `peak.` Note that k-mer counts will only be reported if a `--json` path is specified. This feature can be used to\n  detect motif composition differences between alleles or samples. **Default:** `none`\n* `--consensus` or `-c`: Turn on consensus calculation for alleles. This adds runtime, but gives a better idea of STR \n  structure and is useful for comparing alleles beyond copy number. If `--vcf` is set, this option is forced on. \n  **Default:** off\n* `--poa [spoa|rust-bio]` (v0.25.0+): Specify which POA implementation you wish to use; results vary subtly depending on\n  implementation. The `spoa` option is faster, and is the default as of v0.25.0. **Default:** `spoa` \n* `--large-consensus-length ####`: If the smallest tandem repeat sequence is longer than this, the number of reads used\n  for determining the consensus will be downsampled to `--max-n-large-consensus-reads`. **Default:** 2000\n* `--max-n-large-consensus-reads ##`: When the smallest tandem repeat sequence is longer than\n  `--large-consensus-length`, the number of reads will be downsampled to this value. **Default:** 20\n* `--max-mdn-poa-length ####`: Maximum median STR sequence length before we use a best-representative-read method for \n  the 'consensus' STR sequence rather than partial order alignment (POA) due to computational performance.\n  **Default:** 5000\n* `--vcf-anchor-size #`: Number of bases upstream (5') of the tandem repeat to include in the VCF output. This can include\n  small indels, and having a size above `1` may be beneficial or detrimental to the use case at hand, but is nice for \n  benchmarking and in case of slight misalignment. This is clamped to being in the range of `[1, flank_size]`.\n  **Default:** 5\n* `--num-bootstrap ###` or `-b`: Now many bootstrap re-samplings to perform. **Default:** 100\n* `--force-gm-filter` (v0.25.0+): Whether to force-enable a smoothing filter that removes peaks with low read support \n  called with a Gaussian mixture model (GMM), even for expansion-like reads (i.e., large alleles with copy numbers far \n  above the small allele; see `--gm-filter-expansion-ratio`). This might be useful for messy, old ONT R9 long read data,\n  but *will* result in reduced expansion sensitivity!\n* `--gm-filter-factor #`: Tuning parameter for the copy number Gaussian mixture model (GMM) used for allele calling in\n  some cases. GMM peaks are filtered out when they have a weight lower than `(gm_filter_factor * n_components)` for a\n  given GMM of `n_components`, if they're not deemed to be \"expansion-like\" (see `--gm-filter-expansion-ratio #`) unless \n  the filter is forced on via `--force-gm-filter`. \n  *This filter does not apply when using SNV-based or haplotag peak calling.* **Default:** 3\n* `--gm-filter-expansion-ratio #` (v0.25.0+): Tuning parameter for disabling the above GMM peak filter. When running the\n  GMM for allele calling, peaks with low read support will be filtered out by default (see `--gm-filter-factor`).\n  However, if the largest peak is more than `--gm-filter-expansion-ratio` times the size of the smaller peak, it will be\n  kept (even with low read support.) *This filter does not apply when using SNV-based or haplotag peak calling.* \n  **Default:** 5.0\n* `--sex-chr ??` or `-x`: Sex chromosome configuration. **Without this, loci in sex chromosomes will not be genotyped.**\n  Can be any configuration of Xs and Ys; only count matters. **Default:** *none*\n* `--json [path]` or `-j`: Path to output JSON call data to. JSON call data is more detailed than the `stdout` TSV \n  output. If the value passed is `stdout`, the JSON data will be written to `stdout` instead of a file. \n  **Default:** *none*\n* `--indent-json` or `-i`: If passed alongside `--json [x]`, the JSON output will be indented to be more human-readable\n  but less compact. **Default:** off\n* `--json-read-seq` (v0.25.0+): If passed alongside `--json [x]`, the JSON output will include read-level TR sequence \n  data and 5' anchor sequences.\n* `--vcf [path]`: Path to output VCF-formatted call data to. Setting this option forces the `--consensus` option as \n  well in order to output true REF/ALT values, which slows down runtime somewhat. If the value passed is `stdout`, the \n  VCF data will be written to `stdout` instead of a file. If a `.vcf.gz` path is specified, a bgzipped file will be \n  written automatically. If the value passed is `none`, no VCF data will be written. \n  **Default:** `stdout` (v0.25.0+); `none` (pre-v0.25.0)\n* `--no-tsv`: **[DEPRECATED]** Suppresses TSV output to `stdout`. Without `--json` or `--vcf`, no output will be \n  generated, which isn't very helpful. **Default:** does nothing (v0.25.0+); TSV output on (pre-v0.25.0)\n* `--seed ####`: Seed the random number generator used for all random sampling, Gaussian mixture modeling, etc. \n  Useful for replicability.\n* `--log-level [level]`: Log level. Value must be of `error`, `warning`, `info`, and `debug`. Be careful with the \n  `debug` log level, as it can produce gigabytes of logs for a large run. **Default:** `info`.\n* `--verbose`: Debug log verbosity flag. If `--log-level` is set to `debug`, this will yield many more read-level debug\n  messages (i.e., for each aligned segment from the BAM/CRAM). **Default:** off\n* `--log-progress-interval ##`: How often to log caller progress (INFO logger messages), in seconds. **Default:** 120.\n* `--profile`: Profile function calls for development purposes. **Default:** off\n\n\n## Usage on HPC machines\n\nWe have tested STRkit on three different clusters associated with the \nDigital Research Alliance of Canada (formerly Compute Canada). \n\nUsage is pretty straightforward; for our use cases we set up a Python virtual environment\nwith the `strkit` package installed, and ran a SLURM batch job which looks something like:\n\n```bash\n#!/bin/bash\n#SBATCH --mem=16G\n#SBATCH --ntasks=1\n#SBATCH --cpus-per-task=10\n#SBATCH --time=1-00\n#SBATCH --account=rrg-xxxxx\n\n\nmodule load StdEnv/2023\nmodule load python/3.11 scipy-stack/2025a parasail/2.6.2\n\ncd /home/xxxxx || exit\nsource env/bin/activate\n\nstrkit call \\\n  --loci /path/to/catalog \\\n  --ref /path/to/ref.fa.gz \\\n  --processes 10 \\\n  --seed 342 \\\n  --vcf sample.vcf \\\n  path/to/sample.bam\n\ndeactivate\n\n```\n"
+          },
+          {
+            "file": "docs/output_formats.md",
+            "origin": "repo",
+            "text": "# STRkit output formats\n\nSTRkit can output two different file formats, depending on the set of arguments used:\n\n* [JSON](#json-report): a JSON report, containing the maximum amount of information possible. These files can be quite \n  large, especially if formatted to be human-readable and indented with the `--indent-json` flag.\n* [VCF](#vcf): a [VCF 4.2](https://samtools.github.io/hts-specs/VCFv4.2.pdf) file, with STR and SNV genotypes, including\n  consensus STR sequences. This is the default output format.\n\n## Notes\n\n* In general, the JSON format contains the most information about how STRkit was run, and each locus' called genotype.\n* Adjusted coordinates (`start_adj`/`end_adj` in JSON; standard `POS` field in VCF) are recaculations of locus \n  boundaries done by STRkit. If you want to maintain the original TR boundaries from the locus definition file, you can\n  pass the `--respect-ref` flag to `strkit call`.\n\n\n## JSON report\n\nExample report format:\n\n```javascript\n{\n  \"sample_id\": \"HG002\",\n  \"caller\": {\n    \"name\": \"strkit\",\n    \"version\": \"0.15.0\"\n  },\n  \"parameters\": {\n    \"read_file\": \"HG002.SequelII.ccs.phased.40x.chr4.bam\",\n    \"reference_file\": \"/Users/davidlougheed/git/gt-poc/hg38.analysisSet.fa.gz\",\n    \"loci_file\": \"chr4.f5000.adotto.bed\",\n    \"annotation_file\": \"hg38.knownGene.sorted.gtf.gz\",\n    \"min_reads\": 1,\n    \"min_allele_reads\": 1,\n    \"max_reads\": 250,\n    \"min_avg_phred\": 13,\n    \"rc_method\": \"comp\",\n    \"min_read_align_score\": 0.1,\n    \"max_rcn_iters\": 80,\n    \"max_terrible_reads\": 3,\n    \"num_bootstrap\": 100,\n    \"force_gm_filter\": false,\n    \"gm_filter_factor\": 3,\n    \"gm_filter_expansion_ratio\": 5.0,\n    \"flank_size\": 70,\n    \"sample_id\": \"HG002\",\n    \"allow_only_one_full_flank\": true,\n    \"skip_supplementary\": false,\n    \"skip_secondary\": false,\n    \"sample_id\": null,\n    \"ploidy\": \"diploid_autosomes\",\n    \"realign\": true,\n    \"use_hp\": false,\n    \"use_methyl\": true,\n    \"snv_vcf\": \"00-common_all.vcf.gz\",\n    \"snv_min_base_qual\": 20,\n    \"significant_clip_threshold\": 100,\n    \"targeted\": false,\n    \"respect_ref\": false,\n    \"count_kmers\": \"both\",\n    \"consensus\": true,\n    \"poa\": \"spoa\",\n    \"large_consensus_length\": 2000,\n    \"max_n_large_consensus_reads\": 20,\n    \"max_mdn_poa_length\": 5000,\n    \"vcf_anchor_size\": 5,\n    \"json_read_seq\": true,\n    \"log_level\": 20,\n    \"verbose\": false,\n    \"profile\": false,\n    \"seed\": 1234,\n    \"processes\": 1,\n    \"log_progress_interval\": 15\n  },\n  \"contigs\": [\n    \"chr4\"\n  ],\n  \"catalog\": {\n    \"num_loci\": 5000,\n    \"loci_hash\": \"0b2106349f9e2c62c367c5dbeab231f77aa6ff6030a6b65fb4de36a52dd63d3a\"\n  },\n  \"results\": [\n    {\n      \"locus_index\": 1,\n      \"locus_id\": \"locus1\",\n      \"contig\": \"chr4\",\n      \"start\": 96617,\n      \"end\": 96648,\n      \"start_adj\": 96617,\n      \"end_adj\": 96648,\n      \"motif\": \"AC\",\n      \"annotations\": [],\n      \"ref_cn\": 16,\n      \"ref_start_anchor\": \"t\",\n      \"ref_seq\": \"acacacacacacacacacacacacacacaca\",\n      \"am\": 0.01, // if methylation enabled\n      \"amc\": 1.0, // if methylation enabled\n      \"reads\": {\n        \"m64011_190901_095311/50792740/ccs\": {\n          \"s\": \"-\",\n          \"sc\": 2.0,\n          \"cn\": 15,\n          \"sl\": 31, \n          \"m\": 0.01, // if methylation enabled\n          \"mc\": 1, // if methylation enabled\n          \"w\": 1.0217145751733625,\n          \"snvu\": [\"G\"],\n          \"p\": 0\n        },\n        // ...\n        \"m64012_190921_234837/4523939/ccs\": {\n          \"s\": \"+\",\n          \"sc\": 2.0,\n          \"cn\": 15,\n          \"sl\": 31,\n          \"m\": 0.01, // if methylation enabled\n          \"mc\": 1, // if methylation enabled\n          \"w\": 1.0217145751733625,\n          \"snvu\": [\"A\"],\n          \"p\": 1\n        },\n        // ...\n      },\n      \"snvs\": [\n        {\n          \"id\": \"rs73213545\",\n          \"ref\": \"G\",\n          \"pos\": 94593,\n          \"call\": [\"G\", \"A\"],\n          \"rcs\": [20, 23]\n        }\n      ],\n      \"assign_method\": \"snv+dist\",\n      \"call\": [15, 15],\n      \"call_95_cis\": [\n        [15, 15],\n        [15, 15]\n      ],\n      \"call_99_cis\": [\n        [15, 15],\n        [15, 15]\n      ],\n      \"mean_model_align_score\": 2.0,\n      \"peaks\": {\n        \"means\": [15, 15],\n        \"weights\": [0.5, 0.5],\n        \"stdevs\": [0.31622776601683794, 0.3585309239667531],\n        \"modal_n\": 2,\n        \"n_reads\": [20, 23],\n        \"seqs\": [\n          [\"ACACACACACACACACACACACACACACA\", \"poa\"],\n          [\"ACACACACACACACACACACACACACACA\", \"poa\"]\n        ]\n      },\n      \"read_peaks_called\": true,\n      \"time\": 0.1274\n    },\n    // ...\n  ],\n  \"avg_read_depth\": 37.0,\n  \"avg_read_depths_by_contig\": {\n    \"chr4\": 37.0\n  },\n  \"runtime\": 8.628772\n}\n```\n\n\n## VCF\n\nVCF meta fields (non-exhaustive):\n\n* `source`: always set to `strkit`\n* `phasing`: present and set to `partial` if using SNV/HP phasing\n* `reference`: absolute file URI to FASTA reference (`file://<...>`)\n* `strkitVersion`: STRkit version used to generate the file\n* `strkitCommand`: STRkit subcommand used to generate the VCF (`call`)\n* `strkitCatalogNumLoci`: Number of total loci in the catalog used for genotyping\n* `strkitCatalogHash`: SHA256 hash of the loci loaded from the catalog\n\nVCF records will usually have IDs specified. For STR loci, this will be either `locus<idx>` (e.g., `locus1`) if no ID is \nspecified in the catalog, or a custom value, usually useful if it's a locus of particular significance \n(see [\"Specifying a custom locus ID\"](./caller_catalog.md#specifying-a-custom-locus-id)).\n\nSNVs will copy the ID field from the SNV catalog file.\n\nVCF format fields (i.e., for each variant sample entry):\n\n* `AD`: Read depth for each allele (non-standard vs. common VCF usage, where this is read depth for reference vs. each\n  possible alt.)\n* `AM`: Average methylation level (5-methyl CpG sites) for each allele (if `--use-methyl` is passed).\n* `AMC`: Average number of 5-methyl CpG sites for each allele (if `--use-methyl` is passed).\n* `CONS`: Consensus methods used for each alt (`single`/`poa`/`best_rep`)\n* `DP`: Total read depth\n* `DPS`: Total read depth; only supporting reads (for calls with incorporated SNVs mainly; STR calls only)\n* `GT`: Genotype\n* `MC`: Motif copy number for each allele (STR calls only)\n* `MCCI`: Motif copy number 95% confidence intervals for each allele (STR calls only)\n* `MCRL`: Read-level copy number histogram for each allele. Allele entries are comma-delimited, and copy numbers within \n  an allele's read-set are pipe (`|`)-delimited and formatted as `[copy number]x[reads]`. For example, for two alleles \n  with 8 and 9 copy-number respectively, we may get `7x1|8x10|9x1,8x2|9x12` \u2014 the first allele has one 7-copy read, ten \n  8-copy reads, and one 9-copy read. The second allele has two 8-copy reads and twelve 9-copy reads.\n* `MMAS`: Mean model (candidate TR sequence) alignment score across reads, for this sample. This score, relative to the\n  other locis' scores, represents how well a pure tandem repeat stretch with the catalogued motif and the determined \n  copy number (e.g., `CAGCAGCAG`) aligns to the true sequence.\n* `PS`: Phase set\n* `PM`: Peak-calling method (`dist`/`single`/`snv+dist`/`snv`/`hp`; STR calls only)\n* `SLR`: Read-level TR sequence length histogram for each allele, in the same format as `MCRL`.\n\nVCF info. fields (i.e., for each STR variant record; not present for SNV records):\n\n* `VT`: Variant record type (`str` or `snv`)\n* `MOTIF`: Motif sequence\n* `REFMC`: Motif copy number in the reference genome\n* `BED_START`: Original start position of the locus as defined in the BED catalog (0-based inclusive). \n  *Remember that VCF positions are 1-based for the `POS` column, whereas this is 0-based!*\n* `BED_END`: Original end position of the locus as defined in the BED catalog (0-based exclusive, i.e., 1-based).\n* `ANCH`: 5' anchor size, i.e., size of the prefix of the reference sequence replaced by any of the alts\n* `ANNOT`: Overlapping genome feature annotations from a GFF3 or GTF file, if provided.\n  **Note:** If the feature has an `ID` attribute available, this will be used. Otherwise, an ID will be generated based\n  on a combination of the feature type and the available attributes:\n   * If the feature type is `transcript` and `transcript_id` is set as an attribute, the ID will be constructed as\n     `transcript:<transcript_id>` where `<transcript_id>` is the value of the `transcript_id` attribute. This same \n     pattern holds for `gene` and `exonh` features as well. If `gene_id`/`transcript_id`/`exon_id` cannot be found, the \n     record index is used instead (`gene:0` would be the gene record on line 0, the first record the file.)\n   * If the feature type is something else, the `exon_id` attribute will be used to construct an ID of the same form if \n     possible, with the same fallback as above.\n"
+          },
+          {
+            "file": "docs/remote_viz.md",
+            "origin": "repo",
+            "text": "# Using `strkit visualize` remotely\n\nThe `strkit visualize` command starts a local web server in order to make genotyping results data browseable.\nHowever, if you are working in a high-performance computing (HPC) environment such as a Digital Research Alliance of \nCanada (DRAC; f.k.a. Compute Canada) cluster, you will need to do some additional work to access this web interface \nwithout having to copy data to your local machine.\n\n> [!NOTE]\n> This guide assumes that the `visualize` web server will run on port 5011 both locally and on the server. This is the\n> default, but you can specify a custom port using the `--port` option when running `strkit visualize`.\n\n> [!IMPORTANT]\n> While the server is running, others on the machine can access it, as it binds a port on the entire server. Do not do \n> this in an insecure or untrusted environment!\n\nAs an example, let's assume we have some genotyping results data on the \n[Rorqual](https://docs.alliancecan.ca/wiki/Rorqual/en) cluster. We're going to forward the 5011 port to our local \nmachine from whichever login node we sign in to, using the `ssh -L` option (with the syntax \n`<local port>:<remote host>:<remote port>`):\n\n```bash\nssh -L 5011:localhost:5011 <user>@rorqual.alliancecan.ca \ncd path/to/our/results  # navigate to the directory with our genotyping results JSON file and other required files\nsource env/bin/activate  # activate our STRkit Python virtual environment\nstrkit visualize ./path/to/bam --ref hg38 --json my_calls.json\n```\n\nThen, on your local machine, go to http://localhost:5011. While the SSH connection is active and `strkit visualize` is \nrunning, you should be able to interact with the interface.\n"
+          },
+          {
+            "file": "docs/trio_analyses.md",
+            "origin": "repo",
+            "text": "# Trio analyses with STRkit\n\nTrio datasets include genomic sequence data for a child, their mother, and their father (the \"trio\"). These data\ncan be used to discover de novo mutation (and incidental genotyping errors).\n\nSTRkit includes a Mendelian inheritance (MI) analysis tool, under the sub-command `strkit mi`.\nAfter genotyping the trio with `strkit call`, this command can be used to discover loci which:\n\n1. Do not respect exact MI\n2. Do not respect MI allowing for a \u00b11 repeat unit difference \n   (Note: most true mutation occurs in 1-repeat-unit changes too! \n   See [Ellegren, 2004](https://www.nature.com/articles/nrg1348).)\n3. Do not respect MI under the 95% locus confidence intervals\n4. Look like de novo mutation at a read count distribution level, via a Mann-Whitney *U* test (with tie correction).\n   The alternative hypothesis can be specified as either two-sided or looking for expansion in the offspring. \n   *The requirements for this test are invalidated in cases of mosaicism.*\n5. Look like de novo mutation at a read count distribution level, via a chi-squared independence test,\n   where the contingency table looks like the following:\n\n| Read distribution \\ Copy number | 11   | 12   | 13   |\n|---------------------------------|------|------|------|\n| Parent reads (best peak fit)    | 20   | 10   | 0    |\n| Child reads                     | 2    | 20   | 10   |\n\n\n## Trio-level\n\nAt a trio level, the chi-squared test gives (optionally multiple testing-corrected) loci with a significant\nchance of containing a de novo mutation.\n\n## Cohort-level\n\nAt a cohort level, multiple downstream analyses are possible from a collection of trio mutation analyses,\nsuch as:\n\n  1. Case-control analysis looking for frequency of de novo mutations in specific loci\n  2. Case-control analysis looking at the incidence rate of de novo mutation\n\nCurrently, tools to automatically perform these analyses are not available in STRkit.\n"
+          },
+          {
+            "file": "docs/convert_trf_to_bed.md",
+            "origin": "repo",
+            "text": "# Converting TRF DAT files to BED \n\n**Version:** v0.25.0+\n\n[Tandem Repeats Finder](https://tandem.bu.edu/trf/trf.html) ([Benson 1999](https://pubmed.ncbi.nlm.nih.gov/9862982/)) \nis a widely-used tool for discovering tandem repeat regions in genomes. However, its output is in the form of a `.dat` \nfile, which is not always convenient for use in other programs (e.g., TR callers, web browsers)\n\nSTRkit provides a built-in subcommand, `strkit convert`, which can (among other things) convert TRF files from the TRF\n`.dat` format to either a standard four-column BED file, or a UCSC-style TRF BED file.\n\nTo convert a TRF `.dat` file to a sorted four-column BED using STRkit, run the following command:\n\n```bash\nstrkit convert --in-format trf --out-format bed4 --sort trf.dat > repeats.bed\n```\n\nTo convert a TRF `.dat` file to a sorted UCSC-style TRF BED file, run the following command instead:\n\n```bash\nstrkit convert --in-format trf --out-format trf --sort trf.dat > trf.bed\n```\n"
+          },
+          {
+            "file": "docs/ploidy_configuration.md",
+            "origin": "repo",
+            "text": "# Ploidy configuration\n\n> **NOTE:** Currently, STRkit only supports calling/analyzing haploid/diploid genomic regions in most parts of the code.\n> Polyploid genomes may work with some parts of the code, but are not officially supported. \n\nSTRkit uses a \"ploidy configuration file\" to determine the number of alleles to call, passed via `--ploidy` or \n`--sex-chr`. Several are included in the package (see [`strkit/data/ploidy_configs`](../strkit/data/ploidy_configs)),\nand can be referenced by alias (`diploid_autosomes`, `XX`/`diploid_xx`, `XY`/`diploid_xy`, `haploid`) but custom \nconfigurations can also be specified as a path to a JSON file formatted like the files linked.\n"
+          }
+        ],
+        "tool_names": [
+          "LICENSE",
+          "_bed_4",
+          "_bed_4.py",
+          "align_matrix",
+          "align_matrix.py",
+          "allele",
+          "allele.py",
+          "base",
+          "base.py",
+          "call_locus",
+          "call_locus.py",
+          "call_sample",
+          "call_sample.py",
+          "combine",
+          "combine.py",
+          "constants",
+          "constants.py",
+          "converter",
+          "converter.py",
+          "entry",
+          "entry.py",
+          "exceptions",
+          "exceptions.py",
+          "expansionhunter",
+          "expansionhunter.py",
+          "gangstr",
+          "gangstr.py",
+          "generic_vcf",
+          "generic_vcf.py",
+          "gmm",
+          "gmm.py",
+          "hipstr",
+          "hipstr.py",
+          "intervals",
+          "intervals.py",
+          "iupac",
+          "iupac.py",
+          "json",
+          "json.py",
+          "loci",
+          "loci.py",
+          "logger",
+          "logger.py",
+          "non_daemonic_pool",
+          "non_daemonic_pool.py",
+          "params",
+          "params.py",
+          "ploidy",
+          "ploidy.py",
+          "realign",
+          "realign.py",
+          "repeat_count_params",
+          "repeat_count_params.py",
+          "repeathmm",
+          "repeathmm.py",
+          "repeats",
+          "repeats.py",
+          "result",
+          "result.py",
+          "server",
+          "server.py",
+          "snvs",
+          "snvs.py",
+          "straglr",
+          "straglr.py",
+          "strkit",
+          "strkit.py",
+          "tandem_genotypes",
+          "tandem_genotypes.py",
+          "trf",
+          "trf.py",
+          "trgt",
+          "trgt.py",
+          "types",
+          "types.py",
+          "utils",
+          "utils.py",
+          "vcf_utils",
+          "vcf_utils.py"
+        ],
+        "tree_paths": [
+          ".gitignore",
+          ".idea/.gitignore",
+          ".idea/.name",
+          ".idea/csv-editor.xml",
+          ".idea/inspectionProfiles/Project_Default.xml",
+          ".idea/inspectionProfiles/profiles_settings.xml",
+          ".idea/misc.xml",
+          ".idea/modules.xml",
+          ".idea/pyLspTools.xml",
+          ".idea/vcs.xml",
+          "Dockerfile",
+          "LICENSE",
+          "MANIFEST.in",
+          "README.md",
+          "catalogs/pathogenic_assoc.hg38.tsv",
+          "docs/caller_catalog.md",
+          "docs/caller_usage.md",
+          "docs/convert_trf_to_bed.md",
+          "docs/images/browser_hist.png",
+          "docs/images/browser_igv.png",
+          "docs/images/call_method_flow.png",
+          "docs/images/strkit_logo_open_graph.png",
+          "docs/images/strkit_logo_small.png",
+          "docs/output_formats.md",
+          "docs/ploidy_configuration.md",
+          "docs/remote_viz.md",
+          "docs/trio_analyses.md",
+          "pyproject.toml",
+          "strkit/__init__.py",
+          "strkit/call/__init__.py",
+          "strkit/call/align_matrix.py",
+          "strkit/call/allele.py",
+          "strkit/call/call_locus.py",
+          "strkit/call/call_sample.py",
+          "strkit/call/constants.py",
+          "strkit/call/gmm.py",
+          "strkit/call/loci.py",
+          "strkit/call/non_daemonic_pool.py",
+          "strkit/call/output/__init__.py",
+          "strkit/call/output/json_report.py",
+          "strkit/call/output/vcf.py",
+          "strkit/call/params.py",
+          "strkit/call/realign.py",
+          "strkit/call/repeat_count_params.py",
+          "strkit/call/repeats.py",
+          "strkit/call/snvs.py",
+          "strkit/call/types.py",
+          "strkit/call/utils.py",
+          "strkit/catalog/__init__.py",
+          "strkit/catalog/combine.py",
+          "strkit/constants.py",
+          "strkit/convert/__init__.py",
+          "strkit/convert/_bed_4.py",
+          "strkit/convert/constants.py",
+          "strkit/convert/converter.py",
+          "strkit/convert/expansionhunter.py",
+          "strkit/convert/gangstr.py",
+          "strkit/convert/hipstr.py",
+          "strkit/convert/trf.py",
+          "strkit/convert/trgt.py",
+          "strkit/data/ploidy_configs/diploid_autosomes.json",
+          "strkit/data/ploidy_configs/diploid_xx.json",
+          "strkit/data/ploidy_configs/diploid_xy.json",
+          "strkit/data/ploidy_configs/haploid.json",
+          "strkit/entry.py",
+          "strkit/exceptions.py",
+          "strkit/iupac.py",
+          "strkit/json.py",
+          "strkit/logger.py",
+          "strkit/mi/__init__.py",
+          "strkit/mi/base.py",
+          "strkit/mi/expansionhunter.py",
+          "strkit/mi/gangstr.py",
+          "strkit/mi/generic_vcf.py",
+          "strkit/mi/intervals.py",
+          "strkit/mi/repeathmm.py",
+          "strkit/mi/result.py",
+          "strkit/mi/straglr.py",
+          "strkit/mi/strkit.py",
+          "strkit/mi/tandem_genotypes.py",
+          "strkit/mi/trgt.py",
+          "strkit/mi/vcf_utils.py",
+          "strkit/ploidy.py",
+          "strkit/utils.py",
+          "strkit/viz/__init__.py",
+          "strkit/viz/server.py",
+          "strkit/viz/static/logo.png",
+          "strkit/viz/templates/browser.html",
+          "tests/__init__.py",
+          "tests/data/test_loci.bed",
+          "tests/data/trf_convert_sort.dat",
+          "tests/test_caller_loci_fns.py",
+          "tests/test_caller_utils.py",
+          "tests/test_convert.py",
+          "tests/test_iupac.py",
+          "tests/test_mi_intervals.py",
+          "tests/test_ploidy.py",
+          "tests/test_utils.py",
+          "uv.lock"
+        ],
+        "tree_truncated": false,
+        "upstream_files": {}
+      },
+      "limitations": [
+        "install_profile_unsupported"
+      ],
+      "caveat_items": [
+        "Environment: no proven installation profile; STRhub did not manufacture installation steps.",
+        "Input: the README documents BAM (line 111); this plan selects STRhub's ont-bam-hg38 reference data. Supported platforms documented: ont, pacbio, illumina; STRhub selected ont for this trial.",
+        "Evaluator limitation: the command reads the reference genome in a form STRhub does not mount (it mounts an uncompressed FASTA with its .fai index).",
+        "Evaluator limitation: a read-file argument is outside the closed input substitution table.",
+        "Run command: the one documented in docs/caller_usage.md (line 151), rewritten to STRhub's mounts; the capture wrapper is planned only if the procedure review passes."
+      ]
+    }
+  },
+  "provenance": {
+    "from_upstream": {
+      "install": {
+        "method": "pip",
+        "evidence_source": "repo_file:pyproject.toml"
+      },
+      "command": {
+        "value": "strkit call --loci /path/to/catalog --ref /path/to/ref.fa.gz --processes 10 --seed 342 --vcf sample.vcf path/to/sample.bam",
+        "evidence_source": "docs/caller_usage.md:L151"
+      },
+      "input_kind": {
+        "value": "bam",
+        "evidence_source": "README.md:L111"
+      },
+      "supported_platforms": [
+        {
+          "platform": "ont",
+          "evidence_source": "README.md:L1"
+        },
+        {
+          "platform": "pacbio",
+          "evidence_source": "README.md:L5"
+        },
+        {
+          "platform": "illumina",
+          "evidence_source": "README.md:L402"
+        }
+      ],
+      "assembly": {
+        "declared": "both",
+        "evidence_source": "README.md:L250"
+      },
+      "regions_schema": {
+        "format": "motif",
+        "evidence_source": "README.md:L179"
+      },
+      "output_format": {
+        "glob": "**/*.vcf*",
+        "evidence_source": "docs/caller_usage.md:L151"
+      }
+    },
+    "derived": {
+      "command_rewrites": [],
+      "regions_layout_binding": null,
+      "single_sample_adaptation": null
+    },
+    "harness_choices": {
+      "dataset": {
+        "selected": "ont-bam-hg38",
+        "reason": "STRhub selected 'ont-bam-hg38' as compatible with upstream input 'bam' and platform 'ont'"
+      },
+      "platform": {
+        "selected": "ont",
+        "basis": "harness_choice_from_supported",
+        "supported_platforms": [
+          "ont",
+          "pacbio",
+          "illumina"
+        ]
+      },
+      "assembly": {
+        "selected": "hg38",
+        "basis": "upstream_stated",
+        "note": null
+      },
+      "regions_layout": null,
+      "base_environment": null
+    }
+  },
+  "procedure_validation": {
+    "schema": "strhub-procedure-evidence/1",
+    "valid": true,
+    "reason": "Procedure evidence matches the effective manifest and recomputed decision."
+  },
+  "verdict": {
+    "code": "undetermined",
+    "title": "Could not be determined",
+    "basis": "recipe",
+    "reason": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub.",
+    "readme_gaps": [],
+    "status_code": "UNVERIFIED_INSUFFICIENT_DOCS",
+    "blockers": [
+      {
+        "code": "install_not_copyable",
+        "what": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub.",
+        "ask_owner": {
+          "title": "Write the installation as commands that can be copied and run",
+          "body": "STRhub Verified reads the installation from the repository's documentation and runs it exactly as written, adding nothing. At this commit it could not follow it. Writing the installation as plain commands in one code block (apt, conda, pip, make or cmake, with the files they name in the repository) lets a new user, a reviewer and STRhub install the tool by copying it. The forms it can follow are listed in the guide: https://github.com/Tfronta/strhub-verified-next/blob/main/docs/GUIA-PASO-1.md What stopped it: No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub."
+        }
+      }
+    ]
+  },
+  "step1": {
+    "code": "cannot_tell",
+    "headline": "As documented, a third party cannot tell how to run it.",
+    "body": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub. Nothing was executed. That does not mean the tool does not work: what the guide asks for is missing from the README at this commit. Add it and try the link again on the new commit.",
+    "missing": [
+      "install"
+    ],
+    "missing_text": [
+      "Installation, copyable"
+    ],
+    "guide": "docs/GUIA-PASO-1.md"
+  },
+  "certificate": {
+    "schema": "strhub-verified/certificate/1",
+    "label": "Could not be determined",
+    "reached": "Available",
+    "stages": [
+      {
+        "key": "available",
+        "label": "Source available",
+        "status": "PASS"
+      },
+      {
+        "key": "installs",
+        "label": "Installation",
+        "status": "NOT ATTEMPTED"
+      },
+      {
+        "key": "runs",
+        "label": "End-to-end execution",
+        "status": "NOT ATTEMPTED"
+      },
+      {
+        "key": "output",
+        "label": "Output generated",
+        "status": "NOT ATTEMPTED"
+      }
+    ],
+    "summary": {
+      "purpose": "Evaluate whether the tool installs, runs end-to-end, and produces structurally valid output.",
+      "result": "Could not be determined",
+      "reached": "Available, 1/5 gates passed",
+      "why": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub.",
+      "scope": "Installation, execution, and output structure evaluation.",
+      "not_evaluated": [
+        "Genotype accuracy",
+        "Concordance",
+        "Forensic validity",
+        "Regulatory compliance"
+      ]
+    },
+    "conclusion": [
+      {
+        "title": "Procedure not established",
+        "body": "The recorded gate observations do not establish whether the documented procedure succeeded or failed."
+      },
+      {
+        "title": "Observations retained",
+        "body": "The supplied run and output observations remain in the report; they do not replace procedure evidence."
+      },
+      {
+        "title": "Verdict: Could not be determined",
+        "body": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub."
+      },
+      {
+        "title": "Reproducibility not established",
+        "body": "These observations are insufficient to establish a reproducible documented execution finding."
+      }
+    ],
+    "out_of_scope": [
+      "Genotype correctness or accuracy",
+      "Concordance against known truth sets",
+      "Sensitivity, specificity, or stutter performance",
+      "Allele calling accuracy or forensic casework suitability",
+      "Regulatory compliance or ISO accreditation",
+      "Multi-laboratory or multi-dataset reproducibility"
+    ],
+    "limitations": [
+      "Single reference dataset per input type",
+      "Single containerized environment (Docker / ubuntu-22.04)",
+      "No truth-set comparison or ground-truth genotypes",
+      "No accuracy or concordance assessment",
+      "No forensic or clinical validation of results",
+      "No sequencing data were processed because execution did not complete"
+    ],
+    "scope": {
+      "statement": "Independent automated evaluation of reproducible execution. It checks whether the tool installs, runs end-to-end, and produces structurally valid output in a standardized environment.",
+      "not": "This is not an analytical validation. Genotype accuracy, concordance, forensic suitability, and regulatory compliance are out of scope.",
+      "disclaimer": "Each result is a dated snapshot, verified on the tool's public repository at a pinned commit. STRhub does not store tool source code."
+    }
+  }
+}
