@@ -1,7 +1,7 @@
 {
   "schema": "strhub-verified/index/3",
-  "generated": "2026-11-22T19:15:02+00:00",
-  "count": 18,
+  "generated": "2026-11-22T19:15:07+00:00",
+  "count": 19,
   "tools": [
     {
       "slug": "expansionhunter",
@@ -478,6 +478,50 @@
           "report": "strique/ade4589ecb2bf6672c839e31b80b7cc0c0d7b084/strique.json",
           "page": "strique/ade4589ecb2bf6672c839e31b80b7cc0c0d7b084/strique.html",
           "pdf": "strique/ade4589ecb2bf6672c839e31b80b7cc0c0d7b084/strique.pdf"
+        }
+      ]
+    },
+    {
+      "slug": "strling-med",
+      "name": "STRling",
+      "version": "v0.6.0",
+      "variant": null,
+      "sha": "35c542d8046e6e6489f3bed4e85f7ceeb22e95ba",
+      "committed": "2025-12-06T00:13:57Z",
+      "instrument": "documented",
+      "level": "available",
+      "label": "Could not be determined",
+      "verdict": "undetermined",
+      "errors_reported": false,
+      "generated": "2026-11-22T19:14:42+00:00",
+      "source_repo": "https://github.com/quinlan-lab/STRling",
+      "source_ref": "35c542d8046e6e6489f3bed4e85f7ceeb22e95ba",
+      "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/45059560669",
+      "distinct_str_loci": null,
+      "distinct_snp_markers": null,
+      "total_reads": null,
+      "external_state": "na",
+      "dataset_types": [
+        "illumina-bam-hg38-med"
+      ],
+      "report": "strling-med.json",
+      "page": "strling-med.html",
+      "versions": [
+        {
+          "sha": "35c542d8046e6e6489f3bed4e85f7ceeb22e95ba",
+          "instrument": "documented",
+          "version": "v0.6.0",
+          "variant": null,
+          "committed": "2025-12-06T00:13:57Z",
+          "generated": "2026-11-22T19:14:42+00:00",
+          "level": "available",
+          "label": "Could not be determined",
+          "verdict": "undetermined",
+          "errors_reported": false,
+          "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/45059560669",
+          "report": "strling-med/35c542d8046e6e6489f3bed4e85f7ceeb22e95ba/strling-med.json",
+          "page": "strling-med/35c542d8046e6e6489f3bed4e85f7ceeb22e95ba/strling-med.html",
+          "pdf": "strling-med/35c542d8046e6e6489f3bed4e85f7ceeb22e95ba/strling-med.pdf"
         }
       ]
     },

@@ -1,0 +1,1156 @@
+{
+  "schema": "strhub-verified/1",
+  "mode": "publish",
+  "tool": {
+    "name": "STRling",
+    "version": "v0.6.0",
+    "contact": "https://github.com/quinlan-lab/STRling/issues"
+  },
+  "submission": {
+    "by": "third_party"
+  },
+  "source": {
+    "repo": "https://github.com/quinlan-lab/STRling",
+    "ref": "35c542d8046e6e6489f3bed4e85f7ceeb22e95ba",
+    "ref_resolved": "35c542d8046e6e6489f3bed4e85f7ceeb22e95ba",
+    "committed": "2025-12-06T00:13:57Z"
+  },
+  "environment": {
+    "dockerfile": "Dockerfile",
+    "os": [
+      "ubuntu-22.04"
+    ],
+    "source": "generated"
+  },
+  "generated": "2026-11-22T19:14:42+00:00",
+  "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/45059560669",
+  "run": {
+    "cmd": "../strling call -v -o single/CANVAS.chr4-39348425_AAGGG_0_400 CANVAS.chr4-39348425_AAGGG_0_400.bam single/CANVAS.chr4-39348425_AAGGG_0_400.str.bin",
+    "cwd": ".",
+    "effective_cmd": "cd '.' && touch /tmp/.strhub_mark && ( ../strling call -v -o single/CANVAS.chr4-39348425_AAGGG_0_400 CANVAS.chr4-39348425_AAGGG_0_400.bam single/CANVAS.chr4-39348425_AAGGG_0_400.str.bin ); rc=$?; find . -xdev -type f -newer /tmp/.strhub_mark -size +0 ! -path './.git/*' ! -path './proc/*' ! -path './sys/*' ! -path './dev/*' ! -path './data/*' ! -path '*/__pycache__/*' ! -name '*.pyc' ! -name '*.pyo' 2>/dev/null | head -500 | while IFS= read -r f; do mkdir -p \"/data/out/$(dirname \"$f\")\" && cp \"$f\" \"/data/out/$f\"; done; exit $rc",
+    "step_outcome": "skipped"
+  },
+  "instrument": "documented",
+  "recipe": {
+    "origin": "proposed"
+  },
+  "gates": {
+    "available": true,
+    "installs": false,
+    "runs": false,
+    "io": false,
+    "content": false
+  },
+  "input_contract": {
+    "type": "illumina-bam-hg38-med"
+  },
+  "level": "available",
+  "io_detail": {},
+  "content_detail": {},
+  "example_detail": null,
+  "datasets": [
+    {
+      "leg": "external",
+      "label": "External data",
+      "available": false,
+      "type": "illumina-bam-hg38-med",
+      "dataset": null,
+      "io": false,
+      "content": false,
+      "passed": false
+    },
+    {
+      "leg": "example",
+      "label": "Tool's own example",
+      "available": false,
+      "io": false,
+      "content": null,
+      "passed": false,
+      "matches_expected": null,
+      "produced_count": null
+    }
+  ],
+  "scope": "Assessment of documented execution in the stated environment and output format. Concerns reproducible execution only; no claim of accuracy, casework fitness, or regulatory validation.",
+  "upstream": {
+    "checked": "2026-11-22T19:14:42+00:00",
+    "repo_exists": true,
+    "ref_exists": true,
+    "default_branch": "master",
+    "status": "identical",
+    "behind_by": 0
+  },
+  "evidence": [
+    {
+      "claim": "run_command",
+      "kind": "doc",
+      "path": "docs/source/test.rst",
+      "line": 34,
+      "text": "../strling call -v -o single/CANVAS.chr4-39348425_AAGGG_0_400 CANVAS.chr4-39348425_AAGGG_0_400.bam single/CANVAS.chr4-39348425_AAGGG_0_400.str.bin",
+      "url": "https://github.com/quinlan-lab/STRling/blob/35c542d8046e6e6489f3bed4e85f7ceeb22e95ba/docs/source/test.rst#L34"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "data/hg38.STR_disease_loci.bed",
+      "text": "bed",
+      "url": "https://github.com/quinlan-lab/STRling/blob/35c542d8046e6e6489f3bed4e85f7ceeb22e95ba/data/hg38.STR_disease_loci.bed"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "sim/htt_locus.bed",
+      "text": "bed",
+      "url": "https://github.com/quinlan-lab/STRling/blob/35c542d8046e6e6489f3bed4e85f7ceeb22e95ba/sim/htt_locus.bed"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "sim/disease_loci_sims_minpath.bed",
+      "text": "bed",
+      "url": "https://github.com/quinlan-lab/STRling/blob/35c542d8046e6e6489f3bed4e85f7ceeb22e95ba/sim/disease_loci_sims_minpath.bed"
+    }
+  ],
+  "repo_test_data": {
+    "known": true,
+    "present": true,
+    "count": 3,
+    "examples": [
+      "data/hg38.STR_disease_loci.bed",
+      "sim/htt_locus.bed",
+      "sim/disease_loci_sims_minpath.bed"
+    ]
+  },
+  "caveats": {
+    "source": "detect_recipe",
+    "items": [
+      "Environment: no proven installation profile; STRhub did not manufacture installation steps.",
+      "Input: the documented command takes BAM (docs/source/test.rst, line 34); no sentence says so, so the command is what was read. This plan selects STRhub's illumina-bam-hg38-med reference data.",
+      "Panel: the shipped loci catalog (data/hg38.STR_disease_loci.bed) overlaps 31 loci in STRhub's medical STR slice and 0 in the forensic slice; this plan selects STRhub's illumina-bam-hg38-med reference data.",
+      "Evaluator limitation: a read-file argument is outside the closed input substitution table.",
+      "Run command: the one documented in docs/source/test.rst (line 34), rewritten to STRhub's mounts; the capture wrapper is planned only if the procedure review passes."
+    ]
+  },
+  "install_detail": {
+    "passed": false,
+    "diagnostics": [],
+    "faults": []
+  },
+  "procedure_review": {
+    "may_say_runs": false,
+    "status_code": "UNVERIFIED_INSUFFICIENT_DOCS",
+    "basis": "recipe",
+    "attribution": "strhub",
+    "blocker": "install_not_copyable",
+    "reason": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub.",
+    "amendments": [
+      {
+        "code": "command_profile_unsupported",
+        "what": "A read-file argument is outside the closed input substitution table."
+      },
+      {
+        "code": "input_not_substituted",
+        "what": "This evaluator cannot establish that the cited command reads the declared reference input; no config or input list was rewritten to make it do so."
+      },
+      {
+        "code": "install_not_copyable",
+        "what": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub."
+      },
+      {
+        "code": "input_not_substituted",
+        "what": "The command still names the repository's own file paths, not STRhub's sample. Running it would not be the reference-sample test."
+      }
+    ],
+    "inferences": {
+      "install": {
+        "evidence_source": "release_asset:strling",
+        "verified": false
+      },
+      "run_command": {
+        "evidence_source": "docs/source/test.rst:L34",
+        "verified": true,
+        "kind": "doc",
+        "path": "docs/source/test.rst",
+        "document_sha256": "34bae20dbaace0386444488d1b66f9f9eadc5ebd96e6564a156a62d5fd71dc63"
+      },
+      "input_type": {
+        "verified": true,
+        "kind": "doc",
+        "path": "docs/source/test.rst",
+        "line": 34,
+        "end_line": 34,
+        "document_sha256": "34bae20dbaace0386444488d1b66f9f9eadc5ebd96e6564a156a62d5fd71dc63",
+        "evidence_source": "docs/source/test.rst:L34",
+        "upstream_input_kind": "bam",
+        "selected_dataset": "illumina-bam-hg38-med"
+      },
+      "platform": {
+        "verified": true,
+        "kind": "doc",
+        "path": "README.md",
+        "line": 9,
+        "end_line": 9,
+        "document_sha256": "41e024c970ae79f80f3a84b3befa2f5f7bc465ce2d386e630e13d7954a8e458b",
+        "evidence_source": "README.md:L9",
+        "selected": "illumina",
+        "selection_basis": "upstream_single_platform",
+        "supported_platforms": [
+          "illumina"
+        ]
+      },
+      "output": {
+        "verified": true,
+        "kind": "doc",
+        "path": "docs/source/run.rst",
+        "line": 37,
+        "end_line": 37,
+        "document_sha256": "badeaba89b7824fef4420372ae252873d53f95d35a1d73688a7df243a6920037",
+        "evidence_source": "docs/source/run.rst:L37"
+      }
+    },
+    "unbacked_inferences": [
+      "install"
+    ],
+    "provenance": {
+      "from_upstream": {
+        "install": {
+          "method": "release_binary",
+          "evidence_source": "release_asset:strling"
+        },
+        "command": {
+          "value": "../strling call -v -o single/CANVAS.chr4-39348425_AAGGG_0_400 CANVAS.chr4-39348425_AAGGG_0_400.bam single/CANVAS.chr4-39348425_AAGGG_0_400.str.bin",
+          "evidence_source": "docs/source/test.rst:L34"
+        },
+        "input_kind": {
+          "value": "bam",
+          "evidence_source": "docs/source/test.rst:L34"
+        },
+        "supported_platforms": [
+          {
+            "platform": "illumina",
+            "evidence_source": "README.md:L9"
+          }
+        ],
+        "assembly": {
+          "declared": "hg38",
+          "evidence_source": "docs/source/test.rst:L29"
+        },
+        "regions_schema": null,
+        "output_format": {
+          "glob": "**/*.t[sx][vt]",
+          "evidence_source": "docs/source/run.rst:L37"
+        }
+      },
+      "derived": {
+        "command_rewrites": [],
+        "regions_layout_binding": null,
+        "single_sample_adaptation": null
+      },
+      "harness_choices": {
+        "dataset": {
+          "selected": "illumina-bam-hg38-med",
+          "reason": "STRhub selected 'illumina-bam-hg38-med' as compatible with upstream input 'bam' and platform 'illumina'; shipped catalog 'data/hg38.STR_disease_loci.bed' overlaps 31 medical panel loci and 0 forensic loci"
+        },
+        "platform": {
+          "selected": "illumina",
+          "basis": "upstream_single_platform",
+          "supported_platforms": [
+            "illumina"
+          ]
+        },
+        "assembly": {
+          "selected": "hg38",
+          "basis": "upstream_stated",
+          "note": null
+        },
+        "regions_layout": null,
+        "base_environment": null
+      }
+    },
+    "install_method": "release_binary",
+    "citable_install": false,
+    "input_type": "illumina-bam-hg38-med",
+    "output_glob": "**/*.t[sx][vt]",
+    "profile": "strhub-upstream-procedure/1",
+    "install_ready": false,
+    "example_ready": false,
+    "installation": {
+      "profile": "strhub-upstream-procedure/1",
+      "ready": false,
+      "method": "release_binary",
+      "reason": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub.",
+      "gap": "commit"
+    },
+    "command_review": {
+      "profile": "strhub-upstream-procedure/1",
+      "cited": "../strling call -v -o single/CANVAS.chr4-39348425_AAGGG_0_400 CANVAS.chr4-39348425_AAGGG_0_400.bam single/CANVAS.chr4-39348425_AAGGG_0_400.str.bin",
+      "command": "../strling call -v -o single/CANVAS.chr4-39348425_AAGGG_0_400 CANVAS.chr4-39348425_AAGGG_0_400.bam single/CANVAS.chr4-39348425_AAGGG_0_400.str.bin",
+      "substitutions": [],
+      "read_bindings": [],
+      "limitations": [
+        "a read-file argument is outside the closed input substitution table"
+      ],
+      "expected": "../strling call -v -o single/CANVAS.chr4-39348425_AAGGG_0_400 CANVAS.chr4-39348425_AAGGG_0_400.bam single/CANVAS.chr4-39348425_AAGGG_0_400.str.bin",
+      "executed": "../strling call -v -o single/CANVAS.chr4-39348425_AAGGG_0_400 CANVAS.chr4-39348425_AAGGG_0_400.bam single/CANVAS.chr4-39348425_AAGGG_0_400.str.bin",
+      "cited_sha256": "4419d3c09cdcdf850fd7dd2499baa65f17cffd3d6e2d183c0b7606b6a74f7503",
+      "executed_sha256": "4419d3c09cdcdf850fd7dd2499baa65f17cffd3d6e2d183c0b7606b6a74f7503",
+      "citations": [
+        {
+          "repo": "https://github.com/quinlan-lab/STRling",
+          "ref": "35c542d8046e6e6489f3bed4e85f7ceeb22e95ba",
+          "path": "docs/source/test.rst",
+          "line": 34,
+          "verified": true,
+          "document_sha256": "34bae20dbaace0386444488d1b66f9f9eadc5ebd96e6564a156a62d5fd71dc63",
+          "command_sha256": "4419d3c09cdcdf850fd7dd2499baa65f17cffd3d6e2d183c0b7606b6a74f7503"
+        }
+      ]
+    },
+    "manifest_sha256": "1f58ecbe53c91666ee9331fce39fa52436e1b16fc384398f61a51e509d27f698",
+    "evidence_sha256": "d2a0c7c83a259f2f713505e5324ea046bda95cd4512a65699e615d0e79e53179",
+    "evidence": {
+      "schema": "strhub-procedure-evidence/1",
+      "manifest": {
+        "caveats": {
+          "items": [
+            "Environment: no proven installation profile; STRhub did not manufacture installation steps.",
+            "Input: the documented command takes BAM (docs/source/test.rst, line 34); no sentence says so, so the command is what was read. This plan selects STRhub's illumina-bam-hg38-med reference data.",
+            "Panel: the shipped loci catalog (data/hg38.STR_disease_loci.bed) overlaps 31 loci in STRhub's medical STR slice and 0 in the forensic slice; this plan selects STRhub's illumina-bam-hg38-med reference data.",
+            "Evaluator limitation: a read-file argument is outside the closed input substitution table.",
+            "Run command: the one documented in docs/source/test.rst (line 34), rewritten to STRhub's mounts; the capture wrapper is planned only if the procedure review passes."
+          ],
+          "source": "detect_recipe"
+        },
+        "environment": {
+          "dockerfile": "Dockerfile",
+          "os": [
+            "ubuntu-22.04"
+          ],
+          "source": "generated"
+        },
+        "inputs": {
+          "type": "illumina-bam-hg38-med"
+        },
+        "outputs": [
+          {
+            "format": "tsv",
+            "min_records": 1,
+            "path": "**/*.t[sx][vt]"
+          }
+        ],
+        "recipe": {
+          "origin": "proposed"
+        },
+        "report": {
+          "slug": "strling-med"
+        },
+        "run": {
+          "cmd": "cd '.' && touch /tmp/.strhub_mark && ( ../strling call -v -o single/CANVAS.chr4-39348425_AAGGG_0_400 CANVAS.chr4-39348425_AAGGG_0_400.bam single/CANVAS.chr4-39348425_AAGGG_0_400.str.bin ); rc=$?; find . -xdev -type f -newer /tmp/.strhub_mark -size +0 ! -path './.git/*' ! -path './proc/*' ! -path './sys/*' ! -path './dev/*' ! -path './data/*' ! -path '*/__pycache__/*' ! -name '*.pyc' ! -name '*.pyo' 2>/dev/null | head -500 | while IFS= read -r f; do mkdir -p \"/data/out/$(dirname \"$f\")\" && cp \"$f\" \"/data/out/$f\"; done; exit $rc",
+          "timeout_minutes": 20
+        },
+        "source": {
+          "ref": "35c542d8046e6e6489f3bed4e85f7ceeb22e95ba",
+          "repo": "https://github.com/quinlan-lab/STRling"
+        },
+        "submission": {
+          "by": "third_party"
+        },
+        "tool": {
+          "contact": "https://github.com/quinlan-lab/STRling/issues",
+          "name": "STRling",
+          "version": "v0.6.0"
+        }
+      },
+      "proposal": {
+        "build": {
+          "also_published": null,
+          "asset": "strling",
+          "candidates": [
+            {
+              "asset": "strling",
+              "digest": "sha256:477c24920ef8c3b75d46563106682cf441edf85576bfcaaffc4d728c1a555152",
+              "file": null,
+              "method": "release_binary",
+              "tag": "v0.6.0",
+              "url": "https://github.com/quinlan-lab/STRling/releases/download/v0.6.0/strling"
+            },
+            {
+              "file": "environment.yml",
+              "method": "conda"
+            },
+            {
+              "file": "strling.nimble",
+              "method": "nim"
+            }
+          ],
+          "digest": "sha256:477c24920ef8c3b75d46563106682cf441edf85576bfcaaffc4d728c1a555152",
+          "dir": null,
+          "evidence_source": "release_asset:strling",
+          "file": null,
+          "image": null,
+          "method": "release_binary",
+          "package": null,
+          "readme_install_lines": [],
+          "readme_line": null,
+          "spec_list": false,
+          "ssh_urls_in": [],
+          "tag": "v0.6.0",
+          "then": [],
+          "url": "https://github.com/quinlan-lab/STRling/releases/download/v0.6.0/strling"
+        },
+        "commands": [
+          {
+            "cmd": "../strling call -v -o single/CANVAS.chr4-39348425_AAGGG_0_400 CANVAS.chr4-39348425_AAGGG_0_400.bam single/CANVAS.chr4-39348425_AAGGG_0_400.str.bin",
+            "entry_point": true,
+            "evidence_source": "docs/source/test.rst:L34",
+            "file": "docs/source/test.rst",
+            "has_input_flag": true,
+            "has_output_flag": true,
+            "help_only": false,
+            "invokes": "strling",
+            "line": 34,
+            "main_verb": true,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": true,
+            "source_rank": 9,
+            "subcommand": "call",
+            "synopsis": false
+          },
+          {
+            "cmd": "strling call --output-prefix str-results/$sample -f $reference_fasta /path/to/$sample.cram $sample.bin",
+            "entry_point": true,
+            "evidence_source": "docs/source/run.rst:L33",
+            "file": "docs/source/run.rst",
+            "has_input_flag": true,
+            "has_output_flag": true,
+            "help_only": false,
+            "invokes": "strling",
+            "line": 33,
+            "main_verb": true,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": true,
+            "source_rank": 2,
+            "subcommand": "call",
+            "synopsis": false
+          },
+          {
+            "cmd": "strling call --output-prefix str-results/$sample1 -b str-results/joint-bounds.txt -f $reference_fasta /path/to/$sample1.cram $sample1.bin",
+            "entry_point": true,
+            "evidence_source": "docs/source/run.rst:L71",
+            "file": "docs/source/run.rst",
+            "has_input_flag": true,
+            "has_output_flag": true,
+            "help_only": false,
+            "invokes": "strling",
+            "line": 71,
+            "main_verb": true,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": true,
+            "source_rank": 2,
+            "subcommand": "call",
+            "synopsis": false
+          },
+          {
+            "cmd": "strling call --output-prefix str-results/$sample2 -b str-results/joint-bounds.txt -f $reference_fasta /path/to/$sample2.cram $sample2.bin",
+            "entry_point": true,
+            "evidence_source": "docs/source/run.rst:L72",
+            "file": "docs/source/run.rst",
+            "has_input_flag": true,
+            "has_output_flag": true,
+            "help_only": false,
+            "invokes": "strling",
+            "line": 72,
+            "main_verb": true,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": true,
+            "source_rank": 2,
+            "subcommand": "call",
+            "synopsis": false
+          },
+          {
+            "cmd": "../strling extract -f chr4.fa -g chr4.fa.str -v CANVAS.chr4-39348425_AAGGG_0_400.bam single/CANVAS.chr4-39348425_AAGGG_0_400.str.bin",
+            "entry_point": true,
+            "evidence_source": "docs/source/test.rst:L33",
+            "file": "docs/source/test.rst",
+            "has_input_flag": true,
+            "has_output_flag": false,
+            "help_only": false,
+            "invokes": "strling",
+            "line": 33,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": true,
+            "source_rank": 9,
+            "subcommand": "extract",
+            "synopsis": false
+          },
+          {
+            "cmd": "strling index $reference_fasta",
+            "entry_point": true,
+            "evidence_source": "docs/source/run.rst:L15",
+            "file": "docs/source/run.rst",
+            "has_input_flag": false,
+            "has_output_flag": false,
+            "help_only": false,
+            "invokes": "strling",
+            "line": 15,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": true,
+            "source_rank": 2,
+            "subcommand": "index",
+            "synopsis": false
+          },
+          {
+            "cmd": "strling-outliers.py --genotypes *-genotype.txt --unplaced *-unplaced.txt",
+            "entry_point": false,
+            "evidence_source": "docs/source/run.rst:L82",
+            "file": "docs/source/run.rst",
+            "has_input_flag": false,
+            "has_output_flag": true,
+            "help_only": false,
+            "invokes": "strling-outliers.py",
+            "line": 82,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": true,
+            "source_rank": 2,
+            "subcommand": null,
+            "synopsis": false
+          },
+          {
+            "cmd": "strling extract -f $reference_fasta /path/to/$sample.cram $sample.bin",
+            "entry_point": true,
+            "evidence_source": "docs/source/run.rst:L24",
+            "file": "docs/source/run.rst",
+            "has_input_flag": true,
+            "has_output_flag": false,
+            "help_only": false,
+            "invokes": "strling",
+            "line": 24,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": true,
+            "source_rank": 2,
+            "subcommand": "extract",
+            "synopsis": false
+          },
+          {
+            "cmd": "strling extract -f $reference_fasta /path/to/$sample2.cram $sample1.bin",
+            "entry_point": true,
+            "evidence_source": "docs/source/run.rst:L49",
+            "file": "docs/source/run.rst",
+            "has_input_flag": true,
+            "has_output_flag": false,
+            "help_only": false,
+            "invokes": "strling",
+            "line": 49,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": true,
+            "source_rank": 2,
+            "subcommand": "extract",
+            "synopsis": false
+          },
+          {
+            "cmd": "strling extract -f $reference_fasta /path/to/$sample2.cram $sample2.bin",
+            "entry_point": true,
+            "evidence_source": "docs/source/run.rst:L50",
+            "file": "docs/source/run.rst",
+            "has_input_flag": true,
+            "has_output_flag": false,
+            "help_only": false,
+            "invokes": "strling",
+            "line": 50,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": true,
+            "source_rank": 2,
+            "subcommand": "extract",
+            "synopsis": false
+          }
+        ],
+        "dockerfile": null,
+        "docs_read": [
+          {
+            "origin": "repo",
+            "path": "docs/source/install.rst"
+          },
+          {
+            "origin": "repo",
+            "path": "docs/source/run.rst"
+          },
+          {
+            "origin": "repo",
+            "path": "docs/source/cite.rst"
+          },
+          {
+            "origin": "repo",
+            "path": "docs/source/contribute.rst"
+          },
+          {
+            "origin": "repo",
+            "path": "docs/source/debug.rst"
+          },
+          {
+            "origin": "repo",
+            "path": "docs/source/filter.rst"
+          },
+          {
+            "origin": "repo",
+            "path": "docs/source/index.rst"
+          },
+          {
+            "origin": "repo",
+            "path": "docs/source/outputs.rst"
+          },
+          {
+            "origin": "repo",
+            "path": "docs/source/test.rst"
+          },
+          {
+            "origin": "repo",
+            "path": "docs/source/workflows.rst"
+          }
+        ],
+        "docs_text": "Install\n===================================\n\n.. toctree::\n   :maxdepth: 2\n   :caption: Contents:\n\n\nWe recommending downloading the static binary.\n\nDownload the `strling` binary from the latest release `here <https://github.com/quinlan-lab/STRling/releases/latest>`_.\n\nMake it executable:\n`chmod +x strling`\n\nInstall with conda\n------------------\n\nWe suggest conda installation if you want to perform outlier analysis, which requires a python script.\n\n.. code-block:: bash\n\n  conda config --add channels bioconda\n  conda install -y strling\n\nThe following should now be in your path:  \n`strling`  \n`strling-outliers.py`\n\nNote: It should be safe to ignore \"Solving environment: failed ...\" messages as long as the message \"Solving environment: done\" appears following the failed message and the install proceeds.\n\nInstall from source\n-------------------\n\nInstall nim:\n`curl https://nim-lang.org/choosenim/init.sh -sSf > init.sh && sh init.sh`\n\nInstall STRling:\n\n.. code-block:: bash\n\n  git clone <URL>\n  cd STRling\n  nimble install\n\nCompile options for development:\n\nCompile in fast mode (danger):\n`nim c -d:danger -d:release src/strling.nim`\n\nRun\n===================================\n\n.. toctree::\n   :maxdepth: 2\n   :caption: Contents:\n\nCreating a genome STR index (optional)\n--------------------------------------\n\nCreates a bed file of large STR regions in the reference genome. This step is performed automatically as part of `strling extract`. However, when running multiple samples, it is more efficient to do it once, then pass the file to `strling extract` using the `-g` option.\n\n.. code-block:: bash\n\n    strling index $reference_fasta\n\nSingle sample\n-------------\n\n**Extract informative pairs to a binary format**\n\n.. code-block:: bash\n\n  strling extract -f $reference_fasta /path/to/$sample.cram $sample.bin\n\nOutput file: $sample.bin - a binary file describing STR-containing reads\n\n**Call strs on the extract binary data**\n\n.. code-block:: bash\n\n  mkdir -p str-results/\n  strling call --output-prefix str-results/$sample -f $reference_fasta /path/to/$sample.cram $sample.bin\n\nOutput files:\n$sample-bounds - STR loci interrogated in that sample\n$sample-genotype.txt - Locus size estimates and other per-locus information (see :ref:`outputs`)\n$sample-unplaced.txt - Counts of unplaced STR reads that could not be assigned to a specific locus\n\nJoint calling\n-------------\n\n**Extract informative read pairs to a binary format for each sample**\n\nThis step is the same as above, you can use the same bin files.\n\n.. code-block:: bash\n\n  strling extract -f $reference_fasta /path/to/$sample2.cram $sample1.bin\n  strling extract -f $reference_fasta /path/to/$sample2.cram $sample2.bin\n\nOutput file(s): $sample1.bin, $sample2.bin, ... - binary files describing STR-containing reads\n\n**Joint call str loci across all samples**\n\nRequires minimum read evidence from at least one sample.\n\n.. code-block:: bash\n\n  mkdir -p str-results/\n  strling merge --output-prefix str-results/joint -f $reference_fasta $sample1.bin $sample2.bin\n\nOutput file: joint-bounds.txt - positions of STR loci found by combining across all individuals, used for the call stage when joint calling\n\nPeak memory usage for joint calling increases linearly by ~63 MB per 30-40X human WGS. This can be prohibitively high for large cohorts. To reduce memory requirements, analysis can be parallelized by chromosome using `--chromosome` then subsequently merged. See the workflows for examples. This reduces memory usage to ~5 MB/sample.\n\n**Call genotypes/estimate allele sizes for all loci in each sample**\n\n.. code-block:: bash\n\n  strling call --output-prefix str-results/$sample1 -b str-results/joint-bounds.txt -f $reference_fasta /path/to/$sample1.cram $sample1.bin\n  strling call --output-prefix str-results/$sample2 -b str-results/joint-bounds.txt -f $reference_fasta /path/to/$sample2.cram $sample2.bin\n\nOutput files as above.\n\n**Find outliers**\n\nFinds loci that are expanded in one individual relative to other individuals in the joint called cohort.\n\n.. code-block:: bash\n\n  strling-outliers.py --genotypes *-genotype.txt --unplaced *-unplaced.txt\n\nOutput files:\nSTRs.tsv - a single file with all loci in all samples and their outlier p-values (see :ref:`outputs`)\n$sample.STRs.tsv - the same data, filtered to a single individual\n\nCite\n====\n\n.. toctree::\n   :maxdepth: 2\n   :caption: Contents:\n\n\nSTRling paper\n-------------\n\nFor more details on the STRling algorithm, or if use use our software, please cite:\n\nDashnow, H., Pedersen, B.S., Hiatt, L. et al. STRling: a k-mer counting approach that detects short tandem repeat expansions at known and novel loci. Genome Biol 23, 257 (2022). https://doi.org/10.1186/s13059-022-02826-4\n\nContribute\n==========\n\n.. toctree::\n   :maxdepth: 2\n   :caption: Contents:\n\n\nInstall Python dependencies\n--------------------------\n\nUsing conda:\n.. code-block:: bash\n\n    conda env create -f environment.yml\n    conda activate strling\n\nCreating a STRling release\n--------------------------\n\n- Rebase dev on master as needed\n- Increment version in two places (using the appropriate semantic version https://semver.org/):\n\n`strling.nimble:version \u00a0 \u00a0 \u00a0 = \"0.4.1\"`\n\n`src/strpkg/version.nim:const strlingVersion* = \"0.4.1\"`\n\n- PR/merge dev into master\n- Make a release draft\n- Add static binaries (see below)\n\nCreating a static binary\n------------------------\n\nSee https://github.com/brentp/hts-nim#static-binary-with-singularity for more details.\n\nOn branch master:\n\n.. code-block:: bash\n\n    git pull\n    module load singularity\n\n    #debug binary\n    singularity run --bind $(pwd):/load --bind /scratch --bind /uufs 'docker://brentp/musl-hts-nim:latest' /usr/local/bin/nsb -n strling.nimble -s src/strling.nim -- -d:danger -d:release -d:debug\n    cp strling strling_debug\n\n    #regular binary\n    singularity run --bind $(pwd):/load --bind /scratch --bind /uufs 'docker://brentp/musl-hts-nim:latest' /usr/local/bin/nsb -n strling.nimble -s src/strling.nim -- -d:danger -d:release\n\n\nContinuous Integration\n----------------------\n\nSTRling now uses GitHub Actions for continuous integration instead of Travis CI.\nThe workflow file lives at ``.github/workflows/ci.yml`` and runs:\n\n* Nim build and unit tests (``nimble test``)\n* Optional end-to-end extraction/call tests on pushes to ``master``\n* htslib build from source (matching previous Travis configuration)\n\nTo view the current build status, see the CI badge in the README or visit:\n``https://github.com/quinlan-lab/STRling/actions``\n\nIf you add new dependencies or tests, update ``strling.nimble`` and (if needed)\nthe workflow steps. Keep heavy end-to-end tests in the integration job so that\npull requests remain fast.\n\n\nDebug\n=====\n\n.. toctree::\n   :maxdepth: 2\n   :caption: Contents:\n\n\nCommon issues\n-------------\n\n- If you get the error:\n`could not load: libhts.so`\n\nTry:\n`export LD_LIBRARY_PATH=./htslib/`\n\n- Empty -bounds.txt/-genotype.txt:\n\nCheck the mapping quality (MAPQ) of your reads.\nSTRling requires a default minimum MAPQ of 40 for non-repetitive reads.\nIf the MAPQs are low, and you'd still like to consider these reads,\nyou can change the MAPQ setting using: \n`-q, --min-mapq=MIN_MAPQ`  \nEnsure to do this at all workflow stages where it is an option.\n\n\nFilter\n=====\n\n.. toctree::\n   :maxdepth: 2\n   :caption: Contents:\n\n\nFiltering output\n----------------\n\nIn our experience, homopolymers, and some repetitive regions are enriched for false positives. You may find the following filters useful:\n\nExclude homopolymers\nRequire the repeatunit column be greater than 1 character.\nSTRs.tsv files: `awk '(length($6) > 1)'`\n*-genotype.txt files: `awk '(length($4 > 1)'`\n\n.. STRling documentation master file, created by\n   sphinx-quickstart on Sun Dec 22 16:03:09 2019.\n   You can adapt this file completely to your liking, but it should at least\n   contain the root `toctree` directive.\n\nWelcome to STRling's documentation!\n===================================\n\nSTRling code: https://github.com/quinlan-lab/STRling\n\nSTRling (pronounced like \u201csterling\u201d) is a method to detect large STR expansions from short-read sequencing data. It is capable of detecting novel STR expansions, that is expansions where there is no STR in the reference genome at that position (or a different repeat unit from what is in the reference). It can also detect STR expansions that are annotated in the reference genome. STRling uses kmer counting to recover mis-mapped STR reads. It then uses soft-clipped reads to precisely discover the position of the STR expansion in the reference genome.\n\nDashnow, H., Pedersen, B.S., Hiatt, L. et al. STRling: a k-mer counting approach that detects short tandem repeat expansions at known and novel loci. Genome Biol 23, 257 (2022). https://doi.org/10.1186/s13059-022-02826-4\n\n.. toctree::\n   :maxdepth: 2\n   :caption: Contents:\n\n   install\n   run\n   outputs\n   filter\n   workflows\n   test\n   debug\n   contribute\n   cite\n\n\nQuick start\n===========\n\n\nInstall\n-------\n\nWe recommending downloading the static binary.\n\nDownload the `strling` binary from the latest release `here <https://github.com/quinlan-lab/STRling/releases/latest>`_.\n\nMake it executable:\n`chmod +x strling`\n\nOutputs\n=======\n\n.. toctree::\n   :maxdepth: 2\n   :caption: Contents:\n\n\nThe main output file is `prefix-genotype.txt`. It reports all STR expansion loci that pass thresholds as well as any provided as input. The columns are:\n\n* chrom: chromosome/contig name\n* left: predicted left boundary of STR locus\n* right: predicted right boundary of STR locus\n* repeatunit: predicted STR repeat unit\n* allele1\\_est: estimated size of the shorter allele in repeat units relative to the reference, from spanning reads (if any). \"na\" indicates no reads support an allele shorter than the read length, so both may be large.\n* allele2\\_est: estimated size of the larger allele in repeat units relative to the reference, from anchored reads\n* anchored_reads: number of reads with evidence of expansion, which are anchored by a well aligned mate\n* spanning\\_reads: number of reads that span the locus\n* spanning\\_pairs: number of read pairs that span the locus\n* expected_spanning_pairs: number of read pairs expected to span the locus in the absence of an expansion, given local read depth\n* spanning_pairs_pctl: (1 + obs - exp) / (exp + 1) spanning read pairs as a percentile. Values range between 0 and 1, with smaller values greater confidence of a large expansion (especially homozygous) relative to other loci in that sample.\n* left\\_clips: number of soft-clipped reads supporting the left side of the locus position\n* right\\_clips: number of soft-clipped reads supporting the right side of the locus position\n* unplaced\\_pairs: number of unplaced STR reads assigned to this locus (will only be >0 for a uniquely expanded repeat unit)\n* depth: local median depth around the locus\n* sum\\_str\\_counts: the sum of STR repeat units in all reads assigned to that locus\n\nSome additional outputs are provided with detailed supporting evidence used to make the genotype calls:\n\n* Putative str bounds: `prefix-bounds.txt`\n* Counts of str-like reads that are unplaced (could not be assigned to a locus): `prefix-unplaced.txt`\n\nOnly output when compiled with `-d:debug`:\n\n* All str-like reads: `prefix-reads.txt`\n* Spanning reads and spanning pairs:`prefix-spanning.txt`\n\nThe main output for the strling-outliers script is `STRs.tsv`. The columns are the same as above, except where specified:\n\n* chrom\n* left\n* right\n* locus: locus unique identifier in the form chrom-left-right-repeatunit\n* sample\n* repeatunit\n* allele1\\_est\n* allele2\\_est\n* spanning\\_reads\n* spanning\\_pairs\n* left\\_clips\n* right\\_clips\n* unplaced\\_pairs\n* sum\\_str\\_counts\n* sum\\_str\\_log: log2 of depth normalized sum\\_str\\_counts\n* depth\n* outlier: z score testing for outliers\n* p: p value, is this locus significantly expanded relative to other samples?\n* p\\_adj: p value adjusted for multiple testing per sample using the Benjamini-Hochberg method\n\nNote: p = 0.0 should be interpreted as p < 10e-310\n\nRun tests\n=========\n\n.. toctree::\n   :maxdepth: 2\n   :caption: Contents:\n\n\nRun unit tests\n--------------\n\nFrom the `STRling directory` run:\n\n`nimble test`\n\nEnd-to-end tests\n----------------\n\nDownload data for end to end tests:\n\n.. code-block:: bash\n\n  mkdir -p run_tests\n\tcd run_tests\n\twget -O data.zip https://ndownloader.figshare.com/articles/11367851?private_link=207b2a78ddcbdb28781b\n\tunzip data.zip\n\trm data.zip\n  # Download reference\n\twget -O chr4.fa.gz https://hgdownload.soe.ucsc.edu/goldenPath/hg38/chromosomes/chr4.fa.gz\n\tgzip -d chr4.fa.gz\n  # End-to-end test single\n\tmkdir -p single\n\t../strling extract -f chr4.fa -g chr4.fa.str -v CANVAS.chr4-39348425_AAGGG_0_400.bam single/CANVAS.chr4-39348425_AAGGG_0_400.str.bin\n\t../strling call -v -o single/CANVAS.chr4-39348425_AAGGG_0_400 CANVAS.chr4-39348425_AAGGG_0_400.bam single/CANVAS.chr4-39348425_AAGGG_0_400.str.bin\n  # End-to-end test joint\n\tmkdir -p joint\n\tfor i in *.bam; do ../strling extract -f chr4.fa -g chr4.fa.str -v $i joint/$i.str.bin; done\n\t../strling merge -f chr4.fa -v -o joint/strling joint/*.bin\n\tfor i in *.bam; do ../strling call -v -b joint/strling-bounds.txt -o joint/$i $i joint/$i.str.bin; done\n\nWorkflows\n===================================\n\n.. toctree::\n   :maxdepth: 2\n   :caption: Contents:\n\nRunning STRling at scale, and in the cloud\n------------------------------------------\n\nWe provide workflows/pipelines to run STRling on many samples. These can be run locally, or on cloud services such as Google Cloud or AWS. These workflows have been tested for joint calling on thousands of genomes.\n\nWorkflows\n---------\n\nNextflow: https://github.com/quinlan-lab/STRling-nf\n\nbpipe: https://github.com/quinlan-lab/STRling/tree/master/pipelines\n\nWDL: https://dockstore.org/workflows/github.com/hdashnow/strling-wdl:master?tab=info\n\nDocker Containers\n-----------------\n\nConda: https://quay.io/repository/biocontainers/strling?tag=0.5.0--h14cfee4_0&tab=tags\n\nhttps://hub.docker.com/r/brwnj/strling\n",
+        "evidence": [
+          {
+            "claim": "run_command",
+            "kind": "doc",
+            "line": 34,
+            "path": "docs/source/test.rst",
+            "text": "../strling call -v -o single/CANVAS.chr4-39348425_AAGGG_0_400 CANVAS.chr4-39348425_AAGGG_0_400.bam single/CANVAS.chr4-39348425_AAGGG_0_400.str.bin",
+            "url": "https://github.com/quinlan-lab/STRling/blob/35c542d8046e6e6489f3bed4e85f7ceeb22e95ba/docs/source/test.rst#L34"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "data/hg38.STR_disease_loci.bed",
+            "text": "bed",
+            "url": "https://github.com/quinlan-lab/STRling/blob/35c542d8046e6e6489f3bed4e85f7ceeb22e95ba/data/hg38.STR_disease_loci.bed"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "sim/htt_locus.bed",
+            "text": "bed",
+            "url": "https://github.com/quinlan-lab/STRling/blob/35c542d8046e6e6489f3bed4e85f7ceeb22e95ba/sim/htt_locus.bed"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "sim/disease_loci_sims_minpath.bed",
+            "text": "bed",
+            "url": "https://github.com/quinlan-lab/STRling/blob/35c542d8046e6e6489f3bed4e85f7ceeb22e95ba/sim/disease_loci_sims_minpath.bed"
+          }
+        ],
+        "example": null,
+        "example_data": [
+          {
+            "in_example_dir": true,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "data/hg38.STR_disease_loci.bed",
+            "size": 1284
+          },
+          {
+            "in_example_dir": false,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "sim/htt_locus.bed",
+            "size": 26
+          },
+          {
+            "in_example_dir": false,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "sim/disease_loci_sims_minpath.bed",
+            "size": 674
+          }
+        ],
+        "inferences": {
+          "build": "release_asset:strling",
+          "example": null,
+          "input_type": "docs/source/test.rst:L34",
+          "output": "docs/source/run.rst:L37",
+          "platform": "README.md:L9",
+          "regions": null,
+          "run_command": "docs/source/test.rst:L34",
+          "single_sample_bams": null
+        },
+        "input_type": {
+          "assembly": {
+            "against_hg38": null,
+            "declared": "hg38",
+            "evidence_source": "docs/source/test.rst:L29",
+            "hg19_evidence_source": null,
+            "hg19_hits": 0,
+            "hg38_evidence_source": "docs/source/test.rst:L29",
+            "hg38_hits": 1,
+            "incompatible_with_hg38": false
+          },
+          "best": "illumina-bam-hg38-med",
+          "candidates": [
+            "illumina-bam-hg38-med"
+          ],
+          "evidence_source": "docs/source/test.rst:L34",
+          "how": "command",
+          "panel_match": {
+            "catalog_file": "data/hg38.STR_disease_loci.bed",
+            "dataset": "illumina-bam-hg38-med",
+            "evidence_source": "repo_file:data/hg38.STR_disease_loci.bed",
+            "forensic_overlap": 0,
+            "medical_overlap": 31,
+            "panel": "medical"
+          },
+          "platform": "illumina",
+          "platform_evidence_source": "README.md:L9",
+          "platform_how": "stated",
+          "signals": {
+            "bam": 0,
+            "ce": 0,
+            "fastq": 0,
+            "hg19": 0,
+            "hg38": 1,
+            "illumina": 1,
+            "ont": 0,
+            "snp": 0,
+            "ystr": 0
+          },
+          "statements": {
+            "against": [],
+            "determined": false,
+            "inputs": [],
+            "platform": [
+              {
+                "historical": false,
+                "line": 9,
+                "platform": "illumina",
+                "text": "STRling (pronounced like \u201csterling\u201d) is a method to detect large STR expansions from short-read sequencing data."
+              }
+            ],
+            "recommendation": null
+          },
+          "statements_file": null,
+          "supported_platforms": [
+            {
+              "evidence_source": "README.md:L9",
+              "historical": false,
+              "line": 9,
+              "platform": "illumina",
+              "text": "STRling (pronounced like \u201csterling\u201d) is a method to detect large STR expansions from short-read sequencing data."
+            }
+          ],
+          "unsupported": null,
+          "warnings": []
+        },
+        "known_issues": [],
+        "limitations": [
+          "install_profile_unsupported"
+        ],
+        "output": {
+          "evidence_source": "docs/source/run.rst:L37",
+          "format": "tsv",
+          "signals": {
+            "csv": 0,
+            "json": 0,
+            "tsv": 24,
+            "vcf": 0
+          }
+        },
+        "packaging": {
+          "executables": [
+            "strling"
+          ],
+          "packages": [
+            "strling"
+          ]
+        },
+        "readme": {
+          "gaps": [],
+          "name": "README.md",
+          "sufficient_to_attempt": true
+        },
+        "readme_name": "README.md",
+        "readme_text": "![STRling logo](docs/strling-logo-webres.png)\n\n[![CI](https://github.com/quinlan-lab/STRling/actions/workflows/ci.yml/badge.svg)](https://github.com/quinlan-lab/STRling/actions/workflows/ci.yml)\n[![Documentation Status](https://readthedocs.org/projects/strling/badge/?version=latest)](https://strling.readthedocs.io/en/latest/?badge=latest)\n[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)\n\n__[STRling Documentation](https://strling.readthedocs.io/en/latest/)__\n\nSTRling (pronounced like \u201csterling\u201d) is a method to detect large STR expansions from short-read sequencing data. It is capable of detecting novel STR expansions, that is expansions where there is no STR in the reference genome at that position (or a different repeat unit from what is in the reference). It can also detect STR expansions that are annotated in the reference genome. STRling uses kmer counting to recover mis-mapped STR reads. It then uses soft-clipped reads to precisely discover the position of the STR expansion in the reference genome.\n\n## Install and Run STRling\n\nPlease see the [STRling Documentation](https://strling.readthedocs.io/en/latest/) for installation and running instructions.\n\n## Citation\n\nFor more details able the algorithm check out our paper.\n\nIf using STRling, please cite: \n\nDashnow, H., Pedersen, B.S., Hiatt, L. et al. STRling: a k-mer counting approach that detects short tandem repeat expansions at known and novel loci. Genome Biol 23, 257 (2022). <https://doi.org/10.1186/s13059-022-02826-4>\n",
+        "ref": "35c542d8046e6e6489f3bed4e85f7ceeb22e95ba",
+        "regions": {
+          "ambiguous": false,
+          "candidates": [],
+          "end_line": null,
+          "evidence_source": null,
+          "file": null,
+          "format": null,
+          "line": null,
+          "text": null
+        },
+        "registry": {
+          "bioconda": {
+            "strling": {
+              "has_tag_version": true,
+              "latest": "0.6.0",
+              "versions": 10
+            }
+          },
+          "documented": []
+        },
+        "repo": "https://github.com/quinlan-lab/STRling",
+        "schema": "strhub-verified/recipe-proposal/1",
+        "single_sample_bams": {
+          "allowed": false,
+          "evidence_source": null,
+          "file": null,
+          "line": null,
+          "paired_flags": [],
+          "text": null
+        },
+        "source_documents": [
+          {
+            "file": "README.md",
+            "origin": "readme",
+            "text": "![STRling logo](docs/strling-logo-webres.png)\n\n[![CI](https://github.com/quinlan-lab/STRling/actions/workflows/ci.yml/badge.svg)](https://github.com/quinlan-lab/STRling/actions/workflows/ci.yml)\n[![Documentation Status](https://readthedocs.org/projects/strling/badge/?version=latest)](https://strling.readthedocs.io/en/latest/?badge=latest)\n[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)\n\n__[STRling Documentation](https://strling.readthedocs.io/en/latest/)__\n\nSTRling (pronounced like \u201csterling\u201d) is a method to detect large STR expansions from short-read sequencing data. It is capable of detecting novel STR expansions, that is expansions where there is no STR in the reference genome at that position (or a different repeat unit from what is in the reference). It can also detect STR expansions that are annotated in the reference genome. STRling uses kmer counting to recover mis-mapped STR reads. It then uses soft-clipped reads to precisely discover the position of the STR expansion in the reference genome.\n\n## Install and Run STRling\n\nPlease see the [STRling Documentation](https://strling.readthedocs.io/en/latest/) for installation and running instructions.\n\n## Citation\n\nFor more details able the algorithm check out our paper.\n\nIf using STRling, please cite: \n\nDashnow, H., Pedersen, B.S., Hiatt, L. et al. STRling: a k-mer counting approach that detects short tandem repeat expansions at known and novel loci. Genome Biol 23, 257 (2022). <https://doi.org/10.1186/s13059-022-02826-4>\n"
+          },
+          {
+            "file": "docs/source/install.rst",
+            "origin": "repo",
+            "text": "Install\n===================================\n\n.. toctree::\n   :maxdepth: 2\n   :caption: Contents:\n\n\nWe recommending downloading the static binary.\n\nDownload the `strling` binary from the latest release `here <https://github.com/quinlan-lab/STRling/releases/latest>`_.\n\nMake it executable:\n`chmod +x strling`\n\nInstall with conda\n------------------\n\nWe suggest conda installation if you want to perform outlier analysis, which requires a python script.\n\n.. code-block:: bash\n\n  conda config --add channels bioconda\n  conda install -y strling\n\nThe following should now be in your path:  \n`strling`  \n`strling-outliers.py`\n\nNote: It should be safe to ignore \"Solving environment: failed ...\" messages as long as the message \"Solving environment: done\" appears following the failed message and the install proceeds.\n\nInstall from source\n-------------------\n\nInstall nim:\n`curl https://nim-lang.org/choosenim/init.sh -sSf > init.sh && sh init.sh`\n\nInstall STRling:\n\n.. code-block:: bash\n\n  git clone <URL>\n  cd STRling\n  nimble install\n\nCompile options for development:\n\nCompile in fast mode (danger):\n`nim c -d:danger -d:release src/strling.nim`\n"
+          },
+          {
+            "file": "docs/source/run.rst",
+            "origin": "repo",
+            "text": "Run\n===================================\n\n.. toctree::\n   :maxdepth: 2\n   :caption: Contents:\n\nCreating a genome STR index (optional)\n--------------------------------------\n\nCreates a bed file of large STR regions in the reference genome. This step is performed automatically as part of `strling extract`. However, when running multiple samples, it is more efficient to do it once, then pass the file to `strling extract` using the `-g` option.\n\n.. code-block:: bash\n\n    strling index $reference_fasta\n\nSingle sample\n-------------\n\n**Extract informative pairs to a binary format**\n\n.. code-block:: bash\n\n  strling extract -f $reference_fasta /path/to/$sample.cram $sample.bin\n\nOutput file: $sample.bin - a binary file describing STR-containing reads\n\n**Call strs on the extract binary data**\n\n.. code-block:: bash\n\n  mkdir -p str-results/\n  strling call --output-prefix str-results/$sample -f $reference_fasta /path/to/$sample.cram $sample.bin\n\nOutput files:\n$sample-bounds - STR loci interrogated in that sample\n$sample-genotype.txt - Locus size estimates and other per-locus information (see :ref:`outputs`)\n$sample-unplaced.txt - Counts of unplaced STR reads that could not be assigned to a specific locus\n\nJoint calling\n-------------\n\n**Extract informative read pairs to a binary format for each sample**\n\nThis step is the same as above, you can use the same bin files.\n\n.. code-block:: bash\n\n  strling extract -f $reference_fasta /path/to/$sample2.cram $sample1.bin\n  strling extract -f $reference_fasta /path/to/$sample2.cram $sample2.bin\n\nOutput file(s): $sample1.bin, $sample2.bin, ... - binary files describing STR-containing reads\n\n**Joint call str loci across all samples**\n\nRequires minimum read evidence from at least one sample.\n\n.. code-block:: bash\n\n  mkdir -p str-results/\n  strling merge --output-prefix str-results/joint -f $reference_fasta $sample1.bin $sample2.bin\n\nOutput file: joint-bounds.txt - positions of STR loci found by combining across all individuals, used for the call stage when joint calling\n\nPeak memory usage for joint calling increases linearly by ~63 MB per 30-40X human WGS. This can be prohibitively high for large cohorts. To reduce memory requirements, analysis can be parallelized by chromosome using `--chromosome` then subsequently merged. See the workflows for examples. This reduces memory usage to ~5 MB/sample.\n\n**Call genotypes/estimate allele sizes for all loci in each sample**\n\n.. code-block:: bash\n\n  strling call --output-prefix str-results/$sample1 -b str-results/joint-bounds.txt -f $reference_fasta /path/to/$sample1.cram $sample1.bin\n  strling call --output-prefix str-results/$sample2 -b str-results/joint-bounds.txt -f $reference_fasta /path/to/$sample2.cram $sample2.bin\n\nOutput files as above.\n\n**Find outliers**\n\nFinds loci that are expanded in one individual relative to other individuals in the joint called cohort.\n\n.. code-block:: bash\n\n  strling-outliers.py --genotypes *-genotype.txt --unplaced *-unplaced.txt\n\nOutput files:\nSTRs.tsv - a single file with all loci in all samples and their outlier p-values (see :ref:`outputs`)\n$sample.STRs.tsv - the same data, filtered to a single individual\n"
+          },
+          {
+            "file": "docs/source/cite.rst",
+            "origin": "repo",
+            "text": "Cite\n====\n\n.. toctree::\n   :maxdepth: 2\n   :caption: Contents:\n\n\nSTRling paper\n-------------\n\nFor more details on the STRling algorithm, or if use use our software, please cite:\n\nDashnow, H., Pedersen, B.S., Hiatt, L. et al. STRling: a k-mer counting approach that detects short tandem repeat expansions at known and novel loci. Genome Biol 23, 257 (2022). https://doi.org/10.1186/s13059-022-02826-4\n"
+          },
+          {
+            "file": "docs/source/contribute.rst",
+            "origin": "repo",
+            "text": "Contribute\n==========\n\n.. toctree::\n   :maxdepth: 2\n   :caption: Contents:\n\n\nInstall Python dependencies\n--------------------------\n\nUsing conda:\n.. code-block:: bash\n\n    conda env create -f environment.yml\n    conda activate strling\n\nCreating a STRling release\n--------------------------\n\n- Rebase dev on master as needed\n- Increment version in two places (using the appropriate semantic version https://semver.org/):\n\n`strling.nimble:version \u00a0 \u00a0 \u00a0 = \"0.4.1\"`\n\n`src/strpkg/version.nim:const strlingVersion* = \"0.4.1\"`\n\n- PR/merge dev into master\n- Make a release draft\n- Add static binaries (see below)\n\nCreating a static binary\n------------------------\n\nSee https://github.com/brentp/hts-nim#static-binary-with-singularity for more details.\n\nOn branch master:\n\n.. code-block:: bash\n\n    git pull\n    module load singularity\n\n    #debug binary\n    singularity run --bind $(pwd):/load --bind /scratch --bind /uufs 'docker://brentp/musl-hts-nim:latest' /usr/local/bin/nsb -n strling.nimble -s src/strling.nim -- -d:danger -d:release -d:debug\n    cp strling strling_debug\n\n    #regular binary\n    singularity run --bind $(pwd):/load --bind /scratch --bind /uufs 'docker://brentp/musl-hts-nim:latest' /usr/local/bin/nsb -n strling.nimble -s src/strling.nim -- -d:danger -d:release\n\n\nContinuous Integration\n----------------------\n\nSTRling now uses GitHub Actions for continuous integration instead of Travis CI.\nThe workflow file lives at ``.github/workflows/ci.yml`` and runs:\n\n* Nim build and unit tests (``nimble test``)\n* Optional end-to-end extraction/call tests on pushes to ``master``\n* htslib build from source (matching previous Travis configuration)\n\nTo view the current build status, see the CI badge in the README or visit:\n``https://github.com/quinlan-lab/STRling/actions``\n\nIf you add new dependencies or tests, update ``strling.nimble`` and (if needed)\nthe workflow steps. Keep heavy end-to-end tests in the integration job so that\npull requests remain fast.\n\n"
+          },
+          {
+            "file": "docs/source/debug.rst",
+            "origin": "repo",
+            "text": "Debug\n=====\n\n.. toctree::\n   :maxdepth: 2\n   :caption: Contents:\n\n\nCommon issues\n-------------\n\n- If you get the error:\n`could not load: libhts.so`\n\nTry:\n`export LD_LIBRARY_PATH=./htslib/`\n\n- Empty -bounds.txt/-genotype.txt:\n\nCheck the mapping quality (MAPQ) of your reads.\nSTRling requires a default minimum MAPQ of 40 for non-repetitive reads.\nIf the MAPQs are low, and you'd still like to consider these reads,\nyou can change the MAPQ setting using: \n`-q, --min-mapq=MIN_MAPQ`  \nEnsure to do this at all workflow stages where it is an option.\n\n"
+          },
+          {
+            "file": "docs/source/filter.rst",
+            "origin": "repo",
+            "text": "Filter\n=====\n\n.. toctree::\n   :maxdepth: 2\n   :caption: Contents:\n\n\nFiltering output\n----------------\n\nIn our experience, homopolymers, and some repetitive regions are enriched for false positives. You may find the following filters useful:\n\nExclude homopolymers\nRequire the repeatunit column be greater than 1 character.\nSTRs.tsv files: `awk '(length($6) > 1)'`\n*-genotype.txt files: `awk '(length($4 > 1)'`\n"
+          },
+          {
+            "file": "docs/source/index.rst",
+            "origin": "repo",
+            "text": ".. STRling documentation master file, created by\n   sphinx-quickstart on Sun Dec 22 16:03:09 2019.\n   You can adapt this file completely to your liking, but it should at least\n   contain the root `toctree` directive.\n\nWelcome to STRling's documentation!\n===================================\n\nSTRling code: https://github.com/quinlan-lab/STRling\n\nSTRling (pronounced like \u201csterling\u201d) is a method to detect large STR expansions from short-read sequencing data. It is capable of detecting novel STR expansions, that is expansions where there is no STR in the reference genome at that position (or a different repeat unit from what is in the reference). It can also detect STR expansions that are annotated in the reference genome. STRling uses kmer counting to recover mis-mapped STR reads. It then uses soft-clipped reads to precisely discover the position of the STR expansion in the reference genome.\n\nDashnow, H., Pedersen, B.S., Hiatt, L. et al. STRling: a k-mer counting approach that detects short tandem repeat expansions at known and novel loci. Genome Biol 23, 257 (2022). https://doi.org/10.1186/s13059-022-02826-4\n\n.. toctree::\n   :maxdepth: 2\n   :caption: Contents:\n\n   install\n   run\n   outputs\n   filter\n   workflows\n   test\n   debug\n   contribute\n   cite\n\n\nQuick start\n===========\n\n\nInstall\n-------\n\nWe recommending downloading the static binary.\n\nDownload the `strling` binary from the latest release `here <https://github.com/quinlan-lab/STRling/releases/latest>`_.\n\nMake it executable:\n`chmod +x strling`\n"
+          },
+          {
+            "file": "docs/source/outputs.rst",
+            "origin": "repo",
+            "text": "Outputs\n=======\n\n.. toctree::\n   :maxdepth: 2\n   :caption: Contents:\n\n\nThe main output file is `prefix-genotype.txt`. It reports all STR expansion loci that pass thresholds as well as any provided as input. The columns are:\n\n* chrom: chromosome/contig name\n* left: predicted left boundary of STR locus\n* right: predicted right boundary of STR locus\n* repeatunit: predicted STR repeat unit\n* allele1\\_est: estimated size of the shorter allele in repeat units relative to the reference, from spanning reads (if any). \"na\" indicates no reads support an allele shorter than the read length, so both may be large.\n* allele2\\_est: estimated size of the larger allele in repeat units relative to the reference, from anchored reads\n* anchored_reads: number of reads with evidence of expansion, which are anchored by a well aligned mate\n* spanning\\_reads: number of reads that span the locus\n* spanning\\_pairs: number of read pairs that span the locus\n* expected_spanning_pairs: number of read pairs expected to span the locus in the absence of an expansion, given local read depth\n* spanning_pairs_pctl: (1 + obs - exp) / (exp + 1) spanning read pairs as a percentile. Values range between 0 and 1, with smaller values greater confidence of a large expansion (especially homozygous) relative to other loci in that sample.\n* left\\_clips: number of soft-clipped reads supporting the left side of the locus position\n* right\\_clips: number of soft-clipped reads supporting the right side of the locus position\n* unplaced\\_pairs: number of unplaced STR reads assigned to this locus (will only be >0 for a uniquely expanded repeat unit)\n* depth: local median depth around the locus\n* sum\\_str\\_counts: the sum of STR repeat units in all reads assigned to that locus\n\nSome additional outputs are provided with detailed supporting evidence used to make the genotype calls:\n\n* Putative str bounds: `prefix-bounds.txt`\n* Counts of str-like reads that are unplaced (could not be assigned to a locus): `prefix-unplaced.txt`\n\nOnly output when compiled with `-d:debug`:\n\n* All str-like reads: `prefix-reads.txt`\n* Spanning reads and spanning pairs:`prefix-spanning.txt`\n\nThe main output for the strling-outliers script is `STRs.tsv`. The columns are the same as above, except where specified:\n\n* chrom\n* left\n* right\n* locus: locus unique identifier in the form chrom-left-right-repeatunit\n* sample\n* repeatunit\n* allele1\\_est\n* allele2\\_est\n* spanning\\_reads\n* spanning\\_pairs\n* left\\_clips\n* right\\_clips\n* unplaced\\_pairs\n* sum\\_str\\_counts\n* sum\\_str\\_log: log2 of depth normalized sum\\_str\\_counts\n* depth\n* outlier: z score testing for outliers\n* p: p value, is this locus significantly expanded relative to other samples?\n* p\\_adj: p value adjusted for multiple testing per sample using the Benjamini-Hochberg method\n\nNote: p = 0.0 should be interpreted as p < 10e-310\n"
+          },
+          {
+            "file": "docs/source/test.rst",
+            "origin": "repo",
+            "text": "Run tests\n=========\n\n.. toctree::\n   :maxdepth: 2\n   :caption: Contents:\n\n\nRun unit tests\n--------------\n\nFrom the `STRling directory` run:\n\n`nimble test`\n\nEnd-to-end tests\n----------------\n\nDownload data for end to end tests:\n\n.. code-block:: bash\n\n  mkdir -p run_tests\n\tcd run_tests\n\twget -O data.zip https://ndownloader.figshare.com/articles/11367851?private_link=207b2a78ddcbdb28781b\n\tunzip data.zip\n\trm data.zip\n  # Download reference\n\twget -O chr4.fa.gz https://hgdownload.soe.ucsc.edu/goldenPath/hg38/chromosomes/chr4.fa.gz\n\tgzip -d chr4.fa.gz\n  # End-to-end test single\n\tmkdir -p single\n\t../strling extract -f chr4.fa -g chr4.fa.str -v CANVAS.chr4-39348425_AAGGG_0_400.bam single/CANVAS.chr4-39348425_AAGGG_0_400.str.bin\n\t../strling call -v -o single/CANVAS.chr4-39348425_AAGGG_0_400 CANVAS.chr4-39348425_AAGGG_0_400.bam single/CANVAS.chr4-39348425_AAGGG_0_400.str.bin\n  # End-to-end test joint\n\tmkdir -p joint\n\tfor i in *.bam; do ../strling extract -f chr4.fa -g chr4.fa.str -v $i joint/$i.str.bin; done\n\t../strling merge -f chr4.fa -v -o joint/strling joint/*.bin\n\tfor i in *.bam; do ../strling call -v -b joint/strling-bounds.txt -o joint/$i $i joint/$i.str.bin; done\n"
+          },
+          {
+            "file": "docs/source/workflows.rst",
+            "origin": "repo",
+            "text": "Workflows\n===================================\n\n.. toctree::\n   :maxdepth: 2\n   :caption: Contents:\n\nRunning STRling at scale, and in the cloud\n------------------------------------------\n\nWe provide workflows/pipelines to run STRling on many samples. These can be run locally, or on cloud services such as Google Cloud or AWS. These workflows have been tested for joint calling on thousands of genomes.\n\nWorkflows\n---------\n\nNextflow: https://github.com/quinlan-lab/STRling-nf\n\nbpipe: https://github.com/quinlan-lab/STRling/tree/master/pipelines\n\nWDL: https://dockstore.org/workflows/github.com/hdashnow/strling-wdl:master?tab=info\n\nDocker Containers\n-----------------\n\nConda: https://quay.io/repository/biocontainers/strling?tag=0.5.0--h14cfee4_0&tab=tags\n\nhttps://hub.docker.com/r/brwnj/strling\n"
+          }
+        ],
+        "tool_names": [
+          "STRling",
+          "combine_random_sim_results",
+          "combine_random_sim_results.py",
+          "conf",
+          "conf.py",
+          "generate_str_alleles",
+          "generate_str_alleles.py",
+          "random_str_alleles",
+          "random_str_alleles.py",
+          "strling",
+          "strling-outliers",
+          "strling-outliers.py"
+        ],
+        "tree_paths": [
+          ".gitignore",
+          "LICENSE",
+          "README.md",
+          "data/hg38.STR_disease_loci.bed",
+          "docs/Makefile",
+          "docs/source/cite.rst",
+          "docs/source/conf.py",
+          "docs/source/contribute.rst",
+          "docs/source/debug.rst",
+          "docs/source/filter.rst",
+          "docs/source/index.rst",
+          "docs/source/install.rst",
+          "docs/source/outputs.rst",
+          "docs/source/run.rst",
+          "docs/source/test.rst",
+          "docs/source/workflows.rst",
+          "docs/strling-logo-webres.png",
+          "environment.yml",
+          "nim.cfg",
+          "pipelines/README.md",
+          "pipelines/bpipe.config",
+          "pipelines/pipeline-stages.groovy",
+          "pipelines/strling-individual.groovy",
+          "pipelines/strling-joint-bychrom.groovy",
+          "pipelines/strling-joint.groovy",
+          "scripts/strling-outliers.py",
+          "sim/combine_random_sim_results.py",
+          "sim/disease_loci_sims_minpath.bed",
+          "sim/environment.yml",
+          "sim/generate_str_alleles.py",
+          "sim/htt_locus.bed",
+          "sim/random_str_alleles.py",
+          "sim/sim_shared.groovy",
+          "sim/simulate_multi_loci.groovy",
+          "sim/simulate_random.groovy",
+          "sim/test_generate_str_alleles.py",
+          "src/strling.nim",
+          "src/strpkg/call.nim",
+          "src/strpkg/callclusters.nim",
+          "src/strpkg/cluster.nim",
+          "src/strpkg/collect.nim",
+          "src/strpkg/extract.nim",
+          "src/strpkg/extract_region.nim",
+          "src/strpkg/genome_strs.nim",
+          "src/strpkg/genotyper.nim",
+          "src/strpkg/merge.nim",
+          "src/strpkg/read_bed.nim",
+          "src/strpkg/simulate_reads.nim",
+          "src/strpkg/spanning.nim",
+          "src/strpkg/unpack.nim",
+          "src/strpkg/utils.nim",
+          "src/strpkg/version.nim",
+          "strling.nimble",
+          "tests/all.nim",
+          "tests/nim.cfg",
+          "tests/test_cluster.nim",
+          "tests/test_collect.nim",
+          "tests/test_extract.nim",
+          "tests/test_genotyper.nim",
+          "tests/test_strling.nim",
+          "tests/test_utils.nim"
+        ],
+        "tree_truncated": false,
+        "upstream_files": {}
+      },
+      "limitations": [
+        "install_profile_unsupported"
+      ],
+      "caveat_items": [
+        "Environment: no proven installation profile; STRhub did not manufacture installation steps.",
+        "Input: the documented command takes BAM (docs/source/test.rst, line 34); no sentence says so, so the command is what was read. This plan selects STRhub's illumina-bam-hg38-med reference data.",
+        "Panel: the shipped loci catalog (data/hg38.STR_disease_loci.bed) overlaps 31 loci in STRhub's medical STR slice and 0 in the forensic slice; this plan selects STRhub's illumina-bam-hg38-med reference data.",
+        "Evaluator limitation: a read-file argument is outside the closed input substitution table.",
+        "Run command: the one documented in docs/source/test.rst (line 34), rewritten to STRhub's mounts; the capture wrapper is planned only if the procedure review passes."
+      ]
+    }
+  },
+  "provenance": {
+    "from_upstream": {
+      "install": {
+        "method": "release_binary",
+        "evidence_source": "release_asset:strling"
+      },
+      "command": {
+        "value": "../strling call -v -o single/CANVAS.chr4-39348425_AAGGG_0_400 CANVAS.chr4-39348425_AAGGG_0_400.bam single/CANVAS.chr4-39348425_AAGGG_0_400.str.bin",
+        "evidence_source": "docs/source/test.rst:L34"
+      },
+      "input_kind": {
+        "value": "bam",
+        "evidence_source": "docs/source/test.rst:L34"
+      },
+      "supported_platforms": [
+        {
+          "platform": "illumina",
+          "evidence_source": "README.md:L9"
+        }
+      ],
+      "assembly": {
+        "declared": "hg38",
+        "evidence_source": "docs/source/test.rst:L29"
+      },
+      "regions_schema": null,
+      "output_format": {
+        "glob": "**/*.t[sx][vt]",
+        "evidence_source": "docs/source/run.rst:L37"
+      }
+    },
+    "derived": {
+      "command_rewrites": [],
+      "regions_layout_binding": null,
+      "single_sample_adaptation": null
+    },
+    "harness_choices": {
+      "dataset": {
+        "selected": "illumina-bam-hg38-med",
+        "reason": "STRhub selected 'illumina-bam-hg38-med' as compatible with upstream input 'bam' and platform 'illumina'; shipped catalog 'data/hg38.STR_disease_loci.bed' overlaps 31 medical panel loci and 0 forensic loci"
+      },
+      "platform": {
+        "selected": "illumina",
+        "basis": "upstream_single_platform",
+        "supported_platforms": [
+          "illumina"
+        ]
+      },
+      "assembly": {
+        "selected": "hg38",
+        "basis": "upstream_stated",
+        "note": null
+      },
+      "regions_layout": null,
+      "base_environment": null
+    }
+  },
+  "procedure_validation": {
+    "schema": "strhub-procedure-evidence/1",
+    "valid": true,
+    "reason": "Procedure evidence matches the effective manifest and recomputed decision."
+  },
+  "verdict": {
+    "code": "undetermined",
+    "title": "Could not be determined",
+    "basis": "recipe",
+    "reason": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub.",
+    "readme_gaps": [],
+    "status_code": "UNVERIFIED_INSUFFICIENT_DOCS",
+    "blockers": [
+      {
+        "code": "install_not_copyable",
+        "what": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub.",
+        "ask_owner": {
+          "title": "Write the installation as commands that can be copied and run",
+          "body": "STRhub Verified reads the installation from the repository's documentation and runs it exactly as written, adding nothing. At this commit it could not follow it. Writing the installation as plain commands in one code block (apt, conda, pip, make or cmake, with the files they name in the repository) lets a new user, a reviewer and STRhub install the tool by copying it. The forms it can follow are listed in the guide: https://github.com/Tfronta/strhub-verified-next/blob/main/docs/GUIA-PASO-1.md What stopped it: No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub."
+        }
+      }
+    ]
+  },
+  "step1": {
+    "code": "cannot_tell",
+    "headline": "As documented, a third party cannot tell how to run it.",
+    "body": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub. Nothing was executed. That does not mean the tool does not work: what the guide asks for is missing from the README at this commit. Add it and try the link again on the new commit.",
+    "missing": [
+      "install"
+    ],
+    "missing_text": [
+      "Installation, copyable"
+    ],
+    "guide": "docs/GUIA-PASO-1.md"
+  },
+  "certificate": {
+    "schema": "strhub-verified/certificate/1",
+    "label": "Could not be determined",
+    "reached": "Available",
+    "stages": [
+      {
+        "key": "available",
+        "label": "Source available",
+        "status": "PASS"
+      },
+      {
+        "key": "installs",
+        "label": "Installation",
+        "status": "NOT ATTEMPTED"
+      },
+      {
+        "key": "runs",
+        "label": "End-to-end execution",
+        "status": "NOT ATTEMPTED"
+      },
+      {
+        "key": "output",
+        "label": "Output generated",
+        "status": "NOT ATTEMPTED"
+      }
+    ],
+    "summary": {
+      "purpose": "Evaluate whether the tool installs, runs end-to-end, and produces structurally valid output.",
+      "result": "Could not be determined",
+      "reached": "Available, 1/5 gates passed",
+      "why": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub.",
+      "scope": "Installation, execution, and output structure evaluation.",
+      "not_evaluated": [
+        "Genotype accuracy",
+        "Concordance",
+        "Forensic validity",
+        "Regulatory compliance"
+      ]
+    },
+    "conclusion": [
+      {
+        "title": "Procedure not established",
+        "body": "The recorded gate observations do not establish whether the documented procedure succeeded or failed."
+      },
+      {
+        "title": "Observations retained",
+        "body": "The supplied run and output observations remain in the report; they do not replace procedure evidence."
+      },
+      {
+        "title": "Verdict: Could not be determined",
+        "body": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub."
+      },
+      {
+        "title": "Reproducibility not established",
+        "body": "These observations are insufficient to establish a reproducible documented execution finding."
+      }
+    ],
+    "out_of_scope": [
+      "Genotype correctness or accuracy",
+      "Concordance against known truth sets",
+      "Sensitivity, specificity, or stutter performance",
+      "Allele calling accuracy or forensic casework suitability",
+      "Regulatory compliance or ISO accreditation",
+      "Multi-laboratory or multi-dataset reproducibility"
+    ],
+    "limitations": [
+      "Single reference dataset per input type",
+      "Single containerized environment (Docker / ubuntu-22.04)",
+      "No truth-set comparison or ground-truth genotypes",
+      "No accuracy or concordance assessment",
+      "No forensic or clinical validation of results",
+      "No sequencing data were processed because execution did not complete"
+    ],
+    "scope": {
+      "statement": "Independent automated evaluation of reproducible execution. It checks whether the tool installs, runs end-to-end, and produces structurally valid output in a standardized environment.",
+      "not": "This is not an analytical validation. Genotype accuracy, concordance, forensic suitability, and regulatory compliance are out of scope.",
+      "disclaimer": "Each result is a dated snapshot, verified on the tool's public repository at a pinned commit. STRhub does not store tool source code."
+    }
+  }
+}
