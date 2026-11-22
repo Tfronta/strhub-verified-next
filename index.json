@@ -1,7 +1,7 @@
 {
   "schema": "strhub-verified/index/3",
-  "generated": "2026-11-22T19:15:07+00:00",
-  "count": 19,
+  "generated": "2026-11-22T19:15:12+00:00",
+  "count": 20,
   "tools": [
     {
       "slug": "expansionhunter",
@@ -86,6 +86,50 @@
           "report": "expansionhunterdenovo/5a48ed8b6dceb8d772f702e239c5afede9d5108c/expansionhunterdenovo.json",
           "page": "expansionhunterdenovo/5a48ed8b6dceb8d772f702e239c5afede9d5108c/expansionhunterdenovo.html",
           "pdf": "expansionhunterdenovo/5a48ed8b6dceb8d772f702e239c5afede9d5108c/expansionhunterdenovo.pdf"
+        }
+      ]
+    },
+    {
+      "slug": "fdstools",
+      "name": "FDSTools",
+      "version": "v2.2.1",
+      "variant": null,
+      "sha": "5cad6d057fd2f16bd77f9aa2420e920ccfcc7aa6",
+      "committed": "2026-08-11T16:45:47Z",
+      "instrument": "documented",
+      "level": "available",
+      "label": "Could not be determined",
+      "verdict": "undetermined",
+      "errors_reported": false,
+      "generated": "2026-11-22T19:13:51+00:00",
+      "source_repo": "https://github.com/Jerrythafast/FDSTools",
+      "source_ref": "5cad6d057fd2f16bd77f9aa2420e920ccfcc7aa6",
+      "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/45059487320",
+      "distinct_str_loci": null,
+      "distinct_snp_markers": null,
+      "total_reads": null,
+      "external_state": "na",
+      "dataset_types": [
+        "illumina-str-fastq"
+      ],
+      "report": "fdstools.json",
+      "page": "fdstools.html",
+      "versions": [
+        {
+          "sha": "5cad6d057fd2f16bd77f9aa2420e920ccfcc7aa6",
+          "instrument": "documented",
+          "version": "v2.2.1",
+          "variant": null,
+          "committed": "2026-08-11T16:45:47Z",
+          "generated": "2026-11-22T19:13:51+00:00",
+          "level": "available",
+          "label": "Could not be determined",
+          "verdict": "undetermined",
+          "errors_reported": false,
+          "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/45059487320",
+          "report": "fdstools/5cad6d057fd2f16bd77f9aa2420e920ccfcc7aa6/fdstools.json",
+          "page": "fdstools/5cad6d057fd2f16bd77f9aa2420e920ccfcc7aa6/fdstools.html",
+          "pdf": "fdstools/5cad6d057fd2f16bd77f9aa2420e920ccfcc7aa6/fdstools.pdf"
         }
       ]
     },

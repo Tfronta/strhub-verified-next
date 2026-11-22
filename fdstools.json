@@ -1,0 +1,1382 @@
+{
+  "schema": "strhub-verified/1",
+  "mode": "publish",
+  "tool": {
+    "name": "FDSTools",
+    "version": "v2.2.1",
+    "contact": "https://github.com/Jerrythafast/FDSTools/issues"
+  },
+  "submission": {
+    "by": "third_party"
+  },
+  "source": {
+    "repo": "https://github.com/Jerrythafast/FDSTools",
+    "ref": "5cad6d057fd2f16bd77f9aa2420e920ccfcc7aa6",
+    "ref_resolved": "5cad6d057fd2f16bd77f9aa2420e920ccfcc7aa6",
+    "committed": "2026-08-11T16:45:47Z"
+  },
+  "environment": {
+    "dockerfile": "Dockerfile",
+    "os": [
+      "ubuntu-22.04"
+    ],
+    "source": "generated"
+  },
+  "generated": "2026-11-22T19:13:51+00:00",
+  "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/45059487320",
+  "run": {
+    "cmd": "true  # no command found in the README; nothing to run",
+    "effective_cmd": "true  # no command found in the README; nothing to run",
+    "step_outcome": "skipped"
+  },
+  "instrument": "documented",
+  "recipe": {
+    "origin": "proposed"
+  },
+  "gates": {
+    "available": true,
+    "installs": false,
+    "runs": false,
+    "io": false,
+    "content": false
+  },
+  "input_contract": {
+    "type": "illumina-str-fastq"
+  },
+  "level": "available",
+  "io_detail": {},
+  "content_detail": {},
+  "example_detail": null,
+  "datasets": [
+    {
+      "leg": "external",
+      "label": "External data",
+      "available": false,
+      "type": "illumina-str-fastq",
+      "dataset": null,
+      "io": false,
+      "content": false,
+      "passed": false
+    },
+    {
+      "leg": "example",
+      "label": "Tool's own example",
+      "available": false,
+      "io": false,
+      "content": null,
+      "passed": false,
+      "matches_expected": null,
+      "produced_count": null
+    }
+  ],
+  "scope": "Assessment of documented execution in the stated environment and output format. Concerns reproducible execution only; no claim of accuracy, casework fitness, or regulatory validation.",
+  "upstream": {
+    "checked": "2026-11-22T19:13:52+00:00",
+    "repo_exists": true,
+    "ref_exists": true,
+    "default_branch": "main",
+    "status": "identical",
+    "behind_by": 0
+  },
+  "evidence": [
+    {
+      "claim": "install_method",
+      "kind": "tree",
+      "path": "pyproject.toml",
+      "text": "pip",
+      "url": "https://github.com/Jerrythafast/FDSTools/blob/5cad6d057fd2f16bd77f9aa2420e920ccfcc7aa6/pyproject.toml"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "tests/data/demultiplex/advanced2a/E0150_S2_R1_001.fastq.gz",
+      "text": "fastq",
+      "url": "https://github.com/Jerrythafast/FDSTools/blob/5cad6d057fd2f16bd77f9aa2420e920ccfcc7aa6/tests/data/demultiplex/advanced2a/E0150_S2_R1_001.fastq.gz"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "tests/data/demultiplex/advanced2a/E0150_S2_R2_001.fastq.gz",
+      "text": "fastq",
+      "url": "https://github.com/Jerrythafast/FDSTools/blob/5cad6d057fd2f16bd77f9aa2420e920ccfcc7aa6/tests/data/demultiplex/advanced2a/E0150_S2_R2_001.fastq.gz"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "tests/data/demultiplex/default/E0049_S1_R1_001.fastq.gz",
+      "text": "fastq",
+      "url": "https://github.com/Jerrythafast/FDSTools/blob/5cad6d057fd2f16bd77f9aa2420e920ccfcc7aa6/tests/data/demultiplex/default/E0049_S1_R1_001.fastq.gz"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "tests/data/demultiplex/default/E0049_S1_R2_001.fastq.gz",
+      "text": "fastq",
+      "url": "https://github.com/Jerrythafast/FDSTools/blob/5cad6d057fd2f16bd77f9aa2420e920ccfcc7aa6/tests/data/demultiplex/default/E0049_S1_R2_001.fastq.gz"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "tests/data/demultiplex/default/E0150_S2_R1_001.fastq.gz",
+      "text": "fastq",
+      "url": "https://github.com/Jerrythafast/FDSTools/blob/5cad6d057fd2f16bd77f9aa2420e920ccfcc7aa6/tests/data/demultiplex/default/E0150_S2_R1_001.fastq.gz"
+    }
+  ],
+  "repo_test_data": {
+    "known": true,
+    "present": true,
+    "count": 40,
+    "examples": [
+      "tests/data/demultiplex/advanced2a/E0150_S2_R1_001.fastq.gz",
+      "tests/data/demultiplex/advanced2a/E0150_S2_R2_001.fastq.gz",
+      "tests/data/demultiplex/default/E0049_S1_R1_001.fastq.gz",
+      "tests/data/demultiplex/default/E0049_S1_R2_001.fastq.gz",
+      "tests/data/demultiplex/default/E0150_S2_R1_001.fastq.gz"
+    ]
+  },
+  "caveats": {
+    "source": "detect_recipe",
+    "items": [
+      "Environment: no proven installation profile; STRhub did not manufacture installation steps.",
+      "Input: no sentence in the README says what the tool takes; illumina-str-fastq is only a guess from mentions; it is not authorization to execute."
+    ]
+  },
+  "install_detail": {
+    "passed": false,
+    "diagnostics": [],
+    "faults": []
+  },
+  "procedure_review": {
+    "may_say_runs": false,
+    "status_code": "UNVERIFIED_INSUFFICIENT_DOCS",
+    "basis": "recipe",
+    "attribution": "strhub",
+    "blocker": "install_not_copyable",
+    "reason": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub.",
+    "amendments": [
+      {
+        "code": "command_evidence_missing",
+        "what": "No complete upstream command was established."
+      },
+      {
+        "code": "capture_wrapper_missing",
+        "what": "This profile requires the exact evaluator capture wrapper so output routing is established before execution."
+      },
+      {
+        "code": "command_evidence_missing",
+        "what": "The complete command and prerequisite must be established at the cited lines of this same pinned upstream commit; wiki text or a recipe label is not proof."
+      },
+      {
+        "code": "input_not_substituted",
+        "what": "This evaluator cannot establish that the cited command reads the declared reference input; no config or input list was rewritten to make it do so."
+      },
+      {
+        "code": "input_platform_unproven",
+        "what": "Counting platform mentions does not establish which shared dataset this procedure reads."
+      },
+      {
+        "code": "install_not_copyable",
+        "what": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub."
+      },
+      {
+        "code": "input_guessed",
+        "what": "No sentence states what the tool reads, so the sample was chosen from mentions alone."
+      },
+      {
+        "code": "output_unnamed",
+        "what": "The documentation does not name an output file, so any file the wrapper copied would have been counted as the documented output."
+      }
+    ],
+    "inferences": {
+      "install": {
+        "evidence_source": "repo_file:pyproject.toml",
+        "verified": false
+      },
+      "run_command": {
+        "evidence_source": null,
+        "verified": false
+      },
+      "input_type": {
+        "evidence_source": null,
+        "verified": false
+      },
+      "output": {
+        "evidence_source": null,
+        "verified": false
+      }
+    },
+    "unbacked_inferences": [
+      "input_type",
+      "install",
+      "output",
+      "run_command"
+    ],
+    "provenance": {
+      "from_upstream": {
+        "install": {
+          "method": "pip",
+          "evidence_source": "repo_file:pyproject.toml"
+        },
+        "command": null,
+        "input_kind": {
+          "value": "fastq",
+          "evidence_source": null
+        },
+        "supported_platforms": [
+          {
+            "platform": "illumina",
+            "evidence_source": "README.md:L115"
+          }
+        ],
+        "assembly": {
+          "declared": "hg38",
+          "evidence_source": "README.md:L69"
+        },
+        "regions_schema": null,
+        "output_format": null
+      },
+      "derived": {
+        "command_rewrites": [],
+        "regions_layout_binding": null,
+        "single_sample_adaptation": null
+      },
+      "harness_choices": {
+        "dataset": {
+          "selected": "illumina-str-fastq",
+          "reason": "STRhub selected 'illumina-str-fastq' as compatible with upstream input 'fastq' and platform 'illumina'"
+        },
+        "platform": {
+          "selected": "illumina",
+          "basis": "counted_unproven",
+          "supported_platforms": [
+            "illumina"
+          ]
+        },
+        "assembly": {
+          "selected": null,
+          "basis": "upstream_stated",
+          "note": null
+        },
+        "regions_layout": null,
+        "base_environment": null
+      }
+    },
+    "install_method": "pip",
+    "citable_install": false,
+    "input_type": "illumina-str-fastq",
+    "output_glob": "**/*",
+    "profile": "strhub-upstream-procedure/1",
+    "install_ready": false,
+    "example_ready": false,
+    "installation": {
+      "profile": "strhub-upstream-procedure/1",
+      "ready": false,
+      "method": "pip",
+      "reason": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub.",
+      "gap": "commit"
+    },
+    "command_review": {
+      "profile": "strhub-upstream-procedure/1",
+      "cited": "",
+      "command": "",
+      "substitutions": [],
+      "read_bindings": [],
+      "limitations": [],
+      "expected": "",
+      "executed": "true  # no command found in the README; nothing to run",
+      "cited_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "executed_sha256": "a0c978938beb28f0f3787e7ae0e1b614d2d0a637f0fb037c95be7477acd398b6",
+      "citations": []
+    },
+    "manifest_sha256": "337308f7012cd4c5c907f18956a283e68134a8b096fb6c73b67784cf1df59cea",
+    "evidence_sha256": "83788b19490ccb73a84563345cccb4e985fab2a034912edd938356e76c949b4f",
+    "evidence": {
+      "schema": "strhub-procedure-evidence/1",
+      "manifest": {
+        "caveats": {
+          "items": [
+            "Environment: no proven installation profile; STRhub did not manufacture installation steps.",
+            "Input: no sentence in the README says what the tool takes; illumina-str-fastq is only a guess from mentions; it is not authorization to execute."
+          ],
+          "source": "detect_recipe"
+        },
+        "environment": {
+          "dockerfile": "Dockerfile",
+          "os": [
+            "ubuntu-22.04"
+          ],
+          "source": "generated"
+        },
+        "inputs": {
+          "type": "illumina-str-fastq"
+        },
+        "outputs": [
+          {
+            "format": "text",
+            "min_records": 1,
+            "path": "**/*"
+          }
+        ],
+        "recipe": {
+          "origin": "proposed"
+        },
+        "report": {
+          "slug": "fdstools"
+        },
+        "run": {
+          "cmd": "true  # no command found in the README; nothing to run",
+          "timeout_minutes": 20
+        },
+        "source": {
+          "ref": "5cad6d057fd2f16bd77f9aa2420e920ccfcc7aa6",
+          "repo": "https://github.com/Jerrythafast/FDSTools"
+        },
+        "submission": {
+          "by": "third_party"
+        },
+        "tool": {
+          "contact": "https://github.com/Jerrythafast/FDSTools/issues",
+          "name": "FDSTools",
+          "version": "v2.2.1"
+        }
+      },
+      "proposal": {
+        "build": {
+          "also_published": null,
+          "asset": null,
+          "candidates": [
+            {
+              "file": "pyproject.toml",
+              "method": "pip"
+            }
+          ],
+          "digest": null,
+          "dir": null,
+          "evidence_source": "repo_file:pyproject.toml",
+          "file": "pyproject.toml",
+          "image": null,
+          "method": "pip",
+          "package": null,
+          "readme_install_lines": [
+            "pip install -U fdstools - Changed default value of -m/--min-pct-of-max from 5.0 to 2.0 - Changed default value of -p/--min-pct-of-sum from 3.0 to 1.5"
+          ],
+          "readme_line": null,
+          "spec_list": false,
+          "ssh_urls_in": [],
+          "tag": null,
+          "then": [],
+          "url": null
+        },
+        "commands": [],
+        "dockerfile": null,
+        "docs_read": [],
+        "docs_text": "",
+        "evidence": [
+          {
+            "claim": "install_method",
+            "kind": "tree",
+            "path": "pyproject.toml",
+            "text": "pip",
+            "url": "https://github.com/Jerrythafast/FDSTools/blob/5cad6d057fd2f16bd77f9aa2420e920ccfcc7aa6/pyproject.toml"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "tests/data/demultiplex/advanced2a/E0150_S2_R1_001.fastq.gz",
+            "text": "fastq",
+            "url": "https://github.com/Jerrythafast/FDSTools/blob/5cad6d057fd2f16bd77f9aa2420e920ccfcc7aa6/tests/data/demultiplex/advanced2a/E0150_S2_R1_001.fastq.gz"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "tests/data/demultiplex/advanced2a/E0150_S2_R2_001.fastq.gz",
+            "text": "fastq",
+            "url": "https://github.com/Jerrythafast/FDSTools/blob/5cad6d057fd2f16bd77f9aa2420e920ccfcc7aa6/tests/data/demultiplex/advanced2a/E0150_S2_R2_001.fastq.gz"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "tests/data/demultiplex/default/E0049_S1_R1_001.fastq.gz",
+            "text": "fastq",
+            "url": "https://github.com/Jerrythafast/FDSTools/blob/5cad6d057fd2f16bd77f9aa2420e920ccfcc7aa6/tests/data/demultiplex/default/E0049_S1_R1_001.fastq.gz"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "tests/data/demultiplex/default/E0049_S1_R2_001.fastq.gz",
+            "text": "fastq",
+            "url": "https://github.com/Jerrythafast/FDSTools/blob/5cad6d057fd2f16bd77f9aa2420e920ccfcc7aa6/tests/data/demultiplex/default/E0049_S1_R2_001.fastq.gz"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "tests/data/demultiplex/default/E0150_S2_R1_001.fastq.gz",
+            "text": "fastq",
+            "url": "https://github.com/Jerrythafast/FDSTools/blob/5cad6d057fd2f16bd77f9aa2420e920ccfcc7aa6/tests/data/demultiplex/default/E0150_S2_R1_001.fastq.gz"
+          }
+        ],
+        "example": null,
+        "example_data": [
+          {
+            "in_example_dir": true,
+            "kind": "fastq",
+            "looks_like_output": false,
+            "path": "tests/data/demultiplex/advanced2a/E0150_S2_R1_001.fastq.gz",
+            "size": 198
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fastq",
+            "looks_like_output": false,
+            "path": "tests/data/demultiplex/advanced2a/E0150_S2_R2_001.fastq.gz",
+            "size": 198
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fastq",
+            "looks_like_output": false,
+            "path": "tests/data/demultiplex/default/E0049_S1_R1_001.fastq.gz",
+            "size": 209
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fastq",
+            "looks_like_output": false,
+            "path": "tests/data/demultiplex/default/E0049_S1_R2_001.fastq.gz",
+            "size": 209
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fastq",
+            "looks_like_output": false,
+            "path": "tests/data/demultiplex/default/E0150_S2_R1_001.fastq.gz",
+            "size": 228
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fastq",
+            "looks_like_output": false,
+            "path": "tests/data/demultiplex/default/E0150_S2_R2_001.fastq.gz",
+            "size": 228
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fastq",
+            "looks_like_output": false,
+            "path": "tests/data/demultiplex/advanced2a/E0049_S1_R1_001.fastq.gz",
+            "size": 234
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fastq",
+            "looks_like_output": false,
+            "path": "tests/data/demultiplex/advanced2a/E0049_S1_R2_001.fastq.gz",
+            "size": 234
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fastq",
+            "looks_like_output": false,
+            "path": "tests/data/demultiplex/advanced2b/E0150_S2_R1_001.fastq.gz",
+            "size": 239
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fastq",
+            "looks_like_output": false,
+            "path": "tests/data/demultiplex/advanced2b/E0150_S2_R2_001.fastq.gz",
+            "size": 239
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fastq",
+            "looks_like_output": false,
+            "path": "tests/data/demultiplex/default/Undetermined_S0_R1_001.fastq.gz",
+            "size": 249
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fastq",
+            "looks_like_output": false,
+            "path": "tests/data/demultiplex/default/Undetermined_S0_R2_001.fastq.gz",
+            "size": 249
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fastq",
+            "looks_like_output": false,
+            "path": "tests/data/demultiplex/advanced1/E0150_S2_R1_001.fastq.gz",
+            "size": 266
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fastq",
+            "looks_like_output": false,
+            "path": "tests/data/demultiplex/advanced1/E0150_S2_R2_001.fastq.gz",
+            "size": 266
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fastq",
+            "looks_like_output": false,
+            "path": "tests/data/demultiplex/advanced1/E0049_S1_R1_001.fastq.gz",
+            "size": 268
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fastq",
+            "looks_like_output": false,
+            "path": "tests/data/demultiplex/advanced1/E0049_S1_R2_001.fastq.gz",
+            "size": 268
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fastq",
+            "looks_like_output": false,
+            "path": "tests/data/demultiplex/advanced2b/Undetermined_S00_R1_001.fastq.gz",
+            "size": 289
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fastq",
+            "looks_like_output": false,
+            "path": "tests/data/demultiplex/advanced2b/Undetermined_S00_R2_001.fastq.gz",
+            "size": 289
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fastq",
+            "looks_like_output": false,
+            "path": "tests/data/demultiplex/advanced2b/E0049_S1_R1_001.fastq.gz",
+            "size": 327
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fastq",
+            "looks_like_output": false,
+            "path": "tests/data/demultiplex/advanced2b/E0049_S1_R2_001.fastq.gz",
+            "size": 327
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fastq",
+            "looks_like_output": false,
+            "path": "tests/data/demultiplex/advanced2a/Undetermined_S0_R1_001.fastq.gz",
+            "size": 356
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fastq",
+            "looks_like_output": false,
+            "path": "tests/data/demultiplex/advanced2a/Undetermined_S0_R2_001.fastq.gz",
+            "size": 356
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fastq",
+            "looks_like_output": false,
+            "path": "tests/data/demultiplex/advanced2b/Undetermined_S0_R1_001.fastq.gz",
+            "size": 356
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fastq",
+            "looks_like_output": false,
+            "path": "tests/data/demultiplex/advanced2b/Undetermined_S0_R2_001.fastq.gz",
+            "size": 356
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fastq",
+            "looks_like_output": false,
+            "path": "tests/data/demultiplex/advanced1/Undetermined_S0_R1_001.fastq.gz",
+            "size": 413
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fastq",
+            "looks_like_output": false,
+            "path": "tests/data/demultiplex/advanced1/Undetermined_S0_R2_001.fastq.gz",
+            "size": 413
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fastq",
+            "looks_like_output": false,
+            "path": "tests/data/_reads/ambiguous.fastq",
+            "size": 2282
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fastq",
+            "looks_like_output": false,
+            "path": "tests/data/demultiplex/Multiplexed_R1.fastq",
+            "size": 2711
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fastq",
+            "looks_like_output": false,
+            "path": "tests/data/demultiplex/Multiplexed_R2.fastq",
+            "size": 2711
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fastq",
+            "looks_like_output": false,
+            "path": "tests/data/demultiplex/Multiplexed_interleaved.fastq",
+            "size": 5422
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fasta",
+            "looks_like_output": false,
+            "path": "tests/data/tssv/dir_advanced1/AmelogeninX/noend.fa",
+            "size": 183809
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fasta",
+            "looks_like_output": false,
+            "path": "tests/data/tssv/dir_advanced3/AmelogeninX/noend.fa",
+            "size": 187013
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fasta",
+            "looks_like_output": false,
+            "path": "tests/data/tssv/dir_advanced2/AmelogeninX/noend.fa",
+            "size": 513507
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fastq",
+            "looks_like_output": false,
+            "path": "tests/data/mergereads/OmniSTR_Mixture_4lt2_mergereads_advanced-R1.fastq.gz",
+            "size": 578850
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fastq",
+            "looks_like_output": false,
+            "path": "tests/data/mergereads/OmniSTR_Mixture_4lt2_mergereads_advanced-R2.fastq.gz",
+            "size": 632640
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fastq",
+            "looks_like_output": false,
+            "path": "tests/data/mergereads/OmniSTR_Mixture_4lt2_mergereads_advanced.fastq.gz",
+            "size": 2157474
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fasta",
+            "looks_like_output": false,
+            "path": "tests/data/_reads/OmniSTR_Mixture_R1_4lt2.fasta.gz",
+            "size": 2231535
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fastq",
+            "looks_like_output": false,
+            "path": "tests/data/_reads/OmniSTR_Mixture_R1_4lt2.fastq.gz",
+            "size": 2734147
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fastq",
+            "looks_like_output": false,
+            "path": "tests/data/_reads/OmniSTR_Mixture_R2_4lt2.fastq.gz",
+            "size": 2874683
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fastq",
+            "looks_like_output": false,
+            "path": "tests/data/_reads/OmniSTR_Mixture_interleaved_4lt2.fastq.gz",
+            "size": 5761350
+          }
+        ],
+        "inferences": {
+          "build": "repo_file:pyproject.toml",
+          "example": null,
+          "input_type": null,
+          "output": null,
+          "platform": null,
+          "regions": null,
+          "run_command": null,
+          "single_sample_bams": null
+        },
+        "input_type": {
+          "assembly": {
+            "against_hg38": null,
+            "declared": "hg38",
+            "evidence_source": "README.md:L69",
+            "hg19_evidence_source": null,
+            "hg19_hits": 0,
+            "hg38_evidence_source": "README.md:L69",
+            "hg38_hits": 2,
+            "incompatible_with_hg38": false
+          },
+          "best": "illumina-str-fastq",
+          "candidates": [
+            "illumina-str-fastq",
+            "illumina-bam-hg38"
+          ],
+          "evidence_source": null,
+          "how": "counted",
+          "platform": "illumina",
+          "platform_evidence_source": null,
+          "platform_how": "counted",
+          "signals": {
+            "bam": 0,
+            "ce": 0,
+            "fastq": 3,
+            "hg19": 0,
+            "hg38": 2,
+            "illumina": 8,
+            "ont": 0,
+            "snp": 1,
+            "ystr": 0
+          },
+          "statements": {
+            "against": [],
+            "determined": false,
+            "inputs": [],
+            "platform": [
+              {
+                "historical": false,
+                "line": 115,
+                "platform": "illumina",
+                "text": "Added ForenSeq DNA Signature Prep Kit library files with ranges specifically"
+              }
+            ],
+            "recommendation": null
+          },
+          "statements_file": null,
+          "supported_platforms": [
+            {
+              "evidence_source": "README.md:L115",
+              "historical": false,
+              "line": 115,
+              "platform": "illumina",
+              "text": "Added ForenSeq DNA Signature Prep Kit library files with ranges specifically"
+            }
+          ],
+          "unsupported": null,
+          "warnings": []
+        },
+        "known_issues": [],
+        "limitations": [
+          "input_type_guessed",
+          "install_profile_unsupported",
+          "no_command"
+        ],
+        "output": {
+          "evidence_source": null,
+          "format": null,
+          "signals": {
+            "csv": 0,
+            "json": 0,
+            "tsv": 0,
+            "vcf": 0
+          }
+        },
+        "packaging": {
+          "executables": [
+            "fdstools"
+          ],
+          "packages": [
+            "fdstools"
+          ]
+        },
+        "readme": {
+          "gaps": [
+            {
+              "item": "command",
+              "text": "No command line invoking the tool was found in the README's code blocks."
+            },
+            {
+              "item": "output",
+              "text": "The README does not describe the output file or its format."
+            }
+          ],
+          "name": "README.md",
+          "sufficient_to_attempt": false
+        },
+        "readme_name": "README.md",
+        "readme_text": "Forensic DNA Sequencing Tools\n=============================\nTools for filtering and interpretation of Massively Parallel Sequencing data of\nforensic DNA samples. To obtain a list of included tools with a brief\ndescription of each tool, run:\n\n    fdstools --help\n\nFor a complete description of a specific tool and its command line arguments,\nrun:\n\n    fdstools --help TOOLNAME\n\n\nInstallation\n------------\nFDSTools requires Python version 3.9 or later.\n\nThe recommended way to install FDSTools is by using the `pip` package\ninstaller. If you have `pip` installed, you can easily install FDSTools by\nrunning the following command:\n\n    pip install -U fdstools\n\n\nRelease Notes\n-------------\n### Version 2.2.1 (2026-08-11)\nFixed a critical issue with Samplevis.\n\n\n### Version 2.2.0 (2026-08-10)\nModernized packaging and bumped the minimum supported Python version to 3.9.\nImproved robustness of concurrency and the handling of input and output.\n\nUpdated STRNaming to version 1.2.1. Repeats that extend slightly outside the\nreported region will now include lowercase nucleotides in allele names.\n\nAdded three new tools: Demultiplex (a sample demultiplexer with forensic\nsensitivity, with special options to deal with basecall errors in NextSeq\ndata), MergeReads (a versatile paired-end read merging tool) and Bam2fds\n(for extracting forensic markers from aligned whole genome sequencing data).\n\nThe accuracy of Stuttermodel, BGPredict and BGEstimate has been improved\nand new settings have been introduced in various tools.\n\nAdded a large number of new component tests, covering Bam2fds, BGCorrect,\nBGEstimate, BGMerge, BGPredict, Demultiplex, FindNewAlleles, MergeReads,\nSamplestats and Stuttermodel.\n\nAnd finally, we have two new members in our team: welcome Myrthe & Myrthe!\n\n\n### Version 2.1.1 (2024-07-02)\nFixed an issue that caused the new [flank_length] section to be ignored.\n\nTSSV no longer requires [flanks] to be specified for explicitly-defined\nnon-STR markers if the ending [genome_position] is provided.\n\n\n### Version 2.1.0 (2024-04-30)\nUpdated STRNaming nomenclature to version 1.2. **Please note that this is a\nbackwards incompatible update:** this version of FDSTools is unable to\ncorrectly interpret allele names that were produced with a prior version!\nPlease see https://fdstools.nl/strnaming/updates for more information.\n\nChanged interpretation of the [flanks] section in the library file: it can no\nlonger contain numbers, but the value 'REF' can be specified to indicate that\nGRCh38 reference sequence should be used (which was already the default).\nA new [flank_length] section is introduced to allow specifying marker-specific\nminimum and maximum (or exact) flanking sequence length; the value specified\nfor TSSV's -L/--flank-length option is then clamped between these values.\nIf a [flanks] section is present and contains a short sequence (possibly with\nIUPAC codes), it is implicitly extended with GRCh38 reference sequence to the\nrequested length by TSSV.\n\nTo use TSSV with explicitly-defined markers, those markers now also require\nspecifying flanks explicitly. Previously, since FDSTools v2.0.0, TSSV's\nbehaviour regarding these markers was erratic.\n\nGreatly improved handling of microhaplotype markers, and we finally introduced\nthe first suite of component tests, covering Allelefinder, Seqconvert,\nStuttermark and TSSV. Welcome to the team, Brechtje!\n\n\n### Version 2.0.4 (2023-03-02)\nMicrohaplotype alleles with SNPs adjacent to any of the microhaplotype\npositions are now recognised. For example, an allele previously named\n\"MH_N_123NC>GA\" will now be named \"MH_G_124C>A\" instead.\n\nGreatly improved loading speed for large library files.\n\n\n### Version 2.0.3 (2022-08-27)\nAdded NimaGen IDseek OmniSTR built-in library file (ID-OmniSTR).\n\n\n### Version 2.0.2 (2022-07-25)\nFixed a compatibility issue with Python 3.10, that caused TSSV to crash.\nFixed some issues that could cause crashes in the Pipeline tool.\n\nCorrected the reported range of AmelongeninY in the ForenSeq-A and ForenSeq-B\nlibrary files which were introduced in v2.0.1, by adding 1 to the starting\nposition. The range is now identical to the UAS Flanking Region Report range.\nIf still you need to work with data previously generated using the ForenSeq-A\nor ForenSeq-B library as shipped with v2.0.1, use the Library tool to obtain a\ncopy of the built-in library file and make sure the range of AmelongeninY\nstarts at 6869870.\n\n\n### Version 2.0.1 (2022-05-12)\nAdded support for microhaplotype targets. For markers configured as such,\nthe 'allelename' sequence format will look like \"MH_AGGTC\".\n\nAdded ForenSeq DNA Signature Prep Kit library files with ranges specifically\noptimized for FDSTools (often longer than UAS Flanking Region Report).\n\n\n### Version 2.0.0 (2021-07-15)\nTransition to Python 3.5, along with a major upgrade to all tools to\nprovide an overall better experience.\n\nAllele naming is now handled by STRNaming, eliminating the need for\ncomplex library files. Library files of commonly-used kits are built in.\n\nKits that sequence a target on a single strand (such as the ForenSeq DNA\nSignature Prep Kit by Verogen) are now supported.\n\n\n### Version 1.2.1 (2021-07-15)\nThis release focuses on finishing support for Python2 before the transition\nto Python3. FDSTools will now display the help page if no command is given.\nA message about the transition to Python3 in the next version of FDSTools\nis added to the command-line help pages. Furthermore, dependency version\nnumbers have been updated to ensure smooth installation on Python2 as well\nas a smooth transition to Python3.\n\n\n### Version 1.2.0 (2019-03-29)\nMajor improvements and fixes to the TSSV tool. Most notably, it no longer\nrelies on the external `tssvl` program because that is no longer\ncompatible with FDSTools. Furthermore, the new TSSV tool v2.0.0 comes with\na major performance upgrade and has some updated command-line arguments.\n\nThis release also fixes an issue in Samplestats and adds the ability to\napply graph filtering before noise correction in Samplevis, making the\neffects of noise correction more apparent.\n\n\n### Version 1.1.1 (2017-03-15)\nFixeds incorrect calculation of tLeft, fLeft, rLeft, tRight and fRight\ncolumns in the report output file of TSSV, when -T/--num-threads was set to\n2 or higher. The primary output was unaffected.\n\n\n### Version 1.1.0 (2017-03-14)\nIn STR allele names for sequences that don't exactly match the description\ngiven in the library file, no more insertions are produced at the end of\nthe prefix or the beginning of the suffix, in favour of extra STR blocks.\n\nEmpty input files and broken pipelines are now handled gracefully across\nall tools. Specifically, an empty input file is now treated as if the\nexpected columns existed, but no lines of actual data were present. This\ngreatly helps in tracking down issues in pipelines involving multiple\ntools, as tools will now shutdown gracefully if an upstream tool fails to\nwrite output. Only the failing tool will output an error.\n\nFurthermore, a new option has been added to the TSSV tool, enabling\nmultithreading support. This can greatly reduce analysis time by using\nmore (or all) cores of the system's processor simultaneously.\n\nFinally, various small bugs and glitches were fixed.\n\n\n### Version 1.0.1 (2016-12-21)\nFDSTools library files may now contain IUPAC ambiguous bases in the prefix\nprefix and suffix sequences of STR markers (except the first sequence, as\nit is used as the reference). Additionally, optional bases may be\nrepresented by lowercase letters.\n\nAn option was added to the Pipeline tool to skip running Allelefinder,\nusing a user-supplied allele list file instead. Multiple options have been\nadded to the Vis tool and some have been regrouped to more easily find the\noption you are looking for.\n\nIt is now possible to save the a Samplevis HTML visualisation after having\nmade changes, preserving the changes made.\n\nAnd various minor bug fixes and improvements throughout.\n\n\n### Version 1.0.0 (2016-10-03)\nFixed an issue with variant descriptions in allele names of non-STR markers\nthat made it impossible to convert those back to raw sequences.\n\nAdded various useful options. Most notably, Samplevis now displays a\ntooltip when the mouse pointer is over an allele, providing various details\nabout that allele.\n\nAnd various minor bug fixes.\n\n\n### Version 0.0.5 (2016-09-06)\nAdded the Library tool, for creating a template library file that includes\nhelpful commentary and examples to get new users started. Creating an empty\nlibrary file used to be a somewhat confusing option in the Libconvert tool.\nAlso, the Blame tool was replaced with the more advanced BGAnalyse tool.\n\nAdded the Pipeline tool, which implements some ready-made pipelines\ninvolving most of the other tools in FDSTools. Three pipelines are\nprovided: one for noise reference sample analysis, one for case sample\nanalysis, and one for generating a background noise database from the\nreference samples.\n\nIn Samplestats, the default allele calling option thresholds have changed:\n    - Changed default value of -m/--min-pct-of-max from 5.0 to 2.0\n    - Changed default value of -p/--min-pct-of-sum from 3.0 to 1.5\n\nThe TSSV tool was updated with an option to increase the penalty given to\ninsertions and deletions in the flanking sequences. It now requires TSSV\nversion 0.4.0 to be installed.\n\nVarious upgrades to visualisations, bringing a new responsive design to all\nHTML visualisations and fixing various issues.\n\n\n### Version 0.0.4 (2016-07-26)\nImproved debugging: FDSTools will now print profiling information to stdout\nwhen the -d/--debug option was specified. Also, all tools now correctly\ninterpret '-' as the output filename as 'write to standard out'.\n\nBGEstimate has gained a new option to require a minimum number of unique\ngenotypes in which a specific allele must have been seen before it will be\nconsidered for noise estimation. This is to avoid 'contamination' of the\nnoise profile of one allele with the noise of another. If homozygous\nsamples are available for an allele, this filter is not applied to that\nallele.\n\nReduced the memory usage of BGPredict and BGMerge. Also, BGPredict will now\noutput nonzero values below the threshold set by -n/--min-pct if the\npredicted noise ratio of the same stutter on the other strand is above the\nthreshold. Previously, values below the threshold were clipped to zero,\nwhich may cause unnecessarily high strand bias in the predicted profile.\nSimilarly, by default Stuttermodel will no longer output a fit on one\nstrand if no fit could be optained on the other strand.\n\nChanges have been made to rounding and column order in Samplestats.\n\nVarious minor fixes and enhancements have been made, mostly to the\nvisualisations.\n\n\n### Version 0.0.3 (2016-02-02)\nFirst version of FDSTools with all strings attached. Introduces 15 new tools\nand five visualisations.\n\nIn Stuttermark, the column names 'name' and 'allele' have been changed to\n'marker' and 'sequence', respectively, reflecting those of all the other\ntools. WARNING: Stuttermark is now INCOMPATIBLE with output from TSSV, but\nmade compatible with TSSV-Lite and the new, bundled TSSV tool instead.\n\n\n### Version 0.0.2 (2015-07-23)\nAdded a new global option: -d/--debug. This option disables the suppression\nof technical details that would normally be visible when an error occurs.\n\nStuttermark now accepts raw sequences and allele names as input, which are\nautomatically rewritten as TSSV-style sequences using a specified library\nfile. Also, the 'name' column is now optional.\n\n\n### Version 0.0.1 (2015-07-02)\nInitial version of FDSTools, featuring a single tool: Stuttermark v1.3.\n",
+        "ref": "5cad6d057fd2f16bd77f9aa2420e920ccfcc7aa6",
+        "regions": {
+          "ambiguous": false,
+          "candidates": [],
+          "end_line": null,
+          "evidence_source": null,
+          "file": null,
+          "format": null,
+          "line": null,
+          "text": null
+        },
+        "registry": {
+          "bioconda": {},
+          "documented": []
+        },
+        "repo": "https://github.com/Jerrythafast/FDSTools",
+        "schema": "strhub-verified/recipe-proposal/1",
+        "single_sample_bams": {
+          "allowed": false,
+          "evidence_source": null,
+          "file": null,
+          "line": null,
+          "paired_flags": [],
+          "text": null
+        },
+        "source_documents": [
+          {
+            "file": "README.md",
+            "origin": "readme",
+            "text": "Forensic DNA Sequencing Tools\n=============================\nTools for filtering and interpretation of Massively Parallel Sequencing data of\nforensic DNA samples. To obtain a list of included tools with a brief\ndescription of each tool, run:\n\n    fdstools --help\n\nFor a complete description of a specific tool and its command line arguments,\nrun:\n\n    fdstools --help TOOLNAME\n\n\nInstallation\n------------\nFDSTools requires Python version 3.9 or later.\n\nThe recommended way to install FDSTools is by using the `pip` package\ninstaller. If you have `pip` installed, you can easily install FDSTools by\nrunning the following command:\n\n    pip install -U fdstools\n\n\nRelease Notes\n-------------\n### Version 2.2.1 (2026-08-11)\nFixed a critical issue with Samplevis.\n\n\n### Version 2.2.0 (2026-08-10)\nModernized packaging and bumped the minimum supported Python version to 3.9.\nImproved robustness of concurrency and the handling of input and output.\n\nUpdated STRNaming to version 1.2.1. Repeats that extend slightly outside the\nreported region will now include lowercase nucleotides in allele names.\n\nAdded three new tools: Demultiplex (a sample demultiplexer with forensic\nsensitivity, with special options to deal with basecall errors in NextSeq\ndata), MergeReads (a versatile paired-end read merging tool) and Bam2fds\n(for extracting forensic markers from aligned whole genome sequencing data).\n\nThe accuracy of Stuttermodel, BGPredict and BGEstimate has been improved\nand new settings have been introduced in various tools.\n\nAdded a large number of new component tests, covering Bam2fds, BGCorrect,\nBGEstimate, BGMerge, BGPredict, Demultiplex, FindNewAlleles, MergeReads,\nSamplestats and Stuttermodel.\n\nAnd finally, we have two new members in our team: welcome Myrthe & Myrthe!\n\n\n### Version 2.1.1 (2024-07-02)\nFixed an issue that caused the new [flank_length] section to be ignored.\n\nTSSV no longer requires [flanks] to be specified for explicitly-defined\nnon-STR markers if the ending [genome_position] is provided.\n\n\n### Version 2.1.0 (2024-04-30)\nUpdated STRNaming nomenclature to version 1.2. **Please note that this is a\nbackwards incompatible update:** this version of FDSTools is unable to\ncorrectly interpret allele names that were produced with a prior version!\nPlease see https://fdstools.nl/strnaming/updates for more information.\n\nChanged interpretation of the [flanks] section in the library file: it can no\nlonger contain numbers, but the value 'REF' can be specified to indicate that\nGRCh38 reference sequence should be used (which was already the default).\nA new [flank_length] section is introduced to allow specifying marker-specific\nminimum and maximum (or exact) flanking sequence length; the value specified\nfor TSSV's -L/--flank-length option is then clamped between these values.\nIf a [flanks] section is present and contains a short sequence (possibly with\nIUPAC codes), it is implicitly extended with GRCh38 reference sequence to the\nrequested length by TSSV.\n\nTo use TSSV with explicitly-defined markers, those markers now also require\nspecifying flanks explicitly. Previously, since FDSTools v2.0.0, TSSV's\nbehaviour regarding these markers was erratic.\n\nGreatly improved handling of microhaplotype markers, and we finally introduced\nthe first suite of component tests, covering Allelefinder, Seqconvert,\nStuttermark and TSSV. Welcome to the team, Brechtje!\n\n\n### Version 2.0.4 (2023-03-02)\nMicrohaplotype alleles with SNPs adjacent to any of the microhaplotype\npositions are now recognised. For example, an allele previously named\n\"MH_N_123NC>GA\" will now be named \"MH_G_124C>A\" instead.\n\nGreatly improved loading speed for large library files.\n\n\n### Version 2.0.3 (2022-08-27)\nAdded NimaGen IDseek OmniSTR built-in library file (ID-OmniSTR).\n\n\n### Version 2.0.2 (2022-07-25)\nFixed a compatibility issue with Python 3.10, that caused TSSV to crash.\nFixed some issues that could cause crashes in the Pipeline tool.\n\nCorrected the reported range of AmelongeninY in the ForenSeq-A and ForenSeq-B\nlibrary files which were introduced in v2.0.1, by adding 1 to the starting\nposition. The range is now identical to the UAS Flanking Region Report range.\nIf still you need to work with data previously generated using the ForenSeq-A\nor ForenSeq-B library as shipped with v2.0.1, use the Library tool to obtain a\ncopy of the built-in library file and make sure the range of AmelongeninY\nstarts at 6869870.\n\n\n### Version 2.0.1 (2022-05-12)\nAdded support for microhaplotype targets. For markers configured as such,\nthe 'allelename' sequence format will look like \"MH_AGGTC\".\n\nAdded ForenSeq DNA Signature Prep Kit library files with ranges specifically\noptimized for FDSTools (often longer than UAS Flanking Region Report).\n\n\n### Version 2.0.0 (2021-07-15)\nTransition to Python 3.5, along with a major upgrade to all tools to\nprovide an overall better experience.\n\nAllele naming is now handled by STRNaming, eliminating the need for\ncomplex library files. Library files of commonly-used kits are built in.\n\nKits that sequence a target on a single strand (such as the ForenSeq DNA\nSignature Prep Kit by Verogen) are now supported.\n\n\n### Version 1.2.1 (2021-07-15)\nThis release focuses on finishing support for Python2 before the transition\nto Python3. FDSTools will now display the help page if no command is given.\nA message about the transition to Python3 in the next version of FDSTools\nis added to the command-line help pages. Furthermore, dependency version\nnumbers have been updated to ensure smooth installation on Python2 as well\nas a smooth transition to Python3.\n\n\n### Version 1.2.0 (2019-03-29)\nMajor improvements and fixes to the TSSV tool. Most notably, it no longer\nrelies on the external `tssvl` program because that is no longer\ncompatible with FDSTools. Furthermore, the new TSSV tool v2.0.0 comes with\na major performance upgrade and has some updated command-line arguments.\n\nThis release also fixes an issue in Samplestats and adds the ability to\napply graph filtering before noise correction in Samplevis, making the\neffects of noise correction more apparent.\n\n\n### Version 1.1.1 (2017-03-15)\nFixeds incorrect calculation of tLeft, fLeft, rLeft, tRight and fRight\ncolumns in the report output file of TSSV, when -T/--num-threads was set to\n2 or higher. The primary output was unaffected.\n\n\n### Version 1.1.0 (2017-03-14)\nIn STR allele names for sequences that don't exactly match the description\ngiven in the library file, no more insertions are produced at the end of\nthe prefix or the beginning of the suffix, in favour of extra STR blocks.\n\nEmpty input files and broken pipelines are now handled gracefully across\nall tools. Specifically, an empty input file is now treated as if the\nexpected columns existed, but no lines of actual data were present. This\ngreatly helps in tracking down issues in pipelines involving multiple\ntools, as tools will now shutdown gracefully if an upstream tool fails to\nwrite output. Only the failing tool will output an error.\n\nFurthermore, a new option has been added to the TSSV tool, enabling\nmultithreading support. This can greatly reduce analysis time by using\nmore (or all) cores of the system's processor simultaneously.\n\nFinally, various small bugs and glitches were fixed.\n\n\n### Version 1.0.1 (2016-12-21)\nFDSTools library files may now contain IUPAC ambiguous bases in the prefix\nprefix and suffix sequences of STR markers (except the first sequence, as\nit is used as the reference). Additionally, optional bases may be\nrepresented by lowercase letters.\n\nAn option was added to the Pipeline tool to skip running Allelefinder,\nusing a user-supplied allele list file instead. Multiple options have been\nadded to the Vis tool and some have been regrouped to more easily find the\noption you are looking for.\n\nIt is now possible to save the a Samplevis HTML visualisation after having\nmade changes, preserving the changes made.\n\nAnd various minor bug fixes and improvements throughout.\n\n\n### Version 1.0.0 (2016-10-03)\nFixed an issue with variant descriptions in allele names of non-STR markers\nthat made it impossible to convert those back to raw sequences.\n\nAdded various useful options. Most notably, Samplevis now displays a\ntooltip when the mouse pointer is over an allele, providing various details\nabout that allele.\n\nAnd various minor bug fixes.\n\n\n### Version 0.0.5 (2016-09-06)\nAdded the Library tool, for creating a template library file that includes\nhelpful commentary and examples to get new users started. Creating an empty\nlibrary file used to be a somewhat confusing option in the Libconvert tool.\nAlso, the Blame tool was replaced with the more advanced BGAnalyse tool.\n\nAdded the Pipeline tool, which implements some ready-made pipelines\ninvolving most of the other tools in FDSTools. Three pipelines are\nprovided: one for noise reference sample analysis, one for case sample\nanalysis, and one for generating a background noise database from the\nreference samples.\n\nIn Samplestats, the default allele calling option thresholds have changed:\n    - Changed default value of -m/--min-pct-of-max from 5.0 to 2.0\n    - Changed default value of -p/--min-pct-of-sum from 3.0 to 1.5\n\nThe TSSV tool was updated with an option to increase the penalty given to\ninsertions and deletions in the flanking sequences. It now requires TSSV\nversion 0.4.0 to be installed.\n\nVarious upgrades to visualisations, bringing a new responsive design to all\nHTML visualisations and fixing various issues.\n\n\n### Version 0.0.4 (2016-07-26)\nImproved debugging: FDSTools will now print profiling information to stdout\nwhen the -d/--debug option was specified. Also, all tools now correctly\ninterpret '-' as the output filename as 'write to standard out'.\n\nBGEstimate has gained a new option to require a minimum number of unique\ngenotypes in which a specific allele must have been seen before it will be\nconsidered for noise estimation. This is to avoid 'contamination' of the\nnoise profile of one allele with the noise of another. If homozygous\nsamples are available for an allele, this filter is not applied to that\nallele.\n\nReduced the memory usage of BGPredict and BGMerge. Also, BGPredict will now\noutput nonzero values below the threshold set by -n/--min-pct if the\npredicted noise ratio of the same stutter on the other strand is above the\nthreshold. Previously, values below the threshold were clipped to zero,\nwhich may cause unnecessarily high strand bias in the predicted profile.\nSimilarly, by default Stuttermodel will no longer output a fit on one\nstrand if no fit could be optained on the other strand.\n\nChanges have been made to rounding and column order in Samplestats.\n\nVarious minor fixes and enhancements have been made, mostly to the\nvisualisations.\n\n\n### Version 0.0.3 (2016-02-02)\nFirst version of FDSTools with all strings attached. Introduces 15 new tools\nand five visualisations.\n\nIn Stuttermark, the column names 'name' and 'allele' have been changed to\n'marker' and 'sequence', respectively, reflecting those of all the other\ntools. WARNING: Stuttermark is now INCOMPATIBLE with output from TSSV, but\nmade compatible with TSSV-Lite and the new, bundled TSSV tool instead.\n\n\n### Version 0.0.2 (2015-07-23)\nAdded a new global option: -d/--debug. This option disables the suppression\nof technical details that would normally be visible when an error occurs.\n\nStuttermark now accepts raw sequences and allele names as input, which are\nautomatically rewritten as TSSV-style sequences using a specified library\nfile. Also, the 'name' column is now optional.\n\n\n### Version 0.0.1 (2015-07-02)\nInitial version of FDSTools, featuring a single tool: Stuttermark v1.3.\n"
+          }
+        ],
+        "tool_names": [
+          "FDSTools",
+          "allelefinder",
+          "allelefinder.py",
+          "bam2fds",
+          "bam2fds.py",
+          "bganalyse",
+          "bganalyse.py",
+          "bgcorrect",
+          "bgcorrect.py",
+          "bgestimate",
+          "bgestimate.py",
+          "bghomraw",
+          "bghomraw.py",
+          "bghomstats",
+          "bghomstats.py",
+          "bgmerge",
+          "bgmerge.py",
+          "bgpredict",
+          "bgpredict.py",
+          "demultiplex",
+          "demultiplex.py",
+          "fdstools",
+          "fdstools.py",
+          "findnewalleles",
+          "findnewalleles.py",
+          "libconvert",
+          "libconvert.py",
+          "library",
+          "library.py",
+          "mergereads",
+          "mergereads.py",
+          "mps2ce",
+          "mps2ce.py",
+          "pipeline",
+          "pipeline.py",
+          "samplestats",
+          "samplestats.py",
+          "seqconvert",
+          "seqconvert.py",
+          "stuttermark",
+          "stuttermark.py",
+          "stuttermodel",
+          "stuttermodel.py",
+          "thresholds",
+          "thresholds.py",
+          "tssv",
+          "tssv.py",
+          "vis",
+          "vis.py"
+        ],
+        "tree_paths": [
+          ".gitignore",
+          "CHANGELOG.md",
+          "LICENSE.txt",
+          "LICENSES-3RD-PARTY.txt",
+          "README.md",
+          "fdstools/__init__.py",
+          "fdstools/__main__.py",
+          "fdstools/data/libraries/ForenSeqA-UAS.ini",
+          "fdstools/data/libraries/ForenSeqA.ini",
+          "fdstools/data/libraries/ForenSeqB-UAS.ini",
+          "fdstools/data/libraries/ForenSeqB.ini",
+          "fdstools/data/libraries/ID-OmniSTR.ini",
+          "fdstools/data/libraries/PowerSeq46GY.ini",
+          "fdstools/fdstools.py",
+          "fdstools/tools/__init__.py",
+          "fdstools/tools/allelefinder.py",
+          "fdstools/tools/bam2fds.py",
+          "fdstools/tools/bganalyse.py",
+          "fdstools/tools/bgcorrect.py",
+          "fdstools/tools/bgestimate.py",
+          "fdstools/tools/bghomraw.py",
+          "fdstools/tools/bghomstats.py",
+          "fdstools/tools/bgmerge.py",
+          "fdstools/tools/bgpredict.py",
+          "fdstools/tools/demultiplex.py",
+          "fdstools/tools/findnewalleles.py",
+          "fdstools/tools/libconvert.py",
+          "fdstools/tools/library.py",
+          "fdstools/tools/mergereads.py",
+          "fdstools/tools/mps2ce.py",
+          "fdstools/tools/pipeline.py",
+          "fdstools/tools/samplestats.py",
+          "fdstools/tools/seqconvert.py",
+          "fdstools/tools/stuttermark.py",
+          "fdstools/tools/stuttermodel.py",
+          "fdstools/tools/thresholds.py",
+          "fdstools/tools/tssv.py",
+          "fdstools/tools/vis.py",
+          "fdstools/vis/allelevis/allelevis.json",
+          "fdstools/vis/allelevis/index.html",
+          "fdstools/vis/bganalysevis/bganalysevis.json",
+          "fdstools/vis/bganalysevis/index.html",
+          "fdstools/vis/bgrawvis/bgrawvis.json",
+          "fdstools/vis/bgrawvis/index.html",
+          "fdstools/vis/d3.min.js",
+          "fdstools/vis/profilevis/index.html",
+          "fdstools/vis/profilevis/profilevis.json",
+          "fdstools/vis/samplevis/index.html",
+          "fdstools/vis/samplevis/samplevis.json",
+          "fdstools/vis/samplevis/warning.svg",
+          "fdstools/vis/stuttermodelvis/index.html",
+          "fdstools/vis/stuttermodelvis/stuttermodelvis.json",
+          "fdstools/vis/vega.min.js",
+          "notes.txt",
+          "pyproject.toml",
+          "tests/__init__.py",
+          "tests/component/__init__.py",
+          "tests/component/test_allelefinder.py",
+          "tests/component/test_bam2fds.py",
+          "tests/component/test_bgcorrect.py",
+          "tests/component/test_bgestimate.py",
+          "tests/component/test_bgmerge.py",
+          "tests/component/test_bgpredict.py",
+          "tests/component/test_demultiplex.py",
+          "tests/component/test_findnewalleles.py",
+          "tests/component/test_mergereads.py",
+          "tests/component/test_samplestats.py",
+          "tests/component/test_seqconvert.py",
+          "tests/component/test_stuttermark.py",
+          "tests/component/test_stuttermodel.py",
+          "tests/component/test_tssv.py",
+          "tests/data/_reads/OmniSTR_Mixture_Paired.bam",
+          "tests/data/_reads/OmniSTR_Mixture_Paired.bam.bai",
+          "tests/data/_reads/OmniSTR_Mixture_R1.bam",
+          "tests/data/_reads/OmniSTR_Mixture_R1.bam.bai",
+          "tests/data/_reads/OmniSTR_Mixture_R1_4lt2.fasta.gz",
+          "tests/data/_reads/OmniSTR_Mixture_R1_4lt2.fastq.gz",
+          "tests/data/_reads/OmniSTR_Mixture_R2_4lt2.fastq.gz",
+          "tests/data/_reads/OmniSTR_Mixture_interleaved_4lt2.fastq.gz",
+          "tests/data/_reads/ambiguous.fastq",
+          "tests/data/_references/F0107.txt",
+          "tests/data/_references/F0108.txt",
+          "tests/data/_references/F0109.txt",
+          "tests/data/_references/F0110.txt",
+          "tests/data/_references/F0207.txt",
+          "tests/data/_references/F0208.txt",
+          "tests/data/_references/F0209.txt",
+          "tests/data/_references/F0210.txt",
+          "tests/data/_references/F0307.txt",
+          "tests/data/_references/F0308.txt",
+          "tests/data/_references/F0309.txt",
+          "tests/data/_references/F0310.txt",
+          "tests/data/_references/F0407.txt",
+          "tests/data/_references/F0408.txt",
+          "tests/data/_references/F0409.txt",
+          "tests/data/_references/F0410.txt",
+          "tests/data/_references/F0507.txt",
+          "tests/data/_references/F0508.txt",
+          "tests/data/_references/F0509.txt",
+          "tests/data/_references/F0510.txt",
+          "tests/data/_references/F0607.txt",
+          "tests/data/_references/F0608.txt",
+          "tests/data/_references/F0609.txt",
+          "tests/data/_references/F0610.txt",
+          "tests/data/_references/F0707.txt",
+          "tests/data/_references/F0708.txt",
+          "tests/data/_references/F0709.txt",
+          "tests/data/_references/F0710.txt",
+          "tests/data/_references/F0807.txt",
+          "tests/data/_references/F0808.txt",
+          "tests/data/_references/F0809.txt",
+          "tests/data/allelefinder/allelefinder_advanced1-report.txt",
+          "tests/data/allelefinder/allelefinder_advanced1.txt",
+          "tests/data/allelefinder/allelefinder_advanced2-report.txt",
+          "tests/data/allelefinder/allelefinder_advanced2.txt",
+          "tests/data/allelefinder/allelefinder_default_accepted-report.txt",
+          "tests/data/allelefinder/allelefinder_default_accepted.txt",
+          "tests/data/allelefinder/allelefinder_default_rejected-report.txt",
+          "tests/data/allelefinder/allelefinder_default_rejected.txt",
+          "tests/data/bam2fds/OmniSTR_Mixture_Paired_bam2fds_advanced1.txt",
+          "tests/data/bam2fds/OmniSTR_Mixture_Paired_bam2fds_default.txt",
+          "tests/data/bam2fds/OmniSTR_Mixture_R1_4lt2_bam2fds_advanced2.txt",
+          "tests/data/bam2fds/OmniSTR_Mixture_R1_4lt2_bam2fds_advanced3.txt",
+          "tests/data/bgcorrect/bgcorrect_adv2_F0107.txt",
+          "tests/data/bgcorrect/bgcorrect_adv2_F0108.txt",
+          "tests/data/bgcorrect/bgcorrect_adv2_F0109.txt",
+          "tests/data/bgcorrect/bgcorrect_adv3_F0107.txt",
+          "tests/data/bgcorrect/bgcorrect_adv3_F0108.txt",
+          "tests/data/bgcorrect/bgcorrect_adv3_F0109.txt",
+          "tests/data/bgcorrect/bgcorrect_adv4_F0107.txt",
+          "tests/data/bgcorrect/bgcorrect_adv4_F0108.txt",
+          "tests/data/bgcorrect/bgcorrect_adv4_F0109.txt",
+          "tests/data/bgcorrect/bgcorrect_default.txt",
+          "tests/data/bgestimate/bgestimate_adv2.txt",
+          "tests/data/bgestimate/bgestimate_adv4.txt",
+          "tests/data/bgestimate/bgestimate_adv5.txt",
+          "tests/data/bgestimate/bgestimate_default.txt",
+          "tests/data/bgestimate/start_profile.txt",
+          "tests/data/bgmerge/bgmerge_default.txt",
+          "tests/data/bgpredict/bgpredict-adv2.txt",
+          "tests/data/bgpredict/bgpredict-adv3.txt",
+          "tests/data/bgpredict/bgpredict-adv4.txt",
+          "tests/data/bgpredict/bgpredict-adv5.txt",
+          "tests/data/bgpredict/bgpredict-default.txt",
+          "tests/data/bgpredict/stuttermodel_adapted_adv5.txt",
+          "tests/data/demultiplex/Multiplexed_R1.fastq",
+          "tests/data/demultiplex/Multiplexed_R2.fastq",
+          "tests/data/demultiplex/Multiplexed_interleaved.fastq",
+          "tests/data/demultiplex/SampleSheet.csv",
+          "tests/data/demultiplex/advanced1/E0049_S1_R1_001.fastq.gz",
+          "tests/data/demultiplex/advanced1/E0049_S1_R2_001.fastq.gz",
+          "tests/data/demultiplex/advanced1/E0150_S2_R1_001.fastq.gz",
+          "tests/data/demultiplex/advanced1/E0150_S2_R2_001.fastq.gz",
+          "tests/data/demultiplex/advanced1/Undetermined_S0_R1_001.fastq.gz",
+          "tests/data/demultiplex/advanced1/Undetermined_S0_R2_001.fastq.gz",
+          "tests/data/demultiplex/advanced2a/E0049_S1_R1_001.fastq.gz",
+          "tests/data/demultiplex/advanced2a/E0049_S1_R2_001.fastq.gz",
+          "tests/data/demultiplex/advanced2a/E0150_S2_R1_001.fastq.gz",
+          "tests/data/demultiplex/advanced2a/E0150_S2_R2_001.fastq.gz",
+          "tests/data/demultiplex/advanced2a/Undetermined_S0_R1_001.fastq.gz",
+          "tests/data/demultiplex/advanced2a/Undetermined_S0_R2_001.fastq.gz",
+          "tests/data/demultiplex/advanced2b/E0049_S1_R1_001.fastq.gz",
+          "tests/data/demultiplex/advanced2b/E0049_S1_R2_001.fastq.gz",
+          "tests/data/demultiplex/advanced2b/E0150_S2_R1_001.fastq.gz",
+          "tests/data/demultiplex/advanced2b/E0150_S2_R2_001.fastq.gz",
+          "tests/data/demultiplex/advanced2b/Undetermined_S00_R1_001.fastq.gz",
+          "tests/data/demultiplex/advanced2b/Undetermined_S00_R2_001.fastq.gz",
+          "tests/data/demultiplex/advanced2b/Undetermined_S0_R1_001.fastq.gz",
+          "tests/data/demultiplex/advanced2b/Undetermined_S0_R2_001.fastq.gz",
+          "tests/data/demultiplex/barcodes-reversed-right.txt",
+          "tests/data/demultiplex/barcodes.txt",
+          "tests/data/demultiplex/default/E0049_S1_R1_001.fastq.gz",
+          "tests/data/demultiplex/default/E0049_S1_R2_001.fastq.gz",
+          "tests/data/demultiplex/default/E0150_S2_R1_001.fastq.gz",
+          "tests/data/demultiplex/default/E0150_S2_R2_001.fastq.gz",
+          "tests/data/demultiplex/default/Undetermined_S0_R1_001.fastq.gz",
+          "tests/data/demultiplex/default/Undetermined_S0_R2_001.fastq.gz",
+          "tests/data/demultiplex/xleap-channels.txt",
+          "tests/data/findnewalleles/known.txt",
+          "tests/data/findnewalleles/newalleles_adv3_F0107.txt",
+          "tests/data/findnewalleles/newalleles_adv3_F0108.txt",
+          "tests/data/findnewalleles/newalleles_adv3_F0109.txt",
+          "tests/data/findnewalleles/newalleles_adv5_F0107.txt",
+          "tests/data/findnewalleles/newalleles_adv6_F0107.txt",
+          "tests/data/findnewalleles/newalleles_default.txt",
+          "tests/data/mergereads/OmniSTR_Mixture_4lt2_mergereads_advanced-R1.fastq.gz",
+          "tests/data/mergereads/OmniSTR_Mixture_4lt2_mergereads_advanced-R2.fastq.gz",
+          "tests/data/mergereads/OmniSTR_Mixture_4lt2_mergereads_advanced-report.txt",
+          "tests/data/mergereads/OmniSTR_Mixture_4lt2_mergereads_advanced.fastq.gz",
+          "tests/data/mergereads/OmniSTR_Mixture_4lt2_mergereads_default-report.txt",
+          "tests/data/mergereads/OmniSTR_Mixture_4lt2_mergereads_default.fastq",
+          "tests/data/samplestats/newalleles_default_adapted_for_adv-10.txt",
+          "tests/data/samplestats/samplestats_adv10.txt",
+          "tests/data/samplestats/samplestats_adv4_F0107.txt",
+          "tests/data/samplestats/samplestats_adv5_F0107.txt",
+          "tests/data/samplestats/samplestats_adv6_F0107.txt",
+          "tests/data/samplestats/samplestats_adv7_F0107.txt",
+          "tests/data/samplestats/samplestats_adv8_F0107.txt",
+          "tests/data/samplestats/samplestats_adv9.txt",
+          "tests/data/samplestats/samplestats_default_F0107.txt",
+          "tests/data/samplestats/samplestats_default_F0107_adapated_for_input_adv4-8.txt",
+          "tests/data/samplestats/samplestats_default_F0107_bgcorrect_for_input_adv4-8.txt",
+          "tests/data/samplestats/samplestats_default_F0108.txt",
+          "tests/data/samplestats/samplestats_default_F0109.txt",
+          "tests/data/samplestats/settings.txt",
+          "tests/data/seqconvert/F0107_seqconvert-allele-column_raw+tssv.txt",
+          "tests/data/seqconvert/F0107_seqconvert-allele-column_tssv+allelename.txt",
+          "tests/data/seqconvert/F0107_seqconvert-allele-column_tssv+tssv.txt",
+          "tests/data/seqconvert/OmniSTR_Mixture_R1_4lt2_seqconvert-marker-column.txt",
+          "tests/data/seqconvert/OmniSTR_Mixture_R1_4lt2_seqconvert-marker_allelename_NonSTR.txt",
+          "tests/data/seqconvert/OmniSTR_Mixture_R1_4lt2_seqconvert-marker_allelename_STR.txt",
+          "tests/data/seqconvert/OmniSTR_Mixture_R1_4lt2_seqconvert-marker_tssv_NonSTR.txt",
+          "tests/data/seqconvert/OmniSTR_Mixture_R1_4lt2_seqconvert-marker_tssv_STR.txt",
+          "tests/data/seqconvert/OmniSTR_Mixture_R1_4lt2_seqconvert_allelename.txt",
+          "tests/data/seqconvert/OmniSTR_Mixture_R1_4lt2_seqconvert_tssv.txt",
+          "tests/data/seqconvert/RangeAdjust_ForenSeq.txt",
+          "tests/data/seqconvert/RangeAdjust_OmniSTR.txt",
+          "tests/data/stuttermark/advanced1/F0107-stuttermark.out",
+          "tests/data/stuttermark/advanced1/F0809-stuttermark.out",
+          "tests/data/stuttermark/default/F0107-stuttermark.out",
+          "tests/data/stuttermark/default/F0108-stuttermark.out",
+          "tests/data/stuttermark/default/F0109-stuttermark.out",
+          "tests/data/stuttermark/default/F0110-stuttermark.out",
+          "tests/data/stuttermark/default/F0207-stuttermark.out",
+          "tests/data/stuttermark/default/F0208-stuttermark.out",
+          "tests/data/stuttermark/default/F0209-stuttermark.out",
+          "tests/data/stuttermark/default/F0210-stuttermark.out",
+          "tests/data/stuttermark/default/F0307-stuttermark.out",
+          "tests/data/stuttermark/default/F0308-stuttermark.out",
+          "tests/data/stuttermark/default/F0309-stuttermark.out",
+          "tests/data/stuttermark/default/F0310-stuttermark.out",
+          "tests/data/stuttermark/default/F0407-stuttermark.out",
+          "tests/data/stuttermark/default/F0408-stuttermark.out",
+          "tests/data/stuttermark/default/F0409-stuttermark.out",
+          "tests/data/stuttermark/default/F0410-stuttermark.out",
+          "tests/data/stuttermark/default/F0507-stuttermark.out",
+          "tests/data/stuttermark/default/F0508-stuttermark.out",
+          "tests/data/stuttermark/default/F0509-stuttermark.out",
+          "tests/data/stuttermark/default/F0510-stuttermark.out",
+          "tests/data/stuttermark/default/F0607-stuttermark.out",
+          "tests/data/stuttermark/default/F0608-stuttermark.out",
+          "tests/data/stuttermark/default/F0609-stuttermark.out",
+          "tests/data/stuttermark/default/F0610-stuttermark.out",
+          "tests/data/stuttermark/default/F0707-stuttermark.out",
+          "tests/data/stuttermark/default/F0708-stuttermark.out",
+          "tests/data/stuttermark/default/F0709-stuttermark.out",
+          "tests/data/stuttermark/default/F0710-stuttermark.out",
+          "tests/data/stuttermark/default/F0807-stuttermark.out",
+          "tests/data/stuttermark/default/F0808-stuttermark.out",
+          "tests/data/stuttermark/default/F0809-stuttermark.out",
+          "tests/data/stuttermark/stuttermark_library_required.txt",
+          "tests/data/stuttermodel/stuttermodel-default.txt",
+          "tests/data/stuttermodel/stuttermodel-raw.txt",
+          "tests/data/stuttermodel/stuttermodel_advanced1-raw.txt",
+          "tests/data/stuttermodel/stuttermodel_advanced1.txt",
+          "tests/data/stuttermodel/stuttermodel_advanced2-raw.txt",
+          "tests/data/stuttermodel/stuttermodel_advanced2.txt",
+          "tests/data/stuttermodel/stuttermodel_advanced3-raw.txt",
+          "tests/data/stuttermodel/stuttermodel_advanced3.txt",
+          "tests/data/stuttermodel/stuttermodel_advanced4-raw.txt",
+          "tests/data/stuttermodel/stuttermodel_advanced4.txt",
+          "tests/data/stuttermodel/stuttermodel_advanced5-raw.txt",
+          "tests/data/stuttermodel/stuttermodel_advanced5.txt",
+          "tests/data/stuttermodel/stuttermodel_marker-raw.txt",
+          "tests/data/stuttermodel/stuttermodel_marker.txt",
+          "tests/data/tssv/OmniSTR_Mixture_R1_4lt2_tssv_advanced1-report.txt",
+          "tests/data/tssv/OmniSTR_Mixture_R1_4lt2_tssv_advanced1.txt",
+          "tests/data/tssv/OmniSTR_Mixture_R1_4lt2_tssv_advanced2-report.txt",
+          "tests/data/tssv/OmniSTR_Mixture_R1_4lt2_tssv_advanced2.txt",
+          "tests/data/tssv/OmniSTR_Mixture_R1_4lt2_tssv_advanced3-report.txt",
+          "tests/data/tssv/OmniSTR_Mixture_R1_4lt2_tssv_advanced3.txt",
+          "tests/data/tssv/OmniSTR_Mixture_R1_4lt2_tssv_default-report.txt",
+          "tests/data/tssv/OmniSTR_Mixture_R1_4lt2_tssv_default.txt",
+          "tests/data/tssv/ambiguous-filtered_tssv-report.txt",
+          "tests/data/tssv/ambiguous-filtered_tssv.txt",
+          "tests/data/tssv/ambiguous-qualities_tssv.txt",
+          "tests/data/tssv/ambiguous_tssv-report.txt",
+          "tests/data/tssv/ambiguous_tssv.txt",
+          "tests/data/tssv/dir_advanced1/AmelogeninX/noend.fa",
+          "tests/data/tssv/dir_advanced1/AmelogeninX/sequences.csv",
+          "tests/data/tssv/dir_advanced1/sequences.csv",
+          "tests/data/tssv/dir_advanced1/statistics.csv",
+          "tests/data/tssv/dir_advanced2/AmelogeninX/noend.fa",
+          "tests/data/tssv/dir_advanced2/AmelogeninX/sequences.csv",
+          "tests/data/tssv/dir_advanced2/sequences.csv",
+          "tests/data/tssv/dir_advanced2/statistics.csv",
+          "tests/data/tssv/dir_advanced3/AmelogeninX/noend.fa",
+          "tests/data/tssv/dir_advanced3/AmelogeninX/sequences.csv",
+          "tests/data/tssv/dir_advanced3/sequences.csv",
+          "tests/data/tssv/dir_advanced3/statistics.csv",
+          "tests/data/tssv/distrust-qualities_tssv-report.txt",
+          "tests/data/tssv/distrust-qualities_tssv.txt"
+        ],
+        "tree_truncated": false,
+        "upstream_files": {}
+      },
+      "limitations": [
+        "input_type_guessed",
+        "install_profile_unsupported",
+        "no_command"
+      ],
+      "caveat_items": [
+        "Environment: no proven installation profile; STRhub did not manufacture installation steps.",
+        "Input: no sentence in the README says what the tool takes; illumina-str-fastq is only a guess from mentions; it is not authorization to execute."
+      ]
+    }
+  },
+  "provenance": {
+    "from_upstream": {
+      "install": {
+        "method": "pip",
+        "evidence_source": "repo_file:pyproject.toml"
+      },
+      "command": null,
+      "input_kind": {
+        "value": "fastq",
+        "evidence_source": null
+      },
+      "supported_platforms": [
+        {
+          "platform": "illumina",
+          "evidence_source": "README.md:L115"
+        }
+      ],
+      "assembly": {
+        "declared": "hg38",
+        "evidence_source": "README.md:L69"
+      },
+      "regions_schema": null,
+      "output_format": null
+    },
+    "derived": {
+      "command_rewrites": [],
+      "regions_layout_binding": null,
+      "single_sample_adaptation": null
+    },
+    "harness_choices": {
+      "dataset": {
+        "selected": "illumina-str-fastq",
+        "reason": "STRhub selected 'illumina-str-fastq' as compatible with upstream input 'fastq' and platform 'illumina'"
+      },
+      "platform": {
+        "selected": "illumina",
+        "basis": "counted_unproven",
+        "supported_platforms": [
+          "illumina"
+        ]
+      },
+      "assembly": {
+        "selected": null,
+        "basis": "upstream_stated",
+        "note": null
+      },
+      "regions_layout": null,
+      "base_environment": null
+    }
+  },
+  "procedure_validation": {
+    "schema": "strhub-procedure-evidence/1",
+    "valid": true,
+    "reason": "Procedure evidence matches the effective manifest and recomputed decision."
+  },
+  "verdict": {
+    "code": "undetermined",
+    "title": "Could not be determined",
+    "basis": "recipe",
+    "reason": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub.",
+    "readme_gaps": [
+      {
+        "item": "command",
+        "text": "No command line invoking the tool was found in the README's code blocks."
+      },
+      {
+        "item": "output",
+        "text": "The README does not describe the output file or its format."
+      }
+    ],
+    "status_code": "UNVERIFIED_INSUFFICIENT_DOCS",
+    "blockers": [
+      {
+        "code": "install_not_copyable",
+        "what": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub.",
+        "ask_owner": {
+          "title": "Write the installation as commands that can be copied and run",
+          "body": "STRhub Verified reads the installation from the repository's documentation and runs it exactly as written, adding nothing. At this commit it could not follow it. Writing the installation as plain commands in one code block (apt, conda, pip, make or cmake, with the files they name in the repository) lets a new user, a reviewer and STRhub install the tool by copying it. The forms it can follow are listed in the guide: https://github.com/Tfronta/strhub-verified-next/blob/main/docs/GUIA-PASO-1.md What stopped it: No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub."
+        }
+      },
+      {
+        "code": "no_command",
+        "what": "No command line invoking the tool was found in the README.",
+        "ask_owner": {
+          "title": "Document the command that runs the tool",
+          "body": "STRhub Verified could not find, in the README, a command line that invokes the tool. A one-line example with an input file and the output it writes would let a new user run it and let STRhub verify it automatically."
+        }
+      }
+    ]
+  },
+  "step1": {
+    "code": "cannot_tell",
+    "headline": "As documented, a third party cannot tell how to run it.",
+    "body": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub. Nothing was executed. That does not mean the tool does not work: what the guide asks for is missing from the README at this commit. Add it and try the link again on the new commit.",
+    "missing": [
+      "install"
+    ],
+    "missing_text": [
+      "Installation, copyable"
+    ],
+    "guide": "docs/GUIA-PASO-1.md"
+  },
+  "certificate": {
+    "schema": "strhub-verified/certificate/1",
+    "label": "Could not be determined",
+    "reached": "Available",
+    "stages": [
+      {
+        "key": "available",
+        "label": "Source available",
+        "status": "PASS"
+      },
+      {
+        "key": "installs",
+        "label": "Installation",
+        "status": "NOT ATTEMPTED"
+      },
+      {
+        "key": "runs",
+        "label": "End-to-end execution",
+        "status": "NOT ATTEMPTED"
+      },
+      {
+        "key": "output",
+        "label": "Output generated",
+        "status": "NOT ATTEMPTED"
+      }
+    ],
+    "summary": {
+      "purpose": "Evaluate whether the tool installs, runs end-to-end, and produces structurally valid output.",
+      "result": "Could not be determined",
+      "reached": "Available, 1/5 gates passed",
+      "why": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub.",
+      "scope": "Installation, execution, and output structure evaluation.",
+      "not_evaluated": [
+        "Genotype accuracy",
+        "Concordance",
+        "Forensic validity",
+        "Regulatory compliance"
+      ]
+    },
+    "conclusion": [
+      {
+        "title": "Procedure not established",
+        "body": "The recorded gate observations do not establish whether the documented procedure succeeded or failed."
+      },
+      {
+        "title": "Observations retained",
+        "body": "The supplied run and output observations remain in the report; they do not replace procedure evidence."
+      },
+      {
+        "title": "Verdict: Could not be determined",
+        "body": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub."
+      },
+      {
+        "title": "Reproducibility not established",
+        "body": "These observations are insufficient to establish a reproducible documented execution finding."
+      }
+    ],
+    "out_of_scope": [
+      "Genotype correctness or accuracy",
+      "Concordance against known truth sets",
+      "Sensitivity, specificity, or stutter performance",
+      "Allele calling accuracy or forensic casework suitability",
+      "Regulatory compliance or ISO accreditation",
+      "Multi-laboratory or multi-dataset reproducibility"
+    ],
+    "limitations": [
+      "Single reference dataset per input type",
+      "Single containerized environment (Docker / ubuntu-22.04)",
+      "No truth-set comparison or ground-truth genotypes",
+      "No accuracy or concordance assessment",
+      "No forensic or clinical validation of results",
+      "No sequencing data were processed because execution did not complete"
+    ],
+    "scope": {
+      "statement": "Independent automated evaluation of reproducible execution. It checks whether the tool installs, runs end-to-end, and produces structurally valid output in a standardized environment.",
+      "not": "This is not an analytical validation. Genotype accuracy, concordance, forensic suitability, and regulatory compliance are out of scope.",
+      "disclaimer": "Each result is a dated snapshot, verified on the tool's public repository at a pinned commit. STRhub does not store tool source code."
+    }
+  }
+}
