@@ -1,0 +1,1425 @@
+{
+  "schema": "strhub-verified/1",
+  "mode": "publish",
+  "tool": {
+    "name": "TRGT",
+    "version": "v5.1.0",
+    "contact": "https://github.com/PacificBiosciences/trgt/issues"
+  },
+  "submission": {
+    "by": "third_party"
+  },
+  "source": {
+    "repo": "https://github.com/PacificBiosciences/trgt",
+    "ref": "b21c6217eeaef9a080205932fe29f730dc00e31f",
+    "ref_resolved": "b21c6217eeaef9a080205932fe29f730dc00e31f",
+    "committed": "2026-06-10T09:38:26Z"
+  },
+  "environment": {
+    "dockerfile": "Dockerfile",
+    "os": [
+      "ubuntu-22.04"
+    ],
+    "source": "generated"
+  },
+  "generated": "2026-11-22T19:13:30+00:00",
+  "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/45059467962",
+  "run": {
+    "cmd": "./trgt genotype --genome /data/ref/hg38.fa --repeats /data/in/regions.bed --reads /data/in/input.bam --output-prefix sample",
+    "cwd": ".",
+    "effective_cmd": "cd '.' && touch /tmp/.strhub_mark && ( ./trgt genotype --genome /data/ref/hg38.fa --repeats /data/in/regions.bed --reads /data/in/input.bam --output-prefix sample ); rc=$?; find . -xdev -type f -newer /tmp/.strhub_mark -size +0 ! -path './.git/*' ! -path './proc/*' ! -path './sys/*' ! -path './dev/*' ! -path './data/*' ! -path '*/__pycache__/*' ! -name '*.pyc' ! -name '*.pyo' 2>/dev/null | head -500 | while IFS= read -r f; do mkdir -p \"/data/out/$(dirname \"$f\")\" && cp \"$f\" \"/data/out/$f\"; done; exit $rc",
+    "step_outcome": "skipped"
+  },
+  "instrument": "documented",
+  "recipe": {
+    "origin": "proposed"
+  },
+  "gates": {
+    "available": true,
+    "installs": false,
+    "runs": false,
+    "io": false,
+    "content": false
+  },
+  "input_contract": {
+    "type": "pacbio-hifi-bam-hg38",
+    "regions": "trgt"
+  },
+  "level": "available",
+  "io_detail": {},
+  "content_detail": {},
+  "example_detail": null,
+  "datasets": [
+    {
+      "leg": "external",
+      "label": "External data",
+      "available": false,
+      "type": "pacbio-hifi-bam-hg38",
+      "dataset": null,
+      "io": false,
+      "content": false,
+      "passed": false
+    },
+    {
+      "leg": "example",
+      "label": "Tool's own example",
+      "available": false,
+      "io": false,
+      "content": null,
+      "passed": false,
+      "matches_expected": null,
+      "produced_count": null
+    }
+  ],
+  "scope": "Assessment of documented execution in the stated environment and output format. Concerns reproducible execution only; no claim of accuracy, casework fitness, or regulatory validation.",
+  "upstream": {
+    "checked": "2026-11-22T19:13:30+00:00",
+    "repo_exists": true,
+    "ref_exists": true,
+    "default_branch": "main",
+    "status": "identical",
+    "behind_by": 0
+  },
+  "author_known_issues": [
+    {
+      "heading": "Active development warning",
+      "line": 18,
+      "text": "Please note that TRGT is still under active development. We anticipate some\nchanges to the input and output file formats of TRGT.",
+      "truncated": false,
+      "url": "https://github.com/PacificBiosciences/trgt/blob/b21c6217eeaef9a080205932fe29f730dc00e31f/README.md#L18"
+    }
+  ],
+  "evidence": [
+    {
+      "claim": "run_command",
+      "kind": "doc",
+      "path": "docs/tutorial.md",
+      "line": 39,
+      "text": "./trgt genotype --genome example/reference.fasta \\",
+      "url": "https://github.com/PacificBiosciences/trgt/blob/b21c6217eeaef9a080205932fe29f730dc00e31f/docs/tutorial.md#L39"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "example/repeat.bed",
+      "text": "bed",
+      "url": "https://github.com/PacificBiosciences/trgt/blob/b21c6217eeaef9a080205932fe29f730dc00e31f/example/repeat.bed"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "example/reference.fasta",
+      "text": "fasta",
+      "url": "https://github.com/PacificBiosciences/trgt/blob/b21c6217eeaef9a080205932fe29f730dc00e31f/example/reference.fasta"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "example/sample.bam",
+      "text": "bam",
+      "url": "https://github.com/PacificBiosciences/trgt/blob/b21c6217eeaef9a080205932fe29f730dc00e31f/example/sample.bam"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "repeats/pathogenic_repeats.hg38.bed",
+      "text": "bed",
+      "url": "https://github.com/PacificBiosciences/trgt/blob/b21c6217eeaef9a080205932fe29f730dc00e31f/repeats/pathogenic_repeats.hg38.bed"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "repeats/repeat_catalog.hg38.bed",
+      "text": "bed",
+      "url": "https://github.com/PacificBiosciences/trgt/blob/b21c6217eeaef9a080205932fe29f730dc00e31f/repeats/repeat_catalog.hg38.bed"
+    },
+    {
+      "claim": "known_issue",
+      "kind": "readme",
+      "path": "README.md",
+      "line": 18,
+      "text": "Active development warning",
+      "url": "https://github.com/PacificBiosciences/trgt/blob/b21c6217eeaef9a080205932fe29f730dc00e31f/README.md#L18"
+    },
+    {
+      "claim": "documented_input",
+      "kind": "readme",
+      "path": "README.md",
+      "line": 9,
+      "text": "It is now possible to add a fail reads BAM as a separate aligned BAM in addition to the primary `--reads` BAM.",
+      "url": "https://github.com/PacificBiosciences/trgt/blob/b21c6217eeaef9a080205932fe29f730dc00e31f/README.md#L9"
+    }
+  ],
+  "repo_test_data": {
+    "known": true,
+    "present": true,
+    "count": 5,
+    "examples": [
+      "example/repeat.bed",
+      "example/reference.fasta",
+      "example/sample.bam",
+      "repeats/pathogenic_repeats.hg38.bed",
+      "repeats/repeat_catalog.hg38.bed"
+    ]
+  },
+  "caveats": {
+    "source": "detect_recipe",
+    "items": [
+      "Environment: no proven installation profile; STRhub did not manufacture installation steps.",
+      "Input: the README documents BAM (line 9); this plan selects STRhub's pacbio-hifi-bam-hg38 reference data.",
+      "reference_path: example/reference.fasta -> /data/ref/hg38.fa.",
+      "regions_path: example/repeat.bed -> /data/in/regions.bed.",
+      "read_path: example/sample.bam -> /data/in/input.bam.",
+      "Run command: the one documented in docs/tutorial.md (line 39), rewritten to STRhub's mounts; the capture wrapper is planned only if the procedure review passes."
+    ]
+  },
+  "install_detail": {
+    "passed": false,
+    "diagnostics": [],
+    "faults": []
+  },
+  "procedure_review": {
+    "may_say_runs": false,
+    "status_code": "UNVERIFIED_INSUFFICIENT_DOCS",
+    "basis": "recipe",
+    "attribution": "strhub",
+    "blocker": "install_not_copyable",
+    "reason": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub.",
+    "amendments": [
+      {
+        "code": "install_not_copyable",
+        "what": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub."
+      }
+    ],
+    "inferences": {
+      "install": {
+        "evidence_source": "release_asset:trgt-v5.1.0-x86_64-unknown-linux-gnu.tar.gz",
+        "verified": false
+      },
+      "run_command": {
+        "evidence_source": "docs/tutorial.md:L39",
+        "verified": true,
+        "kind": "doc",
+        "path": "docs/tutorial.md",
+        "document_sha256": "ee6483082e724596b4f102f9bfb4c99e1a147e234e0c4e4bbac5bde2b5859909"
+      },
+      "input_type": {
+        "verified": true,
+        "kind": "doc",
+        "path": "CHANGELOG.md",
+        "line": 9,
+        "end_line": 9,
+        "document_sha256": "19ec22e1a98057604782f8cfa44fa3c0f10c8a15eb07d5a1f54a72880d6df8d6",
+        "evidence_source": "CHANGELOG.md:L9",
+        "upstream_input_kind": "bam",
+        "selected_dataset": "pacbio-hifi-bam-hg38"
+      },
+      "platform": {
+        "verified": true,
+        "kind": "doc",
+        "path": "README.md",
+        "line": 5,
+        "end_line": 5,
+        "document_sha256": "c6631f45e819cc454179b66b0f8c5babe2f2c37855d4eb8a1c5f8a2e65755630",
+        "evidence_source": "README.md:L5",
+        "selected": "pacbio",
+        "selection_basis": "upstream_single_platform",
+        "supported_platforms": [
+          "pacbio"
+        ]
+      },
+      "regions": {
+        "verified": true,
+        "kind": "doc",
+        "path": "docs/tutorial.md",
+        "line": 28,
+        "end_line": 28,
+        "document_sha256": "ee6483082e724596b4f102f9bfb4c99e1a147e234e0c4e4bbac5bde2b5859909",
+        "evidence_source": "docs/tutorial.md:L28"
+      },
+      "output": {
+        "verified": true,
+        "kind": "doc",
+        "path": "README.md",
+        "line": 42,
+        "end_line": 42,
+        "document_sha256": "c6631f45e819cc454179b66b0f8c5babe2f2c37855d4eb8a1c5f8a2e65755630",
+        "evidence_source": "README.md:L42"
+      }
+    },
+    "unbacked_inferences": [
+      "install"
+    ],
+    "provenance": {
+      "from_upstream": {
+        "install": {
+          "method": "release_binary",
+          "evidence_source": "release_asset:trgt-v5.1.0-x86_64-unknown-linux-gnu.tar.gz"
+        },
+        "command": {
+          "value": "./trgt genotype --genome example/reference.fasta --repeats example/repeat.bed --reads example/sample.bam --output-prefix sample",
+          "evidence_source": "docs/tutorial.md:L39"
+        },
+        "input_kind": {
+          "value": "bam",
+          "evidence_source": "CHANGELOG.md:L9"
+        },
+        "supported_platforms": [
+          {
+            "platform": "pacbio",
+            "evidence_source": "README.md:L5"
+          }
+        ],
+        "assembly": {
+          "declared": "hg38",
+          "evidence_source": "README.md:L36"
+        },
+        "regions_schema": {
+          "format": "trgt",
+          "evidence_source": "docs/tutorial.md:L28"
+        },
+        "output_format": {
+          "glob": "**/*.vcf*",
+          "evidence_source": "README.md:L42"
+        }
+      },
+      "derived": {
+        "command_rewrites": [
+          {
+            "role": "reference_path",
+            "original": "example/reference.fasta",
+            "replacement": "/data/ref/hg38.fa",
+            "basis": "registered reference genome mount"
+          },
+          {
+            "role": "regions_path",
+            "original": "example/repeat.bed",
+            "replacement": "/data/in/regions.bed",
+            "basis": "registered regions file (trgt)"
+          },
+          {
+            "role": "read_path",
+            "original": "example/sample.bam",
+            "replacement": "/data/in/input.bam",
+            "basis": "declared dataset mount"
+          }
+        ],
+        "regions_layout_binding": {
+          "documented_schema": "trgt",
+          "evidence_source": "docs/tutorial.md:L28",
+          "strhub_regions_layout": "trgt"
+        },
+        "single_sample_adaptation": null
+      },
+      "harness_choices": {
+        "dataset": {
+          "selected": "pacbio-hifi-bam-hg38",
+          "reason": "STRhub selected 'pacbio-hifi-bam-hg38' as compatible with upstream input 'bam' and platform 'pacbio'"
+        },
+        "platform": {
+          "selected": "pacbio",
+          "basis": "upstream_single_platform",
+          "supported_platforms": [
+            "pacbio"
+          ]
+        },
+        "assembly": {
+          "selected": "hg38",
+          "basis": "upstream_stated",
+          "note": null
+        },
+        "regions_layout": "trgt",
+        "base_environment": null
+      }
+    },
+    "install_method": "release_binary",
+    "citable_install": false,
+    "input_type": "pacbio-hifi-bam-hg38",
+    "output_glob": "**/*.vcf*",
+    "profile": "strhub-upstream-procedure/1",
+    "install_ready": false,
+    "example_ready": false,
+    "installation": {
+      "profile": "strhub-upstream-procedure/1",
+      "ready": false,
+      "method": "release_binary",
+      "reason": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub.",
+      "gap": "commit"
+    },
+    "command_review": {
+      "profile": "strhub-upstream-procedure/1",
+      "cited": "./trgt genotype --genome example/reference.fasta --repeats example/repeat.bed --reads example/sample.bam --output-prefix sample",
+      "command": "./trgt genotype --genome /data/ref/hg38.fa --repeats /data/in/regions.bed --reads /data/in/input.bam --output-prefix sample",
+      "substitutions": [
+        {
+          "token": 3,
+          "original": "example/reference.fasta",
+          "replacement": "/data/ref/hg38.fa",
+          "role": "reference_path",
+          "basis": "registered reference genome mount"
+        },
+        {
+          "token": 5,
+          "original": "example/repeat.bed",
+          "replacement": "/data/in/regions.bed",
+          "role": "regions_path",
+          "basis": "registered regions file (trgt)"
+        },
+        {
+          "token": 7,
+          "original": "example/sample.bam",
+          "replacement": "/data/in/input.bam",
+          "role": "read_path",
+          "basis": "declared dataset mount"
+        }
+      ],
+      "read_bindings": [
+        {
+          "token": 7,
+          "original": "example/sample.bam",
+          "target": "/data/in/input.bam"
+        }
+      ],
+      "limitations": [],
+      "expected": "./trgt genotype --genome /data/ref/hg38.fa --repeats /data/in/regions.bed --reads /data/in/input.bam --output-prefix sample",
+      "executed": "./trgt genotype --genome /data/ref/hg38.fa --repeats /data/in/regions.bed --reads /data/in/input.bam --output-prefix sample",
+      "cited_sha256": "d7982ae730acb7405da02bf127d62f638a53ac6a61cff8cc09d8e26733d3b239",
+      "executed_sha256": "fcc9b7a42b0532755efaa678cea291c37b561fe694130836393c9a85a94e8246",
+      "citations": [
+        {
+          "repo": "https://github.com/PacificBiosciences/trgt",
+          "ref": "b21c6217eeaef9a080205932fe29f730dc00e31f",
+          "path": "docs/tutorial.md",
+          "line": 39,
+          "verified": true,
+          "document_sha256": "ee6483082e724596b4f102f9bfb4c99e1a147e234e0c4e4bbac5bde2b5859909",
+          "command_sha256": "d7982ae730acb7405da02bf127d62f638a53ac6a61cff8cc09d8e26733d3b239"
+        }
+      ]
+    },
+    "manifest_sha256": "2b3ae1a81e74fed02183a9923c1f05684de15fcd4365ebf345d3e424d02aacc0",
+    "evidence_sha256": "ec616bde730277e92575db9983c7ebe1bf5c4269417eb2f45e34015432e3d324",
+    "evidence": {
+      "schema": "strhub-procedure-evidence/1",
+      "manifest": {
+        "caveats": {
+          "items": [
+            "Environment: no proven installation profile; STRhub did not manufacture installation steps.",
+            "Input: the README documents BAM (line 9); this plan selects STRhub's pacbio-hifi-bam-hg38 reference data.",
+            "reference_path: example/reference.fasta -> /data/ref/hg38.fa.",
+            "regions_path: example/repeat.bed -> /data/in/regions.bed.",
+            "read_path: example/sample.bam -> /data/in/input.bam.",
+            "Run command: the one documented in docs/tutorial.md (line 39), rewritten to STRhub's mounts; the capture wrapper is planned only if the procedure review passes."
+          ],
+          "source": "detect_recipe"
+        },
+        "environment": {
+          "dockerfile": "Dockerfile",
+          "os": [
+            "ubuntu-22.04"
+          ],
+          "source": "generated"
+        },
+        "example": {
+          "cmd": "./trgt genotype --genome example/reference.fasta --repeats example/repeat.bed --reads example/sample.bam --output-prefix sample",
+          "cwd": "/opt/tool",
+          "source": "detected"
+        },
+        "inputs": {
+          "regions": "trgt",
+          "type": "pacbio-hifi-bam-hg38"
+        },
+        "outputs": [
+          {
+            "format": "vcf",
+            "min_records": 1,
+            "path": "**/*.vcf*"
+          }
+        ],
+        "recipe": {
+          "origin": "proposed"
+        },
+        "report": {
+          "slug": "trgt-hifi"
+        },
+        "run": {
+          "cmd": "cd '.' && touch /tmp/.strhub_mark && ( ./trgt genotype --genome /data/ref/hg38.fa --repeats /data/in/regions.bed --reads /data/in/input.bam --output-prefix sample ); rc=$?; find . -xdev -type f -newer /tmp/.strhub_mark -size +0 ! -path './.git/*' ! -path './proc/*' ! -path './sys/*' ! -path './dev/*' ! -path './data/*' ! -path '*/__pycache__/*' ! -name '*.pyc' ! -name '*.pyo' 2>/dev/null | head -500 | while IFS= read -r f; do mkdir -p \"/data/out/$(dirname \"$f\")\" && cp \"$f\" \"/data/out/$f\"; done; exit $rc",
+          "timeout_minutes": 20
+        },
+        "source": {
+          "ref": "b21c6217eeaef9a080205932fe29f730dc00e31f",
+          "repo": "https://github.com/PacificBiosciences/trgt"
+        },
+        "submission": {
+          "by": "third_party"
+        },
+        "tool": {
+          "contact": "https://github.com/PacificBiosciences/trgt/issues",
+          "name": "TRGT",
+          "version": "v5.1.0"
+        }
+      },
+      "proposal": {
+        "build": {
+          "also_published": null,
+          "asset": "trgt-v5.1.0-x86_64-unknown-linux-gnu.tar.gz",
+          "candidates": [
+            {
+              "asset": "trgt-v5.1.0-x86_64-unknown-linux-gnu.tar.gz",
+              "digest": "sha256:2ab9ddb0f52516ea92de66c336c151dc3bd5bb22494e2b9dcb8bffa9eb710f63",
+              "file": null,
+              "method": "release_binary",
+              "tag": "v5.1.0",
+              "url": "https://github.com/PacificBiosciences/trgt/releases/download/v5.1.0/trgt-v5.1.0-x86_64-unknown-linux-gnu.tar.gz"
+            },
+            {
+              "file": "Cargo.toml",
+              "method": "cargo"
+            }
+          ],
+          "digest": "sha256:2ab9ddb0f52516ea92de66c336c151dc3bd5bb22494e2b9dcb8bffa9eb710f63",
+          "dir": null,
+          "evidence_source": "release_asset:trgt-v5.1.0-x86_64-unknown-linux-gnu.tar.gz",
+          "file": null,
+          "image": null,
+          "method": "release_binary",
+          "package": null,
+          "readme_install_lines": [],
+          "readme_line": null,
+          "spec_list": false,
+          "ssh_urls_in": [],
+          "tag": "v5.1.0",
+          "then": [],
+          "url": "https://github.com/PacificBiosciences/trgt/releases/download/v5.1.0/trgt-v5.1.0-x86_64-unknown-linux-gnu.tar.gz"
+        },
+        "commands": [
+          {
+            "cmd": "./trgt genotype --genome example/reference.fasta --repeats example/repeat.bed --reads example/sample.bam --output-prefix sample",
+            "entry_point": false,
+            "evidence_source": "docs/tutorial.md:L39",
+            "file": "docs/tutorial.md",
+            "has_input_flag": true,
+            "has_output_flag": true,
+            "help_only": false,
+            "invokes": "trgt",
+            "line": 39,
+            "main_verb": true,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 2,
+            "subcommand": "genotype",
+            "synopsis": false
+          },
+          {
+            "cmd": "./trgt genotype --preset targeted --genome example/reference.fasta --repeats example/repeat.bed --reads example/sample.hifi_reads.pbmm2.bam --fail-reads example/sample.fail_reads.pbmm2.bam --output-prefix sample",
+            "entry_point": false,
+            "evidence_source": "docs/puretarget.md:L64",
+            "file": "docs/puretarget.md",
+            "has_input_flag": true,
+            "has_output_flag": true,
+            "help_only": false,
+            "invokes": "trgt",
+            "line": 64,
+            "main_verb": true,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 4,
+            "subcommand": "genotype",
+            "synopsis": false
+          },
+          {
+            "cmd": "AWS_SHARED_CREDENTIALS_FILE=/dev/null trgt genotype --genome 's3://pacbio-hifi-human-wgs-reference/dataset/GRCh38/human_GRCh38_no_alt_analysis_set.fasta' --reads 'gs://deepvariant/pacbio-case-study-testdata/HG003.pfda_challenge.35x.grch38.bam' --repeats 'https://raw.githubusercontent.com/dashnowlab/STRchive/refs/heads/main/data/catalogs/STRchive-disease-loci.hg38.TRGT.bed' --output-prefix tmp --preset targeted --threads 4 -v",
+            "entry_point": false,
+            "evidence_source": "docs/remote_files.md:L77",
+            "file": "docs/remote_files.md",
+            "has_input_flag": true,
+            "has_output_flag": true,
+            "help_only": false,
+            "invokes": "trgt",
+            "line": 77,
+            "main_verb": true,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 9,
+            "subcommand": "genotype",
+            "synopsis": false
+          },
+          {
+            "cmd": "trgt validate --genome references/hg38.fa --repeats catalogs/hg38_tr_catalog.bed.gz",
+            "entry_point": false,
+            "evidence_source": "docs/validate.md:L26",
+            "file": "docs/validate.md",
+            "has_input_flag": false,
+            "has_output_flag": false,
+            "help_only": false,
+            "invokes": "trgt",
+            "line": 26,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 12,
+            "subcommand": "validate",
+            "synopsis": false
+          },
+          {
+            "cmd": "./trgt plot --genome example/reference.fasta --repeats example/repeat.bed --vcf sample.sorted.vcf.gz --spanning-reads sample.spanning.sorted.bam --repeat-id TR1 --image TR1.svg",
+            "entry_point": false,
+            "evidence_source": "docs/tutorial.md:L100",
+            "file": "docs/tutorial.md",
+            "has_input_flag": true,
+            "has_output_flag": true,
+            "help_only": true,
+            "invokes": "trgt",
+            "line": 100,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 2,
+            "subcommand": "plot",
+            "synopsis": false
+          },
+          {
+            "cmd": "./trgt deepdive --genome example/reference.fasta --repeats example/repeat.bed --vcf sample.sorted.vcf.gz --spanning-reads sample.spanning.sorted.bam --repeat-id TR1 --output-prefix sample.TR1",
+            "entry_point": false,
+            "evidence_source": "docs/tutorial.md:L124",
+            "file": "docs/tutorial.md",
+            "has_input_flag": true,
+            "has_output_flag": true,
+            "help_only": true,
+            "invokes": "trgt",
+            "line": 124,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 2,
+            "subcommand": "deepdive",
+            "synopsis": false
+          },
+          {
+            "cmd": "trgt deepdive [OPTIONS] --genome <FASTA> --vcf <VCF> --repeats <REPEATS> --spanning-reads <SPANNING_READS> --repeat-id <REPEAT_ID> --output-prefix <OUTPUT_PREFIX>",
+            "entry_point": false,
+            "evidence_source": "docs/deepdive.md:L13",
+            "file": "docs/deepdive.md",
+            "has_input_flag": true,
+            "has_output_flag": true,
+            "help_only": true,
+            "invokes": "trgt",
+            "line": 13,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 11,
+            "subcommand": "deepdive",
+            "synopsis": false
+          },
+          {
+            "cmd": "trgt merge --vcf results/sample1.trgt.vcf.gz results/sample2.trgt.vcf.gz results/sample3.trgt.vcf.gz --output cohort.trgt.vcf.gz",
+            "entry_point": false,
+            "evidence_source": "docs/merge.md:L43",
+            "file": "docs/merge.md",
+            "has_input_flag": false,
+            "has_output_flag": true,
+            "help_only": true,
+            "invokes": "trgt",
+            "line": 43,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 10,
+            "subcommand": "merge",
+            "synopsis": false
+          },
+          {
+            "cmd": "trgt merge --vcf results/*.vcf.gz --output cohort.trgt.vcf.gz --write-index --no-index",
+            "entry_point": false,
+            "evidence_source": "docs/merge.md:L52",
+            "file": "docs/merge.md",
+            "has_input_flag": false,
+            "has_output_flag": true,
+            "help_only": true,
+            "invokes": "trgt",
+            "line": 52,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 10,
+            "subcommand": "merge",
+            "synopsis": false
+          },
+          {
+            "cmd": "trgt merge --vcf-list cohort_vcfs.txt --contig chr12 --output cohort.chr12.trgt.vcf.gz",
+            "entry_point": false,
+            "evidence_source": "docs/merge.md:L62",
+            "file": "docs/merge.md",
+            "has_input_flag": false,
+            "has_output_flag": true,
+            "help_only": true,
+            "invokes": "trgt",
+            "line": 62,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 10,
+            "subcommand": "merge",
+            "synopsis": false
+          }
+        ],
+        "dockerfile": null,
+        "docs_read": [
+          {
+            "origin": "repo",
+            "path": "CHANGELOG.md"
+          },
+          {
+            "origin": "repo",
+            "path": "docs/tutorial.md"
+          },
+          {
+            "origin": "repo",
+            "path": "docs/trvz-plots.md"
+          },
+          {
+            "origin": "repo",
+            "path": "docs/puretarget.md"
+          },
+          {
+            "origin": "repo",
+            "path": "docs/cli.md"
+          },
+          {
+            "origin": "repo",
+            "path": "docs/repeat_files.md"
+          },
+          {
+            "origin": "repo",
+            "path": "docs/bam_files.md"
+          },
+          {
+            "origin": "repo",
+            "path": "docs/vcf_files.md"
+          },
+          {
+            "origin": "repo",
+            "path": "docs/remote_files.md"
+          },
+          {
+            "origin": "repo",
+            "path": "docs/merge.md"
+          },
+          {
+            "origin": "repo",
+            "path": "docs/deepdive.md"
+          },
+          {
+            "origin": "repo",
+            "path": "docs/validate.md"
+          }
+        ],
+        "docs_text": "\n# Changelog\n\nAny changes to TRGT are noted below:\n\n## [5.1.0]\n\n- **Important changes**:\n  - Added the `--fail-reads` parameter to `trgt genotype`. It is now possible to add a fail reads BAM as a separate aligned BAM in addition to the primary `--reads` BAM. This is useful for PureTarget and other workflows where fail and HiFi reads are aligned separately, since they no longer need to be merged before running TRGT. Adding `--fail-reads` also disables the default `rq` filter unless `--min-read-quality` is set explicitly.\n- Added BCF output support to `trgt genotype` through `-O, --output-type` (`u`/`b` for uncompressed/compressed BCF, `v`/`z` for uncompressed/compressed VCF).\n\n## [5.0.0]\n\n- **Important changes**:\n  - Extended support for phased BAM inputs (from tool such as [HiPhase](https://github.com/PacificBiosciences/HiPhase)). TRGT can now output phased genotypes (e.g. `1|0`) and phase sets using HP/PS tags, when sufficient haplotype support is available.\n    - **Note:** the FORMAT field order remains unchanged after phasing, any downstream analysis that assumes positional indexing on genotypes must account for phasing.\n  - More robust and optimized VCF merging (`merge` subcommand).\n    - Added a streaming merge mode which avoids loading tabix/CSI indices. This mode is especially useful for merging very large cohorts and can be enabled with the `--no-index` flag. It significantly reduces memory requirements but it requires that all inputs have the exact same contig ordering.\n    - Compressed VCF/BCF output can now be automatically indexed after merging by setting the `--write-index` flag.\n    - Added the `--threads` flag to set the number of (de)compression threads for input/output VCF files.\n\n## [4.1.0]\n\n- **Important changes**:\n  - Experimental remote file support for most TRGT inputs (BAM/CRAM, reference FASTA, repeat catalogs, and VCF/BCF). See [remote file documentation](docs/remote_files.md) for more details.\n  - Improved consensus generation for long repeat expansions, as part of an ongoing refinement effort.\n- CLI: improved terminal color detection, and added a `--color` flag.\n\n## [4.0.0]\n\n- **Important changes**:\n  - Implemented read streaming to reduce I/O operations, achieving 2-4x speed improvements for WGS data (speed-up varies by catalog density). The input catalog must be sorted by contig and start to achieve high performance.\n  - Added `trgt deepdive` subcommand for locus-specific downstream analysis. This command realigns reads to their consensus sequences and outputs FASTA (consensus sequences), BAM (realigned reads), and BED (annotation) files for detailed repeat analysis in tools like IGV. See [deepdive documentation](docs/deepdive.md) for more details.\n- Bug fix: Address non-deterministic behavior caused by inconsistent ordering of reads with identical start positions but different query names in sorted BAM files\n- Bug fix: Fixed missing font in double arrow rendering\n\n## [3.0.0]\n\n- **Breaking change**: Modified how TRGT detects repeat motifs\n  - Changed repeat segmentation algorithm to only match perfect STR motifs (imperfections in VNTR motifs are still allowed)\n  - Implemented more flexible motif matching that allows better detection and visualization of repeat interruptions\n- Made a number of improvements to TRGT plots\n  - Replaced the size scale with the overall allele length\n  - Implemented more accurate motif matching in waterfall plots\n  - Made it possible to compress the plots vertically (useful for high-depth targeted data)\n  - Made it easier to distinguish between mismatches and unsegmented regions\n- Bug fix: Explicitly set reference from genome path for CRAM input, avoiding issues with moved/renamed references\n\n## [2.1.0]\n\n- **Important changes**:\n  - Extended the use of optimized aligners to the plotting (TRVZ) functionality\n  - Further optimized alignments, significantly improving overall performance for targeted datasets beyond the improvements introduced in 2.0, and cumulatively achieving ~2x speed-up for whole-genome sequencing data\n\n## [2.0.0]\n\n- **Important changes**:\n  - Introduced fine-grained parallelization using work-stealing, significantly increasing CPU utilization, resulting in speed-ups of up to 200x for targeted datasets\n  - All previous aligners used for genotyping have been replaced with significantly faster and more memory-efficient alternatives (WFA2-lib)\n  - When using the targeted data preset, reads with higher repeat purity between flanks are now given priority\n- TRGT now includes a default monospace font, ensuring consistent text rendering during plotting even on systems without fonts in standard locations.\n- Added CLI option `--vcf-list` to TRGT merge, allowing users to specify a file containing a list of VCF files. This option is mutually exclusive with the existing `--vcf` flag.\n- Introduced CLI option `--font-family` for specifying custom font families when plotting\n- Bug fix: the VCF QUAL field is now always set with `.` rather than `0`\n- Bug fix: fixed handling of AL tags when loading spanning BAM files modified by samtools\n- Improved error handling and messaging during parsing of plotting inputs\n\n## [1.5.1]\n\n- Fixed an issue that prevented extraction of CpG methylation from BAM records containing multiple base modifications\n\n## [1.5.0]\n\n- Read clustering genotyper (`--genotyper cluster`) is now significantly faster at genotyping high-coverage repeat expansions; this may result in minor changes to consensus sequence and read assignment for highly mosaic repeats\n\n## [1.4.1]\n\n- Bug fix: corrected the type of the rq tag in BAM output\n\n## [1.4.0]\n\n- Parameters appropriate for targeted sequencing can now be set with `--preset targeted` option\n- Waterfall plots no longer panic when there are no reads in a locus\n- Algorithmic changes to `--genotyper cluster` allow fewer reads to be assigned to an allele; this may result in minor changes to consensus sequence and read assignment\n\n## [1.3.0]\n\n- Plotting code has been refactored as we prepare to revamp repeat visualizations\n- The maximum number of reads per allele to plot can now be specified by `--max-allele-reads`\n- Bug fix: repeat identifiers are now permitted to contain commas\n\n## [1.2.0]\n\n- `trgt merge`:\n  - Multi-sample VCF Merging: Added support for merging TRGT VCFs with any number of samples, allowing updates to large, population-scale datasets with new samples\n  - Synced contig indexing: Introduced support for VCFs with inconsistent contig orderings. Additionally the new `--contigs` flag allows specifying a comma-separated list of contigs to be merged\n  - The reference genome is no longer required when merging TRGT VCFs from version 1.0.0 or later\n  - Merging now skips and logs problematic loci by default. Use the `--quit-on-errors` flag to terminate on errors. Statistics are logged post-merge, including counts of failed and skipped TRs\n- `trgt validate`\n  - Always outputs statistics directly to stdout and stderr instead of logging them\n- Bug fix: resolved issue with handling bgzip-compressed BED files\n\n## [1.1.2]\n\n- Bug fix: Prevent genotyping without reads\n- Added the `--disable-bam-output` flag to `trgt genotype`, allowing users to disable BAMlet generation. **However, please note that BAMlets are still required for downstream tasks like trgt plot**\n\n## [1.1.1]\n\n- Bug fix: Read filtering logic no longer removes reads without RQ tags\n\n## [1.1.0]\n\n- Added a new subcommand `trgt merge`. This command merges VCF files generated by `trgt genotype` into a joint VCF file. **Works with VCFs generated by all versions of TRGT** (the resulting joint VCF will always be in the TRGT \u2265v1.0.0 format which includes padding bases)\n- Added subsampling of regions with ultra-high coverage (`>MAX_DEPTH * 3`, by default 750); implemented via reservoir sampling\n- Fixed a cluster genotyper bug that occurred when only a single read covered a locus\n- Added new logic for filtering non-HiFi reads: remove up to 3% of lower quality reads that do not match the expected repeat sequence\n\n## [1.0.0]\n\n- **Breaking change**: TRGT and TRVZ are now merged into a single binary. Users need to run subcommands `trgt genotype` and `trgt plot` for genotyping and visualization, respectively\n- **Breaking change**:  A padding base is now automatically added to all genotyped allele sequences in the VCF file, ensuring better compliance with VCF standards and handling of zero-length alleles\n- Added a new subcommand `trgt validate`. This command allows for validation of a repeat catalog against a given reference genome and reports statistics for any malformed entries\n- Lower memory footprint: Better memory management significantly reduces memory usage with large repeat catalogs\n- Updated error handling: Malformed entries are now logged as errors without terminating the program\n- Added shorthand CLI options to simplify command usage\n\n## [0.9.0]\n\n- Add support for polyalanine repeats (by allowing characters `N` in the motif sequence)\n- Fix a bug causing TRVZ to error out on polyalanine repeats\n\n## [0.8.0]\n\n- **Breaking change**: Motif spans and counts (`MS` and `MC` fields) and purity assessment (`AP` field) are now performed with an HMM-based algorithm for all repeats; expect some differences in results relative to the previous versions\n- Allele purity of zero-length alleles are now reported as missing values in the VCFs\n- The spanning.bam output file now carries over the QUAL values and mapping strand from the input reads\n- Added an advanced flag `--output-flank-len` that controls the number of flanking bases reported in the spanning.bam files and shown in trvz plots\n- A crash that may occur on BAMs where methylation was called twice has been fixed\n- Optimizations to the `--genotyper=cluster` mode, including haploid genotyping of the X chromosome when `--karyotype` is set to `XY`\n\n## [0.7.0]\n\n- Read phasing information can now be used during repeat genotyping (via `HP` tags)\n- Users can now define complex repeats by specifying motif sequences in the MOTIFS field and setting STRUC to <`locus_name`>\n- The original MAPQ values in the input reads are now reported in the BAM output\n- BAMlet sample name can now be provided using the `--sample-name` flag; if it not provided, it is extracted from the input BAM or file stem (addressing issue #18)\n\n## [0.6.0]\n\n- Add alignment CIGARs to spanning.bam reads\n- Increase read extraction region\n- Cluster genotyper reports confidence intervals\n- Improved error handling of invalid input files (genome, catalog\n    and reads)\n\n## [0.5.0]\n\n- The genotyper now uses information about SNPs adjacent to repeats\n- BAM files now contain read-to-allele assignments\n- Added support for gzip compressed repeat files\n- Improved error handling and error messages\n\n## [0.4.0]\n\n- Added TRVZ tutorial\n- Added sample karyotype parameter (`XX` or `XY`)\n- Renamed VCF genotype field `ALCI` to `ALLR`\n- Made genotyping algorithm changes to improve accuracy\n\n## [0.3.4]\n\n- Improved label spacing in TRVZ plots\n\n# Introductory tutorial\n\nIn this tutorial, you will learn the basics of TRGT by analyzing a tiny example\ndataset included in this repository.\n\n## Prerequisites\n\n- Download the [latest TRGT release](https://github.com/PacificBiosciences/trgt/releases)\n- Download the [example dataset](https://github.com/PacificBiosciences/trgt/tree/main/example)\n- Install recent versions of `samtools` and `bcftools`\n\n> Tip: Place the TRGT binary on your `PATH`, or run it with a relative path as\n> shown in the commands below.\n\n## Overview of the input files\n\nThe example directory provides three required files:\n\n- `reference.fasta` \u2013 the reference assembly that TRGT uses for context\n- `sample.bam` \u2013 HiFi reads aligned to that reference\n- `repeat.bed` \u2013 tandem repeat definition catalog for genotyping\n\nEach row in `repeat.bed` follows a BED-style layout with annotation tags in the\nfourth column. For this example, the single entry looks like:\n\n```bash\n$ cat example/repeat.bed\nchrA    10000    10061    ID=TR1;MOTIFS=CAG;STRUC=<TR>\n```\n\n`ID` names the locus (`TR1`), `MOTIFS` lists the repeat unit(s) and the `STRUC`\nfield can be always set to value `<TR>`.\n\n## Genotyping repeats\n\nTo genotype the repeat, run:\n\n```bash\n./trgt genotype --genome example/reference.fasta \\\n       --repeats example/repeat.bed \\\n       --reads example/sample.bam \\\n       --output-prefix sample\n```\n\nTwo primary outputs are created:\n\n- `sample.vcf.gz` \u2013 genotypes and per-allele statistics\n- `sample.spanning.bam` \u2013 read segments that fully span each repeat\n\nFor example, use `bcftools` to examine the first (and only) record of the VCF\nfile:\n\n```bash\n$ bcftools view --no-header sample.vcf.gz | head -n 1\n#CHROM  POS  ID  REF  ALT  QUAL  FILTER  INFO  FORMAT  sample\nchrA 10001 . CCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAG CCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAG . . TRID=TR1;END=10061;MOTIFS=CAG;STRUC=<TR> GT:AL:ALLR:SD:MC:MS:AP:AM 1/1:33,33:30-39,33-33:15,14:11,11:0(0-33),0(0-33):1,1:.,.\n```\n\nNote that TRGT prepends a single padding base to each repeat allele sequenece\n(the first base of the string). Ignoring that base, the record tells us that:\n\n- The tandem repeat starts at position 10001 on contig `chrA`\n- The reference allele sequence of this repeat is\n  CAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAG and contains 20\n  copies of the `CAG` motif\n- Both observed alleles have 11 copies of `CAG`, resulting in a homozygous\n  non-reference call\n\nSee [vcf_files.md](./vcf_files.md) for a detailed breakdown of the generated VCF files\nand interpretation tips, and refer to [bam_files.md](./bam_files.md) for guidance on\ninterpreting the spanning BAM output and its per-read annotations.\n\n## Sort and index the outputs\n\nTRGT leaves both files unsorted. Sorting and indexing makes them compatible with\ntools that expect coordinate order.\n\nSort and index the VCF:\n\n```bash\nbcftools sort -Oz -o sample.sorted.vcf.gz sample.vcf.gz\nbcftools index sample.sorted.vcf.gz\n```\n\nThen sort and index the BAM:\n\n```bash\nsamtools sort -o sample.spanning.sorted.bam sample.spanning.bam\nsamtools index sample.spanning.sorted.bam\n```\n\nAt this point the outputs are ready for downstream filtering, visualization, or\nintegration with other variant calls.\n\n## Visualizing a repeat\n\nTo visualize the repeat with the identifier \"TR1\", run:\n\n```bash\n./trgt plot --genome example/reference.fasta \\\n       --repeats example/repeat.bed \\\n       --vcf sample.sorted.vcf.gz \\\n       --spanning-reads sample.spanning.sorted.bam \\\n       --repeat-id TR1 \\\n       --image TR1.svg\n```\n\nThe resulting `TR1.svg` can be opened directly in any modern browser or edited\nin vector tools such as [Inkscape](https://inkscape.org/). The plot highlights\nthe motif sequence of each allele (blue) and the flanking sequence (green), and\nstacks supporting reads underneath. For more details on interpreting plots,\ncontinue with the [TRVZ plot walkthrough](./trvz-plots.md).\n\n| <img src=\"figures/TR1.svg\" width=\"800\" alt=\"Read pileup for TR1 in the tutorial dataset\"/> |\n| :---: |\n| TRGT pileup for `TR1`, showing the homozygous 11\u00d7 CAG repeat with flanking context. |\n\n## Deepdive on a repeat\n\nWhen you need more in depth analysis on one locus, run the\n`trgt deepdive` command:\n\n```bash\n./trgt deepdive --genome example/reference.fasta \\\n       --repeats example/repeat.bed \\\n       --vcf sample.sorted.vcf.gz \\\n       --spanning-reads sample.spanning.sorted.bam \\\n       --repeat-id TR1 \\\n       --output-prefix sample.TR1\n```\n\nTRGT writes three files: a FASTA with allele consensus plus flanks, a BAM that\nrealigns the spanning reads to those consensus sequences, and a BED that marks\nrepeat and flank boundaries. The BAM is already sorted and indexed, so it can be\nloaded directly into IGV or downstream tooling. If you need longer\nflanks than the defaults, rerun `trgt genotype` with higher values for\n`--flank-len` and `--output-flank-len`.\n\nSee the [deepdive guide](./deepdive.md) for advanced usage and a\nwalkthrough using *FMR1*.\n\n# Interpreting TRGT plots\n\nThis guide explains how to interpret the pileup-style visualizations produced by\nTRGT. The examples below walk through the most common options so you can quickly\ndecide which plot best conveys the structure of a tandem repeat and the evidence\nsupporting it.\n\n## Summary\n\n- `--plot-type allele` (default) renders one panel per allele, showing the\n  consensus allele sequence and how each HiFi read aligns to it, including\n  mismatches, insertions, and deletions.\n- `--plot-type waterfall` skips alignment and instead renders the repeat-spanning\n  portion of each read end-to-end, which makes mosaic or heterogeneous repeats\n  easier to identify.\n- `--show motifs` (default) colors each motif class so repeated sequences stand\n  out against the surrounding flanks, while `--show meth` annotates CpG sites\n  with 5mCpG methylation levels.\n- `--squished` compacts spacing for high coverage targeted data, and\n  `--max-allele-reads` limits how many reads appear in each panel when coverage\n  would otherwise overwhelm the plot.\n\n## An HTT repeat in the HG002 sample\n\nThe *HTT* gene contains adjacent CAG and CCG tandem repeats. Expansion of the\nCAG repeat causes Huntington's disease.\n\nThe allele plot below shows one panel per allele. The top track in each panel is\nthe consensus sequence inferred for that allele. The CAG and CCG repeats are\nshown in blue and purple respectively. The unsegmented regions (regions not\nmatching either CAG or CCG motifs) are shown in light gray. Deletions and\ninsertions in the allele sequence relative to the perfect, uninterrupted repeat\nare also shown when they are present. The remaining tracks show how individual\nHiFi reads align to the consensus allele sequence. Gray bars mark mismatches, vertical lines\nmark insertions, and horizontal lines mark deletions.\n\n| <img src=\"figures/HTT-allele.png\" width=\"800\" alt=\"TRGT allele plot for HTT\"/> |\n| :---: |\n| Allele view of the *HTT* locus in HG002, colored by motif with per-read alignments. |\n\nThe waterfall plot uses the same reads but does not perform an alignment step.\nInstead, each read contributes a single row that displays the repeat-spanning\nsegment in read order. The perfect copies of the CAG and CCG motifs are depicted\nin blue and purple respectively. The remaining portions of the read sequences\nare colored in light gray. Because reads are not warped to a consensus, you can\ninstantly spot minor sequence variants and complex mixtures that might be hidden\nin an alignment view.\n\n| <img src=\"figures/HTT-waterfall.png\" width=\"800\" alt=\"TRGT waterfall plot for HTT\"/> |\n| :---: |\n| Waterfall view of the same HiFi reads, showing the repeat-spanning segment without alignment. |\n\n## Comparing plot styles on FMR1\n\nTRGT can render both motif-centric and methylation-aware views for each plot\ntype. The motif view highlights how repeat units are organized; the methylation\nview overlays CpG methylation calls so epigenetic differences between alleles\nare visible at a glance. Toggling between these modes is controlled by\n`--show motifs` (the default) and `--show meth`.\n\nThe figure below shows all four combinations for the *FMR1* locus in HG00281:\nallele versus waterfall plots, each rendered with motif coloring and with\nmethylation shading. Together they demonstrate how the different renderings\ncomplement one another. The motif views make it easy to count repeat units and\nspot interruptions, while the methylation views reveal that the long expanded\nallele is heavily methylated and the shorter allele has little to no methylation\nsignal.\n\n| <img src=\"../docs/figures/HG00281-TRGT-FMR1-plots.png\" width=\"800\" alt=\"TRGT plots\"> |\n| :---: |\n| Different styles of TRGT plots for *FMR1* in HG00281. The options `--squished` and `--max-allele-reads 20` were used to conserve space, compressing the plots and limiting each allele to 20 reads. |\n\n# TRGT analysis of PureTarget data\n\nThe [PureTarget repeat expansion panel](https://www.pacb.com/technology/puretarget) is a targeted assay used to\nsimultaneously resolve multiple pathogenic tandem repeats. The assay produces\nmultiplexed high-depth sequencing libraries for dozens of samples in a single run.\n\nTo use TRGT with PureTarget data, we need to:\n\n 1. Use all reads produced by a sequencing run\n 2. Use `--preset targeted` when running TRGT\n\nBelow we will describe the commands used to attain these adjustments.\n\n## 1. Prepare sequencing data for analysis\n\nThis step will depend on which sequencer was used.\n\n### Preparing data generated on the Revio system\n\nIf reads were sequenced on a Revio, you should have two BAM files:\n`hifi_reads/movie.hifi_reads.bam` and `fail_reads/movie.fail_reads.bam` (where\n`movie` is a run-specific movie name). The BAM filename may also contain the\ndemultiplexed barcode name, but the important part is that the two files only\ndiffer by the words \"hifi\" and \"fail\". The recommended workflow is to align both\nBAM files to the same reference genome and then pass them to TRGT with `--reads` and `--fail-reads`.\n\nIf your workflow requires a single input BAM, you can use\n[pbmerge](https://github.com/PacificBiosciences/pbbam) to merge both BAM files\nas follows:\n\n```bash\npbmerge -o movie.input.bam hifi_reads/movie.hifi_reads.bam fail_reads/movie.fail_reads.bam\n```\n\n`pbmerge` is recommended over `samtools merge` when creating merged inputs for\ndownstream tools such as `lima` or `pbmm2`.\n\n### Preparing sequencing data generated on the Sequel II or Sequel IIe system\n\nIf your sample is generated on a Sequel II/IIe system, you should have access to\nthe `.subreads.bam` file. In that case, when running `ccs`, use the\n[mode-all](https://ccs.how/faq/mode-all.html) as follows:\n\n```bash\nccs --all movie.subreads.bam movie.input.bam\n```\n\nThe resulting `movie.input.bam` is the starting point of the analysis. It should\nbe mapped using [pbmm2](https://github.com/pacificBiosciences/pbmm2) with the\ndefault `--preset HIFI`, similar to WGS reads:\n\n```bash\npbmm2 align --preset HIFI reference.fasta movie.input.bam movie.pbmm2.bam\n```\n\n## 2. Use `--preset targeted` when running TRGT\n\nWe strongly recommend PureTarget samples to be analyzed with the `--preset targeted`\noption when running TRGT. All other parameters can be set as the\ndefaults. For Revio data with separate aligned HiFi and fail BAMs, the\nresulting command would look like this:\n\n```bash\n./trgt genotype \\\n       --preset targeted \\\n       --genome example/reference.fasta \\\n       --repeats example/repeat.bed \\\n       --reads example/sample.hifi_reads.pbmm2.bam \\\n       --fail-reads example/sample.fail_reads.pbmm2.bam \\\n       --output-prefix sample\n```\n\nIf you prepared one merged BAM instead, omit `--fail-reads` and provide that\nBAM with `--reads`.\n\n## Troubleshooting/FAQ\n\n### 1. Why should my PureTarget analysis include fail reads?\n\nThe PureTarget protocol produces insert sizes of about 5 kb.  Large expansions\nof loci like *FXN*, *C9orf72*, *DMPK* and *CNBP* produce much larger molecules\nthat may not produce reads reaching HiFi quality thresholds at typical movie\ntimes (recall that HiFi reads have an [average quality of Q20 or more](https://ccs.how/nomenclature.html)).\nIncluding fail reads, either with `--fail-reads` or in a pre-merged BAM, may\nsignificantly increase the coverage of expanded alleles and prevent\n[allelic dropouts](https://www.sciencedirect.com/topics/agricultural-and-biological-sciences/allelic-dropouts).\n\nBelow is a comparison using an extreme example of a *FXN* carrier sequenced on a\nRevio platform.  On the left is the [trgt plot](https://github.com/PacificBiosciences/trgt/blob/main/docs/trvz-plots.md)\nwhen only HiFi reads are used, and on the right is the same dataset when all\navailable reads are used for the analysis:\n\n<img width=\"800px\" src=\"figures/fxn-fail-reads-example.png\" />\n\n### 2. What does --preset targeted do?\n\nThe `--preset targeted` command-line option make the following changes on TRGT:\n\n1. It disables filtration of reads based on the `rq` tag. By default TRGT only\n   uses reads with `rq >= 0.98`\n2. It sets the `--genotyper cluster` flag, which assigns reads to alleles based\n   on the sequence composition, and not just the individual STR size of each\n   read\n3. It uses an alignment scoring for flanking sequences that is optimized for\n   all types of reads (e.g., penalizing opening gaps less severely).\n\n### 3. My output does not have an expected repeat expansion\n\nThis may occur if only HiFi reads are being used as the input. Please ensure\nfail reads were included with `--fail-reads` or in a pre-merged BAM,\nas described in step 1 of this document. If fail reads were pre-merged into one\nBAM, this may also occur if `--preset targeted` was not set when running TRGT,\nin which case the expanded reads may be filtered out and TRGT will produce a\nwarning like this:\n\n```\n[WARN] - FXN: Quality filtered 35/106 reads\n```\n\n### 4. I see a clear motif in the allele consensus sequence that is not reported by TRGT or depicted on TRGT plots. Why?\n\nTRGT only analyzes the motif units defined in the repeats catalog, so novel\nmotifs will not be quantified. Algorithms for *de novo* discovery of motif units\nare currently under development. Until then, our suggested solution is to re-run\nTRGT by adding the novel motif to the repeat catalog. For example, if you have\nset `MOTIFS=CAG`, and you clearly see the motif `CCG` in your consensus, change\nthe BED file to `MOTIFS=CAG,CCG` and re-run TRGT. The resulting genotype should\nbe identical, but the VCF tags will contain quantification of spans of the new\n`CCG` motif.\n\n### 5. The targeted preset shows a warning about purity filtering reads\n\nUsing the `targeted` preset, you may see a warning like this:\n\n```\n[WARN] - FXN: Filtered out 5 impure reads\n```\n\nInternally, TRGT uses a heuristic that discards any lower-quality read that does\nnot resemble a relatively perfect tandem repeat (less than 90% similarly in\nterms of the edit distance).  This heuristic cannot be disabled, and the number\nof reads discarded is reported as a warning.\n\n# Command-line interface of TRGT\n\nCommands:\n\n- `genotype`\n- `plot`\n- `merge`\n- `validate`\n- `deepdive`\n\nOptions:\n\n- `-v, --verbose` Specify multiple times to increase verbosity level (e.g., -vv for more verbosity)\n- `--color <COLOR>` Enable or disable color output in logging (always, auto, never); supports NO_COLOR/FORCE_COLOR environment variables [default: auto]\n- `-h, --help` Print help\n- `-V, --version` Print version\n\nMost file input arguments accept remote URIs (`http://`, `https://`, `s3://`,\n`gs://`). See [remote file support](remote_files.md) for details and\nauthentication tips.\n\n## Environmental variables\n\n- `TRGT_ENABLE_HTSLIB_LOGGING` Set this environment variable to re-enable HTSlib error messages, which are disabled by default in TRGT. This can be helpful for debugging unknown errors that might be related to HTSlib.\n- `NO_COLOR` Set this environment variable to disable color output.\n- `FORCE_COLOR` Set this environment variable to force color output.\n\nFor cloud storage and remote file access, additional environment variables are\navailable. See [remote file support](remote_files.md) for more details.\n\n## Genotype command-line\n\nOptions:\n\n- `-g, --genome <GENOME>` Path to the FASTA file containing reference genome. This must be the same reference genome as the one used for read alignment\n- `-r, --reads <READS>` BAM file with aligned HiFi reads\n- `--fail-reads <FAIL_READS>` Optional BAM file with fail reads; disables the default `rq` filter unless `--min-read-quality` is set\n- `-b, --repeats <REPEATS>` BED file with reference coordinates and structure of tandem repeats\n- `-o, --output-prefix <OUTPUT_PREFIX>` Prefix for output files. TRGT generates an unsorted VCF file (`<OUTPUT_PREFIX>.vcf.gz`) and unsorted BAM file with pieces of HiFi reads overlapping the repeats (`<OUTPUT_PREFIX>.spanning.bam`)\n- `-k, --karyotype <KARYOTYPE>` Sample karyotype (XX, XY, or a file path) [default: XX]\n- `-t, --threads <THREADS>` Number of threads [default: 1]\n- `--preset <PRESET>` Parameter preset (wgs or targeted) [default: wgs]\n\nAdvanced:\n\n- `--sample-name <SAMPLE_NAME>` Sample name. If not provided, the sample name is extracted from the input BAM or file stem\n- `--genotyper <GENOTYPER>` Genotyping algorithm (size or cluster) [default: size; targeted preset default: cluster]\n- `--flank-len <FLANK_LEN>` Minimum length of the flanking sequence [default: 250]\n- `--output-flank-len <FLANK_LEN>` Length of flanking sequence to report on output [default: 50]\n- `--disable-bam-output` Disable BAM output\n- `--max-depth <MAX_DEPTH>` Maximum locus depth [default: 250; targeted preset default: 10000]\n- `--fetcher-threads <THREADS>` Number of threads for querying input BAM files [default: half the number of analysis threads, max 8]\n\nPreset-dependent defaults:\n\n- `--preset targeted` changes several defaults:\n  - `--genotyper`: default becomes `cluster` (was `size`)\n  - `--flank-len`: default becomes `200` (was `250`)\n  - `--max-depth`: default becomes `10000` (was `250`)\n  - Advanced (hidden):\n    - `--aln-scoring`: default becomes `1,0,1` (was `2,5,1`)\n    - `--min-flank-id-frac`: default becomes `0.8` (was `0.7`)\n    - `--min-read-quality`: default becomes `-1.0` (was `0.98`)\n- `--fail-reads` also changes `--min-read-quality` to `-1.0` unless `--min-read-quality` is specified explicitly.\n\n## Plot command-line\n\nOptions:\n\n- `-g, --genome <GENOME>` Path to the FASTA file containing reference genome\n- `-b, --repeats <REPEATS>` BED file with repeat coordinates and structure\n- `-f, --vcf <VCF>` VCF file generated by TRGT\n- `-r, --spanning-reads <SPANNING_READS>` BAM file with spanning reads generated by TRGT\n- `-i, --repeat-id <REPEAT_ID>` ID of the repeat to visualize\n- `-o, --image <OUTPUT_PATH>` Output image path that ends with extension .pdf, .svg, or .png\n\nPlotting:\n\n- `--plot-type <PLOT_TYPE>` Two types of plots can be generated: allele plots and waterfall plots. Allele plots show alignments of reads to each repeat allele. Waterfall plo",
+        "evidence": [
+          {
+            "claim": "run_command",
+            "kind": "doc",
+            "line": 39,
+            "path": "docs/tutorial.md",
+            "text": "./trgt genotype --genome example/reference.fasta \\",
+            "url": "https://github.com/PacificBiosciences/trgt/blob/b21c6217eeaef9a080205932fe29f730dc00e31f/docs/tutorial.md#L39"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "example/repeat.bed",
+            "text": "bed",
+            "url": "https://github.com/PacificBiosciences/trgt/blob/b21c6217eeaef9a080205932fe29f730dc00e31f/example/repeat.bed"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "example/reference.fasta",
+            "text": "fasta",
+            "url": "https://github.com/PacificBiosciences/trgt/blob/b21c6217eeaef9a080205932fe29f730dc00e31f/example/reference.fasta"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "example/sample.bam",
+            "text": "bam",
+            "url": "https://github.com/PacificBiosciences/trgt/blob/b21c6217eeaef9a080205932fe29f730dc00e31f/example/sample.bam"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "repeats/pathogenic_repeats.hg38.bed",
+            "text": "bed",
+            "url": "https://github.com/PacificBiosciences/trgt/blob/b21c6217eeaef9a080205932fe29f730dc00e31f/repeats/pathogenic_repeats.hg38.bed"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "repeats/repeat_catalog.hg38.bed",
+            "text": "bed",
+            "url": "https://github.com/PacificBiosciences/trgt/blob/b21c6217eeaef9a080205932fe29f730dc00e31f/repeats/repeat_catalog.hg38.bed"
+          },
+          {
+            "claim": "known_issue",
+            "kind": "readme",
+            "line": 18,
+            "path": "README.md",
+            "text": "Active development warning",
+            "url": "https://github.com/PacificBiosciences/trgt/blob/b21c6217eeaef9a080205932fe29f730dc00e31f/README.md#L18"
+          },
+          {
+            "claim": "documented_input",
+            "kind": "readme",
+            "line": 9,
+            "path": "README.md",
+            "text": "It is now possible to add a fail reads BAM as a separate aligned BAM in addition to the primary `--reads` BAM.",
+            "url": "https://github.com/PacificBiosciences/trgt/blob/b21c6217eeaef9a080205932fe29f730dc00e31f/README.md#L9"
+          }
+        ],
+        "example": {
+          "cmd": "./trgt genotype --genome example/reference.fasta --repeats example/repeat.bed --reads example/sample.bam --output-prefix sample",
+          "cwd": "/opt/tool",
+          "evidence_source": "docs/tutorial.md:L39",
+          "inputs_in_repo": [
+            "example/reference.fasta",
+            "example/repeat.bed",
+            "example/sample.bam"
+          ],
+          "source": "detected"
+        },
+        "example_data": [
+          {
+            "in_example_dir": true,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "example/repeat.bed",
+            "size": 46
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fasta",
+            "looks_like_output": false,
+            "path": "example/reference.fasta",
+            "size": 11252
+          },
+          {
+            "in_example_dir": true,
+            "kind": "bam",
+            "looks_like_output": false,
+            "path": "example/sample.bam",
+            "size": 331422
+          },
+          {
+            "in_example_dir": false,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "repeats/pathogenic_repeats.hg38.bed",
+            "size": 3450
+          },
+          {
+            "in_example_dir": false,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "repeats/repeat_catalog.hg38.bed",
+            "size": 12770708
+          }
+        ],
+        "inferences": {
+          "build": "release_asset:trgt-v5.1.0-x86_64-unknown-linux-gnu.tar.gz",
+          "example": "docs/tutorial.md:L39",
+          "input_type": "CHANGELOG.md:L9",
+          "output": "README.md:L42",
+          "platform": "README.md:L5",
+          "regions": "docs/tutorial.md:L28",
+          "run_command": "docs/tutorial.md:L39",
+          "single_sample_bams": null
+        },
+        "input_type": {
+          "assembly": {
+            "against_hg38": null,
+            "declared": "hg38",
+            "evidence_source": "README.md:L36",
+            "hg19_evidence_source": null,
+            "hg19_hits": 0,
+            "hg38_evidence_source": "README.md:L36",
+            "hg38_hits": 5,
+            "incompatible_with_hg38": false
+          },
+          "best": "pacbio-hifi-bam-hg38",
+          "candidates": [
+            "pacbio-hifi-bam-hg38"
+          ],
+          "evidence_source": "CHANGELOG.md:L9",
+          "how": "read",
+          "platform": "pacbio",
+          "platform_evidence_source": "README.md:L5",
+          "platform_how": "stated",
+          "signals": {
+            "bam": 0,
+            "ce": 0,
+            "fastq": 0,
+            "hg19": 0,
+            "hg38": 5,
+            "illumina": 0,
+            "ont": 0,
+            "snp": 0,
+            "ystr": 0
+          },
+          "statements": {
+            "against": [],
+            "determined": true,
+            "inputs": [
+              {
+                "kind": "bam",
+                "line": 9,
+                "text": "It is now possible to add a fail reads BAM as a separate aligned BAM in addition to the primary `--reads` BAM."
+              }
+            ],
+            "platform": [
+              {
+                "historical": false,
+                "line": 5,
+                "platform": "pacbio",
+                "text": "<h3 align=\"center\">Tandem repeat genotyping tool for HiFi sequencing data</h3>"
+              }
+            ],
+            "platform_file": null,
+            "recommendation": null
+          },
+          "statements_file": "CHANGELOG.md",
+          "supported_platforms": [
+            {
+              "evidence_source": "README.md:L5",
+              "historical": false,
+              "line": 5,
+              "platform": "pacbio",
+              "text": "<h3 align=\"center\">Tandem repeat genotyping tool for HiFi sequencing data</h3>"
+            }
+          ],
+          "unsupported": null,
+          "warnings": []
+        },
+        "known_issues": [
+          {
+            "heading": "Active development warning",
+            "line": 18,
+            "text": "Please note that TRGT is still under active development. We anticipate some\nchanges to the input and output file formats of TRGT.",
+            "truncated": false,
+            "url": "https://github.com/PacificBiosciences/trgt/blob/b21c6217eeaef9a080205932fe29f730dc00e31f/README.md#L18"
+          }
+        ],
+        "limitations": [
+          "install_profile_unsupported"
+        ],
+        "output": {
+          "evidence_source": "README.md:L42",
+          "format": "vcf",
+          "signals": {
+            "csv": 6,
+            "json": 0,
+            "tsv": 3,
+            "vcf": 96
+          }
+        },
+        "packaging": {
+          "executables": [],
+          "packages": [
+            "trgt",
+            "pipeplot"
+          ]
+        },
+        "readme": {
+          "gaps": [],
+          "name": "README.md",
+          "sufficient_to_attempt": true
+        },
+        "readme_name": "README.md",
+        "readme_text": "<h1 align=\"center\"><img width=\"300px\" src=\"docs/figures/logo_TRGT.svg\"/></h1>\n\n<h1 align=\"center\">TRGT</h1>\n\n<h3 align=\"center\">Tandem repeat genotyping tool for HiFi sequencing data</h3>\n\nTRGT is a tool for targeted genotyping of tandem repeats from PacBio HiFi data.\nIn addition to the basic size genotyping, TRGT profiles sequence composition,\nmosaicism, and CpG methylation of each analyzed repeat and visualization of\nreads overlapping the repeats.\n\n## Version information\n\nCurrent version: **5.1.0**.\n\nFor a complete changelog, see the [changelog](CHANGELOG.md) or the git history.\n\n## Active development warning\n\nPlease note that TRGT is still under active development. We anticipate some\nchanges to the input and output file formats of TRGT.\n\n## Availability\n\n- TRGT Linux binary is [available here](https://github.com/PacificBiosciences/trgt/releases)\n\n## Repeat catalogs\n\nIn order to use TRGT, you need to specify which repeats you want it to analyze.\nHere are some repeat catalogs that you can use.\n\n- [STRchive](https://strchive.org/loci/) is a high-quality catalog containing\n  definitions of known pathogenic repeats. It is described [here](https://genomemedicine.biomedcentral.com/articles/10.1186/s13073-025-01454-4).\n- [\"Adotto\" genome-wide repeat catalog](<https://zenodo.org/records/8329210>) described in the original TRGT paper and [here](https://pubmed.ncbi.nlm.nih.gov/38671154/).\n- [Genome-wide repeat catalog containing isolated tandem repeats and variation clusters](https://github.com/broadinstitute/tandem-repeat-catalog/releases) described [here](https://www.biorxiv.org/content/10.1101/2024.10.04.615514v1).\n- [Catalog of pathogenic repeats](repeats/pathogenic_repeats.hg38.bed) originally distributed with TRGT has been deprecated; please use STRchive.\n\n## Joint analysis of multiple samples\n\nTRGT outputs VCFs containing repeat alleles from each region in the repeat\ncatalog. To facilitate analysis of repeats across multiple samples, VCFs can be\neither merged into a multi-sample VCF using the `merge` sub-command or converted\ninto a database using the [TDB tool](https://github.com/ACEnglish/tdb) (formerly\ncalled TRGTdb). TDB offers many advantages over multi-sample VCFs, including\nsimpler data extraction, support for queries, and reduced file sizes.\n\n## Documentation\n\n- Tutorials\n  - Introductory tutorial: [non-interactive](docs/tutorial.md) and\n    [interactive](https://mybinder.org/v2/gh/tandem-repeat-workflows/trgt-tutorial/HEAD?labpath=tutorial.ipynb)\n    versions\n  - [Interpreting TRGT plots](docs/trvz-plots.md)\n  - [Analyzing PureTarget data](docs/puretarget.md)\n- Reference\n  - [Command-line interface](docs/cli.md)\n  - [Repeat definition file](docs/repeat_files.md)\n  - [Spanning BAM generated by TRGT](docs/bam_files.md)\n  - [VCF files generated by TRGT](docs/vcf_files.md)\n  - [Remote file support](docs/remote_files.md)\n  - [Merging TRGT VCFs](docs/merge.md)\n  - [Deepdive subcommand](docs/deepdive.md)\n  - [Validating repeat catalogs](docs/validate.md)\n\n## Need help?\n\nIf you notice any missing features, bugs, or need assistance with analyzing the\noutput of TRGT, please don't hesitate to [reach out by email](mailto:edolzhenko@pacificbiosciences.com)\nor open a GitHub issue.\n\n## Support information\n\nTRGT is currently in active development and is intended for research use only and not for use\nin diagnostic procedures. While efforts have been made to ensure that TRGT\nlives up to the quality that PacBio strives for, we make no warranty regarding\nthis software.\n\nAs TRGT is not covered by any service level agreement or the like, please do\nnot contact a PacBio Field Applications Scientists or PacBio Customer Service\nfor assistance with any TRGT release. Please report all issues through GitHub\ninstead. We make no warranty that any such issue will be addressed, to any\nextent or within any time frame.\n\n## Citation\n\nIf you use TRGT, please consider citing the paper:\n\n[Dolzhenko E, English A, Dashnow H, De Sena Brandine G, Mokveld T, Rowell WJ,\nKarniski C, Kronenberg Z, Danzi MC, Cheung W, Bi C, Farrow E, Wenger A,\nMart\u00ednez-Cerde\u00f1o V, Bartley TD, Jin P, Nelson D, Zuchner S, Pastinen T,\nQuinlan AR, Sedlazeck FJ, Eberle MA. Characterization and visualization of\ntandem repeats at genome scale. 2024](https://www.nature.com/articles/s41587-023-02057-3)\n\n### DISCLAIMER\n\nTHIS WEBSITE AND CONTENT AND ALL SITE-RELATED SERVICES, INCLUDING ANY DATA, ARE\nPROVIDED \"AS IS,\" WITH ALL FAULTS, WITH NO REPRESENTATIONS OR WARRANTIES OF ANY\nKIND, EITHER EXPRESS OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, ANY WARRANTIES\nOF MERCHANTABILITY, SATISFACTORY QUALITY, NON-INFRINGEMENT OR FITNESS FOR A\nPARTICULAR PURPOSE. YOU ASSUME TOTAL RESPONSIBILITY AND RISK FOR YOUR USE OF THIS\nSITE, ALL SITE-RELATED SERVICES, AND ANY THIRD PARTY WEBSITES OR APPLICATIONS. NO\nORAL OR WRITTEN INFORMATION OR ADVICE SHALL CREATE A WARRANTY OF ANY KIND. ANY\nREFERENCES TO SPECIFIC PRODUCTS OR SERVICES ON THE WEBSITES DO NOT CONSTITUTE OR\nIMPLY A RECOMMENDATION OR ENDORSEMENT BY PACIFIC BIOSCIENCES.\n",
+        "ref": "b21c6217eeaef9a080205932fe29f730dc00e31f",
+        "regions": {
+          "ambiguous": false,
+          "candidates": [
+            {
+              "end_line": 28,
+              "evidence_source": "docs/tutorial.md:L28",
+              "file": "docs/tutorial.md",
+              "format": "trgt",
+              "line": 28,
+              "text": "chrA    10000    10061    ID=TR1;MOTIFS=CAG;STRUC=<TR>"
+            }
+          ],
+          "end_line": 28,
+          "evidence_source": "docs/tutorial.md:L28",
+          "file": "docs/tutorial.md",
+          "format": "trgt",
+          "line": 28,
+          "text": "chrA    10000    10061    ID=TR1;MOTIFS=CAG;STRUC=<TR>"
+        },
+        "registry": {
+          "bioconda": {
+            "trgt": {
+              "has_tag_version": true,
+              "latest": "5.1.0",
+              "versions": 22
+            }
+          },
+          "documented": []
+        },
+        "repo": "https://github.com/PacificBiosciences/trgt",
+        "schema": "strhub-verified/recipe-proposal/1",
+        "single_sample_bams": {
+          "allowed": false,
+          "evidence_source": null,
+          "file": null,
+          "line": null,
+          "paired_flags": [],
+          "text": null
+        },
+        "source_documents": [
+          {
+            "file": "README.md",
+            "origin": "readme",
+            "text": "<h1 align=\"center\"><img width=\"300px\" src=\"docs/figures/logo_TRGT.svg\"/></h1>\n\n<h1 align=\"center\">TRGT</h1>\n\n<h3 align=\"center\">Tandem repeat genotyping tool for HiFi sequencing data</h3>\n\nTRGT is a tool for targeted genotyping of tandem repeats from PacBio HiFi data.\nIn addition to the basic size genotyping, TRGT profiles sequence composition,\nmosaicism, and CpG methylation of each analyzed repeat and visualization of\nreads overlapping the repeats.\n\n## Version information\n\nCurrent version: **5.1.0**.\n\nFor a complete changelog, see the [changelog](CHANGELOG.md) or the git history.\n\n## Active development warning\n\nPlease note that TRGT is still under active development. We anticipate some\nchanges to the input and output file formats of TRGT.\n\n## Availability\n\n- TRGT Linux binary is [available here](https://github.com/PacificBiosciences/trgt/releases)\n\n## Repeat catalogs\n\nIn order to use TRGT, you need to specify which repeats you want it to analyze.\nHere are some repeat catalogs that you can use.\n\n- [STRchive](https://strchive.org/loci/) is a high-quality catalog containing\n  definitions of known pathogenic repeats. It is described [here](https://genomemedicine.biomedcentral.com/articles/10.1186/s13073-025-01454-4).\n- [\"Adotto\" genome-wide repeat catalog](<https://zenodo.org/records/8329210>) described in the original TRGT paper and [here](https://pubmed.ncbi.nlm.nih.gov/38671154/).\n- [Genome-wide repeat catalog containing isolated tandem repeats and variation clusters](https://github.com/broadinstitute/tandem-repeat-catalog/releases) described [here](https://www.biorxiv.org/content/10.1101/2024.10.04.615514v1).\n- [Catalog of pathogenic repeats](repeats/pathogenic_repeats.hg38.bed) originally distributed with TRGT has been deprecated; please use STRchive.\n\n## Joint analysis of multiple samples\n\nTRGT outputs VCFs containing repeat alleles from each region in the repeat\ncatalog. To facilitate analysis of repeats across multiple samples, VCFs can be\neither merged into a multi-sample VCF using the `merge` sub-command or converted\ninto a database using the [TDB tool](https://github.com/ACEnglish/tdb) (formerly\ncalled TRGTdb). TDB offers many advantages over multi-sample VCFs, including\nsimpler data extraction, support for queries, and reduced file sizes.\n\n## Documentation\n\n- Tutorials\n  - Introductory tutorial: [non-interactive](docs/tutorial.md) and\n    [interactive](https://mybinder.org/v2/gh/tandem-repeat-workflows/trgt-tutorial/HEAD?labpath=tutorial.ipynb)\n    versions\n  - [Interpreting TRGT plots](docs/trvz-plots.md)\n  - [Analyzing PureTarget data](docs/puretarget.md)\n- Reference\n  - [Command-line interface](docs/cli.md)\n  - [Repeat definition file](docs/repeat_files.md)\n  - [Spanning BAM generated by TRGT](docs/bam_files.md)\n  - [VCF files generated by TRGT](docs/vcf_files.md)\n  - [Remote file support](docs/remote_files.md)\n  - [Merging TRGT VCFs](docs/merge.md)\n  - [Deepdive subcommand](docs/deepdive.md)\n  - [Validating repeat catalogs](docs/validate.md)\n\n## Need help?\n\nIf you notice any missing features, bugs, or need assistance with analyzing the\noutput of TRGT, please don't hesitate to [reach out by email](mailto:edolzhenko@pacificbiosciences.com)\nor open a GitHub issue.\n\n## Support information\n\nTRGT is currently in active development and is intended for research use only and not for use\nin diagnostic procedures. While efforts have been made to ensure that TRGT\nlives up to the quality that PacBio strives for, we make no warranty regarding\nthis software.\n\nAs TRGT is not covered by any service level agreement or the like, please do\nnot contact a PacBio Field Applications Scientists or PacBio Customer Service\nfor assistance with any TRGT release. Please report all issues through GitHub\ninstead. We make no warranty that any such issue will be addressed, to any\nextent or within any time frame.\n\n## Citation\n\nIf you use TRGT, please consider citing the paper:\n\n[Dolzhenko E, English A, Dashnow H, De Sena Brandine G, Mokveld T, Rowell WJ,\nKarniski C, Kronenberg Z, Danzi MC, Cheung W, Bi C, Farrow E, Wenger A,\nMart\u00ednez-Cerde\u00f1o V, Bartley TD, Jin P, Nelson D, Zuchner S, Pastinen T,\nQuinlan AR, Sedlazeck FJ, Eberle MA. Characterization and visualization of\ntandem repeats at genome scale. 2024](https://www.nature.com/articles/s41587-023-02057-3)\n\n### DISCLAIMER\n\nTHIS WEBSITE AND CONTENT AND ALL SITE-RELATED SERVICES, INCLUDING ANY DATA, ARE\nPROVIDED \"AS IS,\" WITH ALL FAULTS, WITH NO REPRESENTATIONS OR WARRANTIES OF ANY\nKIND, EITHER EXPRESS OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, ANY WARRANTIES\nOF MERCHANTABILITY, SATISFACTORY QUALITY, NON-INFRINGEMENT OR FITNESS FOR A\nPARTICULAR PURPOSE. YOU ASSUME TOTAL RESPONSIBILITY AND RISK FOR YOUR USE OF THIS\nSITE, ALL SITE-RELATED SERVICES, AND ANY THIRD PARTY WEBSITES OR APPLICATIONS. NO\nORAL OR WRITTEN INFORMATION OR ADVICE SHALL CREATE A WARRANTY OF ANY KIND. ANY\nREFERENCES TO SPECIFIC PRODUCTS OR SERVICES ON THE WEBSITES DO NOT CONSTITUTE OR\nIMPLY A RECOMMENDATION OR ENDORSEMENT BY PACIFIC BIOSCIENCES.\n"
+          },
+          {
+            "file": "CHANGELOG.md",
+            "origin": "repo",
+            "text": "\n# Changelog\n\nAny changes to TRGT are noted below:\n\n## [5.1.0]\n\n- **Important changes**:\n  - Added the `--fail-reads` parameter to `trgt genotype`. It is now possible to add a fail reads BAM as a separate aligned BAM in addition to the primary `--reads` BAM. This is useful for PureTarget and other workflows where fail and HiFi reads are aligned separately, since they no longer need to be merged before running TRGT. Adding `--fail-reads` also disables the default `rq` filter unless `--min-read-quality` is set explicitly.\n- Added BCF output support to `trgt genotype` through `-O, --output-type` (`u`/`b` for uncompressed/compressed BCF, `v`/`z` for uncompressed/compressed VCF).\n\n## [5.0.0]\n\n- **Important changes**:\n  - Extended support for phased BAM inputs (from tool such as [HiPhase](https://github.com/PacificBiosciences/HiPhase)). TRGT can now output phased genotypes (e.g. `1|0`) and phase sets using HP/PS tags, when sufficient haplotype support is available.\n    - **Note:** the FORMAT field order remains unchanged after phasing, any downstream analysis that assumes positional indexing on genotypes must account for phasing.\n  - More robust and optimized VCF merging (`merge` subcommand).\n    - Added a streaming merge mode which avoids loading tabix/CSI indices. This mode is especially useful for merging very large cohorts and can be enabled with the `--no-index` flag. It significantly reduces memory requirements but it requires that all inputs have the exact same contig ordering.\n    - Compressed VCF/BCF output can now be automatically indexed after merging by setting the `--write-index` flag.\n    - Added the `--threads` flag to set the number of (de)compression threads for input/output VCF files.\n\n## [4.1.0]\n\n- **Important changes**:\n  - Experimental remote file support for most TRGT inputs (BAM/CRAM, reference FASTA, repeat catalogs, and VCF/BCF). See [remote file documentation](docs/remote_files.md) for more details.\n  - Improved consensus generation for long repeat expansions, as part of an ongoing refinement effort.\n- CLI: improved terminal color detection, and added a `--color` flag.\n\n## [4.0.0]\n\n- **Important changes**:\n  - Implemented read streaming to reduce I/O operations, achieving 2-4x speed improvements for WGS data (speed-up varies by catalog density). The input catalog must be sorted by contig and start to achieve high performance.\n  - Added `trgt deepdive` subcommand for locus-specific downstream analysis. This command realigns reads to their consensus sequences and outputs FASTA (consensus sequences), BAM (realigned reads), and BED (annotation) files for detailed repeat analysis in tools like IGV. See [deepdive documentation](docs/deepdive.md) for more details.\n- Bug fix: Address non-deterministic behavior caused by inconsistent ordering of reads with identical start positions but different query names in sorted BAM files\n- Bug fix: Fixed missing font in double arrow rendering\n\n## [3.0.0]\n\n- **Breaking change**: Modified how TRGT detects repeat motifs\n  - Changed repeat segmentation algorithm to only match perfect STR motifs (imperfections in VNTR motifs are still allowed)\n  - Implemented more flexible motif matching that allows better detection and visualization of repeat interruptions\n- Made a number of improvements to TRGT plots\n  - Replaced the size scale with the overall allele length\n  - Implemented more accurate motif matching in waterfall plots\n  - Made it possible to compress the plots vertically (useful for high-depth targeted data)\n  - Made it easier to distinguish between mismatches and unsegmented regions\n- Bug fix: Explicitly set reference from genome path for CRAM input, avoiding issues with moved/renamed references\n\n## [2.1.0]\n\n- **Important changes**:\n  - Extended the use of optimized aligners to the plotting (TRVZ) functionality\n  - Further optimized alignments, significantly improving overall performance for targeted datasets beyond the improvements introduced in 2.0, and cumulatively achieving ~2x speed-up for whole-genome sequencing data\n\n## [2.0.0]\n\n- **Important changes**:\n  - Introduced fine-grained parallelization using work-stealing, significantly increasing CPU utilization, resulting in speed-ups of up to 200x for targeted datasets\n  - All previous aligners used for genotyping have been replaced with significantly faster and more memory-efficient alternatives (WFA2-lib)\n  - When using the targeted data preset, reads with higher repeat purity between flanks are now given priority\n- TRGT now includes a default monospace font, ensuring consistent text rendering during plotting even on systems without fonts in standard locations.\n- Added CLI option `--vcf-list` to TRGT merge, allowing users to specify a file containing a list of VCF files. This option is mutually exclusive with the existing `--vcf` flag.\n- Introduced CLI option `--font-family` for specifying custom font families when plotting\n- Bug fix: the VCF QUAL field is now always set with `.` rather than `0`\n- Bug fix: fixed handling of AL tags when loading spanning BAM files modified by samtools\n- Improved error handling and messaging during parsing of plotting inputs\n\n## [1.5.1]\n\n- Fixed an issue that prevented extraction of CpG methylation from BAM records containing multiple base modifications\n\n## [1.5.0]\n\n- Read clustering genotyper (`--genotyper cluster`) is now significantly faster at genotyping high-coverage repeat expansions; this may result in minor changes to consensus sequence and read assignment for highly mosaic repeats\n\n## [1.4.1]\n\n- Bug fix: corrected the type of the rq tag in BAM output\n\n## [1.4.0]\n\n- Parameters appropriate for targeted sequencing can now be set with `--preset targeted` option\n- Waterfall plots no longer panic when there are no reads in a locus\n- Algorithmic changes to `--genotyper cluster` allow fewer reads to be assigned to an allele; this may result in minor changes to consensus sequence and read assignment\n\n## [1.3.0]\n\n- Plotting code has been refactored as we prepare to revamp repeat visualizations\n- The maximum number of reads per allele to plot can now be specified by `--max-allele-reads`\n- Bug fix: repeat identifiers are now permitted to contain commas\n\n## [1.2.0]\n\n- `trgt merge`:\n  - Multi-sample VCF Merging: Added support for merging TRGT VCFs with any number of samples, allowing updates to large, population-scale datasets with new samples\n  - Synced contig indexing: Introduced support for VCFs with inconsistent contig orderings. Additionally the new `--contigs` flag allows specifying a comma-separated list of contigs to be merged\n  - The reference genome is no longer required when merging TRGT VCFs from version 1.0.0 or later\n  - Merging now skips and logs problematic loci by default. Use the `--quit-on-errors` flag to terminate on errors. Statistics are logged post-merge, including counts of failed and skipped TRs\n- `trgt validate`\n  - Always outputs statistics directly to stdout and stderr instead of logging them\n- Bug fix: resolved issue with handling bgzip-compressed BED files\n\n## [1.1.2]\n\n- Bug fix: Prevent genotyping without reads\n- Added the `--disable-bam-output` flag to `trgt genotype`, allowing users to disable BAMlet generation. **However, please note that BAMlets are still required for downstream tasks like trgt plot**\n\n## [1.1.1]\n\n- Bug fix: Read filtering logic no longer removes reads without RQ tags\n\n## [1.1.0]\n\n- Added a new subcommand `trgt merge`. This command merges VCF files generated by `trgt genotype` into a joint VCF file. **Works with VCFs generated by all versions of TRGT** (the resulting joint VCF will always be in the TRGT \u2265v1.0.0 format which includes padding bases)\n- Added subsampling of regions with ultra-high coverage (`>MAX_DEPTH * 3`, by default 750); implemented via reservoir sampling\n- Fixed a cluster genotyper bug that occurred when only a single read covered a locus\n- Added new logic for filtering non-HiFi reads: remove up to 3% of lower quality reads that do not match the expected repeat sequence\n\n## [1.0.0]\n\n- **Breaking change**: TRGT and TRVZ are now merged into a single binary. Users need to run subcommands `trgt genotype` and `trgt plot` for genotyping and visualization, respectively\n- **Breaking change**:  A padding base is now automatically added to all genotyped allele sequences in the VCF file, ensuring better compliance with VCF standards and handling of zero-length alleles\n- Added a new subcommand `trgt validate`. This command allows for validation of a repeat catalog against a given reference genome and reports statistics for any malformed entries\n- Lower memory footprint: Better memory management significantly reduces memory usage with large repeat catalogs\n- Updated error handling: Malformed entries are now logged as errors without terminating the program\n- Added shorthand CLI options to simplify command usage\n\n## [0.9.0]\n\n- Add support for polyalanine repeats (by allowing characters `N` in the motif sequence)\n- Fix a bug causing TRVZ to error out on polyalanine repeats\n\n## [0.8.0]\n\n- **Breaking change**: Motif spans and counts (`MS` and `MC` fields) and purity assessment (`AP` field) are now performed with an HMM-based algorithm for all repeats; expect some differences in results relative to the previous versions\n- Allele purity of zero-length alleles are now reported as missing values in the VCFs\n- The spanning.bam output file now carries over the QUAL values and mapping strand from the input reads\n- Added an advanced flag `--output-flank-len` that controls the number of flanking bases reported in the spanning.bam files and shown in trvz plots\n- A crash that may occur on BAMs where methylation was called twice has been fixed\n- Optimizations to the `--genotyper=cluster` mode, including haploid genotyping of the X chromosome when `--karyotype` is set to `XY`\n\n## [0.7.0]\n\n- Read phasing information can now be used during repeat genotyping (via `HP` tags)\n- Users can now define complex repeats by specifying motif sequences in the MOTIFS field and setting STRUC to <`locus_name`>\n- The original MAPQ values in the input reads are now reported in the BAM output\n- BAMlet sample name can now be provided using the `--sample-name` flag; if it not provided, it is extracted from the input BAM or file stem (addressing issue #18)\n\n## [0.6.0]\n\n- Add alignment CIGARs to spanning.bam reads\n- Increase read extraction region\n- Cluster genotyper reports confidence intervals\n- Improved error handling of invalid input files (genome, catalog\n    and reads)\n\n## [0.5.0]\n\n- The genotyper now uses information about SNPs adjacent to repeats\n- BAM files now contain read-to-allele assignments\n- Added support for gzip compressed repeat files\n- Improved error handling and error messages\n\n## [0.4.0]\n\n- Added TRVZ tutorial\n- Added sample karyotype parameter (`XX` or `XY`)\n- Renamed VCF genotype field `ALCI` to `ALLR`\n- Made genotyping algorithm changes to improve accuracy\n\n## [0.3.4]\n\n- Improved label spacing in TRVZ plots\n"
+          },
+          {
+            "file": "docs/tutorial.md",
+            "origin": "repo",
+            "text": "# Introductory tutorial\n\nIn this tutorial, you will learn the basics of TRGT by analyzing a tiny example\ndataset included in this repository.\n\n## Prerequisites\n\n- Download the [latest TRGT release](https://github.com/PacificBiosciences/trgt/releases)\n- Download the [example dataset](https://github.com/PacificBiosciences/trgt/tree/main/example)\n- Install recent versions of `samtools` and `bcftools`\n\n> Tip: Place the TRGT binary on your `PATH`, or run it with a relative path as\n> shown in the commands below.\n\n## Overview of the input files\n\nThe example directory provides three required files:\n\n- `reference.fasta` \u2013 the reference assembly that TRGT uses for context\n- `sample.bam` \u2013 HiFi reads aligned to that reference\n- `repeat.bed` \u2013 tandem repeat definition catalog for genotyping\n\nEach row in `repeat.bed` follows a BED-style layout with annotation tags in the\nfourth column. For this example, the single entry looks like:\n\n```bash\n$ cat example/repeat.bed\nchrA    10000    10061    ID=TR1;MOTIFS=CAG;STRUC=<TR>\n```\n\n`ID` names the locus (`TR1`), `MOTIFS` lists the repeat unit(s) and the `STRUC`\nfield can be always set to value `<TR>`.\n\n## Genotyping repeats\n\nTo genotype the repeat, run:\n\n```bash\n./trgt genotype --genome example/reference.fasta \\\n       --repeats example/repeat.bed \\\n       --reads example/sample.bam \\\n       --output-prefix sample\n```\n\nTwo primary outputs are created:\n\n- `sample.vcf.gz` \u2013 genotypes and per-allele statistics\n- `sample.spanning.bam` \u2013 read segments that fully span each repeat\n\nFor example, use `bcftools` to examine the first (and only) record of the VCF\nfile:\n\n```bash\n$ bcftools view --no-header sample.vcf.gz | head -n 1\n#CHROM  POS  ID  REF  ALT  QUAL  FILTER  INFO  FORMAT  sample\nchrA 10001 . CCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAG CCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAG . . TRID=TR1;END=10061;MOTIFS=CAG;STRUC=<TR> GT:AL:ALLR:SD:MC:MS:AP:AM 1/1:33,33:30-39,33-33:15,14:11,11:0(0-33),0(0-33):1,1:.,.\n```\n\nNote that TRGT prepends a single padding base to each repeat allele sequenece\n(the first base of the string). Ignoring that base, the record tells us that:\n\n- The tandem repeat starts at position 10001 on contig `chrA`\n- The reference allele sequence of this repeat is\n  CAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAG and contains 20\n  copies of the `CAG` motif\n- Both observed alleles have 11 copies of `CAG`, resulting in a homozygous\n  non-reference call\n\nSee [vcf_files.md](./vcf_files.md) for a detailed breakdown of the generated VCF files\nand interpretation tips, and refer to [bam_files.md](./bam_files.md) for guidance on\ninterpreting the spanning BAM output and its per-read annotations.\n\n## Sort and index the outputs\n\nTRGT leaves both files unsorted. Sorting and indexing makes them compatible with\ntools that expect coordinate order.\n\nSort and index the VCF:\n\n```bash\nbcftools sort -Oz -o sample.sorted.vcf.gz sample.vcf.gz\nbcftools index sample.sorted.vcf.gz\n```\n\nThen sort and index the BAM:\n\n```bash\nsamtools sort -o sample.spanning.sorted.bam sample.spanning.bam\nsamtools index sample.spanning.sorted.bam\n```\n\nAt this point the outputs are ready for downstream filtering, visualization, or\nintegration with other variant calls.\n\n## Visualizing a repeat\n\nTo visualize the repeat with the identifier \"TR1\", run:\n\n```bash\n./trgt plot --genome example/reference.fasta \\\n       --repeats example/repeat.bed \\\n       --vcf sample.sorted.vcf.gz \\\n       --spanning-reads sample.spanning.sorted.bam \\\n       --repeat-id TR1 \\\n       --image TR1.svg\n```\n\nThe resulting `TR1.svg` can be opened directly in any modern browser or edited\nin vector tools such as [Inkscape](https://inkscape.org/). The plot highlights\nthe motif sequence of each allele (blue) and the flanking sequence (green), and\nstacks supporting reads underneath. For more details on interpreting plots,\ncontinue with the [TRVZ plot walkthrough](./trvz-plots.md).\n\n| <img src=\"figures/TR1.svg\" width=\"800\" alt=\"Read pileup for TR1 in the tutorial dataset\"/> |\n| :---: |\n| TRGT pileup for `TR1`, showing the homozygous 11\u00d7 CAG repeat with flanking context. |\n\n## Deepdive on a repeat\n\nWhen you need more in depth analysis on one locus, run the\n`trgt deepdive` command:\n\n```bash\n./trgt deepdive --genome example/reference.fasta \\\n       --repeats example/repeat.bed \\\n       --vcf sample.sorted.vcf.gz \\\n       --spanning-reads sample.spanning.sorted.bam \\\n       --repeat-id TR1 \\\n       --output-prefix sample.TR1\n```\n\nTRGT writes three files: a FASTA with allele consensus plus flanks, a BAM that\nrealigns the spanning reads to those consensus sequences, and a BED that marks\nrepeat and flank boundaries. The BAM is already sorted and indexed, so it can be\nloaded directly into IGV or downstream tooling. If you need longer\nflanks than the defaults, rerun `trgt genotype` with higher values for\n`--flank-len` and `--output-flank-len`.\n\nSee the [deepdive guide](./deepdive.md) for advanced usage and a\nwalkthrough using *FMR1*.\n"
+          },
+          {
+            "file": "docs/trvz-plots.md",
+            "origin": "repo",
+            "text": "# Interpreting TRGT plots\n\nThis guide explains how to interpret the pileup-style visualizations produced by\nTRGT. The examples below walk through the most common options so you can quickly\ndecide which plot best conveys the structure of a tandem repeat and the evidence\nsupporting it.\n\n## Summary\n\n- `--plot-type allele` (default) renders one panel per allele, showing the\n  consensus allele sequence and how each HiFi read aligns to it, including\n  mismatches, insertions, and deletions.\n- `--plot-type waterfall` skips alignment and instead renders the repeat-spanning\n  portion of each read end-to-end, which makes mosaic or heterogeneous repeats\n  easier to identify.\n- `--show motifs` (default) colors each motif class so repeated sequences stand\n  out against the surrounding flanks, while `--show meth` annotates CpG sites\n  with 5mCpG methylation levels.\n- `--squished` compacts spacing for high coverage targeted data, and\n  `--max-allele-reads` limits how many reads appear in each panel when coverage\n  would otherwise overwhelm the plot.\n\n## An HTT repeat in the HG002 sample\n\nThe *HTT* gene contains adjacent CAG and CCG tandem repeats. Expansion of the\nCAG repeat causes Huntington's disease.\n\nThe allele plot below shows one panel per allele. The top track in each panel is\nthe consensus sequence inferred for that allele. The CAG and CCG repeats are\nshown in blue and purple respectively. The unsegmented regions (regions not\nmatching either CAG or CCG motifs) are shown in light gray. Deletions and\ninsertions in the allele sequence relative to the perfect, uninterrupted repeat\nare also shown when they are present. The remaining tracks show how individual\nHiFi reads align to the consensus allele sequence. Gray bars mark mismatches, vertical lines\nmark insertions, and horizontal lines mark deletions.\n\n| <img src=\"figures/HTT-allele.png\" width=\"800\" alt=\"TRGT allele plot for HTT\"/> |\n| :---: |\n| Allele view of the *HTT* locus in HG002, colored by motif with per-read alignments. |\n\nThe waterfall plot uses the same reads but does not perform an alignment step.\nInstead, each read contributes a single row that displays the repeat-spanning\nsegment in read order. The perfect copies of the CAG and CCG motifs are depicted\nin blue and purple respectively. The remaining portions of the read sequences\nare colored in light gray. Because reads are not warped to a consensus, you can\ninstantly spot minor sequence variants and complex mixtures that might be hidden\nin an alignment view.\n\n| <img src=\"figures/HTT-waterfall.png\" width=\"800\" alt=\"TRGT waterfall plot for HTT\"/> |\n| :---: |\n| Waterfall view of the same HiFi reads, showing the repeat-spanning segment without alignment. |\n\n## Comparing plot styles on FMR1\n\nTRGT can render both motif-centric and methylation-aware views for each plot\ntype. The motif view highlights how repeat units are organized; the methylation\nview overlays CpG methylation calls so epigenetic differences between alleles\nare visible at a glance. Toggling between these modes is controlled by\n`--show motifs` (the default) and `--show meth`.\n\nThe figure below shows all four combinations for the *FMR1* locus in HG00281:\nallele versus waterfall plots, each rendered with motif coloring and with\nmethylation shading. Together they demonstrate how the different renderings\ncomplement one another. The motif views make it easy to count repeat units and\nspot interruptions, while the methylation views reveal that the long expanded\nallele is heavily methylated and the shorter allele has little to no methylation\nsignal.\n\n| <img src=\"../docs/figures/HG00281-TRGT-FMR1-plots.png\" width=\"800\" alt=\"TRGT plots\"> |\n| :---: |\n| Different styles of TRGT plots for *FMR1* in HG00281. The options `--squished` and `--max-allele-reads 20` were used to conserve space, compressing the plots and limiting each allele to 20 reads. |\n"
+          },
+          {
+            "file": "docs/puretarget.md",
+            "origin": "repo",
+            "text": "# TRGT analysis of PureTarget data\n\nThe [PureTarget repeat expansion panel](https://www.pacb.com/technology/puretarget) is a targeted assay used to\nsimultaneously resolve multiple pathogenic tandem repeats. The assay produces\nmultiplexed high-depth sequencing libraries for dozens of samples in a single run.\n\nTo use TRGT with PureTarget data, we need to:\n\n 1. Use all reads produced by a sequencing run\n 2. Use `--preset targeted` when running TRGT\n\nBelow we will describe the commands used to attain these adjustments.\n\n## 1. Prepare sequencing data for analysis\n\nThis step will depend on which sequencer was used.\n\n### Preparing data generated on the Revio system\n\nIf reads were sequenced on a Revio, you should have two BAM files:\n`hifi_reads/movie.hifi_reads.bam` and `fail_reads/movie.fail_reads.bam` (where\n`movie` is a run-specific movie name). The BAM filename may also contain the\ndemultiplexed barcode name, but the important part is that the two files only\ndiffer by the words \"hifi\" and \"fail\". The recommended workflow is to align both\nBAM files to the same reference genome and then pass them to TRGT with `--reads` and `--fail-reads`.\n\nIf your workflow requires a single input BAM, you can use\n[pbmerge](https://github.com/PacificBiosciences/pbbam) to merge both BAM files\nas follows:\n\n```bash\npbmerge -o movie.input.bam hifi_reads/movie.hifi_reads.bam fail_reads/movie.fail_reads.bam\n```\n\n`pbmerge` is recommended over `samtools merge` when creating merged inputs for\ndownstream tools such as `lima` or `pbmm2`.\n\n### Preparing sequencing data generated on the Sequel II or Sequel IIe system\n\nIf your sample is generated on a Sequel II/IIe system, you should have access to\nthe `.subreads.bam` file. In that case, when running `ccs`, use the\n[mode-all](https://ccs.how/faq/mode-all.html) as follows:\n\n```bash\nccs --all movie.subreads.bam movie.input.bam\n```\n\nThe resulting `movie.input.bam` is the starting point of the analysis. It should\nbe mapped using [pbmm2](https://github.com/pacificBiosciences/pbmm2) with the\ndefault `--preset HIFI`, similar to WGS reads:\n\n```bash\npbmm2 align --preset HIFI reference.fasta movie.input.bam movie.pbmm2.bam\n```\n\n## 2. Use `--preset targeted` when running TRGT\n\nWe strongly recommend PureTarget samples to be analyzed with the `--preset targeted`\noption when running TRGT. All other parameters can be set as the\ndefaults. For Revio data with separate aligned HiFi and fail BAMs, the\nresulting command would look like this:\n\n```bash\n./trgt genotype \\\n       --preset targeted \\\n       --genome example/reference.fasta \\\n       --repeats example/repeat.bed \\\n       --reads example/sample.hifi_reads.pbmm2.bam \\\n       --fail-reads example/sample.fail_reads.pbmm2.bam \\\n       --output-prefix sample\n```\n\nIf you prepared one merged BAM instead, omit `--fail-reads` and provide that\nBAM with `--reads`.\n\n## Troubleshooting/FAQ\n\n### 1. Why should my PureTarget analysis include fail reads?\n\nThe PureTarget protocol produces insert sizes of about 5 kb.  Large expansions\nof loci like *FXN*, *C9orf72*, *DMPK* and *CNBP* produce much larger molecules\nthat may not produce reads reaching HiFi quality thresholds at typical movie\ntimes (recall that HiFi reads have an [average quality of Q20 or more](https://ccs.how/nomenclature.html)).\nIncluding fail reads, either with `--fail-reads` or in a pre-merged BAM, may\nsignificantly increase the coverage of expanded alleles and prevent\n[allelic dropouts](https://www.sciencedirect.com/topics/agricultural-and-biological-sciences/allelic-dropouts).\n\nBelow is a comparison using an extreme example of a *FXN* carrier sequenced on a\nRevio platform.  On the left is the [trgt plot](https://github.com/PacificBiosciences/trgt/blob/main/docs/trvz-plots.md)\nwhen only HiFi reads are used, and on the right is the same dataset when all\navailable reads are used for the analysis:\n\n<img width=\"800px\" src=\"figures/fxn-fail-reads-example.png\" />\n\n### 2. What does --preset targeted do?\n\nThe `--preset targeted` command-line option make the following changes on TRGT:\n\n1. It disables filtration of reads based on the `rq` tag. By default TRGT only\n   uses reads with `rq >= 0.98`\n2. It sets the `--genotyper cluster` flag, which assigns reads to alleles based\n   on the sequence composition, and not just the individual STR size of each\n   read\n3. It uses an alignment scoring for flanking sequences that is optimized for\n   all types of reads (e.g., penalizing opening gaps less severely).\n\n### 3. My output does not have an expected repeat expansion\n\nThis may occur if only HiFi reads are being used as the input. Please ensure\nfail reads were included with `--fail-reads` or in a pre-merged BAM,\nas described in step 1 of this document. If fail reads were pre-merged into one\nBAM, this may also occur if `--preset targeted` was not set when running TRGT,\nin which case the expanded reads may be filtered out and TRGT will produce a\nwarning like this:\n\n```\n[WARN] - FXN: Quality filtered 35/106 reads\n```\n\n### 4. I see a clear motif in the allele consensus sequence that is not reported by TRGT or depicted on TRGT plots. Why?\n\nTRGT only analyzes the motif units defined in the repeats catalog, so novel\nmotifs will not be quantified. Algorithms for *de novo* discovery of motif units\nare currently under development. Until then, our suggested solution is to re-run\nTRGT by adding the novel motif to the repeat catalog. For example, if you have\nset `MOTIFS=CAG`, and you clearly see the motif `CCG` in your consensus, change\nthe BED file to `MOTIFS=CAG,CCG` and re-run TRGT. The resulting genotype should\nbe identical, but the VCF tags will contain quantification of spans of the new\n`CCG` motif.\n\n### 5. The targeted preset shows a warning about purity filtering reads\n\nUsing the `targeted` preset, you may see a warning like this:\n\n```\n[WARN] - FXN: Filtered out 5 impure reads\n```\n\nInternally, TRGT uses a heuristic that discards any lower-quality read that does\nnot resemble a relatively perfect tandem repeat (less than 90% similarly in\nterms of the edit distance).  This heuristic cannot be disabled, and the number\nof reads discarded is reported as a warning.\n"
+          },
+          {
+            "file": "docs/cli.md",
+            "origin": "repo",
+            "text": "# Command-line interface of TRGT\n\nCommands:\n\n- `genotype`\n- `plot`\n- `merge`\n- `validate`\n- `deepdive`\n\nOptions:\n\n- `-v, --verbose` Specify multiple times to increase verbosity level (e.g., -vv for more verbosity)\n- `--color <COLOR>` Enable or disable color output in logging (always, auto, never); supports NO_COLOR/FORCE_COLOR environment variables [default: auto]\n- `-h, --help` Print help\n- `-V, --version` Print version\n\nMost file input arguments accept remote URIs (`http://`, `https://`, `s3://`,\n`gs://`). See [remote file support](remote_files.md) for details and\nauthentication tips.\n\n## Environmental variables\n\n- `TRGT_ENABLE_HTSLIB_LOGGING` Set this environment variable to re-enable HTSlib error messages, which are disabled by default in TRGT. This can be helpful for debugging unknown errors that might be related to HTSlib.\n- `NO_COLOR` Set this environment variable to disable color output.\n- `FORCE_COLOR` Set this environment variable to force color output.\n\nFor cloud storage and remote file access, additional environment variables are\navailable. See [remote file support](remote_files.md) for more details.\n\n## Genotype command-line\n\nOptions:\n\n- `-g, --genome <GENOME>` Path to the FASTA file containing reference genome. This must be the same reference genome as the one used for read alignment\n- `-r, --reads <READS>` BAM file with aligned HiFi reads\n- `--fail-reads <FAIL_READS>` Optional BAM file with fail reads; disables the default `rq` filter unless `--min-read-quality` is set\n- `-b, --repeats <REPEATS>` BED file with reference coordinates and structure of tandem repeats\n- `-o, --output-prefix <OUTPUT_PREFIX>` Prefix for output files. TRGT generates an unsorted VCF file (`<OUTPUT_PREFIX>.vcf.gz`) and unsorted BAM file with pieces of HiFi reads overlapping the repeats (`<OUTPUT_PREFIX>.spanning.bam`)\n- `-k, --karyotype <KARYOTYPE>` Sample karyotype (XX, XY, or a file path) [default: XX]\n- `-t, --threads <THREADS>` Number of threads [default: 1]\n- `--preset <PRESET>` Parameter preset (wgs or targeted) [default: wgs]\n\nAdvanced:\n\n- `--sample-name <SAMPLE_NAME>` Sample name. If not provided, the sample name is extracted from the input BAM or file stem\n- `--genotyper <GENOTYPER>` Genotyping algorithm (size or cluster) [default: size; targeted preset default: cluster]\n- `--flank-len <FLANK_LEN>` Minimum length of the flanking sequence [default: 250]\n- `--output-flank-len <FLANK_LEN>` Length of flanking sequence to report on output [default: 50]\n- `--disable-bam-output` Disable BAM output\n- `--max-depth <MAX_DEPTH>` Maximum locus depth [default: 250; targeted preset default: 10000]\n- `--fetcher-threads <THREADS>` Number of threads for querying input BAM files [default: half the number of analysis threads, max 8]\n\nPreset-dependent defaults:\n\n- `--preset targeted` changes several defaults:\n  - `--genotyper`: default becomes `cluster` (was `size`)\n  - `--flank-len`: default becomes `200` (was `250`)\n  - `--max-depth`: default becomes `10000` (was `250`)\n  - Advanced (hidden):\n    - `--aln-scoring`: default becomes `1,0,1` (was `2,5,1`)\n    - `--min-flank-id-frac`: default becomes `0.8` (was `0.7`)\n    - `--min-read-quality`: default becomes `-1.0` (was `0.98`)\n- `--fail-reads` also changes `--min-read-quality` to `-1.0` unless `--min-read-quality` is specified explicitly.\n\n## Plot command-line\n\nOptions:\n\n- `-g, --genome <GENOME>` Path to the FASTA file containing reference genome\n- `-b, --repeats <REPEATS>` BED file with repeat coordinates and structure\n- `-f, --vcf <VCF>` VCF file generated by TRGT\n- `-r, --spanning-reads <SPANNING_READS>` BAM file with spanning reads generated by TRGT\n- `-i, --repeat-id <REPEAT_ID>` ID of the repeat to visualize\n- `-o, --image <OUTPUT_PATH>` Output image path that ends with extension .pdf, .svg, or .png\n\nPlotting:\n\n- `--plot-type <PLOT_TYPE>` Two types of plots can be generated: allele plots and waterfall plots. Allele plots show alignments of reads to each repeat allele. Waterfall plots display unaligned repeat sequences without aligning them to the (consensus) allele. Waterfall plots are especially useful for QC of repeat calls and for visualization of mosaic expansions [default: allele]\n- `--squished` Horizontally compress the plot; useful for visualization of high-coverage targeted data\n- `--show <SHOW>` Either motifs (`motifs`) or methylation (`meth`) is visualized [default: motifs]\n- `--font-family <FONT>` Font family to use for text elements [default: Roboto Mono]\n\nAdvanced:\n\n- `--flank-len <FLANK_LEN>` Length of flanking regions [default: 50]\n- `--max-allele-reads <MAX_READS>` Max number of reads per allele to plot\n\n## Merge command-line\n\nThe `merge` subcommand currently requires local files.\n\nOptions:\n\n- `--vcf <VCF>` VCF files to merge\n- `--vcf-list <VCF_LIST>` File containing paths of VCF files to merge (one per line)\n- `-g, --genome <FASTA>` Path to the FASTA file containing reference genome\n- `-o, --output <FILE>` Write output to a file [default: standard output]\n\nAdvanced:\n\n- `-O, --output-type <OUTPUT_TYPE>` Output type: u|b|v|z, u/b: un/compressed BCF, v/z: un/compressed VCF\n- `--skip-n <SKIP_N>` Skip the first N records\n- `--process-n <PROCESS_N>` Only process N records\n- `--print-header` Print only the merged header and exit\n- `--force-single` Run even if there is only one file on input\n- `--no-version` Do not append version and command line to the header\n- `--quit-on-errors` Quit immediately on errors during merging\n- `--contig <CONTIG>` Process only the specified contigs (comma-separated list)\n- `-t, --threads <THREADS>` Number of threads for (de)compressing input/output VCF files (shared across readers and writer) [default: 2]\n- `--no-index` Stream VCFs without loading their indexes (contig order must match across inputs)\n- `-W, --write-index` Write index for the output compressed VCF/BCF file\n\n## Validate command-line\n\nOptions:\n\n- `-g, --genome <FASTA>` Path to the FASTA file containing reference genome\n- `-b, --repeats <REPEATS>` BED file with repeat coordinates and structure\n\nAdvanced:\n\n- `--flank-len <FLANK_LEN>` Length of flanking regions [default: 50]\n\n## Deepdive command-line\n\nOptions:\n\n- `-g, --genome <FASTA>` Path to reference genome FASTA\n- `-f, --vcf <VCF>` VCF file generated by trgt genotype\n- `-b, --repeats <REPEATS>` BED file with repeat coordinates\n- `-r, --spanning-reads <SPANNING_READS>` BAM file with spanning reads generated by trgt genotype\n- `-i, --repeat-id <REPEAT_ID>` ID of the repeat to realign\n- `-o, --output-prefix <OUTPUT_PREFIX>` Prefix for output files (.fasta, .bed and .bam)\n"
+          },
+          {
+            "file": "docs/repeat_files.md",
+            "origin": "repo",
+            "text": "# Repeat definitions\n\nThe repeat definition files are BED files containing repeat coordinates and\ninformation about the repeat structure. The first three columns specify the\ncoordinates of the repeat region. The fourth column contains the following\nmandatory fields:\n\n- Repeat identifier (`ID`). The identifier must be globally unique.\n- The comma-separated list of repeat motifs (`MOTIFS`) specifying all possible\n  motifs that can appear in this region. In particular, each motif present in\n  the `STRUC` field must also be present in this field.\n- Repeat region structure (`STRUC`) field is required, although it is not\n  currently used by TRGT. It is typically set to `STRUC=<TR>`. This field will\n  be used in the future versions of the tool for defining population structure\n  of complex repeat regions.\n\nFor example, consider this definition of tandem repeat:\n\n```bash\nchr4  3074876  3074966  ID=HTT;MOTIFS=CAG,CCG;STRUC=<TR>\n```\n\nIt tells us that the repeat region has coordinates chr4:3074876-3074966.\nIts identifier is `HTT`. The region is expected to be composed of tandem\nrepeats with motifs `CAG` and `CCG`.\n\nAvoid redundant motif sets when defining repeats. For example, motifs `C`, `ACC`,\nand `ACCAC` are redundant because the sequence `ACCACC` can be decomposed as either\n`ACC\u22c5ACC` or as `ACCAC\u22c5C`. In this situation the segmentation algorithm may pick one\ndecomposition over another simply because of the order in which motifs are\nlisted. That makes results harder to compare across samples or runs. To avoid\nthis issue, prefer a minimal, non-overlapping motif set.\n"
+          },
+          {
+            "file": "docs/bam_files.md",
+            "origin": "repo",
+            "text": "# TRGT spanning BAM files\n\nThe spanning BAM generated by TRGT contains only the reads that were used for\ngenotyping each of the targeted loci. Each read is trimmed to the repeat along\nwith flanking sequence (50 bp by default, configurable using\n`--output-flank-len` in `trgt genotype`). These BAM files are intended for\ninspection (for example, in IGV) and for downstream analyses such as `trgt plot`\nor `trgt deepdive`.\n\nWhen `trgt genotype` is run with both `--reads` and `--fail-reads` input BAM files, the spanning\nBAM may contain records originating from either BAM file.\n\n**Note**: As TRGT is under active development, the BAM formatting may be subject\nto changes in future versions.\n\n## BAM tags\n\nEach BAM record follows the standard SAM layout (QNAME, FLAG, RNAME, POS,\nMAPQ, CIGAR, SEQ, QUAL). See the [SAM specification](https://samtools.github.io/hts-specs/)\nfor more details. TRGT extends these records with the following tags:\n\n- `TR:Z` \u2014 Unique locus identifier from the catalog\n- `AL:i` \u2014 Allele assignment, TRGT labels alleles `0` and `1` in genotype\norder: when two distinct alternate alleles are present, `0` is the shorter and `1` is the longer; whenever the reference allele is present, `0` designates the reference regardless of length, and in homozygous-reference calls both `0` and `1` correspond to the reference allele; haploid loci may only have `0`\n- `SO:i` \u2014 Start offset of the read relative to the locus start (negative = upstream)\n- `EO:i` \u2014 End offset of the read relative to the locus end (positive = downstream)\n- `MO:B:i` \u2014 Offsets of mismatches in the flanking regions outside the repeat\n- `FL:B:I` \u2014 Left/right flank lengths included with the repeat (typically `50,50`)\n- `MC:B:C` \u2014 Per-base methylation encoding\n- `rq:f` \u2014 Predicted read accuracy ([PacBio `rq` tag](https://pacbiofileformats.readthedocs.io/en/11.0/BAM.html#use-of-read-tags-for-per-read-information))\n"
+          },
+          {
+            "file": "docs/vcf_files.md",
+            "origin": "repo",
+            "text": "# Description of VCF files generated by TRGT\n\nThe [Variant Calling Format (VCF)](https://samtools.github.io/hts-specs/VCFv4.3.pdf)\nfiles generated by TRGT describe the lengths, sequence composition, CpG\nmethylation, and other properties of tandem repeats. The TRGT VCF file\nprovides an analysis-ready summary of each genotyped repeat defined in the input\ncatalog. TRGT outputs complete allele sequences (with a leading padding\nbase) along with sample-level annotations capturing length,\ncomposition, support, purity, and methylation data.\n\nEach VCF record contains the standard columns listed below.\n\n| VCF field | Description                                                          |\n|-----------|----------------------------------------------------------------------|\n| CHROM     | Chromosome containing the repeat region                              |\n| POS       | Starting position of the repeat region (minus 1 due to padding base) |\n| ID        | Region identifier (currently set to \".\")                             |\n| REF       | The full reference sequence of the region (plus padding base)        |\n| ALT       | Sequences of the repeat alleles (plus padding base)                  |\n| QUAL      | Currently always set to \".\"                                          |\n| FILTER    | Currently always set to \".\"                                          |\n| INFO      | Fields describing the overall properties of the TR region            |\n| FORMAT    | Names of genotype fields describing the region in the sample         |\n| SAMPLE    | Values of genotype fields describing the region in the sample        |\n\nBeyond the core columns, TRGT encodes locus-level details in the INFO\nfield and sample-level measurements in the FORMAT/SAMPLE columns.\n\n## Information fields (INFO)\n\nInformation fields describe the overall structure of the repeat region,\nindependent of any particular sample. TRGT writes the following keys:\n\n| INFO field | Description                                               | Example            |\n|------------|-----------------------------------------------------------|--------------------|\n| TRID       | Identifier of the repeat region from the input catalog    | HTT                |\n| END        | Ending position of the repeat region                      | 3074966            |\n| MOTIFS     | Comma separated list of motif units observed at the locus | CAG,CCG            |\n| STRUC      | Expected locus structure (deprecated)                     | (CAG)nCAACAG(CCG)n |\n\n## Genotype fields (FORMAT)\n\nThe final column lists per-sample FORMAT names and their comma-separated\nvalues. TRGT currently emits the keys below (values are given in TRGT allele\norder unless otherwise noted):\n\n| Genotype field | Description                                                     | Example       |\n|----------------|-----------------------------------------------------------------|---------------|\n| GT             | Diploid genotype using standard VCF allele numbering            | 1/2           |\n| AL             | Allele lengths in base pairs                                    | 84,105        |\n| ALLR           | Length confidence interval for each allele in \"low-high\" format | 80-85,102-114 |\n| SD             | Number of supporting reads per allele                           | 28,18         |\n| MC             | Motif copy counts per allele, matching the order in `MOTIFS`    | 17_9,24_9     |\n| MS             | Run-length segmentation string per allele                       | 0(0-51)_1(57-84),0(0-72)_1(78-105) |\n| AP             | Allele purity (fraction of motif bases)                         | 0.5,0.9       |\n| AM             | Mean 5mCpG methylation level per allele (`.` when no CpG sites or methylation data unavailable) | 0.4,0.5       |\n| PS             | Phase set identifier, emitted when `GT` is phased               | 15906760      |\n\n### Allele order and phased genotypes\n\nThe `GT` field uses standard VCF allele indexes: `0` refers to the reference\nallele, while `1` and above refer to alternate alleles. When `GT` is phased\nwith `|`, the allele indexes are shown in haplotype order and may be displayed\nas `1|0` or `2|1`.\n\nOther allele-level FORMAT fields are not reordered to match the phased `GT`\ndisplay order. Fields such as `AL`, `ALLR`, `SD`, `MC`, `MS`, `AP`, and `AM`\nremain in TRGT allele order. For heterozygous records, this is the same order\nthe alleles would have in the unphased genotype, such as `0/1` or `1/2`.\n\nFor example, if a record has `GT:MC` equal to `1|0:30,31`, the first `MC`\nvalue (`30`) belongs to allele `0` (the reference allele) and the second value\n(`31`) belongs to allele `1` (the alternate allele). The phased `GT` indicates\nthat allele `1` is on the first haplotype and allele `0` is on the second\nhaplotype; it does not change the order of `MC`. Similarly, if a record has `GT:MC`\nequal to `2|1:10,20`, the `MC` values correspond to alleles `1` and `2`, respectively,\nnot to the left-to-right phased `GT` order.\n\nWhen using TRGT VCFs downstream, keep the phasing interpretation and the\nallele-level FORMAT interpretation separate. To attach FORMAT values to allele\nindexes for a heterozygous record, strip the phasing separator from `GT`, sort\nthe called allele indexes numerically, and zip those indexes with the\ncomma-separated FORMAT values. To report values in haplotype order, first build\nthat allele-index-to-value mapping, then use the left and right sides of the\nphased `GT` to look up each haplotype's value. For `GT:MC` equal to\n`1|0:30,31`, this gives allele `0 -> 30` and allele `1 -> 31`; in haplotype\norder, haplotype 1 carries allele `1` with `MC=31`, and haplotype 2 carries\nallele `0` with `MC=30`.\n\n## MC and MS fields\n\nThe `MC` field contains the count of motifs of each TR on each allele. For\nexample, if the `MC` field is `17_9,24_9` and the `MOTIFS` field is `CAG,CCG`,\nthen one allele contains 17 CAGs and 9 CCGs while the second allele contains 24\nCAGs and 9 CCGs (see panels A and B of the figure below).\n\nThe `MS` field contains spans of each TR on each allele. Each block is encoded\nas `<motifIndex>(start-end)` using 0-based, half-open coordinates on the allele\nsequence. For example, if the `MS` field is `0(0-51)_1(57-84),0(0-72)_1(78-105)`\nand the `MOTIFS` field is `CAG,CCG`, then the CAG repeat (`motifIndex` 0) spans\nbases 0 to 51 on the first allele and bases 0 to 72 on the second allele. The\nCCG repeat (`motifIndex` 1) spans bases 57 to 84 on the first allele and bases\n78 to 105 on the second allele (see panels A and C of the figure below).\n\n<img width=\"600px\" src=\"figures/VCF-overview.png\"/>\n\n## AP field\n\nThe `AP` field contains *purity score* for each repeat allele. The score is a\nvalue between 0.0 and 1.0. If it is 1.0, the allele consists of the perfect\nrepetition of the consensus motif. The closer this score is to 0.0, the more\ndegenerate is the repeat. More formally, the purity score is defined through the\n[edit distance](https://en.wikipedia.org/wiki/Edit_distance): If `E` is the edit\ndistance between the allele of length `L` and the perfect repeat of the same\nlength, the purity score is defined by `(L - E) / L`.\n"
+          },
+          {
+            "file": "docs/remote_files.md",
+            "origin": "repo",
+            "text": "# Remote file support\n\nTRGT can read inputs directly from remotely hosted files. Anywhere the CLI\naccepts a local path you can usually provide a URI instead. Outputs are always\nwritten to the local filesystem.\n\n## Files that can be remote\n\n- Reference genomes (`--genome`)\n- Read alignments (`--reads`, `--fail-reads`, `--spanning-reads`)\n- Repeat catalogs (`--repeats`)\n- VCF files for plotting and deepdive (`--vcf`)\n\nThe `merge` subcommand currently requires local files.\n\n## Supported URI schemes\n\nTRGT accepts `http://`, `https://`, `s3://`, and `gs://` locations in addition\nto normal filesystem paths. At runtime TRGT performs validation and\nlogs warnings for common misconfigurations (for example missing credentials).\n\n## Performance and reliability\n\nRemote file support is still experimental. Performance may be slower when working with large\nFASTA, BAM/CRAM, VCF, and/or BED files, especially over long-distance networks.\n\n## HTTPS certificates and CA bundles\n\nTRGT uses `libcurl` to access remote files. When connecting to HTTPS endpoints\nor cloud gateways, `libcurl` must verify the server's security certificate using\na Certificate Authority (CA) bundle. TRGT automatically tries to find a system\nCA bundle and configure `libcurl` to use it.\n\n- To use a specific CA file, set `CURL_CA_BUNDLE=/path/to/cacert.pem`.\n- To disable automatic detection, set `TRGT_DISABLE_CA_AUTODETECT=1`.\n\nIf no bundle can be found, you might see an error like: `problem with the SSL CA cert (60/77)`. \nTo fix this, install a system CA bundle or download `cacert.pem` from the\n[cURL project](https://curl.se/docs/caextract.html), then point `CURL_CA_BUNDLE`\nto that file.\n\n## Cloud authentication\n\nWhen accessing cloud object stores, TRGT relies on the same authentication\nmethods as aws, gsutil, and other standard tools.\n\n- **Amazon S3** (`s3://`): Use AWS settings such as `AWS_PROFILE`,\n  `AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY`, or a shared credential file. For\n  public buckets, set `AWS_SHARED_CREDENTIALS_FILE=/dev/null` to disable credential lookup and enable anonymous access.\n- **Google Cloud Storage** (`gs://`): Set `GOOGLE_APPLICATION_CREDENTIALS` to a\n  service account JSON key file or authenticate interactively using `gcloud auth application-default login`. \n  If neither is configured, TRGT will warn on runtime.\n\nAccess still depends on the bucket\u2019s permissions and whether the system running\nTRGT can reach the endpoint.\n\n### Environment variables\n\n| Provider | Purpose | Variable(s) |\n|----------|---------|-------------|\n| HTTPS | Override CA trust store | `CURL_CA_BUNDLE` |\n| HTTPS | Disable CA auto-detection | `TRGT_DISABLE_CA_AUTODETECT` |\n| Amazon S3 | Access keys / profiles | `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_PROFILE` |\n| Amazon S3 | Anonymous access to public buckets | `AWS_SHARED_CREDENTIALS_FILE=/dev/null` |\n| Google Cloud Storage | Service account credentials | `GOOGLE_APPLICATION_CREDENTIALS` |\n\n## Quick start example\n\nThe command below runs `trgt genotype` while streaming inputs from three remote\nproviders: an S3-hosted reference genome, a Google Cloud Storage BAM file, and\nan HTTPS repeat catalog. The S3 bucket is public, so the command sets\n`AWS_SHARED_CREDENTIALS_FILE=/dev/null` to disable local credentials and enable\nanonymous access. If your environment requires authentication, remove this\noverride or point it to your credentials file.\n\n```bash\nAWS_SHARED_CREDENTIALS_FILE=/dev/null \\\ntrgt genotype \\\n  --genome 's3://pacbio-hifi-human-wgs-reference/dataset/GRCh38/human_GRCh38_no_alt_analysis_set.fasta' \\\n  --reads 'gs://deepvariant/pacbio-case-study-testdata/HG003.pfda_challenge.35x.grch38.bam' \\\n  --repeats 'https://raw.githubusercontent.com/dashnowlab/STRchive/refs/heads/main/data/catalogs/STRchive-disease-loci.hg38.TRGT.bed' \\\n  --output-prefix tmp \\\n  --preset targeted \\\n  --threads 4 \\\n  -v\n```\n\n## Troubleshooting\n\n- Remote file access fails: set `TRGT_ENABLE_HTSLIB_LOGGING=1` to enable detailed error messages from the underlying HTSlib library. This can help identify permission errors, missing files, or authentication problems.\n- `SSL peer certificate or SSH remote key was not OK` or `problem with the SSL CA cert`: provide a valid `CURL_CA_BUNDLE` or disable auto-detection if using a custom trust store.\n- `Failed to create BAM reader from URI`: Check that the URI is correct, the object exists, and your credentials allow read access.\n- `The 'GOOGLE_APPLICATION_CREDENTIALS' environment variable is not set`: Authenticate using `gcloud auth application-default login` or point to a service account key file.\n- Slow downloads or long runtime: High-latency networks can slow-down streaming. Copy large inputs locally for repeated analyses.\n\nIf you encounter issues with remote access, please report them so this feature\ncan continue improving.\n"
+          },
+          {
+            "file": "docs/merge.md",
+            "origin": "repo",
+            "text": "# Merging TRGT VCFs\n\nThe `trgt merge` command can be used to merge TRGT VCFs into a single multi-sample\nVCF.\n\n## Input requirements\n\nBy default, input TRGT VCFs must be sorted, BGZF-compressed, and indexed (`.tbi` or `.csi`).\nAll VCFs must be genotyped with the same repeat catalog and accessible on the\nlocal filesystem. If any input VCF predates TRGT 1.0 the merge will require a\nreference genome file to be added with `--genome` such that the missing padding\nbase can be reintroduced. Sample IDs must be unique across files, duplicates\ncause the merge to abort and should be renamed before retrying.\n\n## Output formatting\n\nWithout `--output` set, results will stream to standard output in uncompressed\nVCF format. Set `--output` to write to a file. The file extension (`.vcf`,\n`.vcf.gz`, `.bcf`, `.bcf.gz`) will automatically determine both format and\ncompression level unless you override it using `--output-type`. Use\n`--print-header` to inspect the merged header without merging variants, this is\nuseful to verify sample order or merged metadata.\n\n## How records are merged\n\nRecords are traversed contig by contig in reference order, and you can constrain\nwork to specific contigs with `--contig chr20,chrX`. For each site the reference\nalleles must match across all inputs, otherwise the site fails with a clear\nerror. By default the merge logs the error and skips the record, add\n`--quit-on-errors` to terminate immediately. FORMAT fields (`AL`, `ALLR`, `SD`,\n`MC`, `MS`, `AP`, `AM`) are merged sample-by-sample, with missing samples filled\nusing the correct sentinel values so downstream tooling sees absence\nexplicitly. Headers are merged once up-front, the command rewrites historic\nfield definitions when needed (for example, collapsing `ALCI` into the current\n`ALLR` representation) and injects version metadata unless `--no-version` is\nset.\n\n## Example usage\n\nMerge three TRGT VCFs into one compressed VCF:\n\n```bash\ntrgt merge \\\n  --vcf results/sample1.trgt.vcf.gz results/sample2.trgt.vcf.gz results/sample3.trgt.vcf.gz \\\n  --output cohort.trgt.vcf.gz\n```\n\nIf the results folders contains these three VCF files you can also merge using auto-expansions,\nwhile also writing an index file after merging and not loading the indices of the input VCFs:\n\n```bash\ntrgt merge \\\n  --vcf results/*.vcf.gz \\\n  --output cohort.trgt.vcf.gz \\ \n  --write-index \\\n  --no-index\n```\n\nRunning the merge from a manifest file, while also limiting processing to chromosome 12:\n\n```bash\ntrgt merge \\\n  --vcf-list cohort_vcfs.txt \\\n  --contig chr12 \\\n  --output cohort.chr12.trgt.vcf.gz\n```\n\nHere `cohort_vcfs.txt` is a plain text file with one VCF path per line. In this\nfile leading and trailing whitespace is ignored, blank lines are allowed, and\nlines starting with `#` are treated as comments. Both relative and absolute\npaths are accepted as long as they exist when the merge runs.\n\n## Advanced usage\n\n- `--threads N` sets the shared thread pool for decompressing inputs and\n  compressing outputs (defaults to 2). Depending on the underlying disk device used\n  this can significantly improve merging speed, especially when reading or writing\n  compressed VCF/BCF.\n- `--no-index` streams VCFs without `.tbi`/`.csi` files. Only use this when all\n  inputs have identical contig order and are already position-sorted, otherwise\n  the merge aborts with a sorting error. Streaming avoids loading index files\n  into memory, which can cut RAM use significantly for large cohorts with many VCFs.\n\n## Troubleshooting\n\n- If an error is reported with \"Reference alleles do not match\", it indicates that\n  the input VCFs used different TR catalogs for genotyping.\n- High memory use: try `--no-index` to avoid loading `.tbi`/`.csi` into RAM, and\n  consider hierarchical merging instead of a single monolithic run. For example: merge `a` + `b`\n  -> `ab`, merge `c` + `d` -> `cd`, then merge `ab` + `cd` -> `abcd`.\n"
+          },
+          {
+            "file": "docs/deepdive.md",
+            "origin": "repo",
+            "text": "# Using TRGT deepdive outputs\n\nThe `trgt deepdive` command is meant to facilitate locus-specific downstream\nanalysis after genotyping. The first step of such analyses often involves\nre-aligning reads associated to each allele to their consensus sequences. For\nthis purpose, the command takes the outputs of `trgt genotype`, as well as the\nreference and BED annotation, and realigns each read to its matching consensus\nsequence.\n\nThe interface for the command looks like this:\n\n```\ntrgt deepdive [OPTIONS] --genome <FASTA> --vcf <VCF> --repeats <REPEATS> --spanning-reads <SPANNING_READS> --repeat-id <REPEAT_ID> --output-prefix <OUTPUT_PREFIX>\n```\n\nHere `--genome` and `--repeats` are the same as in `trgt genotype` and `trgt plot`,\nand `--spanning-reads` and `--vcf` are the outputs of `trgt genotype`.\nFinally, specify which repeat should be realigned through the `--repeat-id`\nflag. The name must match the name the repeat `ID`  in the fourth column of the\nrepeats BED file.\n\nThere are three outputs to the command:\n\n 1. A FASTA file containing the consensus and flanking sequence of all genotyped\n    alleles,\n 2. A BAM file that re-aligns the genotyped reads to their matching consensus,\n    including both flanks and tandem repeats and\n 3. A BED file highlighting where the flanks and tandem repeat start and end.\n\nThe suffixes `.fasta`, `.bam` and `.bed` will be added to the value passed on\n`--output-prefix`. The BAM output is already sorted and indexed.\n\n**NOTE**: The flank length is automatically calculated as the largest flank\nvalue in the `.spanning.bam` input (stored in the `FL` tag of each read, which you can\ninspect using `samtools view`). To increase the flank length, rerun `trgt genotype`\nby setting both the values of `--flank-len` and `--output-flank-len`\nto the desired values you wish to analyze. If these values are not overridden in\nthe genotype command, the default value is set to 50.\n\n### Example: Allele-specific FMR1 methylation in the NA06968 cell line\n\nThis example concerns a repeat region in the *FMR1* gene. This is a CGG tandem\nrepeat in the X chromosome whose expansion is associated with Fragile-X\nsyndrome. The sample below is a\n[PureTarget](https://www.pacb.com/technology/puretarget) dataset, which was\ngenotyped using `trgt genotype` with a flank length of 500 and the `--preset targeted` flag set.\n\nThe outputs of `trgt deepdive` were designed to be viewed on\n[IGV](https://igv.org/), but should be proper inputs for various other\ndownstream tools. You can load the FASTA outputs through `Genomes > Load Genome from File`,\nand add the mapped reads and annotation using `File > Load from File`.\n\nThe output BAM contains methylation information that can be visualized by IGV.\nThis allows individual CpGs to be queried. We recommend passing the outputs of\nthis command to\n[pb-CpG-tools](https://github.com/PacificBiosciences/pb-CpG-tools) to genereate\npileup-level CpG methylation values.\n\nIn this example, the short allele is unmethylated in both flanks and tandem\nrepeat:\n\n<img width=\"800px\" src=\"figures/trgt-deepdive-igv-short.png\"/>\n\nWhereas the long allele is predominantly methylated, which is expected in FMR1\nexpansions with 200+ CGG motif units:\n\n<img width=\"800px\" src=\"figures/trgt-deepdive-igv-long.png\"/>\n"
+          },
+          {
+            "file": "docs/validate.md",
+            "origin": "repo",
+            "text": "# Validating repeat catalogs\n\nUse `trgt validate` to validate a given TRGT repeat catalog\nrelative to a reference genome before running `trgt genotype`. This is\nuseful when you're developing your own repeat catalogs so issues\nget caught early. Every locus is analyzed, confirming that the coordinates are in\nbounds, and that the required annotations are present.\n\n## Inputs requirements\n\n- Reference genome (`--genome`): must point to the same FASTA file used during genotyping.\n- Repeat catalog (`--repeats`): accepts uncompressed or BGZF-compressed BED files. Each line must follow TRGT\u2019s four-column format:\n```chrom  start  end  ID=<ID>;MOTIFS=<motif1,...>;STRUC=<structure>```\n\n## What is validated?\n\nValidation confirms that every contig name exists in the reference FASTA and\nthat the repeat interval plus any requested flanks remain within sequence\nbounds. Whenever a locus fails validation, an error message is printed with\nthe 1-based line number. Execution continues so you get a full list of issues in\na single pass.\n\n## Example usage\n\n```bash\ntrgt validate \\\n  --genome references/hg38.fa \\\n  --repeats catalogs/hg38_tr_catalog.bed.gz\n```\n"
+          }
+        ],
+        "tool_names": [
+          "trgt"
+        ],
+        "tree_paths": [
+          "CHANGELOG.md",
+          "CITATION.bib",
+          "Cargo.lock",
+          "Cargo.toml",
+          "LICENSE-THIRDPARTY.json",
+          "LICENSE.md",
+          "README.md",
+          "build.rs",
+          "crates/pipeplot/Cargo.toml",
+          "crates/pipeplot/assets/fonts/RobotoMono-Bold.ttf",
+          "crates/pipeplot/licenses/LICENSE-ROBOTO.txt",
+          "crates/pipeplot/licenses/LICENSE-THIRDPARTY.json",
+          "crates/pipeplot/licenses/LICENSE.md",
+          "crates/pipeplot/src/common.rs",
+          "crates/pipeplot/src/image.rs",
+          "crates/pipeplot/src/lib.rs",
+          "crates/pipeplot/src/pdf.rs",
+          "crates/pipeplot/src/pipeplot.rs",
+          "crates/pipeplot/src/png.rs",
+          "crates/pipeplot/src/svg.rs",
+          "docs/bam_files.md",
+          "docs/cli.md",
+          "docs/deepdive.md",
+          "docs/figures/HG00281-TRGT-FMR1-plots.png",
+          "docs/figures/HTT-allele.png",
+          "docs/figures/HTT-waterfall.png",
+          "docs/figures/TR1.svg",
+          "docs/figures/VCF-overview.png",
+          "docs/figures/fxn-fail-reads-example.png",
+          "docs/figures/logo_TRGT.svg",
+          "docs/figures/trgt-deepdive-igv-long.png",
+          "docs/figures/trgt-deepdive-igv-short.png",
+          "docs/merge.md",
+          "docs/puretarget.md",
+          "docs/remote_files.md",
+          "docs/repeat_files.md",
+          "docs/trvz-plots.md",
+          "docs/tutorial.md",
+          "docs/validate.md",
+          "docs/vcf_files.md",
+          "example/reference.fasta",
+          "example/reference.fasta.fai",
+          "example/repeat.bed",
+          "example/sample.bam",
+          "example/sample.bam.bai",
+          "repeats/pathogenic_repeats.hg38.bed",
+          "repeats/repeat_catalog.hg38.bed",
+          "src/cli.rs",
+          "src/commands.rs",
+          "src/commands/deepdive.rs",
+          "src/commands/genotype.rs",
+          "src/commands/merge.rs",
+          "src/commands/plot.rs",
+          "src/commands/validate.rs",
+          "src/hmm/builder.rs",
+          "src/hmm/events.rs",
+          "src/hmm/hmm_model.rs",
+          "src/hmm/mod.rs",
+          "src/hmm/operations.rs",
+          "src/hmm/purity.rs",
+          "src/hmm/spans.rs",
+          "src/hmm/utils.rs",
+          "src/lib.rs",
+          "src/main.rs",
+          "src/merge/field_descriptors.rs",
+          "src/merge/field_registry.rs",
+          "src/merge/genotype_types.rs",
+          "src/merge/mod.rs",
+          "src/merge/strategy/exact.rs",
+          "src/merge/strategy/mod.rs",
+          "src/merge/tpool.rs",
+          "src/merge/vcf_processor.rs",
+          "src/merge/vcf_reader.rs",
+          "src/merge/vcf_writer.rs",
+          "src/trgt/genotype/consensus.rs",
+          "src/trgt/genotype/diploid.rs",
+          "src/trgt/genotype/genotype_cluster.rs",
+          "src/trgt/genotype/genotype_flank.rs",
+          "src/trgt/genotype/genotype_size.rs",
+          "src/trgt/genotype/gt.rs",
+          "src/trgt/genotype/haploid.rs",
+          "src/trgt/genotype/mod.rs",
+          "src/trgt/genotype/span_locater.rs",
+          "src/trgt/genotype_reader.rs",
+          "src/trgt/locus.rs",
+          "src/trgt/locus_group.rs",
+          "src/trgt/mod.rs",
+          "src/trgt/reads/cigar.rs",
+          "src/trgt/reads/clip_bases.rs",
+          "src/trgt/reads/clip_region.rs",
+          "src/trgt/reads/mod.rs",
+          "src/trgt/reads/read.rs",
+          "src/trgt/reads/snp.rs",
+          "src/trgt/reads/test_utils.rs",
+          "src/trgt/workflows/locus_result.rs",
+          "src/trgt/workflows/mod.rs",
+          "src/trgt/workflows/tr.rs",
+          "src/trgt/writers/mod.rs",
+          "src/trgt/writers/write_bam.rs",
+          "src/trgt/writers/write_vcf.rs",
+          "src/trvz/align.rs",
+          "src/trvz/align_allele.rs",
+          "src/trvz/align_consensus.rs",
+          "src/trvz/align_reads.rs",
+          "src/trvz/allele_plot.rs",
+          "src/trvz/mod.rs",
+          "src/trvz/params.rs",
+          "src/trvz/scale.rs",
+          "src/trvz/waterfall_plot.rs",
+          "src/utils/align.rs",
+          "src/utils/bam_utils.rs",
+          "src/utils/genotyper.rs",
+          "src/utils/input.rs",
+          "src/utils/input_source.rs",
+          "src/utils/io_utils.rs",
+          "src/utils/karyotype.rs",
+          "src/utils/locus.rs",
+          "src/utils/math.rs",
+          "src/utils/mod.rs",
+          "src/utils/ploidy.rs",
+          "src/utils/presets.rs",
+          "src/utils/read.rs",
+          "src/utils/readers.rs",
+          "src/utils/readers/bam.rs",
+          "src/utils/readers/catalog.rs",
+          "src/utils/readers/genome.rs",
+          "src/utils/readers/vcf.rs",
+          "src/utils/region.rs",
+          "src/utils/test_util.rs",
+          "src/utils/util.rs",
+          "src/wfa2.rs",
+          "src/wfaligner.rs"
+        ],
+        "tree_truncated": false,
+        "upstream_files": {}
+      },
+      "limitations": [
+        "install_profile_unsupported"
+      ],
+      "caveat_items": [
+        "Environment: no proven installation profile; STRhub did not manufacture installation steps.",
+        "Input: the README documents BAM (line 9); this plan selects STRhub's pacbio-hifi-bam-hg38 reference data.",
+        "reference_path: example/reference.fasta -> /data/ref/hg38.fa.",
+        "regions_path: example/repeat.bed -> /data/in/regions.bed.",
+        "read_path: example/sample.bam -> /data/in/input.bam.",
+        "Run command: the one documented in docs/tutorial.md (line 39), rewritten to STRhub's mounts; the capture wrapper is planned only if the procedure review passes."
+      ]
+    }
+  },
+  "provenance": {
+    "from_upstream": {
+      "install": {
+        "method": "release_binary",
+        "evidence_source": "release_asset:trgt-v5.1.0-x86_64-unknown-linux-gnu.tar.gz"
+      },
+      "command": {
+        "value": "./trgt genotype --genome example/reference.fasta --repeats example/repeat.bed --reads example/sample.bam --output-prefix sample",
+        "evidence_source": "docs/tutorial.md:L39"
+      },
+      "input_kind": {
+        "value": "bam",
+        "evidence_source": "CHANGELOG.md:L9"
+      },
+      "supported_platforms": [
+        {
+          "platform": "pacbio",
+          "evidence_source": "README.md:L5"
+        }
+      ],
+      "assembly": {
+        "declared": "hg38",
+        "evidence_source": "README.md:L36"
+      },
+      "regions_schema": {
+        "format": "trgt",
+        "evidence_source": "docs/tutorial.md:L28"
+      },
+      "output_format": {
+        "glob": "**/*.vcf*",
+        "evidence_source": "README.md:L42"
+      }
+    },
+    "derived": {
+      "command_rewrites": [
+        {
+          "role": "reference_path",
+          "original": "example/reference.fasta",
+          "replacement": "/data/ref/hg38.fa",
+          "basis": "registered reference genome mount"
+        },
+        {
+          "role": "regions_path",
+          "original": "example/repeat.bed",
+          "replacement": "/data/in/regions.bed",
+          "basis": "registered regions file (trgt)"
+        },
+        {
+          "role": "read_path",
+          "original": "example/sample.bam",
+          "replacement": "/data/in/input.bam",
+          "basis": "declared dataset mount"
+        }
+      ],
+      "regions_layout_binding": {
+        "documented_schema": "trgt",
+        "evidence_source": "docs/tutorial.md:L28",
+        "strhub_regions_layout": "trgt"
+      },
+      "single_sample_adaptation": null
+    },
+    "harness_choices": {
+      "dataset": {
+        "selected": "pacbio-hifi-bam-hg38",
+        "reason": "STRhub selected 'pacbio-hifi-bam-hg38' as compatible with upstream input 'bam' and platform 'pacbio'"
+      },
+      "platform": {
+        "selected": "pacbio",
+        "basis": "upstream_single_platform",
+        "supported_platforms": [
+          "pacbio"
+        ]
+      },
+      "assembly": {
+        "selected": "hg38",
+        "basis": "upstream_stated",
+        "note": null
+      },
+      "regions_layout": "trgt",
+      "base_environment": null
+    }
+  },
+  "procedure_validation": {
+    "schema": "strhub-procedure-evidence/1",
+    "valid": true,
+    "reason": "Procedure evidence matches the effective manifest and recomputed decision."
+  },
+  "verdict": {
+    "code": "undetermined",
+    "title": "Could not be determined",
+    "basis": "recipe",
+    "reason": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub.",
+    "readme_gaps": [],
+    "status_code": "UNVERIFIED_INSUFFICIENT_DOCS",
+    "blockers": [
+      {
+        "code": "install_not_copyable",
+        "what": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub.",
+        "ask_owner": {
+          "title": "Write the installation as commands that can be copied and run",
+          "body": "STRhub Verified reads the installation from the repository's documentation and runs it exactly as written, adding nothing. At this commit it could not follow it. Writing the installation as plain commands in one code block (apt, conda, pip, make or cmake, with the files they name in the repository) lets a new user, a reviewer and STRhub install the tool by copying it. The forms it can follow are listed in the guide: https://github.com/Tfronta/strhub-verified-next/blob/main/docs/GUIA-PASO-1.md What stopped it: No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub."
+        }
+      }
+    ]
+  },
+  "step1": {
+    "code": "cannot_tell",
+    "headline": "As documented, a third party cannot tell how to run it.",
+    "body": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub. Nothing was executed. That does not mean the tool does not work: what the guide asks for is missing from the README at this commit. Add it and try the link again on the new commit.",
+    "missing": [
+      "install"
+    ],
+    "missing_text": [
+      "Installation, copyable"
+    ],
+    "guide": "docs/GUIA-PASO-1.md"
+  },
+  "certificate": {
+    "schema": "strhub-verified/certificate/1",
+    "label": "Could not be determined",
+    "reached": "Available",
+    "stages": [
+      {
+        "key": "available",
+        "label": "Source available",
+        "status": "PASS"
+      },
+      {
+        "key": "installs",
+        "label": "Installation",
+        "status": "NOT ATTEMPTED"
+      },
+      {
+        "key": "runs",
+        "label": "End-to-end execution",
+        "status": "NOT ATTEMPTED"
+      },
+      {
+        "key": "output",
+        "label": "Output generated",
+        "status": "NOT ATTEMPTED"
+      }
+    ],
+    "summary": {
+      "purpose": "Evaluate whether the tool installs, runs end-to-end, and produces structurally valid output.",
+      "result": "Could not be determined",
+      "reached": "Available, 1/5 gates passed",
+      "why": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub.",
+      "scope": "Installation, execution, and output structure evaluation.",
+      "not_evaluated": [
+        "Genotype accuracy",
+        "Concordance",
+        "Forensic validity",
+        "Regulatory compliance"
+      ]
+    },
+    "conclusion": [
+      {
+        "title": "Procedure not established",
+        "body": "The recorded gate observations do not establish whether the documented procedure succeeded or failed."
+      },
+      {
+        "title": "Observations retained",
+        "body": "The supplied run and output observations remain in the report; they do not replace procedure evidence."
+      },
+      {
+        "title": "Verdict: Could not be determined",
+        "body": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub."
+      },
+      {
+        "title": "Reproducibility not established",
+        "body": "These observations are insufficient to establish a reproducible documented execution finding."
+      }
+    ],
+    "out_of_scope": [
+      "Genotype correctness or accuracy",
+      "Concordance against known truth sets",
+      "Sensitivity, specificity, or stutter performance",
+      "Allele calling accuracy or forensic casework suitability",
+      "Regulatory compliance or ISO accreditation",
+      "Multi-laboratory or multi-dataset reproducibility"
+    ],
+    "limitations": [
+      "Single reference dataset per input type",
+      "Single containerized environment (Docker / ubuntu-22.04)",
+      "No truth-set comparison or ground-truth genotypes",
+      "No accuracy or concordance assessment",
+      "No forensic or clinical validation of results",
+      "No sequencing data were processed because execution did not complete"
+    ],
+    "scope": {
+      "statement": "Independent automated evaluation of reproducible execution. It checks whether the tool installs, runs end-to-end, and produces structurally valid output in a standardized environment.",
+      "not": "This is not an analytical validation. Genotype accuracy, concordance, forensic suitability, and regulatory compliance are out of scope.",
+      "disclaimer": "Each result is a dated snapshot, verified on the tool's public repository at a pinned commit. STRhub does not store tool source code."
+    }
+  }
+}
