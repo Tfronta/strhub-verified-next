@@ -1,0 +1,1036 @@
+{
+  "schema": "strhub-verified/1",
+  "mode": "publish",
+  "tool": {
+    "name": "STRetch",
+    "version": "v0.4.0",
+    "contact": "https://github.com/Oshlack/STRetch/issues"
+  },
+  "submission": {
+    "by": "third_party"
+  },
+  "source": {
+    "repo": "https://github.com/Oshlack/STRetch",
+    "ref": "ce74895ad7b469a43972c9571009fea8cb1fe39c",
+    "ref_resolved": "ce74895ad7b469a43972c9571009fea8cb1fe39c",
+    "committed": "2019-01-22T00:17:38Z"
+  },
+  "environment": {
+    "dockerfile": "Dockerfile",
+    "os": [
+      "ubuntu-22.04"
+    ],
+    "source": "generated"
+  },
+  "generated": "2026-11-22T19:14:32+00:00",
+  "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/45059547695",
+  "run": {
+    "cmd": "STRetch/tools/bin/bpipe run -p input_regions=all_STRs_in_genome.bed STRetch/pipelines/STRetch_wgs_bam_pipeline.groovy sample1.bam sample2.bam",
+    "cwd": ".",
+    "effective_cmd": "cd '.' && touch /tmp/.strhub_mark && ( STRetch/tools/bin/bpipe run -p input_regions=all_STRs_in_genome.bed STRetch/pipelines/STRetch_wgs_bam_pipeline.groovy sample1.bam sample2.bam ); rc=$?; find . -xdev -type f -newer /tmp/.strhub_mark -size +0 ! -path './.git/*' ! -path './proc/*' ! -path './sys/*' ! -path './dev/*' ! -path './data/*' ! -path '*/__pycache__/*' ! -name '*.pyc' ! -name '*.pyo' 2>/dev/null | head -500 | while IFS= read -r f; do mkdir -p \"/data/out/$(dirname \"$f\")\" && cp \"$f\" \"/data/out/$f\"; done; exit $rc",
+    "step_outcome": "skipped"
+  },
+  "instrument": "documented",
+  "recipe": {
+    "origin": "proposed"
+  },
+  "gates": {
+    "available": true,
+    "installs": false,
+    "runs": false,
+    "io": false,
+    "content": false
+  },
+  "input_contract": {
+    "type": "illumina-bam-hg38"
+  },
+  "level": "available",
+  "io_detail": {},
+  "content_detail": {},
+  "example_detail": null,
+  "datasets": [
+    {
+      "leg": "external",
+      "label": "External data",
+      "available": false,
+      "type": "illumina-bam-hg38",
+      "dataset": null,
+      "io": false,
+      "content": false,
+      "passed": false
+    },
+    {
+      "leg": "example",
+      "label": "Tool's own example",
+      "available": false,
+      "io": false,
+      "content": null,
+      "passed": false,
+      "matches_expected": null,
+      "produced_count": null
+    }
+  ],
+  "scope": "Assessment of documented execution in the stated environment and output format. Concerns reproducible execution only; no claim of accuracy, casework fitness, or regulatory validation.",
+  "upstream": {
+    "checked": "2026-11-22T19:14:33+00:00",
+    "repo_exists": true,
+    "ref_exists": true,
+    "default_branch": "master",
+    "status": "ahead",
+    "behind_by": 19
+  },
+  "evidence": [
+    {
+      "claim": "install_method",
+      "kind": "tree",
+      "path": "install.sh",
+      "text": "script",
+      "url": "https://github.com/Oshlack/STRetch/blob/ce74895ad7b469a43972c9571009fea8cb1fe39c/install.sh"
+    },
+    {
+      "claim": "run_command",
+      "kind": "wiki",
+      "path": "wiki/Running-STRetch",
+      "line": 36,
+      "text": "`STRetch/tools/bin/bpipe run -p input_regions=all_STRs_in_genome.bed STRetch/pipelines/STRetch_wgs_bam_pipeline.groovy sample1.bam sample2.bam`",
+      "url": "https://github.com/Oshlack/STRetch/wiki/Running-STRetch"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "scripts/tests/test_data/49_L001_R1.STRdecoy.bam",
+      "text": "bam",
+      "url": "https://github.com/Oshlack/STRetch/blob/ce74895ad7b469a43972c9571009fea8cb1fe39c/scripts/tests/test_data/49_L001_R1.STRdecoy.bam"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "scripts/tests/test_data/11_L001_R1.STRdecoy.bam",
+      "text": "bam",
+      "url": "https://github.com/Oshlack/STRetch/blob/ce74895ad7b469a43972c9571009fea8cb1fe39c/scripts/tests/test_data/11_L001_R1.STRdecoy.bam"
+    },
+    {
+      "claim": "documented_input",
+      "kind": "readme",
+      "path": "README.md",
+      "line": 34,
+      "text": "This pipeline takes a position sorted mapped bam file and extracts reads from it likely to contain STR sequence.",
+      "url": "https://github.com/Oshlack/STRetch/blob/ce74895ad7b469a43972c9571009fea8cb1fe39c/README.md#L34"
+    }
+  ],
+  "repo_test_data": {
+    "known": true,
+    "present": true,
+    "count": 2,
+    "examples": [
+      "scripts/tests/test_data/49_L001_R1.STRdecoy.bam",
+      "scripts/tests/test_data/11_L001_R1.STRdecoy.bam"
+    ]
+  },
+  "caveats": {
+    "source": "detect_recipe",
+    "items": [
+      "Environment: no proven installation profile; STRhub did not manufacture installation steps.",
+      "Input: the README documents BAM (line 34); this plan selects STRhub's illumina-bam-hg38 reference data.",
+      "Evaluator limitation: a read-file argument is outside the closed input substitution table.",
+      "Evaluator limitation: a read-file argument is outside the closed input substitution table.",
+      "Run command: the one documented on the wiki (wiki/Running-STRetch, line 36), rewritten to STRhub's mounts; the capture wrapper is planned only if the procedure review passes. A wiki is not versioned with the code: it was read as it is today.",
+      "File: the documented command reads all_STRs_in_genome.bed (in input_regions=all_STRs_in_genome.bed), which is neither in the repository nor among STRhub's data."
+    ]
+  },
+  "install_detail": {
+    "passed": false,
+    "diagnostics": [],
+    "faults": []
+  },
+  "procedure_review": {
+    "may_say_runs": false,
+    "status_code": "UNVERIFIED_INSUFFICIENT_DOCS",
+    "basis": "recipe",
+    "attribution": "strhub",
+    "blocker": "install_not_copyable",
+    "reason": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub.",
+    "amendments": [
+      {
+        "code": "command_evidence_missing",
+        "what": "The complete command and prerequisite must be established at the cited lines of this same pinned upstream commit; wiki text or a recipe label is not proof."
+      },
+      {
+        "code": "command_profile_unsupported",
+        "what": "A read-file argument is outside the closed input substitution table. A read-file argument is outside the closed input substitution table."
+      },
+      {
+        "code": "input_not_substituted",
+        "what": "This evaluator cannot establish that the cited command reads the declared reference input; no config or input list was rewritten to make it do so."
+      },
+      {
+        "code": "install_not_copyable",
+        "what": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub."
+      },
+      {
+        "code": "input_not_substituted",
+        "what": "The command still names the repository's own file paths, not STRhub's sample. Running it would not be the reference-sample test."
+      }
+    ],
+    "inferences": {
+      "install": {
+        "evidence_source": "repo_file:install.sh",
+        "verified": false
+      },
+      "run_command": {
+        "evidence_source": "wiki/Running-STRetch:L36",
+        "verified": false
+      },
+      "input_type": {
+        "verified": false,
+        "evidence_source": "wiki/Running-STRetch:L34",
+        "upstream_input_kind": "bam",
+        "selected_dataset": "illumina-bam-hg38"
+      },
+      "platform": {
+        "verified": true,
+        "kind": "doc",
+        "path": "README.md",
+        "line": 15,
+        "end_line": 15,
+        "document_sha256": "a5a246a22f748310cf7688280f646bfc491570a2bee8af96e4946b722a88b477",
+        "evidence_source": "README.md:L15",
+        "selected": "illumina",
+        "selection_basis": "upstream_single_platform",
+        "supported_platforms": [
+          "illumina"
+        ]
+      },
+      "output": {
+        "verified": false,
+        "evidence_source": "wiki/Running-STRetch:L79"
+      }
+    },
+    "unbacked_inferences": [
+      "input_type",
+      "install",
+      "output",
+      "run_command"
+    ],
+    "provenance": {
+      "from_upstream": {
+        "install": {
+          "method": "script",
+          "evidence_source": "repo_file:install.sh"
+        },
+        "command": {
+          "value": "STRetch/tools/bin/bpipe run -p input_regions=all_STRs_in_genome.bed STRetch/pipelines/STRetch_wgs_bam_pipeline.groovy sample1.bam sample2.bam",
+          "evidence_source": "wiki/Running-STRetch:L36"
+        },
+        "input_kind": {
+          "value": "bam",
+          "evidence_source": "wiki/Running-STRetch:L34"
+        },
+        "supported_platforms": [
+          {
+            "platform": "illumina",
+            "evidence_source": "README.md:L15"
+          }
+        ],
+        "assembly": {
+          "declared": null,
+          "evidence_source": null
+        },
+        "regions_schema": null,
+        "output_format": {
+          "glob": "**/*.t[sx][vt]",
+          "evidence_source": "wiki/Running-STRetch:L79"
+        }
+      },
+      "derived": {
+        "command_rewrites": [],
+        "regions_layout_binding": null,
+        "single_sample_adaptation": null
+      },
+      "harness_choices": {
+        "dataset": {
+          "selected": "illumina-bam-hg38",
+          "reason": "STRhub selected 'illumina-bam-hg38' as compatible with upstream input 'bam' and platform 'illumina'"
+        },
+        "platform": {
+          "selected": "illumina",
+          "basis": "upstream_single_platform",
+          "supported_platforms": [
+            "illumina"
+          ]
+        },
+        "assembly": {
+          "selected": "hg38",
+          "basis": "harness_choice_unstated",
+          "note": "Upstream did not specify an assembly; STRhub supplied an internally coherent hg38 BAM, FASTA and regions set"
+        },
+        "regions_layout": null,
+        "base_environment": null
+      }
+    },
+    "install_method": "script",
+    "citable_install": false,
+    "input_type": "illumina-bam-hg38",
+    "output_glob": "**/*.t[sx][vt]",
+    "profile": "strhub-upstream-procedure/1",
+    "install_ready": false,
+    "example_ready": false,
+    "installation": {
+      "profile": "strhub-upstream-procedure/1",
+      "ready": false,
+      "method": "script",
+      "reason": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub.",
+      "gap": "commit"
+    },
+    "command_review": {
+      "profile": "strhub-upstream-procedure/1",
+      "cited": "STRetch/tools/bin/bpipe run -p input_regions=all_STRs_in_genome.bed STRetch/pipelines/STRetch_wgs_bam_pipeline.groovy sample1.bam sample2.bam",
+      "command": "STRetch/tools/bin/bpipe run -p input_regions=all_STRs_in_genome.bed STRetch/pipelines/STRetch_wgs_bam_pipeline.groovy sample1.bam sample2.bam",
+      "substitutions": [],
+      "read_bindings": [],
+      "limitations": [
+        "a read-file argument is outside the closed input substitution table",
+        "a read-file argument is outside the closed input substitution table"
+      ],
+      "expected": "STRetch/tools/bin/bpipe run -p input_regions=all_STRs_in_genome.bed STRetch/pipelines/STRetch_wgs_bam_pipeline.groovy sample1.bam sample2.bam",
+      "executed": "STRetch/tools/bin/bpipe run -p input_regions=all_STRs_in_genome.bed STRetch/pipelines/STRetch_wgs_bam_pipeline.groovy sample1.bam sample2.bam",
+      "cited_sha256": "9cc325431f3d83dddfc21294de0c4d173650be59750a180b13db1205ca6e8e99",
+      "executed_sha256": "9cc325431f3d83dddfc21294de0c4d173650be59750a180b13db1205ca6e8e99",
+      "citations": [
+        {
+          "repo": "https://github.com/Oshlack/STRetch",
+          "ref": "ce74895ad7b469a43972c9571009fea8cb1fe39c",
+          "path": "wiki/Running-STRetch",
+          "line": 36,
+          "verified": false,
+          "reason": "the complete command is not established at the cited repository line"
+        }
+      ]
+    },
+    "manifest_sha256": "81ecae42403f5d18d13111d5e80541afb39bfb08a14b725207d95b34d38c3cd3",
+    "evidence_sha256": "a7da786cafc78e79207a5a63b6f4f65c7aa0096ad988bbb1aa7816ff9f68cb14",
+    "evidence": {
+      "schema": "strhub-procedure-evidence/1",
+      "manifest": {
+        "caveats": {
+          "items": [
+            "Environment: no proven installation profile; STRhub did not manufacture installation steps.",
+            "Input: the README documents BAM (line 34); this plan selects STRhub's illumina-bam-hg38 reference data.",
+            "Evaluator limitation: a read-file argument is outside the closed input substitution table.",
+            "Evaluator limitation: a read-file argument is outside the closed input substitution table.",
+            "Run command: the one documented on the wiki (wiki/Running-STRetch, line 36), rewritten to STRhub's mounts; the capture wrapper is planned only if the procedure review passes. A wiki is not versioned with the code: it was read as it is today.",
+            "File: the documented command reads all_STRs_in_genome.bed (in input_regions=all_STRs_in_genome.bed), which is neither in the repository nor among STRhub's data."
+          ],
+          "source": "detect_recipe"
+        },
+        "environment": {
+          "dockerfile": "Dockerfile",
+          "os": [
+            "ubuntu-22.04"
+          ],
+          "source": "generated"
+        },
+        "inputs": {
+          "type": "illumina-bam-hg38"
+        },
+        "outputs": [
+          {
+            "format": "tsv",
+            "min_records": 1,
+            "path": "**/*.t[sx][vt]"
+          }
+        ],
+        "recipe": {
+          "origin": "proposed"
+        },
+        "report": {
+          "slug": "stretch"
+        },
+        "run": {
+          "cmd": "cd '.' && touch /tmp/.strhub_mark && ( STRetch/tools/bin/bpipe run -p input_regions=all_STRs_in_genome.bed STRetch/pipelines/STRetch_wgs_bam_pipeline.groovy sample1.bam sample2.bam ); rc=$?; find . -xdev -type f -newer /tmp/.strhub_mark -size +0 ! -path './.git/*' ! -path './proc/*' ! -path './sys/*' ! -path './dev/*' ! -path './data/*' ! -path '*/__pycache__/*' ! -name '*.pyc' ! -name '*.pyo' 2>/dev/null | head -500 | while IFS= read -r f; do mkdir -p \"/data/out/$(dirname \"$f\")\" && cp \"$f\" \"/data/out/$f\"; done; exit $rc",
+          "timeout_minutes": 20
+        },
+        "source": {
+          "ref": "ce74895ad7b469a43972c9571009fea8cb1fe39c",
+          "repo": "https://github.com/Oshlack/STRetch"
+        },
+        "submission": {
+          "by": "third_party"
+        },
+        "tool": {
+          "contact": "https://github.com/Oshlack/STRetch/issues",
+          "name": "STRetch",
+          "version": "v0.4.0"
+        }
+      },
+      "proposal": {
+        "build": {
+          "also_published": null,
+          "asset": null,
+          "candidates": [
+            {
+              "documented": true,
+              "file": "install.sh",
+              "method": "script"
+            },
+            {
+              "file": "environment.yml",
+              "method": "conda"
+            }
+          ],
+          "digest": null,
+          "dir": null,
+          "evidence_source": "repo_file:install.sh",
+          "file": "install.sh",
+          "image": null,
+          "method": "script",
+          "package": null,
+          "readme_install_lines": [],
+          "readme_line": null,
+          "spec_list": false,
+          "ssh_urls_in": [],
+          "tag": null,
+          "then": [],
+          "url": null
+        },
+        "commands": [
+          {
+            "cmd": "STRetch/tools/bin/bpipe run -p input_regions=all_STRs_in_genome.bed STRetch/pipelines/STRetch_wgs_bam_pipeline.groovy sample1.bam sample2.bam",
+            "entry_point": false,
+            "evidence_source": "wiki/Running-STRetch:L36",
+            "file": "wiki/Running-STRetch",
+            "has_input_flag": true,
+            "has_output_flag": false,
+            "help_only": false,
+            "invokes": "bpipe",
+            "line": 36,
+            "main_verb": true,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "wiki",
+            "piped": false,
+            "rst": false,
+            "source_rank": 4,
+            "subcommand": "run",
+            "synopsis": false
+          },
+          {
+            "cmd": "STRetch/tools/bin/bpipe run STRetch/pipelines/STRetch_wgs_pipeline.groovy sample_L001_R1.fastq.gz sample_L001_R2.fastq.gz",
+            "entry_point": false,
+            "evidence_source": "wiki/Running-STRetch:L26",
+            "file": "wiki/Running-STRetch",
+            "has_input_flag": true,
+            "has_output_flag": false,
+            "help_only": false,
+            "invokes": "bpipe",
+            "line": 26,
+            "main_verb": true,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "wiki",
+            "piped": false,
+            "rst": false,
+            "source_rank": 4,
+            "subcommand": "run",
+            "synopsis": false
+          },
+          {
+            "cmd": "STRetch/tools/bin/bpipe run STRetch/pipelines/STRetch_wgs_pipeline.groovy sample1_L001_R1.fastq.gz sample1_L001_R2.fastq.gz sample2_L001_R1.fastq.gz sample2_L001_R2.fastq.gz \u2026",
+            "entry_point": false,
+            "evidence_source": "wiki/Running-STRetch:L5",
+            "file": "wiki/Running-STRetch",
+            "has_input_flag": true,
+            "has_output_flag": false,
+            "help_only": false,
+            "invokes": "bpipe",
+            "line": 5,
+            "main_verb": true,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "wiki",
+            "piped": false,
+            "rst": false,
+            "source_rank": 4,
+            "subcommand": "run",
+            "synopsis": false
+          },
+          {
+            "cmd": "STRetch/tools/bin/bpipe run STRetch/pipelines/STRetch_exome_pipeline.groovy sample1_L001_R1.fastq.gz sample1_L001_R2.fastq.gz sample2_L001_R1.fastq.gz sample2_L001_R2.fastq.gz \u2026",
+            "entry_point": false,
+            "evidence_source": "wiki/Running-STRetch:L59",
+            "file": "wiki/Running-STRetch",
+            "has_input_flag": true,
+            "has_output_flag": false,
+            "help_only": false,
+            "invokes": "bpipe",
+            "line": 59,
+            "main_verb": true,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "wiki",
+            "piped": false,
+            "rst": false,
+            "source_rank": 4,
+            "subcommand": "run",
+            "synopsis": false
+          },
+          {
+            "cmd": "STRetch/tools/bin/bpipe run STRetch/pipelines/STRetch_exome_bam_pipeline.groovy sample1.bam sample2.bam \u2026",
+            "entry_point": false,
+            "evidence_source": "wiki/Running-STRetch:L65",
+            "file": "wiki/Running-STRetch",
+            "has_input_flag": true,
+            "has_output_flag": false,
+            "help_only": false,
+            "invokes": "bpipe",
+            "line": 65,
+            "main_verb": true,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "wiki",
+            "piped": false,
+            "rst": false,
+            "source_rank": 4,
+            "subcommand": "run",
+            "synopsis": false
+          },
+          {
+            "cmd": "STRetch/tools/bin/python STRetch/scripts/estimateSTR.py --model STRetch/scripts/STRcov.model.csv --locus_counts *.locus_counts --STR_counts *.STR_counts --median_cov *.median_cov --emit my_controls.tsv",
+            "entry_point": false,
+            "evidence_source": "wiki/Running-STRetch:L79",
+            "file": "wiki/Running-STRetch",
+            "has_input_flag": false,
+            "has_output_flag": false,
+            "help_only": false,
+            "invokes": "estimateSTR.py",
+            "line": 79,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "wiki",
+            "piped": false,
+            "rst": false,
+            "source_rank": 4,
+            "subcommand": null,
+            "synopsis": false
+          },
+          {
+            "cmd": "./install.sh",
+            "entry_point": false,
+            "evidence_source": "wiki/Installing-STRetch:L13",
+            "file": "wiki/Installing-STRetch",
+            "has_input_flag": false,
+            "has_output_flag": false,
+            "help_only": true,
+            "invokes": "install.sh",
+            "line": 13,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "wiki",
+            "piped": false,
+            "rst": false,
+            "source_rank": 3,
+            "subcommand": null,
+            "synopsis": false
+          }
+        ],
+        "dockerfile": null,
+        "docs_read": [
+          {
+            "origin": "wiki",
+            "path": "wiki/Home"
+          },
+          {
+            "origin": "wiki",
+            "path": "wiki/_Sidebar"
+          },
+          {
+            "origin": "wiki",
+            "path": "wiki/Installing-STRetch"
+          },
+          {
+            "origin": "wiki",
+            "path": "wiki/Running-STRetch"
+          },
+          {
+            "origin": "wiki",
+            "path": "wiki/Output-files"
+          }
+        ],
+        "docs_text": "Note: this software is still in development, with features still being added and deprecated. Please feel free to report any bugs.\n\n# STRetch\n\nSTRetch is a method to detect pathogenic STR expansions from next-gen sequencing data. STRetch uses short read sequencing to detect expansions at all known STR loci and estimate their approximate size. The method adds STR decoy sequences to the reference genome to identify reads originating from a large STR expansion. These reads are then mapped back to the genome using read pair information, and the source locus is assessed for an expansion using a statistical test based on coverage of the STR chromosome. \n\nSTRetch requires paired end reads to work. It is primarily intended for use on\nwhole genome sequencing data, but can also be run on exome or other targeted\nsequencing data, although size estimates should be interpreted with caution.\n[Home](Home)\n\n[Installing STRetch](Installing-STRetch)\n\n[Running STRetch](Running-STRetch)\n\n[Output files](Output-files)\n\n[Troubleshooting](Troubleshooting.md)\n\n[Custom reference data for STRetch](Reference-Data)\n\n[Questions and Bugs](Questions-and-Bugs)\n\n[License](License)\n\n[How to cite](How-to-cite)\n## Quick Start Installation\n\nThis is an example of installing STRetch using the install script. \nIt assumes **Git** and **Java** are already installed.\n\nThe install script also downloads the hg19 genome and annotation files ~8 GB.\nIt takes approximately 20 minutes (depending on your download speed).\n\nDownload STRetch and run the install script:\n```\ngit clone git@github.com:Oshlack/STRetch.git STRetch\ncd STRetch\n./install.sh\n```\n\nDownload the test data\n```\nmkdir test\ncd test/\nwget -O testdata.zip https://ndownloader.figshare.com/articles/4762489?private_link=cc7347f4637d9a7fe22d\nunzip testdata.zip \nrm testdata.zip\n```\n\nRun the test data\n```\n../tools/bin/bpipe run -p EXOME_TARGET=\"SCA8_region.bed\" ../pipelines/STRetch_exome_pipeline.groovy *.fastq.gz\n```\n(The test data only includes reads from one locus, so runs very quickly, but may produce warning messages about there being no data from many chromosomes - this is fine)\n\nNotes: \n- If you would like to use the included PCR WGS reference set as controls, you will need to edit the \"CONTROL\" line in `pipeline_config.groovy`.\n- To use system versions of any software, simply edit `pipeline_config.groovy` to point to the location of the executables. \nBe aware that using different versions of the tools can results in errors.\n- If using STRetch on a cluster, you can use bpipe to send jobs to the queue. You will need to create `STRetch/pipelines/bpipe.config`. See http://docs.bpipe.org/Guides/ResourceManagers/ for instructions, as they will likely differ by cluster.\n\n## Requirements\n\nOperating system: Linux\n\nThe installation script requires the following to run (most of of these will already be installed on many systems). The remaining dependancies can be installed automatically.\n- Git\n- Java (tested on version 1.8)\n- bzip2\n- unzip\n\n[Bpipe](http://docs.bpipe.org/) - this pipeline software runs the STRetch pipelines\n\nPython 3\n- See `environment.yml` for specific packages\n- Easiest to install using [Conda](http://conda.pydata.org/docs/using/envs.html):\n`conda env create -f environment.yml`\n- Then activate the environment with `source activate STR`.\n- For some cluster environments you may need to point the pipeline to the\nspecific version of Python, which would look something like this\n`[where you installed conda]/miniconda3/envs/STR/bin/python`\n\nThese commandline tools are required, but will already be installed by\nenvironment.yml as part of the python dependencies\n- BedTools\n- goleft\n- mosdepth\n\nOther command line tools\n- BWA (requires mem algorithm - tested on version 0.7.12)\n- Samtools\n- Picard\n- [Bazam](https://github.com/ssadedin/bazam) - for extracting reads if starting from bam/cram files\n\n## Reference data\n\n**Quick start for human data:**\nYou can download a bundle of the pre-indexed hg19 genome with STR decoys and\ncorresponding bed files [here](https://figshare.com/s/1a39be9282c90c4860cd).\n\nRequired reference files:\n- Reference genome with STR decoy chromosomes (fasta)\n- BWA indices of reference\n- .genome file of reference\n- STR decoy bed file\n- STR positions in genome annotated bed file\n\nAll chromosomes names in these files must be in the same sort order.\n\nSTRetch requires a reference genome that includes STR decoy chromosomes.\nYou can generate this by adding concatenating STRdecoys.fasta to the end of\nany reference genome in fasta format, and then indexing the result.\nFor example:\n```\n$ cat ucsc.hg19.fasta STRdecoys.fasta > ucsc.hg19.STRdecoys.fasta\n$ bwa index ucsc.hg19.STRdecoys.fasta\n```\n\nSTRetch also requires a bed file specifying the position of all STRs in the\nreference genome, with two additional columns containing the repeat unit/motif\nand the number of repeat units in the reference.\n\nFor example:\n\n```chr1\t10000\t10468\tTAACCC\t77.2```\n\nThis file is produced by extracting the appropriate columns from Tandem Repeats\nFinder output.\n\n## Configuring STRetch\n\n`install.sh` will create a text file `STRetch/pipelines/pipeline_config.groovy` (note this file\nmust be in the same directory as the pipelines).\nThis will contain system-specific settings, especially paths to the locations\nof software and reference files.\nThere is a template, and several examples provided:\n`pipelines/config-examples/pipeline_config_[cluster-name].groovy`.\n\n## Troubleshooting ?\n\nSee the [Troubleshooting](Troubleshooting.md) wiki page.\n\n## old STRetch version 0.1.0 - R requirements\n\nR 3 (tested on R version 3.3.1)\n- install.packages(c('optparse','plyr','dplyr','tidyr','reshape2'))\n\nInstall R packages:\n```\nR\n> install.packages(c('optparse','plyr','dplyr','tidyr','reshape2'))\n> q()\n```\n## Quick start\n\nRun the WGS pipeline:\n\n```STRetch/tools/bin/bpipe run STRetch/pipelines/STRetch_wgs_pipeline.groovy sample1_L001_R1.fastq.gz sample1_L001_R2.fastq.gz sample2_L001_R1.fastq.gz sample2_L001_R2.fastq.gz \u2026```\n\nAll reads are assumed to be paired end with filenames ending in\n`_R1.fastq.gz` and `_R2.fastq.gz`.\nMultiple samples can be run in the same command and will be processed in\nparallel and their STR variation compared to find outliers. \n\nIf you would like to use the included PCR WGS reference set as controls, you will need to edit the \"CONTROL\" line in `pipeline_config.groovy`. Otherwise by default STRetch will use all the other samples in your set as controls.\n\n## STRetch pipelines\n\nSTRetch provides three pipelines, depending on what type of sequencing you are doing and what format your data is in.\n\nFor all pipelines, if you analyse multiple samples together you can look for outliers in your set of samples.\n\n### Whole genome sequencing starting from fastq files: _STRetch_wgs_pipeline.groovy_\n\nThis pipeline maps all paired-end reads against a reference genome containing STR-decoy chromosomes. It then uses reads mapping to the STR-decoy chromosomes to detect large STR expansions.\n\nOn a single sample:\n\n`STRetch/tools/bin/bpipe run STRetch/pipelines/STRetch_wgs_pipeline.groovy sample_L001_R1.fastq.gz sample_L001_R2.fastq.gz`\n\nOn multiple samples:\n\n`STRetch/tools/bin/bpipe run STRetch/pipelines/STRetch_wgs_pipeline.groovy sample1_L001_R1.fastq.gz sample1_L001_R2.fastq.gz sample2_L001_R1.fastq.gz sample2_L001_R2.fastq.gz \u2026`\n\n### Whole genome sequencing starting from mapped bam/cram files: _STRetch_wgs_bam_pipeline.groovy_\n\nThis pipeline takes a position sorted mapped bam file and extracts reads from it likely to contain STR sequence. Specifically, all reads mapping to any STRs, flanking sequence, and unmapped reads. These reads are then mapped against a new reference genome containing STR-decoy chromosomes and the pipeline continues much as the standard STRetch WGS pipeline.\n\n`STRetch/tools/bin/bpipe run -p input_regions=all_STRs_in_genome.bed STRetch/pipelines/STRetch_wgs_bam_pipeline.groovy sample1.bam sample2.bam`\n\n<!--\nor \n\n`STRetch/tools/bin/bpipe run -p input_regions=all_STRs_in_genome.bed -p CRAM_REF=reference_genome.fasta STRetch/pipelines/STRetch_wgs_bam_pipeline.groovy sample1.cram sample2.cram`\n\nIf using cram input files, make sure to set `CRAM_REF=reference_genome.fasta` in `pipeline_config.groovy` to the reference genome used to create the cram files.\n-->\n\n`all_STRs_in_genome.bed` is a bed file defining the positions of *all STRs* in the genome, for example `hg19.simpleRepeat_period1-6.dedup.sorted.bed`. **WARNING:** using a bed file that only specifies some STRs may cause STRetch to miss expansions, this file must include all STRs in the genome. It must match the reference genome used to produce the bam file, but doesn\u2019t have to match the reference genome used for the rest of the pipeline. This be file must not contain two STRs at the same position (this does occur in some genome annotations, see [Reference data](Reference-data) for more details)\n\nYou can additionally run multiple instances of BWA in parallel to speed up the read extraction and mapping time. To do this, set the `bwa_parallelism` parameter. For example `-p bwa_parallelism=12` would run BWA 12 times in parallel for each sample.\n\n### Exome or other targeted sequencing, starting from fastq files: _STRetch_exome_pipeline.groovy_\n\nNote that because STRetch assumes uniform coverage when estimate STR allele sizes, the exome pipeline will likely not produce accurate size estimate. It can be used to find check if samples are outliers at a given STR locus. This pipeline requires that all samples run together should have been sequenced using the same technology, for example the same exome kit. \n\nNote: for exome samples, the exome target region must be set in the\n`pipeline_config.groovy` and is assumed to be the same for all samples.\n\n`EXOME_TARGET=\"target_region.bed\"`\n\n`STRetch/tools/bin/bpipe run STRetch/pipelines/STRetch_exome_pipeline.groovy sample1_L001_R1.fastq.gz sample1_L001_R2.fastq.gz sample2_L001_R1.fastq.gz sample2_L001_R2.fastq.gz \u2026`\n\n### Exome or other targeted sequencing, starting from BAM/CRAM files: _STRetch_exome_bam_pipeline.groovy_\n\nPlease see notes above about running STRetch on exome data from BAM/CRAM files. In particular, it's important to set `EXOME_TARGET` and `input_regions` correctly.\n\n`STRetch/tools/bin/bpipe run STRetch/pipelines/STRetch_exome_bam_pipeline.groovy sample1.bam sample2.bam \u2026`\n\n## Running STRetch in a cluster environment and more advanced bpipe options\n\nYou can also use the bpipe `-n` parameter to limit concurrency. Please see the [Bpipe documentation](http://docs.bpipe.org/Commands/run/). `-n` is the number of threads, and STRetch is set to use 8 threads per sample for alignment by default, so if you set `-n` to less than 8 it will simply sit there and not run.\nIn general, it's not necessary to set `-n`. Bpipe will not try to use more resources than are available. The exception to that is when you want to submit a large number of jobs to a cluster, in which case setting '-n' to a large number is generally the best strategy. For more information on using Bpipe to submit STRetch jobs directly to your cluster, please see the [Bpipe resource manager documentation](http://docs.bpipe.org/Guides/ResourceManagers/).\n\nAny setting in `pipeline_config.groovy` can also be set at the command line using the `-p VARIABLE=\"content\"` structure. For example:\n`bpipe run -p EXOME_TARGET=\"SCA8_region.bed\" -p input_regions=\"STR_regions.bed\" pipeline.groovy inputdata`\n\n## Making your own custom control data\n\nIf you have a set of samples you would like to use as controls for future samples, simply run all samples using the STRetch pipeline, then re-run the `estimateSTR.py` script in the same working directory with the `--emit` option, like so:\n\n`STRetch/tools/bin/python STRetch/scripts/estimateSTR.py --model STRetch/scripts/STRcov.model.csv --locus_counts *.locus_counts --STR_counts *.STR_counts --median_cov *.median_cov --emit my_controls.tsv`\n\nWhen running STRetch with your new samples, edit the file `STRetch/pipelines/pipeline_config.groovy`:\n\n`CONTROL=\"my_controls.tsv\"`\n\n## Final results\n\n**sample.STRs.tsv** contains STRetch results for all STR loci with any assigned reads in that sample (not all results are significant). If there are no reads assigned to a locus, that locus will not be reported.\n\n**STRs.tsv** contains all STRetch results for all STR loci all samples in that batch with any assigned reads in any sample. If reads are only assigned for a given locus in in one sample, the other samples with show 0 reads.\n\nBoth files have the same columns, with one line per locus per sample.\n\n**Columns:**  \nchrom  \nstart  \nend  \nsample  \nrepeatunit  \nreflen - number of repeat units in the reference   \nlocuscoverage - number of STR reads assigned to that locus  \noutlier - z score testing for outliers  \np_adj - adjusted p value, is this locus significantly expanded relative to other samples? (p values have already been adjusted for multiple testing using the Benjamini-Hochberg method)  \nbpInsertion - estimated size of allele in bp inserted relative to the reference  \nrepeatUnits - estimated total size of allele in repeat units\n\nThe STR allele size estimates are only based on the reads in that sample, not the control information. The control is only used to calculate the outlier z scores and corresponding p values, asking the question: is the allele in this sample significantly longer than other samples? If you run a single sample, you simply get no values for the outlier z scores and p values.\n\n## Intermediate files\n\n### sample.STR_counts\n\nNumber of reads mapping to each STR decoy chromosome. All STR decoy chromosomes are listed.\n\n**Columns:**  \nChromosome  \nStart of chromosome (i.e. always 0)  \nEnd of chromosome (i.e. length of the chromosome -1)  \nNumber of reads mapping to that chromosome  \n\n### sample.locus_counts\n\nCounts the number of reads than are assigned to each STR locus. The file consists of only those loci for which there are any assigned reads. Each line is an STR as defined in the reference annotation, along with the count of reads for that locus.\n\n**Columns:**  \nChromosome  \nStart  \nEnd  \nrepeat unit  \nNumber of repeat units in the reference genome  \nNumber of reads assigned to the locus  \n\n### sample.median_cov\n\nEstimated median coverage over the whole genome, or specified target region for that sample.",
+        "evidence": [
+          {
+            "claim": "install_method",
+            "kind": "tree",
+            "path": "install.sh",
+            "text": "script",
+            "url": "https://github.com/Oshlack/STRetch/blob/ce74895ad7b469a43972c9571009fea8cb1fe39c/install.sh"
+          },
+          {
+            "claim": "run_command",
+            "kind": "wiki",
+            "line": 36,
+            "path": "wiki/Running-STRetch",
+            "text": "`STRetch/tools/bin/bpipe run -p input_regions=all_STRs_in_genome.bed STRetch/pipelines/STRetch_wgs_bam_pipeline.groovy sample1.bam sample2.bam`",
+            "url": "https://github.com/Oshlack/STRetch/wiki/Running-STRetch"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "scripts/tests/test_data/49_L001_R1.STRdecoy.bam",
+            "text": "bam",
+            "url": "https://github.com/Oshlack/STRetch/blob/ce74895ad7b469a43972c9571009fea8cb1fe39c/scripts/tests/test_data/49_L001_R1.STRdecoy.bam"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "scripts/tests/test_data/11_L001_R1.STRdecoy.bam",
+            "text": "bam",
+            "url": "https://github.com/Oshlack/STRetch/blob/ce74895ad7b469a43972c9571009fea8cb1fe39c/scripts/tests/test_data/11_L001_R1.STRdecoy.bam"
+          },
+          {
+            "claim": "documented_input",
+            "kind": "readme",
+            "line": 34,
+            "path": "README.md",
+            "text": "This pipeline takes a position sorted mapped bam file and extracts reads from it likely to contain STR sequence.",
+            "url": "https://github.com/Oshlack/STRetch/blob/ce74895ad7b469a43972c9571009fea8cb1fe39c/README.md#L34"
+          }
+        ],
+        "example": null,
+        "example_data": [
+          {
+            "in_example_dir": true,
+            "kind": "bam",
+            "looks_like_output": false,
+            "path": "scripts/tests/test_data/49_L001_R1.STRdecoy.bam",
+            "size": 621037
+          },
+          {
+            "in_example_dir": true,
+            "kind": "bam",
+            "looks_like_output": false,
+            "path": "scripts/tests/test_data/11_L001_R1.STRdecoy.bam",
+            "size": 627078
+          }
+        ],
+        "inferences": {
+          "build": "repo_file:install.sh",
+          "example": null,
+          "input_type": "wiki/Running-STRetch:L34",
+          "output": "wiki/Running-STRetch:L79",
+          "platform": "README.md:L15",
+          "regions": null,
+          "run_command": "wiki/Running-STRetch:L36",
+          "single_sample_bams": null
+        },
+        "input_type": {
+          "assembly": {
+            "against_hg38": null,
+            "declared": null,
+            "evidence_source": null,
+            "hg19_evidence_source": null,
+            "hg19_hits": 0,
+            "hg38_evidence_source": null,
+            "hg38_hits": 0,
+            "incompatible_with_hg38": false
+          },
+          "best": "illumina-bam-hg38",
+          "candidates": [
+            "illumina-bam-hg38"
+          ],
+          "evidence_source": "wiki/Running-STRetch:L34",
+          "how": "read",
+          "platform": "illumina",
+          "platform_evidence_source": "README.md:L15",
+          "platform_how": "stated",
+          "signals": {
+            "bam": 0,
+            "ce": 0,
+            "fastq": 0,
+            "hg19": 0,
+            "hg38": 0,
+            "illumina": 2,
+            "ont": 0,
+            "snp": 0,
+            "ystr": 0
+          },
+          "statements": {
+            "against": [],
+            "determined": true,
+            "inputs": [
+              {
+                "kind": "bam",
+                "line": 34,
+                "text": "This pipeline takes a position sorted mapped bam file and extracts reads from it likely to contain STR sequence."
+              }
+            ],
+            "platform": [
+              {
+                "historical": false,
+                "line": 15,
+                "platform": "illumina",
+                "text": "Method for detecting short tandem repeat expansions from short-read sequencing data."
+              }
+            ],
+            "platform_file": null,
+            "recommendation": null
+          },
+          "statements_file": "wiki/Running-STRetch",
+          "supported_platforms": [
+            {
+              "evidence_source": "README.md:L15",
+              "historical": false,
+              "line": 15,
+              "platform": "illumina",
+              "text": "Method for detecting short tandem repeat expansions from short-read sequencing data."
+            }
+          ],
+          "unsupported": null,
+          "warnings": []
+        },
+        "known_issues": [],
+        "limitations": [
+          "install_profile_unsupported",
+          "documented_file_missing"
+        ],
+        "output": {
+          "evidence_source": "wiki/Running-STRetch:L79",
+          "format": "tsv",
+          "signals": {
+            "csv": 2,
+            "json": 0,
+            "tsv": 5,
+            "vcf": 0
+          }
+        },
+        "packaging": {
+          "executables": [],
+          "packages": []
+        },
+        "readme": {
+          "gaps": [],
+          "name": "README.md",
+          "sufficient_to_attempt": true
+        },
+        "readme_name": "README.md",
+        "readme_text": "[![Build Status](https://travis-ci.org/Oshlack/STRetch.svg?branch=master)](https://travis-ci.org/Oshlack/STRetch)\n[![codecov](https://codecov.io/github/Oshlack/STRetch/branch/master/graphs/badge.svg)](https://codecov.io/github/Oshlack/STRetch)\n\n\n## [STRetch user guide](https://github.com/Oshlack/STRetch/wiki)\n\n**Update:** the STRetch paper is now published!\n\nIf using STRetch, please cite:\n\nDashnow, Harriet, Monkol Lek, Belinda Phipson, Andreas Halman, Simon Sadedin, Andrew Lonsdale, Mark Davis, et al. 2018. \u201cSTRetch: Detecting and Discovering Pathogenic Short Tandem Repeat Expansions.\u201d Genome Biology 19 (1): 121. [https://doi.org/10.1186/s13059-018-1505-2](https://doi.org/10.1186/s13059-018-1505-2)\n\n# STRetch\n\nMethod for detecting short tandem repeat expansions from short-read sequencing data.\n\nSTRetch requires paired end reads to work. It is primarily intended for use on\nwhole genome sequencing data, but can also be run on exome or other targeted\nsequencing data, although size estimates should be interpreted with caution.\n\nPlease see the [STRetch user guide](https://github.com/Oshlack/STRetch/wiki)\nfor installation and usage instructions.\n",
+        "ref": "ce74895ad7b469a43972c9571009fea8cb1fe39c",
+        "regions": {
+          "ambiguous": false,
+          "candidates": [],
+          "end_line": null,
+          "evidence_source": null,
+          "file": null,
+          "format": null,
+          "line": null,
+          "text": null
+        },
+        "registry": {
+          "bioconda": {},
+          "documented": []
+        },
+        "repo": "https://github.com/Oshlack/STRetch",
+        "schema": "strhub-verified/recipe-proposal/1",
+        "single_sample_bams": {
+          "allowed": false,
+          "evidence_source": null,
+          "file": null,
+          "line": null,
+          "paired_flags": [],
+          "text": null
+        },
+        "source_documents": [
+          {
+            "file": "README.md",
+            "origin": "readme",
+            "text": "[![Build Status](https://travis-ci.org/Oshlack/STRetch.svg?branch=master)](https://travis-ci.org/Oshlack/STRetch)\n[![codecov](https://codecov.io/github/Oshlack/STRetch/branch/master/graphs/badge.svg)](https://codecov.io/github/Oshlack/STRetch)\n\n\n## [STRetch user guide](https://github.com/Oshlack/STRetch/wiki)\n\n**Update:** the STRetch paper is now published!\n\nIf using STRetch, please cite:\n\nDashnow, Harriet, Monkol Lek, Belinda Phipson, Andreas Halman, Simon Sadedin, Andrew Lonsdale, Mark Davis, et al. 2018. \u201cSTRetch: Detecting and Discovering Pathogenic Short Tandem Repeat Expansions.\u201d Genome Biology 19 (1): 121. [https://doi.org/10.1186/s13059-018-1505-2](https://doi.org/10.1186/s13059-018-1505-2)\n\n# STRetch\n\nMethod for detecting short tandem repeat expansions from short-read sequencing data.\n\nSTRetch requires paired end reads to work. It is primarily intended for use on\nwhole genome sequencing data, but can also be run on exome or other targeted\nsequencing data, although size estimates should be interpreted with caution.\n\nPlease see the [STRetch user guide](https://github.com/Oshlack/STRetch/wiki)\nfor installation and usage instructions.\n"
+          },
+          {
+            "file": "wiki/Home",
+            "origin": "wiki",
+            "text": "Note: this software is still in development, with features still being added and deprecated. Please feel free to report any bugs.\n\n# STRetch\n\nSTRetch is a method to detect pathogenic STR expansions from next-gen sequencing data. STRetch uses short read sequencing to detect expansions at all known STR loci and estimate their approximate size. The method adds STR decoy sequences to the reference genome to identify reads originating from a large STR expansion. These reads are then mapped back to the genome using read pair information, and the source locus is assessed for an expansion using a statistical test based on coverage of the STR chromosome. \n\nSTRetch requires paired end reads to work. It is primarily intended for use on\nwhole genome sequencing data, but can also be run on exome or other targeted\nsequencing data, although size estimates should be interpreted with caution."
+          },
+          {
+            "file": "wiki/_Sidebar",
+            "origin": "wiki",
+            "text": "[Home](Home)\n\n[Installing STRetch](Installing-STRetch)\n\n[Running STRetch](Running-STRetch)\n\n[Output files](Output-files)\n\n[Troubleshooting](Troubleshooting.md)\n\n[Custom reference data for STRetch](Reference-Data)\n\n[Questions and Bugs](Questions-and-Bugs)\n\n[License](License)\n\n[How to cite](How-to-cite)"
+          },
+          {
+            "file": "wiki/Installing-STRetch",
+            "origin": "wiki",
+            "text": "## Quick Start Installation\n\nThis is an example of installing STRetch using the install script. \nIt assumes **Git** and **Java** are already installed.\n\nThe install script also downloads the hg19 genome and annotation files ~8 GB.\nIt takes approximately 20 minutes (depending on your download speed).\n\nDownload STRetch and run the install script:\n```\ngit clone git@github.com:Oshlack/STRetch.git STRetch\ncd STRetch\n./install.sh\n```\n\nDownload the test data\n```\nmkdir test\ncd test/\nwget -O testdata.zip https://ndownloader.figshare.com/articles/4762489?private_link=cc7347f4637d9a7fe22d\nunzip testdata.zip \nrm testdata.zip\n```\n\nRun the test data\n```\n../tools/bin/bpipe run -p EXOME_TARGET=\"SCA8_region.bed\" ../pipelines/STRetch_exome_pipeline.groovy *.fastq.gz\n```\n(The test data only includes reads from one locus, so runs very quickly, but may produce warning messages about there being no data from many chromosomes - this is fine)\n\nNotes: \n- If you would like to use the included PCR WGS reference set as controls, you will need to edit the \"CONTROL\" line in `pipeline_config.groovy`.\n- To use system versions of any software, simply edit `pipeline_config.groovy` to point to the location of the executables. \nBe aware that using different versions of the tools can results in errors.\n- If using STRetch on a cluster, you can use bpipe to send jobs to the queue. You will need to create `STRetch/pipelines/bpipe.config`. See http://docs.bpipe.org/Guides/ResourceManagers/ for instructions, as they will likely differ by cluster.\n\n## Requirements\n\nOperating system: Linux\n\nThe installation script requires the following to run (most of of these will already be installed on many systems). The remaining dependancies can be installed automatically.\n- Git\n- Java (tested on version 1.8)\n- bzip2\n- unzip\n\n[Bpipe](http://docs.bpipe.org/) - this pipeline software runs the STRetch pipelines\n\nPython 3\n- See `environment.yml` for specific packages\n- Easiest to install using [Conda](http://conda.pydata.org/docs/using/envs.html):\n`conda env create -f environment.yml`\n- Then activate the environment with `source activate STR`.\n- For some cluster environments you may need to point the pipeline to the\nspecific version of Python, which would look something like this\n`[where you installed conda]/miniconda3/envs/STR/bin/python`\n\nThese commandline tools are required, but will already be installed by\nenvironment.yml as part of the python dependencies\n- BedTools\n- goleft\n- mosdepth\n\nOther command line tools\n- BWA (requires mem algorithm - tested on version 0.7.12)\n- Samtools\n- Picard\n- [Bazam](https://github.com/ssadedin/bazam) - for extracting reads if starting from bam/cram files\n\n## Reference data\n\n**Quick start for human data:**\nYou can download a bundle of the pre-indexed hg19 genome with STR decoys and\ncorresponding bed files [here](https://figshare.com/s/1a39be9282c90c4860cd).\n\nRequired reference files:\n- Reference genome with STR decoy chromosomes (fasta)\n- BWA indices of reference\n- .genome file of reference\n- STR decoy bed file\n- STR positions in genome annotated bed file\n\nAll chromosomes names in these files must be in the same sort order.\n\nSTRetch requires a reference genome that includes STR decoy chromosomes.\nYou can generate this by adding concatenating STRdecoys.fasta to the end of\nany reference genome in fasta format, and then indexing the result.\nFor example:\n```\n$ cat ucsc.hg19.fasta STRdecoys.fasta > ucsc.hg19.STRdecoys.fasta\n$ bwa index ucsc.hg19.STRdecoys.fasta\n```\n\nSTRetch also requires a bed file specifying the position of all STRs in the\nreference genome, with two additional columns containing the repeat unit/motif\nand the number of repeat units in the reference.\n\nFor example:\n\n```chr1\t10000\t10468\tTAACCC\t77.2```\n\nThis file is produced by extracting the appropriate columns from Tandem Repeats\nFinder output.\n\n## Configuring STRetch\n\n`install.sh` will create a text file `STRetch/pipelines/pipeline_config.groovy` (note this file\nmust be in the same directory as the pipelines).\nThis will contain system-specific settings, especially paths to the locations\nof software and reference files.\nThere is a template, and several examples provided:\n`pipelines/config-examples/pipeline_config_[cluster-name].groovy`.\n\n## Troubleshooting ?\n\nSee the [Troubleshooting](Troubleshooting.md) wiki page.\n\n## old STRetch version 0.1.0 - R requirements\n\nR 3 (tested on R version 3.3.1)\n- install.packages(c('optparse','plyr','dplyr','tidyr','reshape2'))\n\nInstall R packages:\n```\nR\n> install.packages(c('optparse','plyr','dplyr','tidyr','reshape2'))\n> q()\n```"
+          },
+          {
+            "file": "wiki/Running-STRetch",
+            "origin": "wiki",
+            "text": "## Quick start\n\nRun the WGS pipeline:\n\n```STRetch/tools/bin/bpipe run STRetch/pipelines/STRetch_wgs_pipeline.groovy sample1_L001_R1.fastq.gz sample1_L001_R2.fastq.gz sample2_L001_R1.fastq.gz sample2_L001_R2.fastq.gz \u2026```\n\nAll reads are assumed to be paired end with filenames ending in\n`_R1.fastq.gz` and `_R2.fastq.gz`.\nMultiple samples can be run in the same command and will be processed in\nparallel and their STR variation compared to find outliers. \n\nIf you would like to use the included PCR WGS reference set as controls, you will need to edit the \"CONTROL\" line in `pipeline_config.groovy`. Otherwise by default STRetch will use all the other samples in your set as controls.\n\n## STRetch pipelines\n\nSTRetch provides three pipelines, depending on what type of sequencing you are doing and what format your data is in.\n\nFor all pipelines, if you analyse multiple samples together you can look for outliers in your set of samples.\n\n### Whole genome sequencing starting from fastq files: _STRetch_wgs_pipeline.groovy_\n\nThis pipeline maps all paired-end reads against a reference genome containing STR-decoy chromosomes. It then uses reads mapping to the STR-decoy chromosomes to detect large STR expansions.\n\nOn a single sample:\n\n`STRetch/tools/bin/bpipe run STRetch/pipelines/STRetch_wgs_pipeline.groovy sample_L001_R1.fastq.gz sample_L001_R2.fastq.gz`\n\nOn multiple samples:\n\n`STRetch/tools/bin/bpipe run STRetch/pipelines/STRetch_wgs_pipeline.groovy sample1_L001_R1.fastq.gz sample1_L001_R2.fastq.gz sample2_L001_R1.fastq.gz sample2_L001_R2.fastq.gz \u2026`\n\n### Whole genome sequencing starting from mapped bam/cram files: _STRetch_wgs_bam_pipeline.groovy_\n\nThis pipeline takes a position sorted mapped bam file and extracts reads from it likely to contain STR sequence. Specifically, all reads mapping to any STRs, flanking sequence, and unmapped reads. These reads are then mapped against a new reference genome containing STR-decoy chromosomes and the pipeline continues much as the standard STRetch WGS pipeline.\n\n`STRetch/tools/bin/bpipe run -p input_regions=all_STRs_in_genome.bed STRetch/pipelines/STRetch_wgs_bam_pipeline.groovy sample1.bam sample2.bam`\n\n<!--\nor \n\n`STRetch/tools/bin/bpipe run -p input_regions=all_STRs_in_genome.bed -p CRAM_REF=reference_genome.fasta STRetch/pipelines/STRetch_wgs_bam_pipeline.groovy sample1.cram sample2.cram`\n\nIf using cram input files, make sure to set `CRAM_REF=reference_genome.fasta` in `pipeline_config.groovy` to the reference genome used to create the cram files.\n-->\n\n`all_STRs_in_genome.bed` is a bed file defining the positions of *all STRs* in the genome, for example `hg19.simpleRepeat_period1-6.dedup.sorted.bed`. **WARNING:** using a bed file that only specifies some STRs may cause STRetch to miss expansions, this file must include all STRs in the genome. It must match the reference genome used to produce the bam file, but doesn\u2019t have to match the reference genome used for the rest of the pipeline. This be file must not contain two STRs at the same position (this does occur in some genome annotations, see [Reference data](Reference-data) for more details)\n\nYou can additionally run multiple instances of BWA in parallel to speed up the read extraction and mapping time. To do this, set the `bwa_parallelism` parameter. For example `-p bwa_parallelism=12` would run BWA 12 times in parallel for each sample.\n\n### Exome or other targeted sequencing, starting from fastq files: _STRetch_exome_pipeline.groovy_\n\nNote that because STRetch assumes uniform coverage when estimate STR allele sizes, the exome pipeline will likely not produce accurate size estimate. It can be used to find check if samples are outliers at a given STR locus. This pipeline requires that all samples run together should have been sequenced using the same technology, for example the same exome kit. \n\nNote: for exome samples, the exome target region must be set in the\n`pipeline_config.groovy` and is assumed to be the same for all samples.\n\n`EXOME_TARGET=\"target_region.bed\"`\n\n`STRetch/tools/bin/bpipe run STRetch/pipelines/STRetch_exome_pipeline.groovy sample1_L001_R1.fastq.gz sample1_L001_R2.fastq.gz sample2_L001_R1.fastq.gz sample2_L001_R2.fastq.gz \u2026`\n\n### Exome or other targeted sequencing, starting from BAM/CRAM files: _STRetch_exome_bam_pipeline.groovy_\n\nPlease see notes above about running STRetch on exome data from BAM/CRAM files. In particular, it's important to set `EXOME_TARGET` and `input_regions` correctly.\n\n`STRetch/tools/bin/bpipe run STRetch/pipelines/STRetch_exome_bam_pipeline.groovy sample1.bam sample2.bam \u2026`\n\n## Running STRetch in a cluster environment and more advanced bpipe options\n\nYou can also use the bpipe `-n` parameter to limit concurrency. Please see the [Bpipe documentation](http://docs.bpipe.org/Commands/run/). `-n` is the number of threads, and STRetch is set to use 8 threads per sample for alignment by default, so if you set `-n` to less than 8 it will simply sit there and not run.\nIn general, it's not necessary to set `-n`. Bpipe will not try to use more resources than are available. The exception to that is when you want to submit a large number of jobs to a cluster, in which case setting '-n' to a large number is generally the best strategy. For more information on using Bpipe to submit STRetch jobs directly to your cluster, please see the [Bpipe resource manager documentation](http://docs.bpipe.org/Guides/ResourceManagers/).\n\nAny setting in `pipeline_config.groovy` can also be set at the command line using the `-p VARIABLE=\"content\"` structure. For example:\n`bpipe run -p EXOME_TARGET=\"SCA8_region.bed\" -p input_regions=\"STR_regions.bed\" pipeline.groovy inputdata`\n\n## Making your own custom control data\n\nIf you have a set of samples you would like to use as controls for future samples, simply run all samples using the STRetch pipeline, then re-run the `estimateSTR.py` script in the same working directory with the `--emit` option, like so:\n\n`STRetch/tools/bin/python STRetch/scripts/estimateSTR.py --model STRetch/scripts/STRcov.model.csv --locus_counts *.locus_counts --STR_counts *.STR_counts --median_cov *.median_cov --emit my_controls.tsv`\n\nWhen running STRetch with your new samples, edit the file `STRetch/pipelines/pipeline_config.groovy`:\n\n`CONTROL=\"my_controls.tsv\"`\n"
+          },
+          {
+            "file": "wiki/Output-files",
+            "origin": "wiki",
+            "text": "## Final results\n\n**sample.STRs.tsv** contains STRetch results for all STR loci with any assigned reads in that sample (not all results are significant). If there are no reads assigned to a locus, that locus will not be reported.\n\n**STRs.tsv** contains all STRetch results for all STR loci all samples in that batch with any assigned reads in any sample. If reads are only assigned for a given locus in in one sample, the other samples with show 0 reads.\n\nBoth files have the same columns, with one line per locus per sample.\n\n**Columns:**  \nchrom  \nstart  \nend  \nsample  \nrepeatunit  \nreflen - number of repeat units in the reference   \nlocuscoverage - number of STR reads assigned to that locus  \noutlier - z score testing for outliers  \np_adj - adjusted p value, is this locus significantly expanded relative to other samples? (p values have already been adjusted for multiple testing using the Benjamini-Hochberg method)  \nbpInsertion - estimated size of allele in bp inserted relative to the reference  \nrepeatUnits - estimated total size of allele in repeat units\n\nThe STR allele size estimates are only based on the reads in that sample, not the control information. The control is only used to calculate the outlier z scores and corresponding p values, asking the question: is the allele in this sample significantly longer than other samples? If you run a single sample, you simply get no values for the outlier z scores and p values.\n\n## Intermediate files\n\n### sample.STR_counts\n\nNumber of reads mapping to each STR decoy chromosome. All STR decoy chromosomes are listed.\n\n**Columns:**  \nChromosome  \nStart of chromosome (i.e. always 0)  \nEnd of chromosome (i.e. length of the chromosome -1)  \nNumber of reads mapping to that chromosome  \n\n### sample.locus_counts\n\nCounts the number of reads than are assigned to each STR locus. The file consists of only those loci for which there are any assigned reads. Each line is an STR as defined in the reference annotation, along with the count of reads for that locus.\n\n**Columns:**  \nChromosome  \nStart  \nEnd  \nrepeat unit  \nNumber of repeat units in the reference genome  \nNumber of reads assigned to the locus  \n\n### sample.median_cov\n\nEstimated median coverage over the whole genome, or specified target region for that sample."
+          }
+        ],
+        "tool_names": [
+          "STRetch",
+          "TRFdat_to_bed",
+          "TRFdat_to_bed.py",
+          "decoy_STR",
+          "decoy_STR.py",
+          "estimateSTR",
+          "estimateSTR.py",
+          "identify_locus",
+          "identify_locus.py",
+          "install",
+          "install-ci",
+          "install-ci.sh",
+          "install.sh",
+          "mosdepth_mean_region",
+          "mosdepth_mean_region.py",
+          "mosdepth_median",
+          "mosdepth_median.py",
+          "sort_fasta",
+          "sort_fasta.py",
+          "stretch",
+          "test_decoySTR.py",
+          "test_identify_locus.py"
+        ],
+        "tree_paths": [
+          ".gitignore",
+          ".testing/STRs.benchmark.tsv",
+          ".testing/install-ci.sh",
+          ".travis.yml",
+          "LICENSE",
+          "README.md",
+          "environment.yml",
+          "install.sh",
+          "pipelines/STRetch_exome_bam_pipeline.groovy",
+          "pipelines/STRetch_exome_pipeline.groovy",
+          "pipelines/STRetch_wgs_bam_pipeline.groovy",
+          "pipelines/STRetch_wgs_pipeline.groovy",
+          "pipelines/config-examples/bpipe.config_meerkat",
+          "pipelines/config-examples/bpipe.config_template",
+          "pipelines/config-examples/pipeline_config_broad.groovy",
+          "pipelines/config-examples/pipeline_config_meerkat.groovy",
+          "pipelines/config-examples/pipeline_config_template.groovy",
+          "pipelines/extract_fastq.groovy",
+          "pipelines/pipeline_stages.groovy",
+          "scripts/STRcov.model.ATXN8_AGC.csv",
+          "scripts/STRcov.model.csv",
+          "scripts/TRFdat_to_bed.py",
+          "scripts/decoy_STR.py",
+          "scripts/dedupSTRannotation.R",
+          "scripts/estimateSTR.py",
+          "scripts/generate.STRcov.model.R",
+          "scripts/identify_locus.py",
+          "scripts/median.awk",
+          "scripts/mosdepth_mean_region.py",
+          "scripts/mosdepth_median.py",
+          "scripts/sort_fasta.py",
+          "scripts/tests/test_data/11_L001_R1.STRdecoy.bam",
+          "scripts/tests/test_data/11_L001_R1.STRdecoy.bam.bai",
+          "scripts/tests/test_data/49_L001_R1.STRdecoy.bam",
+          "scripts/tests/test_data/49_L001_R1.STRdecoy.bam.bai",
+          "scripts/tests/test_data/49_tests.STRdecoy.sam",
+          "scripts/tests/test_data/README.md",
+          "scripts/tests/test_decoySTR.py",
+          "scripts/tests/test_identify_locus.py"
+        ],
+        "tree_truncated": false,
+        "upstream_files": {}
+      },
+      "limitations": [
+        "install_profile_unsupported",
+        "documented_file_missing"
+      ],
+      "caveat_items": [
+        "Environment: no proven installation profile; STRhub did not manufacture installation steps.",
+        "Input: the README documents BAM (line 34); this plan selects STRhub's illumina-bam-hg38 reference data.",
+        "Evaluator limitation: a read-file argument is outside the closed input substitution table.",
+        "Evaluator limitation: a read-file argument is outside the closed input substitution table.",
+        "Run command: the one documented on the wiki (wiki/Running-STRetch, line 36), rewritten to STRhub's mounts; the capture wrapper is planned only if the procedure review passes. A wiki is not versioned with the code: it was read as it is today.",
+        "File: the documented command reads all_STRs_in_genome.bed (in input_regions=all_STRs_in_genome.bed), which is neither in the repository nor among STRhub's data."
+      ]
+    }
+  },
+  "provenance": {
+    "from_upstream": {
+      "install": {
+        "method": "script",
+        "evidence_source": "repo_file:install.sh"
+      },
+      "command": {
+        "value": "STRetch/tools/bin/bpipe run -p input_regions=all_STRs_in_genome.bed STRetch/pipelines/STRetch_wgs_bam_pipeline.groovy sample1.bam sample2.bam",
+        "evidence_source": "wiki/Running-STRetch:L36"
+      },
+      "input_kind": {
+        "value": "bam",
+        "evidence_source": "wiki/Running-STRetch:L34"
+      },
+      "supported_platforms": [
+        {
+          "platform": "illumina",
+          "evidence_source": "README.md:L15"
+        }
+      ],
+      "assembly": {
+        "declared": null,
+        "evidence_source": null
+      },
+      "regions_schema": null,
+      "output_format": {
+        "glob": "**/*.t[sx][vt]",
+        "evidence_source": "wiki/Running-STRetch:L79"
+      }
+    },
+    "derived": {
+      "command_rewrites": [],
+      "regions_layout_binding": null,
+      "single_sample_adaptation": null
+    },
+    "harness_choices": {
+      "dataset": {
+        "selected": "illumina-bam-hg38",
+        "reason": "STRhub selected 'illumina-bam-hg38' as compatible with upstream input 'bam' and platform 'illumina'"
+      },
+      "platform": {
+        "selected": "illumina",
+        "basis": "upstream_single_platform",
+        "supported_platforms": [
+          "illumina"
+        ]
+      },
+      "assembly": {
+        "selected": "hg38",
+        "basis": "harness_choice_unstated",
+        "note": "Upstream did not specify an assembly; STRhub supplied an internally coherent hg38 BAM, FASTA and regions set"
+      },
+      "regions_layout": null,
+      "base_environment": null
+    }
+  },
+  "procedure_validation": {
+    "schema": "strhub-procedure-evidence/1",
+    "valid": true,
+    "reason": "Procedure evidence matches the effective manifest and recomputed decision."
+  },
+  "verdict": {
+    "code": "undetermined",
+    "title": "Could not be determined",
+    "basis": "recipe",
+    "reason": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub.",
+    "readme_gaps": [],
+    "status_code": "UNVERIFIED_INSUFFICIENT_DOCS",
+    "blockers": [
+      {
+        "code": "install_not_copyable",
+        "what": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub.",
+        "ask_owner": {
+          "title": "Write the installation as commands that can be copied and run",
+          "body": "STRhub Verified reads the installation from the repository's documentation and runs it exactly as written, adding nothing. At this commit it could not follow it. Writing the installation as plain commands in one code block (apt, conda, pip, make or cmake, with the files they name in the repository) lets a new user, a reviewer and STRhub install the tool by copying it. The forms it can follow are listed in the guide: https://github.com/Tfronta/strhub-verified-next/blob/main/docs/GUIA-PASO-1.md What stopped it: No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub."
+        }
+      },
+      {
+        "code": "documented_file_missing",
+        "what": "The documented command reads a file that is not in the repository at this commit and that STRhub does not hold, so the command cannot run as written.",
+        "ask_owner": {
+          "title": "Ship, or link from the README, the file the documented command reads",
+          "body": "STRhub Verified tried to run the command the documentation shows, in a clean environment at the pinned commit. The command reads a file that is not in the repository at that commit. Shipping it, or a documented step that fetches it, would let a new user run the command as written."
+        }
+      }
+    ]
+  },
+  "step1": {
+    "code": "cannot_tell",
+    "headline": "As documented, a third party cannot tell how to run it.",
+    "body": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub. Nothing was executed. That does not mean the tool does not work: what the guide asks for is missing from the README at this commit. Add it and try the link again on the new commit.",
+    "missing": [
+      "install"
+    ],
+    "missing_text": [
+      "Installation, copyable"
+    ],
+    "guide": "docs/GUIA-PASO-1.md"
+  },
+  "certificate": {
+    "schema": "strhub-verified/certificate/1",
+    "label": "Could not be determined",
+    "reached": "Available",
+    "stages": [
+      {
+        "key": "available",
+        "label": "Source available",
+        "status": "PASS"
+      },
+      {
+        "key": "installs",
+        "label": "Installation",
+        "status": "NOT ATTEMPTED"
+      },
+      {
+        "key": "runs",
+        "label": "End-to-end execution",
+        "status": "NOT ATTEMPTED"
+      },
+      {
+        "key": "output",
+        "label": "Output generated",
+        "status": "NOT ATTEMPTED"
+      }
+    ],
+    "summary": {
+      "purpose": "Evaluate whether the tool installs, runs end-to-end, and produces structurally valid output.",
+      "result": "Could not be determined",
+      "reached": "Available, 1/5 gates passed",
+      "why": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub.",
+      "scope": "Installation, execution, and output structure evaluation.",
+      "not_evaluated": [
+        "Genotype accuracy",
+        "Concordance",
+        "Forensic validity",
+        "Regulatory compliance"
+      ]
+    },
+    "conclusion": [
+      {
+        "title": "Procedure not established",
+        "body": "The recorded gate observations do not establish whether the documented procedure succeeded or failed."
+      },
+      {
+        "title": "Observations retained",
+        "body": "The supplied run and output observations remain in the report; they do not replace procedure evidence."
+      },
+      {
+        "title": "Verdict: Could not be determined",
+        "body": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub."
+      },
+      {
+        "title": "Reproducibility not established",
+        "body": "These observations are insufficient to establish a reproducible documented execution finding."
+      }
+    ],
+    "out_of_scope": [
+      "Genotype correctness or accuracy",
+      "Concordance against known truth sets",
+      "Sensitivity, specificity, or stutter performance",
+      "Allele calling accuracy or forensic casework suitability",
+      "Regulatory compliance or ISO accreditation",
+      "Multi-laboratory or multi-dataset reproducibility"
+    ],
+    "limitations": [
+      "Single reference dataset per input type",
+      "Single containerized environment (Docker / ubuntu-22.04)",
+      "No truth-set comparison or ground-truth genotypes",
+      "No accuracy or concordance assessment",
+      "No forensic or clinical validation of results",
+      "No sequencing data were processed because execution did not complete"
+    ],
+    "scope": {
+      "statement": "Independent automated evaluation of reproducible execution. It checks whether the tool installs, runs end-to-end, and produces structurally valid output in a standardized environment.",
+      "not": "This is not an analytical validation. Genotype accuracy, concordance, forensic suitability, and regulatory compliance are out of scope.",
+      "disclaimer": "Each result is a dated snapshot, verified on the tool's public repository at a pinned commit. STRhub does not store tool source code."
+    }
+  }
+}

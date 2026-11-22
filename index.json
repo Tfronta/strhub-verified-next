@@ -1,7 +1,7 @@
 {
   "schema": "strhub-verified/index/3",
-  "generated": "2026-11-22T19:14:56+00:00",
-  "count": 16,
+  "generated": "2026-11-22T19:14:59+00:00",
+  "count": 17,
   "tools": [
     {
       "slug": "expansionhunter",
@@ -350,6 +350,50 @@
           "report": "straitrazor/b618e9345ab40f348b504083ae8de2b39abb60fa/straitrazor.json",
           "page": "straitrazor/b618e9345ab40f348b504083ae8de2b39abb60fa/straitrazor.html",
           "pdf": "straitrazor/b618e9345ab40f348b504083ae8de2b39abb60fa/straitrazor.pdf"
+        }
+      ]
+    },
+    {
+      "slug": "stretch",
+      "name": "STRetch",
+      "version": "v0.4.0",
+      "variant": null,
+      "sha": "ce74895ad7b469a43972c9571009fea8cb1fe39c",
+      "committed": "2019-01-22T00:17:38Z",
+      "instrument": "documented",
+      "level": "available",
+      "label": "Could not be determined",
+      "verdict": "undetermined",
+      "errors_reported": false,
+      "generated": "2026-11-22T19:14:32+00:00",
+      "source_repo": "https://github.com/Oshlack/STRetch",
+      "source_ref": "ce74895ad7b469a43972c9571009fea8cb1fe39c",
+      "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/45059547695",
+      "distinct_str_loci": null,
+      "distinct_snp_markers": null,
+      "total_reads": null,
+      "external_state": "na",
+      "dataset_types": [
+        "illumina-bam-hg38"
+      ],
+      "report": "stretch.json",
+      "page": "stretch.html",
+      "versions": [
+        {
+          "sha": "ce74895ad7b469a43972c9571009fea8cb1fe39c",
+          "instrument": "documented",
+          "version": "v0.4.0",
+          "variant": null,
+          "committed": "2019-01-22T00:17:38Z",
+          "generated": "2026-11-22T19:14:32+00:00",
+          "level": "available",
+          "label": "Could not be determined",
+          "verdict": "undetermined",
+          "errors_reported": false,
+          "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/45059547695",
+          "report": "stretch/ce74895ad7b469a43972c9571009fea8cb1fe39c/stretch.json",
+          "page": "stretch/ce74895ad7b469a43972c9571009fea8cb1fe39c/stretch.html",
+          "pdf": "stretch/ce74895ad7b469a43972c9571009fea8cb1fe39c/stretch.pdf"
         }
       ]
     },
