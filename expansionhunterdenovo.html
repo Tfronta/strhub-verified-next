@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>STRhub Verified · ExpansionHunterDenovo (expansionhunterdenovo)</title>
+<style>
+  body { font: 16px/1.6 system-ui, sans-serif; max-width: 820px; margin: 2rem auto;
+          padding: 0 1rem; background:#ffffff; color:#1a1a1a; }
+  a { color: #2563eb; }
+  .badge { display:inline-block; padding:.25rem .7rem; border-radius:999px; color:#fff; font-weight:600; background:#c33; }
+  table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
+  th, td { text-align: left; padding: .5rem .6rem; border-bottom: 1px solid #ddd; }
+  .ok { color:#16a34a; font-weight:700; }
+  .no { color:#999; }
+  .warn { color:#b45309; font-weight:700; }
+  .meta li, .stats li { margin:.15rem 0; }
+  .scope { background:#f3f4f6; border-left:4px solid #c33; padding:.8rem 1rem; border-radius:6px; }
+  code { background:#eef0f2; padding:.1rem .3rem; border-radius:4px; }
+  pre { background:#eef0f2; padding:.8rem 1rem; border-radius:6px; overflow-x:auto; white-space:pre-wrap; word-break:break-all; font-size:.85rem; }
+  pre code { background:none; padding:0; }
+  table.depth td { padding:.25rem .6rem; }
+  table.depth td:nth-child(2) { text-align:right; font-variant-numeric:tabular-nums; width:5rem; }
+  table.depth td:nth-child(3) { width:50%; }
+  .bar { display:inline-block; height:.6rem; background:#c33; border-radius:3px; vertical-align:middle; }
+  nav { margin-bottom:1rem; }
+  @media (prefers-color-scheme: dark) {
+    body { background:#0d1117; color:#e6edf3; }
+    a { color:#58a6ff; }
+    th, td { border-bottom:1px solid #30363d; }
+    .scope { background:#161b22; }
+    code, pre { background:#21262d; }
+  }
+</style></head><body>
+<nav><a href="index.html">← All tools</a></nav>
+<h1>STRhub Verified · ExpansionHunterDenovo</h1>
+<p><span class="badge">Does not run as documented: stops at install</span></p>
+<h2>As it is in the repository</h2><p><b>Step 1, the documented run: As documented, it does not run.</b> The environment did not build from the declared install steps. That does not mean the tool does not work. It means a third party following the README at this commit did not reach the end. Fix the documentation, or the step that broke, and try the link again on the new commit.</p><p><b>Verdict: Fails.</b> The environment did not build from the declared install steps.</p><p>Reached <b>Available</b>: the pinned public source exists.</p>
+<h3>Gates</h3>
+<table><thead><tr><th>Gate</th><th>Status</th><th>Meaning</th></tr></thead>
+<tbody><tr><td>Available</td><td><span class="ok">PASS</span></td><td>the pinned public source exists</td></tr><tr><td>Installs</td><td><span class="no">—</span></td><td>the environment builds from source</td></tr><tr><td>Runs</td><td><span class="no">—</span></td><td>it executes end-to-end without crashing</td></tr><tr><td>Runs + Expected IO</td><td><span class="no">—</span></td><td>it produces a non-empty file in the declared format</td></tr><tr><td>Runs + Plausible output</td><td><span class="no">—</span></td><td>its output looks like plausible genotype-bearing data (declared columns, DNA sequences, integer read counts, and enough recognisable forensic loci)</td></tr></tbody></table>
+<h3>It did not build from source</h3><p>STRhub tried to build the tool from its source at the pinned commit, following the build steps the repository declares, and the build failed. Nothing below the Installs gate ran.</p><p><b>What this means</b></p><ul class='stats'><li><b>If you are trying to run it:</b> A build from source at this commit stopped in a clean environment; the observed build log lines are cited below.</li><li><b>If you are reviewing a paper:</b> Nothing ran, so this says nothing about the software&#x27;s output. It records that this build attempt stopped at the Installs stage and cites the observed build log lines below.</li><li><b>If you maintain it:</b> The cause could not be classified automatically. The full build output is linked below.</li></ul><p><b>What failed</b></p><table><thead><tr><th>What happened</th><th>Times</th><th>What the log establishes</th></tr></thead><tbody><tr><td>A download in the build failed: https://dl.bintray.com/boostorg/release/1.67.0/source/boost_1_67_0.tar.bz2</td><td>3</td><td>Observed: during compilation, CMake attempted to fetch an external dependency from &#x27;https://dl.bintray.com/boostorg/release/1.67.0/source/boost_1_67_0.tar.bz2&#x27; and received an HTTP or hash-mismatch error. Inferred: the remote URL may be unavailable or hosted on a retired service (such as dl.bintray.com, which shut down in May 2021). Not determined automatically: whether the outage is transient or permanent.</td></tr></tbody></table><p><a href="expansionhunterdenovo.log-build.txt">Full build output</a></p>
+
+<h3>Author-documented warnings and limitations</h3><p>Quoted from the repository's README at the verified commit. STRhub did not establish any of this by running the tool; it is the author's own note about their own software.</p><p><b>Limitations</b> (README line 36)</p><blockquote>- STRs shorter than the read length are ignored; the program is appropriate<br>only for detecting expansions that exceed the read length.<br>- The location of each reported STR is approximate (up to about 500bp-1Kbp)<br>- STRs are not genotyped; the program reports a depth-normalized count of reads<br>originating inside each STR; this count can be used as a very approximate<br>measure of the repeat length<br>- To achieve best results all samples must be sequenced on the same instrument<br>to similar coverage, have the same read and fragment lengths, and be subjected<br>to the same computational pre-processing (e.g.…</blockquote>
+<h3>Planned command</h3><p>The run step was skipped. This command was not executed by that step.</p><pre><code>cd &#x27;.&#x27; &amp;&amp; touch /tmp/.strhub_mark &amp;&amp; ( ExpansionHunterDenovo profile --reads input.bam --reference reference.fasta --output-prefix output --min-anchor-mapq 50 --max-irr-mapq 40 ); rc=$?; find . -xdev -type f -newer /tmp/.strhub_mark -size +0 ! -path &#x27;./.git/*&#x27; ! -path &#x27;./proc/*&#x27; ! -path &#x27;./sys/*&#x27; ! -path &#x27;./dev/*&#x27; ! -path &#x27;./data/*&#x27; ! -path &#x27;*/__pycache__/*&#x27; ! -name &#x27;*.pyc&#x27; ! -name &#x27;*.pyo&#x27; 2&gt;/dev/null | head -500 | while IFS= read -r f; do mkdir -p &quot;/data/out/$(dirname &quot;$f&quot;)&quot; &amp;&amp; cp &quot;$f&quot; &quot;/data/out/$f&quot;; done; exit $rc</code></pre>
+
+
+<p style="font-size:.85rem">Log (build): <a href="expansionhunterdenovo.log-build.txt">expansionhunterdenovo.log-build.txt</a></p>
+<h2>Run details</h2>
+<ul class="meta">
+  <li>Variant: <code>expansionhunterdenovo</code></li>
+  <li>Source: <code>https://github.com/Illumina/ExpansionHunterDenovo</code> @ <code>5a48ed8b6dceb8d772f702e239c5afede9d5108c</code></li>
+  <li>Environment: ubuntu-22.04 (<code>Dockerfile</code>)</li>
+  <li>Generated: 2026-11-22T19:12:00+00:00</li>
+  <li>Upstream: The verified commit is 7 commit(s) behind `master`. That is context, not a fault: a pinned release is often meant to sit behind, and the attestation describes the commit it names.</li>
+  <li><a href="https://github.com/Tfronta/strhub-verified-next/actions/runs/45059287281">CI run</a></li>
+</ul>
+
+<h2>Verification matrix</h2><table><thead><tr><th>Leg</th><th>Result</th><th>Errors reported</th><th>Dataset</th></tr></thead><tbody><tr><td>External data</td><td><span class="no">N/A</span></td><td><span class="no">—</span></td><td>None</td></tr><tr><td>Tool&#x27;s own example</td><td><span class="no">N/A</span></td><td><span class="no">—</span></td><td>—</td></tr></tbody></table>
+<h2>Evidence</h2><p>What this run&#x27;s configuration rests on, each item at the verified commit. Open any of them to check the claim it supports.</p><ul class='stats'><li>Run command: <a href="https://github.com/Illumina/ExpansionHunterDenovo/blob/5a48ed8b6dceb8d772f702e239c5afede9d5108c/documentation/05_Computing_profiles.md#L35">documentation/05_Computing_profiles.md line 35</a>: <code>ExpansionHunterDenovo profile \</code></li><li>Example data: <a href="https://github.com/Illumina/ExpansionHunterDenovo/blob/5a48ed8b6dceb8d772f702e239c5afede9d5108c/examples/outlier/reference.fasta">examples/outlier/reference.fasta</a></li><li>Example data: <a href="https://github.com/Illumina/ExpansionHunterDenovo/blob/5a48ed8b6dceb8d772f702e239c5afede9d5108c/examples/case-control/reference.fasta">examples/case-control/reference.fasta</a></li><li>Example data: <a href="https://github.com/Illumina/ExpansionHunterDenovo/blob/5a48ed8b6dceb8d772f702e239c5afede9d5108c/examples/outlier/bamlets/sample10.bam">examples/outlier/bamlets/sample10.bam</a></li><li>Example data: <a href="https://github.com/Illumina/ExpansionHunterDenovo/blob/5a48ed8b6dceb8d772f702e239c5afede9d5108c/examples/outlier/bamlets/sample12.bam">examples/outlier/bamlets/sample12.bam</a></li><li>Example data: <a href="https://github.com/Illumina/ExpansionHunterDenovo/blob/5a48ed8b6dceb8d772f702e239c5afede9d5108c/examples/outlier/bamlets/sample14.bam">examples/outlier/bamlets/sample14.bam</a></li><li>Known issue: <a href="https://github.com/Illumina/ExpansionHunterDenovo/blob/5a48ed8b6dceb8d772f702e239c5afede9d5108c/README.md#L36">README.md line 36</a>: <code>Limitations</code></li><li>Documented input: <a href="https://github.com/Illumina/ExpansionHunterDenovo/blob/5a48ed8b6dceb8d772f702e239c5afede9d5108c/README.md#L10">README.md line 10</a>: <code>During the first step, genome-wide STR profiles are extracted from the input BAM</code></li></ul>
+<h2>Provenance of this trial (upstream vs. STRhub choices)</h2><h3>From upstream documentation</h3><ul class='stats'><li>Install (release_binary): `documentation/02_Installation.md:L19-L30`</li><li>Command: `documentation/05_Computing_profiles.md:L35`</li><li>Input format: `bam` (not explicitly stated)</li><li>Reference assembly: `both` (`documentation/08_Annotation.md:L41`)</li></ul><h3>Selected by STRhub for this trial</h3><ul class='stats'><li>Base environment supplied by STRhub: `ubuntu:22.04`; added beyond plain Ubuntu: minimal build toolchain: build-essential, cmake, git, ca-certificates (no tool-specific libraries)</li></ul>
+<h2>What this run needed beyond the repository</h2><p>The result above describes a run configured as follows. Anyone repeating it needs the same things.</p><ul class='stats'><li>A base environment for the documented installation: STRhub ran the repository&#x27;s install commands unchanged on Ubuntu 22.04, package lists refreshed, apt answering yes, plus minimal build toolchain (build-essential, cmake, git, ca-certificates; no tool-specific libraries). Base-image and package versions are not frozen by the commands.</li></ul>
+<h2>Notes from reading the repository</h2><p>Recorded automatically from the tool&#x27;s public files when this run was configured. Not verified by execution, and not part of the gates above. Useful for what to check by hand.</p><ul class='stats'><li>Environment: STRhub transcribed the documented installation commands unchanged into its own carrier (Ubuntu 22.04, package lists refreshed, apt answering yes, plus minimal build toolchain (build-essential, cmake, git, ca-certificates; no tool-specific libraries)).</li><li>Run command: the one documented in documentation/05_Computing_profiles.md (line 35), rewritten to STRhub&#x27;s mounts; the capture wrapper is planned only if the procedure review passes.</li></ul>
+<h2>Out of scope</h2>
+<p>This report does not evaluate any of the following:</p>
+<ul class="stats"><li>Genotype correctness or accuracy</li><li>Concordance against known truth sets</li><li>Sensitivity, specificity, or stutter performance</li><li>Allele calling accuracy or forensic casework suitability</li><li>Regulatory compliance or ISO accreditation</li><li>Multi-laboratory or multi-dataset reproducibility</li></ul>
+<h2>Limitations</h2>
+<ul class="stats"><li>Single reference dataset per input type</li><li>Single containerized environment (Docker / ubuntu-22.04)</li><li>No truth-set comparison or ground-truth genotypes</li><li>No accuracy or concordance assessment</li><li>No forensic or clinical validation of results</li><li>No sequencing data were processed because execution did not complete</li></ul>
+<h2>Scope</h2>
+<p class="scope">Assessment of documented execution in the stated environment and output format. Concerns reproducible execution only; no claim of accuracy, casework fitness, or regulatory validation.<br><br>
+This is <b>not</b> a claim that the genotypes are correct, nor that the tool is
+fit for casework or meets any regulatory standard. Concordance against known
+truth is out of scope.</p>
+<p style="color:#888;font-size:.85rem">Verified automatically, in a clean environment, on the tool&#x27;s public source at the pinned commit. This is a record of what happened, not an endorsement by the tool&#x27;s author.</p>
+<p style="color:#888;font-size:.85rem">Machine-readable:
+<a href="expansionhunterdenovo.json">expansionhunterdenovo.json</a> ·
+<a href="expansionhunterdenovo.badge.json">badge</a> ·
+<a href="expansionhunterdenovo.summary.md">summary.md</a></p>
+</body></html>

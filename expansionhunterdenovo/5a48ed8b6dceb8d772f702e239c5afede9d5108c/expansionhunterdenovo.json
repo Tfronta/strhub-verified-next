@@ -1,0 +1,1694 @@
+{
+  "schema": "strhub-verified/1",
+  "mode": "publish",
+  "tool": {
+    "name": "ExpansionHunterDenovo",
+    "version": "v0.9.0",
+    "contact": "https://github.com/Illumina/ExpansionHunterDenovo/issues"
+  },
+  "submission": {
+    "by": "third_party"
+  },
+  "source": {
+    "repo": "https://github.com/Illumina/ExpansionHunterDenovo",
+    "ref": "5a48ed8b6dceb8d772f702e239c5afede9d5108c",
+    "ref_resolved": "5a48ed8b6dceb8d772f702e239c5afede9d5108c",
+    "committed": "2020-03-04T04:44:07Z"
+  },
+  "environment": {
+    "dockerfile": "Dockerfile",
+    "os": [
+      "ubuntu-22.04"
+    ],
+    "source": "documented"
+  },
+  "generated": "2026-11-22T19:12:00+00:00",
+  "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/45059287281",
+  "run": {
+    "cmd": "ExpansionHunterDenovo profile --reads input.bam --reference reference.fasta --output-prefix output --min-anchor-mapq 50 --max-irr-mapq 40",
+    "cwd": ".",
+    "effective_cmd": "cd '.' && touch /tmp/.strhub_mark && ( ExpansionHunterDenovo profile --reads input.bam --reference reference.fasta --output-prefix output --min-anchor-mapq 50 --max-irr-mapq 40 ); rc=$?; find . -xdev -type f -newer /tmp/.strhub_mark -size +0 ! -path './.git/*' ! -path './proc/*' ! -path './sys/*' ! -path './dev/*' ! -path './data/*' ! -path '*/__pycache__/*' ! -name '*.pyc' ! -name '*.pyo' 2>/dev/null | head -500 | while IFS= read -r f; do mkdir -p \"/data/out/$(dirname \"$f\")\" && cp \"$f\" \"/data/out/$f\"; done; exit $rc",
+    "step_outcome": "skipped"
+  },
+  "instrument": "documented",
+  "recipe": {
+    "origin": "proposed"
+  },
+  "gates": {
+    "available": true,
+    "installs": false,
+    "runs": false,
+    "io": false,
+    "content": false
+  },
+  "input_contract": {},
+  "level": "available",
+  "io_detail": {},
+  "content_detail": {},
+  "example_detail": null,
+  "datasets": [
+    {
+      "leg": "external",
+      "label": "External data",
+      "available": false,
+      "type": null,
+      "dataset": null,
+      "io": false,
+      "content": false,
+      "passed": false
+    },
+    {
+      "leg": "example",
+      "label": "Tool's own example",
+      "available": false,
+      "io": false,
+      "content": null,
+      "passed": false,
+      "matches_expected": null,
+      "produced_count": null
+    }
+  ],
+  "scope": "Assessment of documented execution in the stated environment and output format. Concerns reproducible execution only; no claim of accuracy, casework fitness, or regulatory validation.",
+  "upstream": {
+    "checked": "2026-11-22T19:12:00+00:00",
+    "repo_exists": true,
+    "ref_exists": true,
+    "default_branch": "master",
+    "status": "ahead",
+    "behind_by": 7
+  },
+  "needed_beyond_repo": [
+    "A base environment for the documented installation: STRhub ran the repository's install commands unchanged on Ubuntu 22.04, package lists refreshed, apt answering yes, plus minimal build toolchain (build-essential, cmake, git, ca-certificates; no tool-specific libraries). Base-image and package versions are not frozen by the commands."
+  ],
+  "author_known_issues": [
+    {
+      "heading": "Limitations",
+      "line": 36,
+      "text": "- STRs shorter than the read length are ignored; the program is appropriate\nonly for detecting expansions that exceed the read length.\n- The location of each reported STR is approximate (up to about 500bp-1Kbp)\n- STRs are not genotyped; the program reports a depth-normalized count of reads\noriginating inside each STR; this count can be used as a very approximate\nmeasure of the repeat length\n- To achieve best results all samples must be sequenced on the same instrument\nto similar coverage, have the same read and fragment lengths, and be subjected\nto the same computational pre-processing (e.g.",
+      "truncated": true,
+      "url": "https://github.com/Illumina/ExpansionHunterDenovo/blob/5a48ed8b6dceb8d772f702e239c5afede9d5108c/README.md#L36"
+    }
+  ],
+  "evidence": [
+    {
+      "claim": "run_command",
+      "kind": "doc",
+      "path": "documentation/05_Computing_profiles.md",
+      "line": 35,
+      "text": "ExpansionHunterDenovo profile \\",
+      "url": "https://github.com/Illumina/ExpansionHunterDenovo/blob/5a48ed8b6dceb8d772f702e239c5afede9d5108c/documentation/05_Computing_profiles.md#L35"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "examples/outlier/reference.fasta",
+      "text": "fasta",
+      "url": "https://github.com/Illumina/ExpansionHunterDenovo/blob/5a48ed8b6dceb8d772f702e239c5afede9d5108c/examples/outlier/reference.fasta"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "examples/case-control/reference.fasta",
+      "text": "fasta",
+      "url": "https://github.com/Illumina/ExpansionHunterDenovo/blob/5a48ed8b6dceb8d772f702e239c5afede9d5108c/examples/case-control/reference.fasta"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "examples/outlier/bamlets/sample10.bam",
+      "text": "bam",
+      "url": "https://github.com/Illumina/ExpansionHunterDenovo/blob/5a48ed8b6dceb8d772f702e239c5afede9d5108c/examples/outlier/bamlets/sample10.bam"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "examples/outlier/bamlets/sample12.bam",
+      "text": "bam",
+      "url": "https://github.com/Illumina/ExpansionHunterDenovo/blob/5a48ed8b6dceb8d772f702e239c5afede9d5108c/examples/outlier/bamlets/sample12.bam"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "examples/outlier/bamlets/sample14.bam",
+      "text": "bam",
+      "url": "https://github.com/Illumina/ExpansionHunterDenovo/blob/5a48ed8b6dceb8d772f702e239c5afede9d5108c/examples/outlier/bamlets/sample14.bam"
+    },
+    {
+      "claim": "known_issue",
+      "kind": "readme",
+      "path": "README.md",
+      "line": 36,
+      "text": "Limitations",
+      "url": "https://github.com/Illumina/ExpansionHunterDenovo/blob/5a48ed8b6dceb8d772f702e239c5afede9d5108c/README.md#L36"
+    },
+    {
+      "claim": "documented_input",
+      "kind": "readme",
+      "path": "README.md",
+      "line": 10,
+      "text": "During the first step, genome-wide STR profiles are extracted from the input BAM",
+      "url": "https://github.com/Illumina/ExpansionHunterDenovo/blob/5a48ed8b6dceb8d772f702e239c5afede9d5108c/README.md#L10"
+    }
+  ],
+  "repo_test_data": {
+    "known": true,
+    "present": true,
+    "count": 30,
+    "examples": [
+      "examples/outlier/reference.fasta",
+      "examples/case-control/reference.fasta",
+      "examples/outlier/bamlets/sample10.bam",
+      "examples/outlier/bamlets/sample12.bam",
+      "examples/outlier/bamlets/sample14.bam"
+    ]
+  },
+  "caveats": {
+    "source": "detect_recipe",
+    "items": [
+      "Environment: STRhub transcribed the documented installation commands unchanged into its own carrier (Ubuntu 22.04, package lists refreshed, apt answering yes, plus minimal build toolchain (build-essential, cmake, git, ca-certificates; no tool-specific libraries)).",
+      "Run command: the one documented in documentation/05_Computing_profiles.md (line 35), rewritten to STRhub's mounts; the capture wrapper is planned only if the procedure review passes."
+    ]
+  },
+  "logs": {
+    "build": "expansionhunterdenovo.log-build.txt"
+  },
+  "terminals": {
+    "build": "expansionhunterdenovo.terminal-build.txt"
+  },
+  "install_detail": {
+    "passed": false,
+    "diagnostics": [
+      {
+        "id": "build_download_failed",
+        "severity": "error",
+        "title": "A download in the build failed: https://dl.bintray.com/boostorg/release/1.67.0/source/boost_1_67_0.tar.bz2",
+        "count": 3,
+        "examples": [
+          "https://dl.bintray.com/boostorg/release/1.67.0/source/boost_1_67_0.tar.bz2"
+        ],
+        "suggestion": "Observed: during compilation, CMake attempted to fetch an external dependency from 'https://dl.bintray.com/boostorg/release/1.67.0/source/boost_1_67_0.tar.bz2' and received an HTTP or hash-mismatch error. Inferred: the remote URL may be unavailable or hosted on a retired service (such as dl.bintray.com, which shut down in May 2021). Not determined automatically: whether the outage is transient or permanent."
+      }
+    ],
+    "faults": []
+  },
+  "procedure_review": {
+    "may_say_runs": true,
+    "status_code": "VERIFIED_PROCEDURE_READY",
+    "basis": "gates",
+    "attribution": "tool",
+    "blocker": "ready",
+    "reason": "The repository states how to install (release_binary) and STRhub holds the sample. The container is that install, packaged. If the documented command then fails, the failure is that command's.",
+    "amendments": [],
+    "inferences": {
+      "install": {
+        "evidence_source": "documentation/02_Installation.md:L19-L30",
+        "verified": true
+      },
+      "run_command": {
+        "evidence_source": "documentation/05_Computing_profiles.md:L35",
+        "verified": true,
+        "kind": "doc",
+        "path": "documentation/05_Computing_profiles.md",
+        "document_sha256": "ffd3791d3e6cbd260486eb7486a11ed1d704eabbe4603c9684eef7666d43c632"
+      },
+      "output": {
+        "verified": true,
+        "kind": "doc",
+        "path": "documentation/03_Case_control_quickstart.md",
+        "line": 25,
+        "end_line": 25,
+        "document_sha256": "d4745be37ee36fcd0327462e346b464144a516c66132413c7267d281267ae4dc",
+        "evidence_source": "documentation/03_Case_control_quickstart.md:L25"
+      }
+    },
+    "unbacked_inferences": [],
+    "provenance": {
+      "from_upstream": {
+        "install": {
+          "method": "release_binary",
+          "evidence_source": "documentation/02_Installation.md:L19-L30"
+        },
+        "command": {
+          "value": "ExpansionHunterDenovo profile --reads input.bam --reference reference.fasta --output-prefix output --min-anchor-mapq 50 --max-irr-mapq 40",
+          "evidence_source": "documentation/05_Computing_profiles.md:L35"
+        },
+        "input_kind": {
+          "value": "bam",
+          "evidence_source": null
+        },
+        "supported_platforms": [],
+        "assembly": {
+          "declared": "both",
+          "evidence_source": "documentation/08_Annotation.md:L41"
+        },
+        "regions_schema": null,
+        "output_format": {
+          "glob": "**/*.json",
+          "evidence_source": "documentation/03_Case_control_quickstart.md:L25"
+        }
+      },
+      "derived": {
+        "command_rewrites": [],
+        "regions_layout_binding": null,
+        "single_sample_adaptation": null
+      },
+      "harness_choices": {
+        "dataset": null,
+        "platform": {
+          "selected": "illumina",
+          "basis": "counted_unproven",
+          "supported_platforms": []
+        },
+        "assembly": {
+          "selected": null,
+          "basis": "upstream_stated",
+          "note": null
+        },
+        "regions_layout": null,
+        "base_environment": {
+          "image": "ubuntu:22.04",
+          "description": "Ubuntu 22.04, package lists refreshed, apt answering yes, plus minimal build toolchain (build-essential, cmake, git, ca-certificates; no tool-specific libraries)",
+          "added_packages": [
+            "build-essential",
+            "cmake",
+            "git",
+            "ca-certificates"
+          ],
+          "miniforge": false,
+          "submodules": false
+        }
+      }
+    },
+    "install_method": "release_binary",
+    "citable_install": true,
+    "input_type": null,
+    "output_glob": "**/*.json",
+    "profile": "strhub-upstream-procedure/1",
+    "install_ready": true,
+    "example_ready": false,
+    "installation": {
+      "profile": "strhub-documented-install/1",
+      "ready": true,
+      "method": "release_binary",
+      "reason": "Transcribe the installation commands the repository documents, unchanged and in order, into a fixed evaluator carrier; no step, dependency, option or choice was added.",
+      "repo": "https://github.com/Illumina/ExpansionHunterDenovo",
+      "ref": "5a48ed8b6dceb8d772f702e239c5afede9d5108c",
+      "documents": [
+        {
+          "path": "README.md",
+          "sha256": "20972ccae9f2cdd626be4e6ba0575c7706423597be575196bf48b4ce051efd9c"
+        },
+        {
+          "path": "documentation/02_Installation.md",
+          "sha256": "bddb51e61c62ba7459bdd78c6a7af72c8907663490d21ddd977f052a20b088dc"
+        }
+      ],
+      "commands": [
+        {
+          "file": "documentation/02_Installation.md",
+          "line": 19,
+          "text": "apt install zlib1g-dev libbz2-dev liblzma-dev",
+          "argv": [
+            "apt",
+            "install",
+            "zlib1g-dev",
+            "libbz2-dev",
+            "liblzma-dev"
+          ]
+        },
+        {
+          "file": "documentation/02_Installation.md",
+          "line": 28,
+          "text": "mkdir build",
+          "argv": [
+            "mkdir",
+            "build"
+          ]
+        },
+        {
+          "file": "documentation/02_Installation.md",
+          "line": 28,
+          "text": "cd build",
+          "argv": [
+            "cd",
+            "build"
+          ]
+        },
+        {
+          "file": "documentation/02_Installation.md",
+          "line": 29,
+          "text": "cmake -DCMAKE_BUILD_TYPE=Release ../source",
+          "argv": [
+            "cmake",
+            "-DCMAKE_BUILD_TYPE=Release",
+            "../source"
+          ]
+        },
+        {
+          "file": "documentation/02_Installation.md",
+          "line": 30,
+          "text": "make",
+          "argv": [
+            "make"
+          ]
+        }
+      ],
+      "published_alternatives": [],
+      "conda_environment": null,
+      "base_condition": {
+        "image": "ubuntu:22.04",
+        "description": "Ubuntu 22.04, package lists refreshed, apt answering yes, plus minimal build toolchain (build-essential, cmake, git, ca-certificates; no tool-specific libraries)",
+        "role": "evaluator base environment",
+        "added_packages": [
+          "build-essential",
+          "cmake",
+          "git",
+          "ca-certificates"
+        ],
+        "miniforge": false,
+        "submodules": false
+      },
+      "citation": {
+        "repo": "https://github.com/Illumina/ExpansionHunterDenovo",
+        "ref": "5a48ed8b6dceb8d772f702e239c5afede9d5108c",
+        "path": "documentation/02_Installation.md",
+        "line": 19,
+        "end_line": 30,
+        "verified": true,
+        "document_sha256": "bddb51e61c62ba7459bdd78c6a7af72c8907663490d21ddd977f052a20b088dc"
+      },
+      "carrier_dockerfile": "# Evaluator carrier: strhub-documented-install/1; not an upstream Dockerfile.\nFROM ubuntu:22.04\nENV DEBIAN_FRONTEND=noninteractive\nRUN [\"bash\", \"-c\", \"echo 'APT::Get::Assume-Yes \\\"true\\\";' > /etc/apt/apt.conf.d/90strhub && apt-get update\"]\nRUN [\"bash\", \"-c\", \"apt-get install --no-install-recommends build-essential cmake git ca-certificates\"]\nCOPY [\".\", \"/opt/tool\"]\nWORKDIR /opt/tool\nRUN [\"bash\", \"-lc\", \"set -eo pipefail\\napt install zlib1g-dev libbz2-dev liblzma-dev\\nmkdir build\\ncd build\\ncmake -DCMAKE_BUILD_TYPE=Release ../source\\nmake\\n\"]\nENTRYPOINT [\"/bin/bash\", \"-lc\"]\n",
+      "carrier_sha256": "a3e484daf60007c44e842445f18a670203bf1fabe46bd9176e7f3b34a1195a86"
+    },
+    "command_review": {
+      "profile": "strhub-upstream-procedure/1",
+      "cited": "ExpansionHunterDenovo profile --reads input.bam --reference reference.fasta --output-prefix output --min-anchor-mapq 50 --max-irr-mapq 40",
+      "command": "ExpansionHunterDenovo profile --reads input.bam --reference reference.fasta --output-prefix output --min-anchor-mapq 50 --max-irr-mapq 40",
+      "substitutions": [],
+      "read_bindings": [],
+      "limitations": [],
+      "expected": "ExpansionHunterDenovo profile --reads input.bam --reference reference.fasta --output-prefix output --min-anchor-mapq 50 --max-irr-mapq 40",
+      "executed": "ExpansionHunterDenovo profile --reads input.bam --reference reference.fasta --output-prefix output --min-anchor-mapq 50 --max-irr-mapq 40",
+      "cited_sha256": "9bad10e1aa6566b6157dc60407dd53add2888395a838556360ab5f7d355e40a1",
+      "executed_sha256": "9bad10e1aa6566b6157dc60407dd53add2888395a838556360ab5f7d355e40a1",
+      "citations": [
+        {
+          "repo": "https://github.com/Illumina/ExpansionHunterDenovo",
+          "ref": "5a48ed8b6dceb8d772f702e239c5afede9d5108c",
+          "path": "documentation/05_Computing_profiles.md",
+          "line": 35,
+          "verified": true,
+          "document_sha256": "ffd3791d3e6cbd260486eb7486a11ed1d704eabbe4603c9684eef7666d43c632",
+          "command_sha256": "9bad10e1aa6566b6157dc60407dd53add2888395a838556360ab5f7d355e40a1"
+        }
+      ]
+    },
+    "manifest_sha256": "c6c0b4748f39bbaff18440f49ae917b07a9828180b65fea1e67cec3b4c1eae81",
+    "evidence_sha256": "dd77e20b9cf235002b3a227f6735036b0eb7a2004094da5c5c8d2e3376516c35",
+    "evidence": {
+      "schema": "strhub-procedure-evidence/1",
+      "manifest": {
+        "caveats": {
+          "items": [
+            "Environment: STRhub transcribed the documented installation commands unchanged into its own carrier (Ubuntu 22.04, package lists refreshed, apt answering yes, plus minimal build toolchain (build-essential, cmake, git, ca-certificates; no tool-specific libraries)).",
+            "Run command: the one documented in documentation/05_Computing_profiles.md (line 35), rewritten to STRhub's mounts; the capture wrapper is planned only if the procedure review passes."
+          ],
+          "source": "detect_recipe"
+        },
+        "environment": {
+          "dockerfile": "Dockerfile",
+          "os": [
+            "ubuntu-22.04"
+          ],
+          "source": "documented"
+        },
+        "example": {
+          "cmd": "ExpansionHunterDenovo profile --reads bamlets/sample1.bam --reference reference.fasta --output-prefix str-profiles/sample1 --min-anchor-mapq 50 --max-irr-mapq 40",
+          "cwd": ".",
+          "source": "detected"
+        },
+        "inputs": {},
+        "outputs": [
+          {
+            "format": "json",
+            "min_records": 1,
+            "path": "**/*.json"
+          }
+        ],
+        "recipe": {
+          "origin": "proposed"
+        },
+        "report": {
+          "slug": "expansionhunterdenovo"
+        },
+        "run": {
+          "cmd": "cd '.' && touch /tmp/.strhub_mark && ( ExpansionHunterDenovo profile --reads input.bam --reference reference.fasta --output-prefix output --min-anchor-mapq 50 --max-irr-mapq 40 ); rc=$?; find . -xdev -type f -newer /tmp/.strhub_mark -size +0 ! -path './.git/*' ! -path './proc/*' ! -path './sys/*' ! -path './dev/*' ! -path './data/*' ! -path '*/__pycache__/*' ! -name '*.pyc' ! -name '*.pyo' 2>/dev/null | head -500 | while IFS= read -r f; do mkdir -p \"/data/out/$(dirname \"$f\")\" && cp \"$f\" \"/data/out/$f\"; done; exit $rc",
+          "timeout_minutes": 20
+        },
+        "source": {
+          "ref": "5a48ed8b6dceb8d772f702e239c5afede9d5108c",
+          "repo": "https://github.com/Illumina/ExpansionHunterDenovo"
+        },
+        "submission": {
+          "by": "third_party"
+        },
+        "tool": {
+          "contact": "https://github.com/Illumina/ExpansionHunterDenovo/issues",
+          "name": "ExpansionHunterDenovo",
+          "version": "v0.9.0"
+        }
+      },
+      "proposal": {
+        "build": {
+          "also_published": null,
+          "asset": "ExpansionHunterDenovo-v0.9.0-linux_x86_64.tar.gz",
+          "candidates": [
+            {
+              "asset": "ExpansionHunterDenovo-v0.9.0-linux_x86_64.tar.gz",
+              "digest": null,
+              "file": null,
+              "method": "release_binary",
+              "tag": "v0.9.0",
+              "url": "https://github.com/Illumina/ExpansionHunterDenovo/releases/download/v0.9.0/ExpansionHunterDenovo-v0.9.0-linux_x86_64.tar.gz"
+            },
+            {
+              "dir": "source",
+              "file": "source/CMakeLists.txt",
+              "method": "cmake"
+            },
+            {
+              "dir": "source",
+              "file": "source/Makefile",
+              "method": "make"
+            }
+          ],
+          "digest": null,
+          "dir": null,
+          "evidence_source": "release_asset:ExpansionHunterDenovo-v0.9.0-linux_x86_64.tar.gz",
+          "file": null,
+          "image": null,
+          "method": "release_binary",
+          "package": null,
+          "readme_install_lines": [],
+          "readme_line": null,
+          "spec_list": false,
+          "ssh_urls_in": [],
+          "tag": "v0.9.0",
+          "then": [],
+          "url": "https://github.com/Illumina/ExpansionHunterDenovo/releases/download/v0.9.0/ExpansionHunterDenovo-v0.9.0-linux_x86_64.tar.gz"
+        },
+        "commands": [
+          {
+            "cmd": "ExpansionHunterDenovo profile --reads input.bam --reference reference.fasta --output-prefix output --min-anchor-mapq 50 --max-irr-mapq 40",
+            "entry_point": true,
+            "evidence_source": "documentation/05_Computing_profiles.md:L35",
+            "file": "documentation/05_Computing_profiles.md",
+            "has_input_flag": true,
+            "has_output_flag": true,
+            "help_only": false,
+            "invokes": "ExpansionHunterDenovo",
+            "line": 35,
+            "main_verb": true,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 8,
+            "subcommand": "profile",
+            "synopsis": false
+          },
+          {
+            "cmd": "/path/to/ExpansionHunterDenovo profile --reads bamlets/sample1.bam --reference reference.fasta --output-prefix str-profiles/sample1 --min-anchor-mapq 50 --max-irr-mapq 40",
+            "entry_point": true,
+            "evidence_source": "documentation/03_Case_control_quickstart.md:L17",
+            "file": "documentation/03_Case_control_quickstart.md",
+            "has_input_flag": true,
+            "has_output_flag": true,
+            "help_only": false,
+            "invokes": "ExpansionHunterDenovo",
+            "line": 17,
+            "main_verb": true,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 5,
+            "subcommand": "profile",
+            "synopsis": false
+          },
+          {
+            "cmd": "./make-bamlet.py --bam input_full_bam.bam --bamlet output_bamlet.bam --region chr2:6123657-6123714",
+            "entry_point": false,
+            "evidence_source": "documentation/05_Computing_profiles.md:L120",
+            "file": "documentation/05_Computing_profiles.md",
+            "has_input_flag": true,
+            "has_output_flag": false,
+            "help_only": false,
+            "invokes": "make-bamlet.py",
+            "line": 120,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 8,
+            "subcommand": null,
+            "synopsis": false
+          },
+          {
+            "cmd": "bash annotate_ehdn.sh --ehdn-results locus_output.tsv --ehdn-annotated-results locus_output_annotated.tsv --annovar-annotate-variation ~/annovar/annotate_variation.pl --annovar-humandb ~/annovar/humandb --annovar-buildver hg19",
+            "entry_point": false,
+            "evidence_source": "documentation/08_Annotation.md:L59",
+            "file": "documentation/08_Annotation.md",
+            "has_input_flag": false,
+            "has_output_flag": false,
+            "help_only": false,
+            "invokes": "annotate_ehdn.sh",
+            "line": 59,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 11,
+            "subcommand": null,
+            "synopsis": false
+          },
+          {
+            "cmd": "path/to/scripts/casecontrol.py motif --manifest manifest.tsv --multisample-profile example_dataset.multisample_profile.json --output example_dataset.casecontrol_motif.tsv",
+            "entry_point": false,
+            "evidence_source": "documentation/03_Case_control_quickstart.md:L96",
+            "file": "documentation/03_Case_control_quickstart.md",
+            "has_input_flag": false,
+            "has_output_flag": true,
+            "help_only": false,
+            "invokes": "casecontrol.py",
+            "line": 96,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 5,
+            "subcommand": "motif",
+            "synopsis": false
+          },
+          {
+            "cmd": "/path/to/scripts/outlier.py locus --manifest manifest.tsv --multisample-profile example_dataset.multisample_profile.json --output example_dataset.outlier_locus.tsv",
+            "entry_point": false,
+            "evidence_source": "documentation/04_Outlier_quickstart.md:L23",
+            "file": "documentation/04_Outlier_quickstart.md",
+            "has_input_flag": false,
+            "has_output_flag": true,
+            "help_only": false,
+            "invokes": "outlier.py",
+            "line": 23,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 6,
+            "subcommand": "locus",
+            "synopsis": false
+          },
+          {
+            "cmd": "/path/to/scripts/casecontrol.py locus --manifest manifest.tsv --multisample-profile example_dataset.multisample_profile.json --output example_dataset.casecontrol_locus.tsv [--target-regions target_regions.bed]",
+            "entry_point": false,
+            "evidence_source": "documentation/03_Case_control_quickstart.md:L69",
+            "file": "documentation/03_Case_control_quickstart.md",
+            "has_input_flag": false,
+            "has_output_flag": true,
+            "help_only": false,
+            "invokes": "casecontrol.py",
+            "line": 69,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 5,
+            "subcommand": "locus",
+            "synopsis": true
+          },
+          {
+            "cmd": "path/to/scripts/outlier.py motif --manifest manifest.tsv --multisample-profile example_dataset.multisample_profile.json --output example_dataset.outlier_motif.tsv [--target-regions target_regions.bed]",
+            "entry_point": false,
+            "evidence_source": "documentation/04_Outlier_quickstart.md:L46",
+            "file": "documentation/04_Outlier_quickstart.md",
+            "has_input_flag": false,
+            "has_output_flag": true,
+            "help_only": false,
+            "invokes": "outlier.py",
+            "line": 46,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 6,
+            "subcommand": "motif",
+            "synopsis": true
+          },
+          {
+            "cmd": "ExpansionHunterDenovo merge --reference reference.fa --manifest manifest.txt --output-prefix example_dataset",
+            "entry_point": true,
+            "evidence_source": "documentation/06_Merging_profiles.md:L97",
+            "file": "documentation/06_Merging_profiles.md",
+            "has_input_flag": false,
+            "has_output_flag": true,
+            "help_only": true,
+            "invokes": "ExpansionHunterDenovo",
+            "line": 97,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 9,
+            "subcommand": "merge",
+            "synopsis": false
+          },
+          {
+            "cmd": "/path/to/ExpansionHunterDenovo merge --reference reference.fasta --manifest manifest.tsv --output-prefix example_dataset",
+            "entry_point": true,
+            "evidence_source": "documentation/03_Case_control_quickstart.md:L48",
+            "file": "documentation/03_Case_control_quickstart.md",
+            "has_input_flag": false,
+            "has_output_flag": true,
+            "help_only": true,
+            "invokes": "ExpansionHunterDenovo",
+            "line": 48,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 5,
+            "subcommand": "merge",
+            "synopsis": false
+          }
+        ],
+        "dockerfile": null,
+        "docs_read": [
+          {
+            "origin": "repo",
+            "path": "documentation/00_Introduction.md"
+          },
+          {
+            "origin": "repo",
+            "path": "LICENSE.txt"
+          },
+          {
+            "origin": "repo",
+            "path": "COPYRIGHT.txt"
+          },
+          {
+            "origin": "repo",
+            "path": "documentation/02_Installation.md"
+          },
+          {
+            "origin": "repo",
+            "path": "documentation/03_Case_control_quickstart.md"
+          },
+          {
+            "origin": "repo",
+            "path": "documentation/04_Outlier_quickstart.md"
+          },
+          {
+            "origin": "repo",
+            "path": "documentation/01_Before_you_begin.md"
+          },
+          {
+            "origin": "repo",
+            "path": "documentation/05_Computing_profiles.md"
+          },
+          {
+            "origin": "repo",
+            "path": "documentation/06_Merging_profiles.md"
+          },
+          {
+            "origin": "repo",
+            "path": "documentation/07_Case_control_analysis.md"
+          },
+          {
+            "origin": "repo",
+            "path": "documentation/08_Annotation.md"
+          },
+          {
+            "origin": "repo",
+            "path": "documentation/09_Repeat_prioritization_strategies.md"
+          }
+        ],
+        "docs_text": "# A guide to ExpansionHunter Denovo software\n\nExpansionHunter Denovo (EHdn) is a suite of tools for detecting novel expansions\nof short tandem repeats (STRs). EHdn is intended for analysis of a collection of\nBAM/CRAM files containing alignments of short (100-200bp) reads.\n\nTo use ExpansionHunter Denovo you need to (1) download the latest release or build\nthe program from source, (2) obtain a collection of BAM/CRAM files a subset of which\nis suspected to contain a repeat expansion.\n\nThe following sections will help you to get started.\n\nQuick start guides:\n\n- [Before you begin](01_Before_you_begin.md)\n- [Installation](02_Installation.md)\n- [Case-control analysis](03_Case_control_quickstart.md)\n- [Outlier analysis](04_Outlier_quickstart.md)\n\nManual pages:\n\n- [Computing STR profiles](05_Computing_profiles.md)\n- [Merging single-sample STR profiles into multisample profiles](06_Merging_profiles.md)\n- [Performing case control analysis](07_Case_control_analysis.md)\n- [Annotating locus analysis results](08_Annotation.md)\n- [Repeat Prioritization Strategies](09_Repeat_prioritization_strategies.md)\n\n\n                                 Apache License\n                           Version 2.0, January 2004\n                        http://www.apache.org/licenses/\n\n   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION\n\n   1. Definitions.\n\n      \"License\" shall mean the terms and conditions for use, reproduction,\n      and distribution as defined by Sections 1 through 9 of this document.\n\n      \"Licensor\" shall mean the copyright owner or entity authorized by\n      the copyright owner that is granting the License.\n\n      \"Legal Entity\" shall mean the union of the acting entity and all\n      other entities that control, are controlled by, or are under common\n      control with that entity. For the purposes of this definition,\n      \"control\" means (i) the power, direct or indirect, to cause the\n      direction or management of such entity, whether by contract or\n      otherwise, or (ii) ownership of fifty percent (50%) or more of the\n      outstanding shares, or (iii) beneficial ownership of such entity.\n\n      \"You\" (or \"Your\") shall mean an individual or Legal Entity\n      exercising permissions granted by this License.\n\n      \"Source\" form shall mean the preferred form for making modifications,\n      including but not limited to software source code, documentation\n      source, and configuration files.\n\n      \"Object\" form shall mean any form resulting from mechanical\n      transformation or translation of a Source form, including but\n      not limited to compiled object code, generated documentation,\n      and conversions to other media types.\n\n      \"Work\" shall mean the work of authorship, whether in Source or\n      Object form, made available under the License, as indicated by a\n      copyright notice that is included in or attached to the work\n      (an example is provided in the Appendix below).\n\n      \"Derivative Works\" shall mean any work, whether in Source or Object\n      form, that is based on (or derived from) the Work and for which the\n      editorial revisions, annotations, elaborations, or other modifications\n      represent, as a whole, an original work of authorship. For the purposes\n      of this License, Derivative Works shall not include works that remain\n      separable from, or merely link (or bind by name) to the interfaces of,\n      the Work and Derivative Works thereof.\n\n      \"Contribution\" shall mean any work of authorship, including\n      the original version of the Work and any modifications or additions\n      to that Work or Derivative Works thereof, that is intentionally\n      submitted to Licensor for inclusion in the Work by the copyright owner\n      or by an individual or Legal Entity authorized to submit on behalf of\n      the copyright owner. For the purposes of this definition, \"submitted\"\n      means any form of electronic, verbal, or written communication sent\n      to the Licensor or its representatives, including but not limited to\n      communication on electronic mailing lists, source code control systems,\n      and issue tracking systems that are managed by, or on behalf of, the\n      Licensor for the purpose of discussing and improving the Work, but\n      excluding communication that is conspicuously marked or otherwise\n      designated in writing by the copyright owner as \"Not a Contribution.\"\n\n      \"Contributor\" shall mean Licensor and any individual or Legal Entity\n      on behalf of whom a Contribution has been received by Licensor and\n      subsequently incorporated within the Work.\n\n   2. Grant of Copyright License. Subject to the terms and conditions of\n      this License, each Contributor hereby grants to You a perpetual,\n      worldwide, non-exclusive, no-charge, royalty-free, irrevocable\n      copyright license to reproduce, prepare Derivative Works of,\n      publicly display, publicly perform, sublicense, and distribute the\n      Work and such Derivative Works in Source or Object form.\n\n   3. Grant of Patent License. Subject to the terms and conditions of\n      this License, each Contributor hereby grants to You a perpetual,\n      worldwide, non-exclusive, no-charge, royalty-free, irrevocable\n      (except as stated in this section) patent license to make, have made,\n      use, offer to sell, sell, import, and otherwise transfer the Work,\n      where such license applies only to those patent claims licensable\n      by such Contributor that are necessarily infringed by their\n      Contribution(s) alone or by combination of their Contribution(s)\n      with the Work to which such Contribution(s) was submitted. If You\n      institute patent litigation against any entity (including a\n      cross-claim or counterclaim in a lawsuit) alleging that the Work\n      or a Contribution incorporated within the Work constitutes direct\n      or contributory patent infringement, then any patent licenses\n      granted to You under this License for that Work shall terminate\n      as of the date such litigation is filed.\n\n   4. Redistribution. You may reproduce and distribute copies of the\n      Work or Derivative Works thereof in any medium, with or without\n      modifications, and in Source or Object form, provided that You\n      meet the following conditions:\n\n      (a) You must give any other recipients of the Work or\n          Derivative Works a copy of this License; and\n\n      (b) You must cause any modified files to carry prominent notices\n          stating that You changed the files; and\n\n      (c) You must retain, in the Source form of any Derivative Works\n          that You distribute, all copyright, patent, trademark, and\n          attribution notices from the Source form of the Work,\n          excluding those notices that do not pertain to any part of\n          the Derivative Works; and\n\n      (d) If the Work includes a \"NOTICE\" text file as part of its\n          distribution, then any Derivative Works that You distribute must\n          include a readable copy of the attribution notices contained\n          within such NOTICE file, excluding those notices that do not\n          pertain to any part of the Derivative Works, in at least one\n          of the following places: within a NOTICE text file distributed\n          as part of the Derivative Works; within the Source form or\n          documentation, if provided along with the Derivative Works; or,\n          within a display generated by the Derivative Works, if and\n          wherever such third-party notices normally appear. The contents\n          of the NOTICE file are for informational purposes only and\n          do not modify the License. You may add Your own attribution\n          notices within Derivative Works that You distribute, alongside\n          or as an addendum to the NOTICE text from the Work, provided\n          that such additional attribution notices cannot be construed\n          as modifying the License.\n\n      You may add Your own copyright statement to Your modifications and\n      may provide additional or different license terms and conditions\n      for use, reproduction, or distribution of Your modifications, or\n      for any such Derivative Works as a whole, provided Your use,\n      reproduction, and distribution of the Work otherwise complies with\n      the conditions stated in this License.\n\n   5. Submission of Contributions. Unless You explicitly state otherwise,\n      any Contribution intentionally submitted for inclusion in the Work\n      by You to the Licensor shall be under the terms and conditions of\n      this License, without any additional terms or conditions.\n      Notwithstanding the above, nothing herein shall supersede or modify\n      the terms of any separate license agreement you may have executed\n      with Licensor regarding such Contributions.\n\n   6. Trademarks. This License does not grant permission to use the trade\n      names, trademarks, service marks, or product names of the Licensor,\n      except as required for reasonable and customary use in describing the\n      origin of the Work and reproducing the content of the NOTICE file.\n\n   7. Disclaimer of Warranty. Unless required by applicable law or\n      agreed to in writing, Licensor provides the Work (and each\n      Contributor provides its Contributions) on an \"AS IS\" BASIS,\n      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or\n      implied, including, without limitation, any warranties or conditions\n      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A\n      PARTICULAR PURPOSE. You are solely responsible for determining the\n      appropriateness of using or redistributing the Work and assume any\n      risks associated with Your exercise of permissions under this License.\n\n   8. Limitation of Liability. In no event and under no legal theory,\n      whether in tort (including negligence), contract, or otherwise,\n      unless required by applicable law (such as deliberate and grossly\n      negligent acts) or agreed to in writing, shall any Contributor be\n      liable to You for damages, including any direct, indirect, special,\n      incidental, or consequential damages of any character arising as a\n      result of this License or out of the use or inability to use the\n      Work (including but not limited to damages for loss of goodwill,\n      work stoppage, computer failure or malfunction, or any and all\n      other commercial damages or losses), even if such Contributor\n      has been advised of the possibility of such damages.\n\n   9. Accepting Warranty or Additional Liability. While redistributing\n      the Work or Derivative Works thereof, You may choose to offer,\n      and charge a fee for, acceptance of support, warranty, indemnity,\n      or other liability obligations and/or rights consistent with this\n      License. However, in accepting such obligations, You may act only\n      on Your own behalf and on Your sole responsibility, not on behalf\n      of any other Contributor, and only if You agree to indemnify,\n      defend, and hold each Contributor harmless for any liability\n      incurred by, or claims asserted against, such Contributor by reason\n      of your accepting any such warranty or additional liability.\n\n   END OF TERMS AND CONDITIONS\n\n   APPENDIX: How to apply the Apache License to your work.\n\n      To apply the Apache License to your work, attach the following\n      boilerplate notice, with the fields enclosed by brackets \"[]\"\n      replaced with your own identifying information. (Don't include\n      the brackets!)  The text should be enclosed in the appropriate\n      comment syntax for the file format. We also recommend that a\n      file or class name and description of purpose be included on the\n      same \"printed page\" as the copyright notice for easier\n      identification within third-party archives.\n\n   Copyright [yyyy] [name of copyright owner]\n\n   Licensed under the Apache License, Version 2.0 (the \"License\");\n   you may not use this file except in compliance with the License.\n   You may obtain a copy of the License at\n\n       http://www.apache.org/licenses/LICENSE-2.0\n\n   Unless required by applicable law or agreed to in writing, software\n   distributed under the License is distributed on an \"AS IS\" BASIS,\n   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n   See the License for the specific language governing permissions and\n   limitations under the License.\n\nExpansionHunter Denovo relies on the following libraries/external\ntools. These are distributed according to the licensing terms\ngoverning each library:\n\n******************************************************************\n\nBoost CMake\n\nNew BSD License\n\nCopyright (c) 2016, Florent Castelli All rights reserved.\n\nRedistribution and use in source and binary forms, with or without\nmodification, are permitted provided that the following conditions\nare met:\n\nRedistributions of source code must retain the above copyright notice,\nthis list of conditions and the following disclaimer. Redistributions\nin binary form must reproduce the above copyright notice, this list of\nconditions and the following disclaimer in the documentation and/or\nother materials provided with the distribution. Neither the name of the\nPhalcon nor the names of its contributors may be used to endorse or\npromote products derived from this software without specific prior\nwritten permission.\n\nTHIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS\nIS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED\nTO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A\nPARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL PHALCON FRAMEWORK\nTEAM BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,\nOR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF\nSUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS\nINTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN\nCONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)\nARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF\nTHE POSSIBILITY OF SUCH DAMAGE.\n\n******************************************************************\n\nCatch2\n\nBoost Software License - Version 1.0 - August 17th, 2003\n\nPermission is hereby granted, free of charge, to any person or organization\nobtaining a copy of the software and accompanying documentation covered by\nthis license (the \"Software\") to use, reproduce, display, distribute,\nexecute, and transmit the Software, and to prepare derivative works of the\nSoftware, and to permit third-parties to whom the Software is furnished to\ndo so, all subject to the following:\n\nThe copyright notices in the Software and this entire statement, including\nthe above license grant, this restriction and the following disclaimer,\nmust be included in all copies of the Software, in whole or in part, and\nall derivative works of the Software, unless such copies or derivative\nworks are solely in the form of machine-executable object code generated by\na source language processor.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO EVENT\nSHALL THE COPYRIGHT HOLDERS OR ANYONE DISTRIBUTING THE SOFTWARE BE LIABLE\nFOR ANY DAMAGES OR OTHER LIABILITY, WHETHER IN CONTRACT, TORT OR OTHERWISE,\nARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER\nDEALINGS IN THE SOFTWARE.\n\n******************************************************************\n\nHTSlib\n\n[Files in this distribution outwith the cram/ subdirectory are distributed\naccording to the terms of the following MIT/Expat license.]\n\nThe MIT/Expat License\n\nCopyright (C) 2012-2019 Genome Research Ltd.\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in\nall copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL\nTHE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING\nFROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER\nDEALINGS IN THE SOFTWARE.\n\n\n[Files within the cram/ subdirectory in this distribution are distributed\naccording to the terms of the following Modified 3-Clause BSD license.]\n\nThe Modified-BSD License\n\nCopyright (C) 2012-2019 Genome Research Ltd.\n\nRedistribution and use in source and binary forms, with or without\nmodification, are permitted provided that the following conditions are met:\n\n1. Redistributions of source code must retain the above copyright notice,\n   this list of conditions and the following disclaimer.\n\n2. Redistributions in binary form must reproduce the above copyright notice,\n   this list of conditions and the following disclaimer in the documentation\n   and/or other materials provided with the distribution.\n\n3. Neither the names Genome Research Ltd and Wellcome Trust Sanger Institute\n   nor the names of its contributors may be used to endorse or promote products\n   derived from this software without specific prior written permission.\n\nTHIS SOFTWARE IS PROVIDED BY GENOME RESEARCH LTD AND CONTRIBUTORS \"AS IS\"\nAND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\nIMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE\nDISCLAIMED. IN NO EVENT SHALL GENOME RESEARCH LTD OR ITS CONTRIBUTORS BE LIABLE\nFOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL\nDAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR\nSERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER\nCAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,\nOR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE\nOF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n\n\n[The use of a range of years within a copyright notice in this distribution\nshould be interpreted as being equivalent to a list of years including the\nfirst and last year specified and all consecutive years between them.\n\nFor example, a copyright notice that reads \"Copyright (C) 2005, 2007-2009,\n2011-2012\" should be interpreted as being identical to a notice that reads\n\"Copyright (C) 2005, 2007, 2008, 2009, 2011, 2012\" and a copyright notice\nthat reads \"Copyright (C) 2005-2012\" should be interpreted as being identical\nto a notice that reads \"Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010,\n2011, 2012\".]\n\n******************************************************************\n\nJSON for Modern C++\n\nMIT License \n\nCopyright (c) 2013-2019 Niels Lohmann\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n\n******************************************************************\n\nspdlog\n\nThe MIT License (MIT)\n\nCopyright (c) 2016 Gabi Melman.                                       \n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in\nall copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN\nTHE SOFTWARE.\n# Installation\n\nExpansionHunter Denovo is designed for Linux and macOS operating systems.\nCompiled binaries can be downloaded from the [releases\npage](https://github.com/Illumina/ExpansionHunterDenovo/releases).\nAlternatively, the program can be built from source following the\ninstructions below.\n\n## Building from source\n\nPrerequisites:\n\n- GCC or clang compiler supporting C++11 standard\n- CMake version 3.10 or above\n- Libraries zlib, bzip2, liblzma along with their development files; these\n  can be installed on Ubuntu Linux like so:\n\n  ```bash\n  sudo apt install zlib1g-dev libbz2-dev liblzma-dev\n  ```\n  \n- Active internet connection (to automatically download Boost libraries)\n\nOnce the above prerequisites are satisfied the program can be built as follows:\n\n```bash\ncd ExpansionHunterDenovo/\nmkdir build && cd build\ncmake -DCMAKE_BUILD_TYPE=Release ../source\nmake\n```\n\nIf the build procedure succeeds, the `build` directory will contain the\n`ExpansionHunterDenovo` binary file.\n\n# Quickstart: Case-control analysis\n\nA case-control analysis is appropriate when a significant subset of cases is\nexpected to contain expansions of the same repeat. For example, if a\ncase-control analysis is applied to a dataset consisting of ALS patients and\nhealthy controls, it is expected to flag the GGCCCC repeat in *C9orf72* gene\nas significant.\n\nLet's perform a case-control analysis of a tiny simulated dataset consisting\nof seven samples. The data we will be using is contained inside directory\n`ExpansionHunterDenovo/examples/case-control`. We assume that this is our\nworking directory.\n\nWe start by generating an **STR profile** for the first sample:\n\n```bash\n/path/to/ExpansionHunterDenovo profile \\\n        --reads bamlets/sample1.bam \\\n        --reference reference.fasta \\\n        --output-prefix str-profiles/sample1 \\\n        --min-anchor-mapq 50 \\\n        --max-irr-mapq 40\n```\n\nThis command will produce an STR profile `sample1.str_profile.json` inside the\n`str-profiles` directory containing information about STR longer than the read\nlength in `sample1`. STR profiles for the remaining six BAM files can be\ncomputed the same way.\n\nWe next merge the STR profiles together into a **multi-sample STR profile**.\nThis requires us to create the manifest file `manifest.tsv` describing the\ndataset. The manifest file contains columns for sample identifier,\ncase-control status, and path to the associated STR profile for each sample.\n\n```bash\nsample1 case    str-profiles/sample1.str_profile.json\nsample2 case    str-profiles/sample2.str_profile.json\nsample3 case    str-profiles/sample3.str_profile.json\nsample4 control str-profiles/sample4.str_profile.json\nsample5 control str-profiles/sample5.str_profile.json\nsample6 control str-profiles/sample6.str_profile.json\nsample7 control str-profiles/sample7.str_profile.json\n```\n\nThe merge operation is performed like so:\n\n```bash\n/path/to/ExpansionHunterDenovo merge \\\n        --reference reference.fasta \\\n        --manifest manifest.tsv \\\n        --output-prefix example_dataset\n```\n\nThe resulting multisample STR profile is named\n`example_dataset.multisample_profile.json`. It contains information\nabout long repeats across the entire dataset and sample-specific\nparameters like read length and read coverage depth.\n\nThe next step is to actually compare STR lengths between cases and controls. Two\ntypes of comparisons are supported: locus-based comparison and motif-based\ncomparison. These comparisons are performed by a Python3 script `casecontrol.py`\nlocated in the `scripts/` directory.\n\n- The locus-based comparison can distinguish between repeats longer\nthan the read length but shorter than the fragment length. It can be\nrun like so:\n\n    ```bash\n    /path/to/scripts/casecontrol.py locus \\\n            --manifest manifest.tsv \\\n            --multisample-profile example_dataset.multisample_profile.json \\\n            --output example_dataset.casecontrol_locus.tsv \\\n            [--target-regions target_regions.bed]\n    ```\n\n  where `--target-regions` is an optional parameter for restricting the analysis\n  to regions in the provided a BED file.\n\n  The resulting file `example_dataset.casecontrol_locus.tsv` contains the\n  following information.\n  \n  | Column      | Description                         |\n  |-------------|-------------------------------------|\n  | contig      | Contig of the repeat region         |\n  | start       | Approximate start of the repeat     |\n  | end         | Approximate end of the repeat       |\n  | motif       | Inferred repeat motif               |\n  | pvalue      | P-value from Wilcoxon rank-sum test |\n  | bonf_pvalue | P-value after Bonferroni correction |\n  | counts      | Depth-normalized counts of anchored in-repeat reads for each sample (omitting samples with zero count) |\n\n- The motif-based comparison analyzes the overall enrichment of\ngenomes with repeats longer than the fragment length. It can be run like so:\n\n    ```bash\n    path/to/scripts/casecontrol.py motif \\\n            --manifest manifest.tsv \\\n            --multisample-profile example_dataset.multisample_profile.json \\\n            --output example_dataset.casecontrol_motif.tsv\n    ```\n\n  The resulting file `example_dataset.casecontrol_motif.tsv` contains the\n  following information.\n  \n  | Column      | Description                         |\n  |-------------|-------------------------------------|\n  | motif       | Inferred repeat motif               |\n  | pvalue      | P-value from Wilcoxon rank-sum test |\n  | bonf_pvalue | P-value after Bonferroni correction |\n  | counts      | Depth-normalized counts of in-repeat read pairs for each sample (omitting samples with zero count) |\n\n# Quickstart: Outlier analysis\n\nIf cases consist of samples from patients with diverse phenotypes, it might be\nappropriate to assume that there is no enrichment for any specific expansion\nand hence the case-control analysis is not appropriate. In this situation, an\noutlier analysis can be used to flag repeats that are expanded in a small\nproportion of cases compared to the rest of the dataset.\n\nThe example dataset used for this section is located in\n`ExpansionHunterDenovo/examples/outlier`. We assume that individual STR\nprofiles and the multisample STR profile are computed as described in the\n[quick start guide to case-control analysis](03_Case_control_quickstart.md).\n\nThe outlier analysis is performed by a Python3 script `outlier.py` located\nin the `scripts/` directory. Two types of comparisons are supported:\nlocus-based comparison and motif-based comparison.\n\n- The locus-based comparison can distinguish between repeats longer\nthan the read length but shorter than the fragment length. It can be\nrun like so:\n\n    ```bash\n    /path/to/scripts/outlier.py locus \\\n            --manifest manifest.tsv \\\n            --multisample-profile example_dataset.multisample_profile.json \\\n            --output example_dataset.outlier_locus.tsv\n    ```\n\n  The resulting file `example_dataset.outlier_locus.tsv` contains the\n  following information.\n\n  | Column           | Description                                                      |\n  |------------------|------------------------------------------------------------------|\n  | contig           | Contig of the repeat region                                      |\n  | start            | Approximate start of the repeat                                  |\n  | end              | Approximate end of the repeat                                    |\n  | motif            | Inferred repeat motif                                            |\n  | top_case_zscore  | Top z-score of a case sample                                     |\n  | high_case_counts | Counts of case samples corresponding to z-score greater than 1.0 |\n  | counts           | Nonzero counts for all samples                                   |\n\n- The motif-based comparison analyzes the overall enrichment of genomes with\nrepeats longer than the fragment length. It can be run like so:\n\n    ```bash\n    path/to/scripts/outlier.py motif \\\n            --manifest manifest.tsv \\\n            --multisample-profile example_dataset.multisample_profile.json \\\n            --output example_dataset.outlier_motif.tsv \\\n            [--target-regions target_regions.bed]\n    ```\n\n  where `--target-regions` is an optional parameter for restricting the analysis\n  to regions in the provided a BED file.\n\n  The resulting file `example_dataset.outlier_motif.tsv` cont",
+        "evidence": [
+          {
+            "claim": "run_command",
+            "kind": "doc",
+            "line": 35,
+            "path": "documentation/05_Computing_profiles.md",
+            "text": "ExpansionHunterDenovo profile \\",
+            "url": "https://github.com/Illumina/ExpansionHunterDenovo/blob/5a48ed8b6dceb8d772f702e239c5afede9d5108c/documentation/05_Computing_profiles.md#L35"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "examples/outlier/reference.fasta",
+            "text": "fasta",
+            "url": "https://github.com/Illumina/ExpansionHunterDenovo/blob/5a48ed8b6dceb8d772f702e239c5afede9d5108c/examples/outlier/reference.fasta"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "examples/case-control/reference.fasta",
+            "text": "fasta",
+            "url": "https://github.com/Illumina/ExpansionHunterDenovo/blob/5a48ed8b6dceb8d772f702e239c5afede9d5108c/examples/case-control/reference.fasta"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "examples/outlier/bamlets/sample10.bam",
+            "text": "bam",
+            "url": "https://github.com/Illumina/ExpansionHunterDenovo/blob/5a48ed8b6dceb8d772f702e239c5afede9d5108c/examples/outlier/bamlets/sample10.bam"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "examples/outlier/bamlets/sample12.bam",
+            "text": "bam",
+            "url": "https://github.com/Illumina/ExpansionHunterDenovo/blob/5a48ed8b6dceb8d772f702e239c5afede9d5108c/examples/outlier/bamlets/sample12.bam"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "examples/outlier/bamlets/sample14.bam",
+            "text": "bam",
+            "url": "https://github.com/Illumina/ExpansionHunterDenovo/blob/5a48ed8b6dceb8d772f702e239c5afede9d5108c/examples/outlier/bamlets/sample14.bam"
+          },
+          {
+            "claim": "known_issue",
+            "kind": "readme",
+            "line": 36,
+            "path": "README.md",
+            "text": "Limitations",
+            "url": "https://github.com/Illumina/ExpansionHunterDenovo/blob/5a48ed8b6dceb8d772f702e239c5afede9d5108c/README.md#L36"
+          },
+          {
+            "claim": "documented_input",
+            "kind": "readme",
+            "line": 10,
+            "path": "README.md",
+            "text": "During the first step, genome-wide STR profiles are extracted from the input BAM",
+            "url": "https://github.com/Illumina/ExpansionHunterDenovo/blob/5a48ed8b6dceb8d772f702e239c5afede9d5108c/README.md#L10"
+          }
+        ],
+        "example": {
+          "cmd": "ExpansionHunterDenovo profile --reads bamlets/sample1.bam --reference reference.fasta --output-prefix str-profiles/sample1 --min-anchor-mapq 50 --max-irr-mapq 40",
+          "cwd": "/opt/tool/examples/outlier",
+          "evidence_source": "documentation/03_Case_control_quickstart.md:L17",
+          "inputs_in_repo": [
+            "examples/outlier/bamlets/sample1.bam",
+            "examples/outlier/reference.fasta"
+          ],
+          "source": "detected"
+        },
+        "example_data": [
+          {
+            "in_example_dir": true,
+            "kind": "fasta",
+            "looks_like_output": false,
+            "path": "examples/outlier/reference.fasta",
+            "size": 4014
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fasta",
+            "looks_like_output": false,
+            "path": "examples/case-control/reference.fasta",
+            "size": 8028
+          },
+          {
+            "in_example_dir": true,
+            "kind": "bam",
+            "looks_like_output": false,
+            "path": "examples/outlier/bamlets/sample10.bam",
+            "size": 32359
+          },
+          {
+            "in_example_dir": true,
+            "kind": "bam",
+            "looks_like_output": false,
+            "path": "examples/outlier/bamlets/sample12.bam",
+            "size": 32385
+          },
+          {
+            "in_example_dir": true,
+            "kind": "bam",
+            "looks_like_output": false,
+            "path": "examples/outlier/bamlets/sample14.bam",
+            "size": 32429
+          },
+          {
+            "in_example_dir": true,
+            "kind": "bam",
+            "looks_like_output": false,
+            "path": "examples/outlier/bamlets/sample13.bam",
+            "size": 32589
+          },
+          {
+            "in_example_dir": true,
+            "kind": "bam",
+            "looks_like_output": false,
+            "path": "examples/outlier/bamlets/sample11.bam",
+            "size": 32701
+          },
+          {
+            "in_example_dir": true,
+            "kind": "bam",
+            "looks_like_output": false,
+            "path": "examples/outlier/bamlets/sample3.bam",
+            "size": 33009
+          },
+          {
+            "in_example_dir": true,
+            "kind": "bam",
+            "looks_like_output": false,
+            "path": "examples/outlier/bamlets/sample4.bam",
+            "size": 33187
+          },
+          {
+            "in_example_dir": true,
+            "kind": "bam",
+            "looks_like_output": false,
+            "path": "examples/outlier/bamlets/sample6.bam",
+            "size": 33201
+          },
+          {
+            "in_example_dir": true,
+            "kind": "bam",
+            "looks_like_output": false,
+            "path": "examples/outlier/bamlets/sample5.bam",
+            "size": 33376
+          },
+          {
+            "in_example_dir": true,
+            "kind": "bam",
+            "looks_like_output": false,
+            "path": "examples/outlier/bamlets/sample8.bam",
+            "size": 33388
+          },
+          {
+            "in_example_dir": true,
+            "kind": "bam",
+            "looks_like_output": false,
+            "path": "examples/outlier/bamlets/sample9.bam",
+            "size": 33502
+          },
+          {
+            "in_example_dir": true,
+            "kind": "bam",
+            "looks_like_output": false,
+            "path": "examples/outlier/bamlets/sample7.bam",
+            "size": 33556
+          },
+          {
+            "in_example_dir": true,
+            "kind": "bam",
+            "looks_like_output": false,
+            "path": "examples/outlier/bamlets/sample17.bam",
+            "size": 33569
+          },
+          {
+            "in_example_dir": true,
+            "kind": "bam",
+            "looks_like_output": false,
+            "path": "examples/outlier/bamlets/sample2.bam",
+            "size": 33569
+          },
+          {
+            "in_example_dir": true,
+            "kind": "bam",
+            "looks_like_output": false,
+            "path": "examples/outlier/bamlets/sample15.bam",
+            "size": 33621
+          },
+          {
+            "in_example_dir": true,
+            "kind": "bam",
+            "looks_like_output": false,
+            "path": "examples/outlier/bamlets/sample1.bam",
+            "size": 33741
+          },
+          {
+            "in_example_dir": true,
+            "kind": "bam",
+            "looks_like_output": false,
+            "path": "examples/outlier/bamlets/sample18.bam",
+            "size": 33783
+          },
+          {
+            "in_example_dir": true,
+            "kind": "bam",
+            "looks_like_output": false,
+            "path": "examples/outlier/bamlets/sample20.bam",
+            "size": 33846
+          },
+          {
+            "in_example_dir": true,
+            "kind": "bam",
+            "looks_like_output": false,
+            "path": "examples/outlier/bamlets/sample21.bam",
+            "size": 33886
+          },
+          {
+            "in_example_dir": true,
+            "kind": "bam",
+            "looks_like_output": false,
+            "path": "examples/outlier/bamlets/sample16.bam",
+            "size": 34172
+          },
+          {
+            "in_example_dir": true,
+            "kind": "bam",
+            "looks_like_output": false,
+            "path": "examples/outlier/bamlets/sample19.bam",
+            "size": 34280
+          },
+          {
+            "in_example_dir": true,
+            "kind": "bam",
+            "looks_like_output": false,
+            "path": "examples/case-control/bamlets/sample5.bam",
+            "size": 63975
+          },
+          {
+            "in_example_dir": true,
+            "kind": "bam",
+            "looks_like_output": false,
+            "path": "examples/case-control/bamlets/sample4.bam",
+            "size": 64400
+          },
+          {
+            "in_example_dir": true,
+            "kind": "bam",
+            "looks_like_output": false,
+            "path": "examples/case-control/bamlets/sample7.bam",
+            "size": 64490
+          },
+          {
+            "in_example_dir": true,
+            "kind": "bam",
+            "looks_like_output": false,
+            "path": "examples/case-control/bamlets/sample6.bam",
+            "size": 64624
+          },
+          {
+            "in_example_dir": true,
+            "kind": "bam",
+            "looks_like_output": false,
+            "path": "examples/case-control/bamlets/sample1.bam",
+            "size": 66155
+          },
+          {
+            "in_example_dir": true,
+            "kind": "bam",
+            "looks_like_output": false,
+            "path": "examples/case-control/bamlets/sample2.bam",
+            "size": 67197
+          },
+          {
+            "in_example_dir": true,
+            "kind": "bam",
+            "looks_like_output": false,
+            "path": "examples/case-control/bamlets/sample3.bam",
+            "size": 67845
+          }
+        ],
+        "inferences": {
+          "build": "release_asset:ExpansionHunterDenovo-v0.9.0-linux_x86_64.tar.gz",
+          "example": "documentation/03_Case_control_quickstart.md:L17",
+          "input_type": "README.md:L10",
+          "output": "documentation/03_Case_control_quickstart.md:L25",
+          "platform": null,
+          "regions": null,
+          "run_command": "documentation/05_Computing_profiles.md:L35",
+          "single_sample_bams": null
+        },
+        "input_type": {
+          "assembly": {
+            "against_hg38": null,
+            "declared": "both",
+            "evidence_source": "documentation/08_Annotation.md:L41",
+            "hg19_evidence_source": "documentation/08_Annotation.md:L40",
+            "hg19_hits": 3,
+            "hg38_evidence_source": "documentation/08_Annotation.md:L41",
+            "hg38_hits": 2,
+            "incompatible_with_hg38": false
+          },
+          "best": null,
+          "candidates": [],
+          "evidence_source": "README.md:L10",
+          "how": "read",
+          "platform": "illumina",
+          "platform_evidence_source": null,
+          "platform_how": "counted",
+          "signals": {
+            "bam": 0,
+            "ce": 0,
+            "fastq": 0,
+            "hg19": 3,
+            "hg38": 2,
+            "illumina": 0,
+            "ont": 0,
+            "snp": 0,
+            "ystr": 0
+          },
+          "statements": {
+            "against": [],
+            "determined": true,
+            "inputs": [
+              {
+                "kind": "bam",
+                "line": 10,
+                "text": "During the first step, genome-wide STR profiles are extracted from the input BAM"
+              }
+            ],
+            "platform": [],
+            "recommendation": null
+          },
+          "statements_file": null,
+          "supported_platforms": [],
+          "unsupported": {
+            "kinds": [
+              "cohort"
+            ],
+            "platform": "illumina"
+          },
+          "warnings": []
+        },
+        "known_issues": [
+          {
+            "heading": "Limitations",
+            "line": 36,
+            "text": "- STRs shorter than the read length are ignored; the program is appropriate\nonly for detecting expansions that exceed the read length.\n- The location of each reported STR is approximate (up to about 500bp-1Kbp)\n- STRs are not genotyped; the program reports a depth-normalized count of reads\noriginating inside each STR; this count can be used as a very approximate\nmeasure of the repeat length\n- To achieve best results all samples must be sequenced on the same instrument\nto similar coverage, have the same read and fragment lengths, and be subjected\nto the same computational pre-processing (e.g.",
+            "truncated": true,
+            "url": "https://github.com/Illumina/ExpansionHunterDenovo/blob/5a48ed8b6dceb8d772f702e239c5afede9d5108c/README.md#L36"
+          }
+        ],
+        "limitations": [],
+        "output": {
+          "evidence_source": "documentation/03_Case_control_quickstart.md:L25",
+          "format": "json",
+          "signals": {
+            "csv": 0,
+            "json": 31,
+            "tsv": 27,
+            "vcf": 0
+          }
+        },
+        "packaging": {
+          "executables": [
+            "ExpansionHunterDenovo"
+          ],
+          "packages": []
+        },
+        "readme": {
+          "gaps": [],
+          "name": "README.md",
+          "sufficient_to_attempt": true
+        },
+        "readme_name": "README.md",
+        "readme_text": "# ExpansionHunter Denovo\n\nExpansionHunter Denovo (EHdn) is a suite of tools for detecting novel expansions\nof short tandem repeats (STRs). EHdn is intended for analysis of a collection of\nBAM/CRAM files containing alignments of short (100-200bp) reads.\n\n![workflow](documentation/images/workflow.png)\n\nAs shown in the figure above, the analysis workflow consists of two steps.\nDuring the first step, genome-wide STR profiles are extracted from the input BAM\nfiles. The STR profiles contain information about reads that originate in STRs\nlonger than the read length. The second step involves comparing STR profiles to\neach other. The type of comparison depends on the dataset:\n\n| Analysis type | Dataset                                                         |\n|---------------|-----------------------------------------------------------------|\n| Case-control  | Cases are enriched in expansions of the same STR                |\n| Outlier       | Only a few cases are expected to contain the same STR expansion |\n\nFor example, if a case-control analysis is applied to a dataset consisting of\nALS patients and healthy controls, then it is expected to flag the GGCCCC repeat\nin *C9orf72* gene as highly significant. On the other hand, if cases consist of\nsamples from patients with diverse phenotypes, it might be appropriate to assume\nthat there is no enrichment for any specific expansion and hence the\ncase-control analysis is not appropriate. In this situation, an outlier analysis\ncan be used to flag repeats that are expanded in a small proportion of cases\ncompared to the rest of the dataset.\n\n## Features\n\n- Approximate location and nucleotide composition of STRs are inferred\nautomatically.\n- A single BAM/CRAM file can be analyzed in about 30 mins to 5 hours on a\ntypical workstation. The exact runtime will depend on the sensitivity settings.\n\n## Limitations\n\n- STRs shorter than the read length are ignored; the program is appropriate\n  only for detecting expansions that exceed the read length.\n- The location of each reported STR is approximate (up to about 500bp-1Kbp)\n- STRs are not genotyped; the program reports a depth-normalized count of reads\n  originating inside each STR; this count can be used as a very approximate\n  measure of the repeat length\n- To achieve best results all samples must be sequenced on the same instrument\n  to similar coverage, have the same read and fragment lengths, and be subjected\n  to the same computational pre-processing (e.g. reads must be aligned by the\n  same aligner)\n\n## Documentation\n\nSee [documentation](documentation/00_Introduction.md) for installation\ninstructions, usage guide, and description of file formats.\n\n## License\n\nExpansionHunter Denovo is provided under the terms and conditions of the [Apache\nLicense Version 2.0](LICENSE.txt). It relies on several third party packages\nprovided under other open-source licenses, please see [COPYRIGHT.txt](COPYRIGHT.txt)\nfor additional details.\n",
+        "ref": "5a48ed8b6dceb8d772f702e239c5afede9d5108c",
+        "regions": {
+          "ambiguous": false,
+          "candidates": [],
+          "end_line": null,
+          "evidence_source": null,
+          "file": null,
+          "format": null,
+          "line": null,
+          "text": null
+        },
+        "registry": {
+          "bioconda": {
+            "expansionhunterdenovo": {
+              "has_tag_version": true,
+              "latest": "0.9.0",
+              "versions": 1
+            }
+          },
+          "documented": []
+        },
+        "repo": "https://github.com/Illumina/ExpansionHunterDenovo",
+        "schema": "strhub-verified/recipe-proposal/1",
+        "single_sample_bams": {
+          "allowed": false,
+          "evidence_source": null,
+          "file": null,
+          "line": null,
+          "paired_flags": [],
+          "text": null
+        },
+        "source_documents": [
+          {
+            "file": "README.md",
+            "origin": "readme",
+            "text": "# ExpansionHunter Denovo\n\nExpansionHunter Denovo (EHdn) is a suite of tools for detecting novel expansions\nof short tandem repeats (STRs). EHdn is intended for analysis of a collection of\nBAM/CRAM files containing alignments of short (100-200bp) reads.\n\n![workflow](documentation/images/workflow.png)\n\nAs shown in the figure above, the analysis workflow consists of two steps.\nDuring the first step, genome-wide STR profiles are extracted from the input BAM\nfiles. The STR profiles contain information about reads that originate in STRs\nlonger than the read length. The second step involves comparing STR profiles to\neach other. The type of comparison depends on the dataset:\n\n| Analysis type | Dataset                                                         |\n|---------------|-----------------------------------------------------------------|\n| Case-control  | Cases are enriched in expansions of the same STR                |\n| Outlier       | Only a few cases are expected to contain the same STR expansion |\n\nFor example, if a case-control analysis is applied to a dataset consisting of\nALS patients and healthy controls, then it is expected to flag the GGCCCC repeat\nin *C9orf72* gene as highly significant. On the other hand, if cases consist of\nsamples from patients with diverse phenotypes, it might be appropriate to assume\nthat there is no enrichment for any specific expansion and hence the\ncase-control analysis is not appropriate. In this situation, an outlier analysis\ncan be used to flag repeats that are expanded in a small proportion of cases\ncompared to the rest of the dataset.\n\n## Features\n\n- Approximate location and nucleotide composition of STRs are inferred\nautomatically.\n- A single BAM/CRAM file can be analyzed in about 30 mins to 5 hours on a\ntypical workstation. The exact runtime will depend on the sensitivity settings.\n\n## Limitations\n\n- STRs shorter than the read length are ignored; the program is appropriate\n  only for detecting expansions that exceed the read length.\n- The location of each reported STR is approximate (up to about 500bp-1Kbp)\n- STRs are not genotyped; the program reports a depth-normalized count of reads\n  originating inside each STR; this count can be used as a very approximate\n  measure of the repeat length\n- To achieve best results all samples must be sequenced on the same instrument\n  to similar coverage, have the same read and fragment lengths, and be subjected\n  to the same computational pre-processing (e.g. reads must be aligned by the\n  same aligner)\n\n## Documentation\n\nSee [documentation](documentation/00_Introduction.md) for installation\ninstructions, usage guide, and description of file formats.\n\n## License\n\nExpansionHunter Denovo is provided under the terms and conditions of the [Apache\nLicense Version 2.0](LICENSE.txt). It relies on several third party packages\nprovided under other open-source licenses, please see [COPYRIGHT.txt](COPYRIGHT.txt)\nfor additional details.\n"
+          },
+          {
+            "file": "documentation/00_Introduction.md",
+            "origin": "repo",
+            "text": "# A guide to ExpansionHunter Denovo software\n\nExpansionHunter Denovo (EHdn) is a suite of tools for detecting novel expansions\nof short tandem repeats (STRs). EHdn is intended for analysis of a collection of\nBAM/CRAM files containing alignments of short (100-200bp) reads.\n\nTo use ExpansionHunter Denovo you need to (1) download the latest release or build\nthe program from source, (2) obtain a collection of BAM/CRAM files a subset of which\nis suspected to contain a repeat expansion.\n\nThe following sections will help you to get started.\n\nQuick start guides:\n\n- [Before you begin](01_Before_you_begin.md)\n- [Installation](02_Installation.md)\n- [Case-control analysis](03_Case_control_quickstart.md)\n- [Outlier analysis](04_Outlier_quickstart.md)\n\nManual pages:\n\n- [Computing STR profiles](05_Computing_profiles.md)\n- [Merging single-sample STR profiles into multisample profiles](06_Merging_profiles.md)\n- [Performing case control analysis](07_Case_control_analysis.md)\n- [Annotating locus analysis results](08_Annotation.md)\n- [Repeat Prioritization Strategies](09_Repeat_prioritization_strategies.md)\n"
+          },
+          {
+            "file": "LICENSE.txt",
+            "origin": "repo",
+            "text": "\n                                 Apache License\n                           Version 2.0, January 2004\n                        http://www.apache.org/licenses/\n\n   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION\n\n   1. Definitions.\n\n      \"License\" shall mean the terms and conditions for use, reproduction,\n      and distribution as defined by Sections 1 through 9 of this document.\n\n      \"Licensor\" shall mean the copyright owner or entity authorized by\n      the copyright owner that is granting the License.\n\n      \"Legal Entity\" shall mean the union of the acting entity and all\n      other entities that control, are controlled by, or are under common\n      control with that entity. For the purposes of this definition,\n      \"control\" means (i) the power, direct or indirect, to cause the\n      direction or management of such entity, whether by contract or\n      otherwise, or (ii) ownership of fifty percent (50%) or more of the\n      outstanding shares, or (iii) beneficial ownership of such entity.\n\n      \"You\" (or \"Your\") shall mean an individual or Legal Entity\n      exercising permissions granted by this License.\n\n      \"Source\" form shall mean the preferred form for making modifications,\n      including but not limited to software source code, documentation\n      source, and configuration files.\n\n      \"Object\" form shall mean any form resulting from mechanical\n      transformation or translation of a Source form, including but\n      not limited to compiled object code, generated documentation,\n      and conversions to other media types.\n\n      \"Work\" shall mean the work of authorship, whether in Source or\n      Object form, made available under the License, as indicated by a\n      copyright notice that is included in or attached to the work\n      (an example is provided in the Appendix below).\n\n      \"Derivative Works\" shall mean any work, whether in Source or Object\n      form, that is based on (or derived from) the Work and for which the\n      editorial revisions, annotations, elaborations, or other modifications\n      represent, as a whole, an original work of authorship. For the purposes\n      of this License, Derivative Works shall not include works that remain\n      separable from, or merely link (or bind by name) to the interfaces of,\n      the Work and Derivative Works thereof.\n\n      \"Contribution\" shall mean any work of authorship, including\n      the original version of the Work and any modifications or additions\n      to that Work or Derivative Works thereof, that is intentionally\n      submitted to Licensor for inclusion in the Work by the copyright owner\n      or by an individual or Legal Entity authorized to submit on behalf of\n      the copyright owner. For the purposes of this definition, \"submitted\"\n      means any form of electronic, verbal, or written communication sent\n      to the Licensor or its representatives, including but not limited to\n      communication on electronic mailing lists, source code control systems,\n      and issue tracking systems that are managed by, or on behalf of, the\n      Licensor for the purpose of discussing and improving the Work, but\n      excluding communication that is conspicuously marked or otherwise\n      designated in writing by the copyright owner as \"Not a Contribution.\"\n\n      \"Contributor\" shall mean Licensor and any individual or Legal Entity\n      on behalf of whom a Contribution has been received by Licensor and\n      subsequently incorporated within the Work.\n\n   2. Grant of Copyright License. Subject to the terms and conditions of\n      this License, each Contributor hereby grants to You a perpetual,\n      worldwide, non-exclusive, no-charge, royalty-free, irrevocable\n      copyright license to reproduce, prepare Derivative Works of,\n      publicly display, publicly perform, sublicense, and distribute the\n      Work and such Derivative Works in Source or Object form.\n\n   3. Grant of Patent License. Subject to the terms and conditions of\n      this License, each Contributor hereby grants to You a perpetual,\n      worldwide, non-exclusive, no-charge, royalty-free, irrevocable\n      (except as stated in this section) patent license to make, have made,\n      use, offer to sell, sell, import, and otherwise transfer the Work,\n      where such license applies only to those patent claims licensable\n      by such Contributor that are necessarily infringed by their\n      Contribution(s) alone or by combination of their Contribution(s)\n      with the Work to which such Contribution(s) was submitted. If You\n      institute patent litigation against any entity (including a\n      cross-claim or counterclaim in a lawsuit) alleging that the Work\n      or a Contribution incorporated within the Work constitutes direct\n      or contributory patent infringement, then any patent licenses\n      granted to You under this License for that Work shall terminate\n      as of the date such litigation is filed.\n\n   4. Redistribution. You may reproduce and distribute copies of the\n      Work or Derivative Works thereof in any medium, with or without\n      modifications, and in Source or Object form, provided that You\n      meet the following conditions:\n\n      (a) You must give any other recipients of the Work or\n          Derivative Works a copy of this License; and\n\n      (b) You must cause any modified files to carry prominent notices\n          stating that You changed the files; and\n\n      (c) You must retain, in the Source form of any Derivative Works\n          that You distribute, all copyright, patent, trademark, and\n          attribution notices from the Source form of the Work,\n          excluding those notices that do not pertain to any part of\n          the Derivative Works; and\n\n      (d) If the Work includes a \"NOTICE\" text file as part of its\n          distribution, then any Derivative Works that You distribute must\n          include a readable copy of the attribution notices contained\n          within such NOTICE file, excluding those notices that do not\n          pertain to any part of the Derivative Works, in at least one\n          of the following places: within a NOTICE text file distributed\n          as part of the Derivative Works; within the Source form or\n          documentation, if provided along with the Derivative Works; or,\n          within a display generated by the Derivative Works, if and\n          wherever such third-party notices normally appear. The contents\n          of the NOTICE file are for informational purposes only and\n          do not modify the License. You may add Your own attribution\n          notices within Derivative Works that You distribute, alongside\n          or as an addendum to the NOTICE text from the Work, provided\n          that such additional attribution notices cannot be construed\n          as modifying the License.\n\n      You may add Your own copyright statement to Your modifications and\n      may provide additional or different license terms and conditions\n      for use, reproduction, or distribution of Your modifications, or\n      for any such Derivative Works as a whole, provided Your use,\n      reproduction, and distribution of the Work otherwise complies with\n      the conditions stated in this License.\n\n   5. Submission of Contributions. Unless You explicitly state otherwise,\n      any Contribution intentionally submitted for inclusion in the Work\n      by You to the Licensor shall be under the terms and conditions of\n      this License, without any additional terms or conditions.\n      Notwithstanding the above, nothing herein shall supersede or modify\n      the terms of any separate license agreement you may have executed\n      with Licensor regarding such Contributions.\n\n   6. Trademarks. This License does not grant permission to use the trade\n      names, trademarks, service marks, or product names of the Licensor,\n      except as required for reasonable and customary use in describing the\n      origin of the Work and reproducing the content of the NOTICE file.\n\n   7. Disclaimer of Warranty. Unless required by applicable law or\n      agreed to in writing, Licensor provides the Work (and each\n      Contributor provides its Contributions) on an \"AS IS\" BASIS,\n      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or\n      implied, including, without limitation, any warranties or conditions\n      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A\n      PARTICULAR PURPOSE. You are solely responsible for determining the\n      appropriateness of using or redistributing the Work and assume any\n      risks associated with Your exercise of permissions under this License.\n\n   8. Limitation of Liability. In no event and under no legal theory,\n      whether in tort (including negligence), contract, or otherwise,\n      unless required by applicable law (such as deliberate and grossly\n      negligent acts) or agreed to in writing, shall any Contributor be\n      liable to You for damages, including any direct, indirect, special,\n      incidental, or consequential damages of any character arising as a\n      result of this License or out of the use or inability to use the\n      Work (including but not limited to damages for loss of goodwill,\n      work stoppage, computer failure or malfunction, or any and all\n      other commercial damages or losses), even if such Contributor\n      has been advised of the possibility of such damages.\n\n   9. Accepting Warranty or Additional Liability. While redistributing\n      the Work or Derivative Works thereof, You may choose to offer,\n      and charge a fee for, acceptance of support, warranty, indemnity,\n      or other liability obligations and/or rights consistent with this\n      License. However, in accepting such obligations, You may act only\n      on Your own behalf and on Your sole responsibility, not on behalf\n      of any other Contributor, and only if You agree to indemnify,\n      defend, and hold each Contributor harmless for any liability\n      incurred by, or claims asserted against, such Contributor by reason\n      of your accepting any such warranty or additional liability.\n\n   END OF TERMS AND CONDITIONS\n\n   APPENDIX: How to apply the Apache License to your work.\n\n      To apply the Apache License to your work, attach the following\n      boilerplate notice, with the fields enclosed by brackets \"[]\"\n      replaced with your own identifying information. (Don't include\n      the brackets!)  The text should be enclosed in the appropriate\n      comment syntax for the file format. We also recommend that a\n      file or class name and description of purpose be included on the\n      same \"printed page\" as the copyright notice for easier\n      identification within third-party archives.\n\n   Copyright [yyyy] [name of copyright owner]\n\n   Licensed under the Apache License, Version 2.0 (the \"License\");\n   you may not use this file except in compliance with the License.\n   You may obtain a copy of the License at\n\n       http://www.apache.org/licenses/LICENSE-2.0\n\n   Unless required by applicable law or agreed to in writing, software\n   distributed under the License is distributed on an \"AS IS\" BASIS,\n   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n   See the License for the specific language governing permissions and\n   limitations under the License.\n"
+          },
+          {
+            "file": "COPYRIGHT.txt",
+            "origin": "repo",
+            "text": "ExpansionHunter Denovo relies on the following libraries/external\ntools. These are distributed according to the licensing terms\ngoverning each library:\n\n******************************************************************\n\nBoost CMake\n\nNew BSD License\n\nCopyright (c) 2016, Florent Castelli All rights reserved.\n\nRedistribution and use in source and binary forms, with or without\nmodification, are permitted provided that the following conditions\nare met:\n\nRedistributions of source code must retain the above copyright notice,\nthis list of conditions and the following disclaimer. Redistributions\nin binary form must reproduce the above copyright notice, this list of\nconditions and the following disclaimer in the documentation and/or\nother materials provided with the distribution. Neither the name of the\nPhalcon nor the names of its contributors may be used to endorse or\npromote products derived from this software without specific prior\nwritten permission.\n\nTHIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS\nIS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED\nTO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A\nPARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL PHALCON FRAMEWORK\nTEAM BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,\nOR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF\nSUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS\nINTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN\nCONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)\nARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF\nTHE POSSIBILITY OF SUCH DAMAGE.\n\n******************************************************************\n\nCatch2\n\nBoost Software License - Version 1.0 - August 17th, 2003\n\nPermission is hereby granted, free of charge, to any person or organization\nobtaining a copy of the software and accompanying documentation covered by\nthis license (the \"Software\") to use, reproduce, display, distribute,\nexecute, and transmit the Software, and to prepare derivative works of the\nSoftware, and to permit third-parties to whom the Software is furnished to\ndo so, all subject to the following:\n\nThe copyright notices in the Software and this entire statement, including\nthe above license grant, this restriction and the following disclaimer,\nmust be included in all copies of the Software, in whole or in part, and\nall derivative works of the Software, unless such copies or derivative\nworks are solely in the form of machine-executable object code generated by\na source language processor.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO EVENT\nSHALL THE COPYRIGHT HOLDERS OR ANYONE DISTRIBUTING THE SOFTWARE BE LIABLE\nFOR ANY DAMAGES OR OTHER LIABILITY, WHETHER IN CONTRACT, TORT OR OTHERWISE,\nARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER\nDEALINGS IN THE SOFTWARE.\n\n******************************************************************\n\nHTSlib\n\n[Files in this distribution outwith the cram/ subdirectory are distributed\naccording to the terms of the following MIT/Expat license.]\n\nThe MIT/Expat License\n\nCopyright (C) 2012-2019 Genome Research Ltd.\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in\nall copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL\nTHE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING\nFROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER\nDEALINGS IN THE SOFTWARE.\n\n\n[Files within the cram/ subdirectory in this distribution are distributed\naccording to the terms of the following Modified 3-Clause BSD license.]\n\nThe Modified-BSD License\n\nCopyright (C) 2012-2019 Genome Research Ltd.\n\nRedistribution and use in source and binary forms, with or without\nmodification, are permitted provided that the following conditions are met:\n\n1. Redistributions of source code must retain the above copyright notice,\n   this list of conditions and the following disclaimer.\n\n2. Redistributions in binary form must reproduce the above copyright notice,\n   this list of conditions and the following disclaimer in the documentation\n   and/or other materials provided with the distribution.\n\n3. Neither the names Genome Research Ltd and Wellcome Trust Sanger Institute\n   nor the names of its contributors may be used to endorse or promote products\n   derived from this software without specific prior written permission.\n\nTHIS SOFTWARE IS PROVIDED BY GENOME RESEARCH LTD AND CONTRIBUTORS \"AS IS\"\nAND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\nIMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE\nDISCLAIMED. IN NO EVENT SHALL GENOME RESEARCH LTD OR ITS CONTRIBUTORS BE LIABLE\nFOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL\nDAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR\nSERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER\nCAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,\nOR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE\nOF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n\n\n[The use of a range of years within a copyright notice in this distribution\nshould be interpreted as being equivalent to a list of years including the\nfirst and last year specified and all consecutive years between them.\n\nFor example, a copyright notice that reads \"Copyright (C) 2005, 2007-2009,\n2011-2012\" should be interpreted as being identical to a notice that reads\n\"Copyright (C) 2005, 2007, 2008, 2009, 2011, 2012\" and a copyright notice\nthat reads \"Copyright (C) 2005-2012\" should be interpreted as being identical\nto a notice that reads \"Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010,\n2011, 2012\".]\n\n******************************************************************\n\nJSON for Modern C++\n\nMIT License \n\nCopyright (c) 2013-2019 Niels Lohmann\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n\n******************************************************************\n\nspdlog\n\nThe MIT License (MIT)\n\nCopyright (c) 2016 Gabi Melman.                                       \n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in\nall copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN\nTHE SOFTWARE."
+          },
+          {
+            "file": "documentation/02_Installation.md",
+            "origin": "repo",
+            "text": "# Installation\n\nExpansionHunter Denovo is designed for Linux and macOS operating systems.\nCompiled binaries can be downloaded from the [releases\npage](https://github.com/Illumina/ExpansionHunterDenovo/releases).\nAlternatively, the program can be built from source following the\ninstructions below.\n\n## Building from source\n\nPrerequisites:\n\n- GCC or clang compiler supporting C++11 standard\n- CMake version 3.10 or above\n- Libraries zlib, bzip2, liblzma along with their development files; these\n  can be installed on Ubuntu Linux like so:\n\n  ```bash\n  sudo apt install zlib1g-dev libbz2-dev liblzma-dev\n  ```\n  \n- Active internet connection (to automatically download Boost libraries)\n\nOnce the above prerequisites are satisfied the program can be built as follows:\n\n```bash\ncd ExpansionHunterDenovo/\nmkdir build && cd build\ncmake -DCMAKE_BUILD_TYPE=Release ../source\nmake\n```\n\nIf the build procedure succeeds, the `build` directory will contain the\n`ExpansionHunterDenovo` binary file.\n"
+          },
+          {
+            "file": "documentation/03_Case_control_quickstart.md",
+            "origin": "repo",
+            "text": "# Quickstart: Case-control analysis\n\nA case-control analysis is appropriate when a significant subset of cases is\nexpected to contain expansions of the same repeat. For example, if a\ncase-control analysis is applied to a dataset consisting of ALS patients and\nhealthy controls, it is expected to flag the GGCCCC repeat in *C9orf72* gene\nas significant.\n\nLet's perform a case-control analysis of a tiny simulated dataset consisting\nof seven samples. The data we will be using is contained inside directory\n`ExpansionHunterDenovo/examples/case-control`. We assume that this is our\nworking directory.\n\nWe start by generating an **STR profile** for the first sample:\n\n```bash\n/path/to/ExpansionHunterDenovo profile \\\n        --reads bamlets/sample1.bam \\\n        --reference reference.fasta \\\n        --output-prefix str-profiles/sample1 \\\n        --min-anchor-mapq 50 \\\n        --max-irr-mapq 40\n```\n\nThis command will produce an STR profile `sample1.str_profile.json` inside the\n`str-profiles` directory containing information about STR longer than the read\nlength in `sample1`. STR profiles for the remaining six BAM files can be\ncomputed the same way.\n\nWe next merge the STR profiles together into a **multi-sample STR profile**.\nThis requires us to create the manifest file `manifest.tsv` describing the\ndataset. The manifest file contains columns for sample identifier,\ncase-control status, and path to the associated STR profile for each sample.\n\n```bash\nsample1 case    str-profiles/sample1.str_profile.json\nsample2 case    str-profiles/sample2.str_profile.json\nsample3 case    str-profiles/sample3.str_profile.json\nsample4 control str-profiles/sample4.str_profile.json\nsample5 control str-profiles/sample5.str_profile.json\nsample6 control str-profiles/sample6.str_profile.json\nsample7 control str-profiles/sample7.str_profile.json\n```\n\nThe merge operation is performed like so:\n\n```bash\n/path/to/ExpansionHunterDenovo merge \\\n        --reference reference.fasta \\\n        --manifest manifest.tsv \\\n        --output-prefix example_dataset\n```\n\nThe resulting multisample STR profile is named\n`example_dataset.multisample_profile.json`. It contains information\nabout long repeats across the entire dataset and sample-specific\nparameters like read length and read coverage depth.\n\nThe next step is to actually compare STR lengths between cases and controls. Two\ntypes of comparisons are supported: locus-based comparison and motif-based\ncomparison. These comparisons are performed by a Python3 script `casecontrol.py`\nlocated in the `scripts/` directory.\n\n- The locus-based comparison can distinguish between repeats longer\nthan the read length but shorter than the fragment length. It can be\nrun like so:\n\n    ```bash\n    /path/to/scripts/casecontrol.py locus \\\n            --manifest manifest.tsv \\\n            --multisample-profile example_dataset.multisample_profile.json \\\n            --output example_dataset.casecontrol_locus.tsv \\\n            [--target-regions target_regions.bed]\n    ```\n\n  where `--target-regions` is an optional parameter for restricting the analysis\n  to regions in the provided a BED file.\n\n  The resulting file `example_dataset.casecontrol_locus.tsv` contains the\n  following information.\n  \n  | Column      | Description                         |\n  |-------------|-------------------------------------|\n  | contig      | Contig of the repeat region         |\n  | start       | Approximate start of the repeat     |\n  | end         | Approximate end of the repeat       |\n  | motif       | Inferred repeat motif               |\n  | pvalue      | P-value from Wilcoxon rank-sum test |\n  | bonf_pvalue | P-value after Bonferroni correction |\n  | counts      | Depth-normalized counts of anchored in-repeat reads for each sample (omitting samples with zero count) |\n\n- The motif-based comparison analyzes the overall enrichment of\ngenomes with repeats longer than the fragment length. It can be run like so:\n\n    ```bash\n    path/to/scripts/casecontrol.py motif \\\n            --manifest manifest.tsv \\\n            --multisample-profile example_dataset.multisample_profile.json \\\n            --output example_dataset.casecontrol_motif.tsv\n    ```\n\n  The resulting file `example_dataset.casecontrol_motif.tsv` contains the\n  following information.\n  \n  | Column      | Description                         |\n  |-------------|-------------------------------------|\n  | motif       | Inferred repeat motif               |\n  | pvalue      | P-value from Wilcoxon rank-sum test |\n  | bonf_pvalue | P-value after Bonferroni correction |\n  | counts      | Depth-normalized counts of in-repeat read pairs for each sample (omitting samples with zero count) |\n"
+          },
+          {
+            "file": "documentation/04_Outlier_quickstart.md",
+            "origin": "repo",
+            "text": "# Quickstart: Outlier analysis\n\nIf cases consist of samples from patients with diverse phenotypes, it might be\nappropriate to assume that there is no enrichment for any specific expansion\nand hence the case-control analysis is not appropriate. In this situation, an\noutlier analysis can be used to flag repeats that are expanded in a small\nproportion of cases compared to the rest of the dataset.\n\nThe example dataset used for this section is located in\n`ExpansionHunterDenovo/examples/outlier`. We assume that individual STR\nprofiles and the multisample STR profile are computed as described in the\n[quick start guide to case-control analysis](03_Case_control_quickstart.md).\n\nThe outlier analysis is performed by a Python3 script `outlier.py` located\nin the `scripts/` directory. Two types of comparisons are supported:\nlocus-based comparison and motif-based comparison.\n\n- The locus-based comparison can distinguish between repeats longer\nthan the read length but shorter than the fragment length. It can be\nrun like so:\n\n    ```bash\n    /path/to/scripts/outlier.py locus \\\n            --manifest manifest.tsv \\\n            --multisample-profile example_dataset.multisample_profile.json \\\n            --output example_dataset.outlier_locus.tsv\n    ```\n\n  The resulting file `example_dataset.outlier_locus.tsv` contains the\n  following information.\n\n  | Column           | Description                                                      |\n  |------------------|------------------------------------------------------------------|\n  | contig           | Contig of the repeat region                                      |\n  | start            | Approximate start of the repeat                                  |\n  | end              | Approximate end of the repeat                                    |\n  | motif            | Inferred repeat motif                                            |\n  | top_case_zscore  | Top z-score of a case sample                                     |\n  | high_case_counts | Counts of case samples corresponding to z-score greater than 1.0 |\n  | counts           | Nonzero counts for all samples                                   |\n\n- The motif-based comparison analyzes the overall enrichment of genomes with\nrepeats longer than the fragment length. It can be run like so:\n\n    ```bash\n    path/to/scripts/outlier.py motif \\\n            --manifest manifest.tsv \\\n            --multisample-profile example_dataset.multisample_profile.json \\\n            --output example_dataset.outlier_motif.tsv \\\n            [--target-regions target_regions.bed]\n    ```\n\n  where `--target-regions` is an optional parameter for restricting the analysis\n  to regions in the provided a BED file.\n\n  The resulting file `example_dataset.outlier_motif.tsv` contains the following\n  information.\n\n  | Column           | Description                                                      |\n  |------------------|------------------------------------------------------------------|\n  | motif            | Inferred repeat motif                                            |\n  | top_case_zscore  | Top z-score of a case sample                                     |\n  | high_case_counts | Counts of case samples corresponding to z-score greater than 1.0 |\n  | counts           | Nonzero counts for all samples                                   |\n"
+          },
+          {
+            "file": "documentation/01_Before_you_begin.md",
+            "origin": "repo",
+            "text": "# Before you begin\n\nExpansionHunter Denovo (EHdn) can be used to analyze a collection of BAM/CRAM\nfiles containing alignments of short (100-200bp) reads. For best results, the\nsamples should be sequenced on the same instrument to similar coverage of at\nleast 30x. All data should be aligned with the **same short-read aligner**\nideally without any post-processing steps such as indel realignment or\nrecalibration.\n\nYour dataset should contain one or more samples that are suspected to harbor a\nrepeat expansion and a set of controls. If the controls are not available,\nconsider using\n[Illumina Polaris](https://github.com/Illumina/Polaris/wiki/HiSeqX-Diversity-Cohort)\ndataset.\n\n## Choosing between case/control and outlier analysis\n\nEHdn supports two secondary analysis types: case/control analysis and outlier\nanalysis. Case/control analysis is appropriate for detecting expansions present\nin a significant proportion of cases and largely absent from controls. Outlier\nanalysis, on the other hand, should be used when an expansion might be present\nonly in one or few case samples.\n\n![AnalysisTypes](./images/analysis-types.png)\n\n**Example 1** If the set of cases consists of many related individuals\nexhibiting the same phenotype then a **case/control** analysis may be\nappropriate.\n\n**Example 2** If the set of cases consists of ALS patients, the **case/control**\nanalysis is expected to flag the GGCCCC repeat in *C9orf72* gene as highly\nsignificant.\n\n**Example 3** If the set of cases is an undiagnosed rare disease cohort\nexhibiting a mix of phenotypes, it is unlikely that there is an enrichment for\nany specific expansion and hence the **outlier** analysis is appropriate.\n"
+          },
+          {
+            "file": "documentation/05_Computing_profiles.md",
+            "origin": "repo",
+            "text": "# Computing STR profiles\n\nEHdn performs a genome-wide search for STRs whose size exceeds the read length.\nThe program does this by collecting the following read-level evidence:\n\n- **Anchored in-repeat reads**: reads that originate inside STRs and their\n  mates (called the **anchors**) originate in the surrounding flanking sequence.\n- **In-repeat read pairs** are read pairs where both mates originate inside\n  the same STR.\n\nThe files containing summaries of identified anchored in-repeat reads and\nin-repeat read pairs are called **STR profiles**. STR profiles generated by\nEHdn are JSONs containing a separate record for each repeat unit (motif).\n\nFor example, consider a CGG repeat depicted in the figure below.\n![workflow](images/str-profile.png)\nThere are 7 anchored in-repeat reads and 3 in-repeat read pairs\noriginating from this repeat. They give rise to the following entry in the STR\nprofile file.\n\n```json\n\"CCG\": {\n    \"AnchoredIrrCount\": 7,\n    \"IrrPairCount\": 3,\n    \"RegionsWithIrrAnchors\": {\n        \"chr1:100-1000\": 7\n    },\n    \"RepeatUnit\": \"CCG\"\n}\n```\n\nSTR profiles are computed by the `profile` command as follows.\n\n```bash\nExpansionHunterDenovo profile \\\n        --reads input.bam \\\n        --reference reference.fasta \\\n        --output-prefix output \\\n        --min-anchor-mapq 50 \\\n        --max-irr-mapq 40\n```\n\n| Parameter         | Description                                     |\n|-------------------|-------------------------------------------------|\n| --reads           | The BAM/CRAM file to analyze                    |\n| --reference       | The FASTA file to which the reads were aligned  |\n| --output-prefix   | Common prefix for the output files              |\n| --min-anchor-mapq | Minimum MAPQ for anchor reads                   |\n| --max-irr-mapq    | Maximum MAPQ for in-repeat reads                |\n\n## Supplementary files generated by the `profile` command\n\nIn addition to the STR profile itself, the `profile` command generates\nsupplementary files `<output prefix>.locus.tsv`, `<output prefix>.motif.tsv`,\nand `<output prefix>.reads.tsv`. The last file is generated when `--log-reads`\ncommand-line parameter is set.\n\nThe `<output prefix>.locus.tsv` file summarizes information about all identified\nanchored in-repeat reads. The first four columns of this file give the location\nand motif of the STR. The fifth and sixth columns contain the raw and\ndepth-normalized (to 30x) counts of anchored in-repeat reads identified at the\nregion. Finally, the last column provides the estimated repeat expansion size.\nThis estimate is computed assuming that the expansion is heterozygous. If STR\nboundaries can be accurately annotated, a more accurate size estimate could be\nobtained using\n[a targeted STR genotyper](https://github.com/Illumina/ExpansionHunter). Here is\nan example output file describing two STRs.\n\n```\ncontig  start  end   motif  num_anc_irrs  norm_num_anc_irrs  het_str_size\nStrA    1771   2053  AGC    32            24.96              133\nStrB    1757   2154  CCG    22            17.16              107\n```\n\nThe `<output prefix>.motif.tsv` file summarizes information about all identified\nin-repeat read pairs. This file contains raw and depth-normalized counts of\nin-repeat read pairs for each motif. Here is an example.\n\n```\nmotif  num_paired_irrs  norm_num_paired_irrs\nAGC    2                1.56\nCCG    46               35.89\n```\n\nFinally, the optional file `<output prefix>.reads.tsv` contains the detailed\ninformation about all informative read pairs. Here is a description of each\ncolumn.\n\n| Column    | Description                                                                                               |\n|-----------|-----------------------------------------------------------------------------------------------------------|\n| pair_type | Type of read pair: in-repeat read and its anchor (`anchored_irr`) or pair of in-repeat reads (`irr_pair`) |\n| motif     | Motif of the in-repeat read(s); if motifs differ, they are given by `<read_motif>_<mate_motif>`           |\n| read_type | Type of read: anchor read (`anchor`) or in-repeat read (`irr`)                                            |\n| read_pos  | Position where the read is placed by the aligner (`unaligned` if the read is not aligned)                 |\n| mate_type | Type of mate: anchor read (`anchor`) or in-repeat read (`irr`)                                            |\n| mate_pos  | Position where the mate is placed by the aligner (`unaligned` if the mate is not aligned)                 |\n| name      | Identifier of the read pair                                                                               |\n\nHere is an example describing three read pairs.\n\n```\npair_type    motif   read_type  read_pos        mate_type  mate_pos        name\nanchored_irr CCG     irr        chr1:1734-1735  anchor     chr1:1734-1735  ZXZ555:98:HTJW3CZXM:1:2204\nirr_pair     AGC     irr        chr2:2431-2432  irr        chr2:2523-2524  ZXZ555:98:HTJW3CZXM:1:2205\nirr_pair     AGC_CCG irr        unaligned       irr        unaligned       ZXZ555:98:HTJW3CZXM:1:2206\n```\n\n## Generating a \"BAMlet\" for a given repeat region\n\nDirect analysis of reads supporting a given repeat expansion call offers a\npowerful way to assess EHdn findings. To help with this task, we implemented\na script `make-bamlet.py` that generates a small BAM file (BAMlet) with\nreads aligned to the repeat region and their mates. The script extends a given\nregion (+/-2Kb), extracts reads from the extended region, and then extracts\nmates of the collected reads located anomalously far away (>1Kb).\n\nThe script can be run like so.\n\n```bash\n./make-bamlet.py \\\n    --bam input_full_bam.bam \\\n    --bamlet output_bamlet.bam \\\n    --region chr2:6123657-6123714\n```\n"
+          },
+          {
+            "file": "documentation/06_Merging_profiles.md",
+            "origin": "repo",
+            "text": "# Merging single-sample profiles into multisample profiles\n\nOnce STR profiles have been computed for each sample in the dataset, they must\nbe merged together into a **multisample STR profile**. Multisample STR profiles\nare produced by `ExpansionHunterDenovo merge` command which has the following\nparameters.\n\n| Required parameter | Description                                    |\n|--------------------|------------------------------------------------|\n| --reference        | The FASTA file to which the reads were aligned |\n| --manifest         | TSV file with describing each sample           |\n| --output-prefix    | Common prefix for the output files             |\n\n| Optional parameter | Description                      | Default |\n|--------------------|----------------------------------|:-------:|\n| --min-unit-len     | Shortest repeat unit to consider | 2       |\n| --max-unit-len     | Longest repeat unit to consider  | 20      |\n\n## Manifest files\n\nThe manifest file is a tab-delimited file whose columns contain\nsample id, case/control status, and absolute path to the EH Denovo\noutput file. For example,\n\n```\nsample1\tcase\t/path/to/sample1.str_profile.json\nsample2\tcase\t/path/to/sample2.str_profile.json\nsample3\tcase\t/path/to/sample3.str_profile.json\nsample4\tcontrol\t/path/to/sample4.str_profile.json\nsample5\tcontrol\t/path/to/sample5.str_profile.json\nsample6\tcontrol\t/path/to/sample6.str_profile.json\n```\n\n## Multisample STR profiles\n\nA multisample STR profile is a result of merging multiple single-sample STR\nprofiles. It is a JSON object containing counts of in-repeat reads across\nall samples for each repeat motif. When two samples have overlapping or\nnearby regions with anchored in-repeat reads corresponding to the same repeat\nmotif, these regions are merged together. By default, `merge` operation merges\nregions located within 500bp of one another.\n\n## Example\n\nLet's assume we have two (single-sample) STR profiles that we want to combine.\nThe first profile is the file `sample1.str_profile.json` containing\n```json\n{\n    \"CCG\": {\n        \"AnchoredIrrCount\": 7,\n        \"IrrPairCount\": 3,\n        \"RegionsWithIrrAnchors\": {\n            \"chr1:100-1000\": 7\n        },\n        \"RepeatUnit\": \"CCG\",\n        \"ReadLength\": 150,\n        \"Depth\": 30.0\n    }\n}\n```\n\nAnd second profile is the file `sample2.str_profile.json` containing\n\n```json\n{\n    \"AGG\": {\n        \"AnchoredIrrCount\": 7,\n        \"IrrPairCount\": 2,\n        \"RegionsWithIrrAnchors\": {\n            \"chr2:5000-5300\": 7\n        },\n        \"RepeatUnit\": \"AGG\"\n    },\n    \"CCG\": {\n        \"AnchoredIrrCount\": 3,\n        \"IrrPairCount\": 10,\n        \"RegionsWithIrrAnchors\": {\n            \"chr1:1150-1200\": 3\n        },\n        \"RepeatUnit\": \"CCG\",\n        \"ReadLength\": 150,\n        \"Depth\": 40.0\n    }\n}\n```\n\nTo merge these profiles together we create a manifest file `manifest.txt`\n\n```\nsample1\tcase\t/path/to/sample1.str_profile.json\nsample2\tcontrol\t/path/to/sample2.str_profile.json\n```\n\nand then run\n\n```bash\nExpansionHunterDenovo merge \\\n  --reference reference.fa \\\n  --manifest manifest.txt \\\n  --output-prefix example_dataset\n```\n\nThe program generates a file `example_dataset.multisample_str_profile.json`\nwith the following content\n\n```json\n{\n    \"Counts\": {\n        \"AGG\": {\n            \"IrrPairCounts\": {\n                \"sample2\": 2\n            },\n            \"RegionsWithIrrAnchors\": {\n                \"chr2:5000-5300\": {\n                    \"sample2\": 7\n                }\n            }\n        },\n        \"CCG\": {\n            \"IrrPairCounts\": {\n                \"sample1\": 3,\n                \"sample2\": 10\n            },\n            \"RegionsWithIrrAnchors\": {\n                \"chr1:100-1200\": {\n                    \"sample1\": 7,\n                    \"sample2\": 3\n                },\n            }\n        }\n    },\n    \"Parameters\": {\n        \"Depths\": {\n            \"sample1\": 30.0,\n            \"sample2\": 40.0\n        },\n        \"ReadLengths\": {\n            \"sample1\": 150,\n            \"sample2\": 150\n        }\n    }\n}\n```"
+          },
+          {
+            "file": "documentation/07_Case_control_analysis.md",
+            "origin": "repo",
+            "text": "# Case-control analysis\n\nThe case-control analysis is performed by a Python3 script `casecontrol.py`\nlocated inside `scripts` directory. The locus-based analysis can be run\nlike so:\n\n```bash\npython3 case_control_analysis.py locus \\\n    --manifest manifest.txt \\\n    --multisample-profile multisample_profile.json \\\n    --output-prefix output\n```\n\nThe command to run the motif-based analysis is nearly identical:\n\n```bash\npython3 case_control_analysis.py motif \\\n    --manifest manifest.txt \\\n    --multisample-profile multisample_profile.json \\\n    --output-prefix output\n```\n\nThe input parameters manifest.txt and multisample_profile.json are as\n[described previously](04_Merging_profiles.md). \n\n| Optional parameter | Description                                                  | Default |\n|--------------------|--------------------------------------------------------------|:-------:|\n| --min-count        | Minimum number reads in a region for downstream analysis     | 5       |\n| --target-regions   | BED file with regions to which analysis should be restricted | NA      |\n| --test-method      | Method of calculating Wilcoxon Rank-Sum Test p-value*         | normal  |\n\n\\* The default value `normal` invokes the Normal approximation appropriate for\nlarger samples. To compute the p-value directly for smaller samples, use\n`permute_<N>` where N is the number of permutations. For example,\npermute_1000000 invokes a test with 1000000 permutations.\n\n## Outputs\n\nThe program produces two output files. One of them summarizes per-locus\ncomparison of in-repeat reads. The other file summarizes the overall genome-wide\ncomparison of motifs.\n"
+          },
+          {
+            "file": "documentation/08_Annotation.md",
+            "origin": "repo",
+            "text": "# Annotate locus-based analysis results\n\nThis guide provide an example of one method by which the ExpansionHunter Denovo\ncase-control or outlier locus-based analysis results can be annotated with\ninformation about the gene and genomic region for each repeat locus identified.\n\nA script to annotate ExpansionHunter Denovo locus-based results using\n[ANNOVAR](http://annovar.openbioinformatics.org) is provided here\n`ExpansionHunterDenovo/scripts/annotate_ehdn.sh`.\n\n**Note:** Genomic regions reported by this annotation script need to be\ninterpreted with caution.\n\nRegions identified by ExpansionHunter Denovo are defined based on the\nlocations of the supporting anchored in-repeat reads and do not exactly\ncorrespond to location of the repeat expansion itself. ANNOVAR denotes\na region as 'exonic' if any part of the region overlaps with an exon.\n\nA locus annotated as 'exonic' does not guarantee that the repeat expansion\nitself overlaps a coding region, only that the region defined by the\nsupporting anchored in-repeats reads overlaps with an exon. However, it does\nsuggest the expansion lies very close to a coding region.\n\n## Setup ANNOVAR\n\nThe provided annotation script requires an existing ANNOVAR installation and the\nrefGene annotation database to be downloaded.\n\n1. [Register and download ANNOVAR](http://download.openbioinformatics.org/annovar_download_form.php)\n2. Unpack ANNOVAR in your home directory or any other directory in your `PATH`\n\n    ```bash\n    tar xvfz annovar.latest.tar.gz\n    mv annovar ~/annovar\n    ```\n\n3. Download the refGene annotation database for the genome build you wish to use:\n\n    ```bash\n    perl ~/annovar/annotate_variation.pl -buildver hg19 -downdb -webfrom annovar refGene ~/annovar/humandb/\n    perl ~/annovar/annotate_variation.pl -buildver hg38 -downdb -webfrom annovar refGene ~/annovar/humandb/\n    ```\n\n4. The remainder of this guide assumes that ANNOVAR is installed in the\n   directory `~/annovar/` and the annotation databases are downloaded to\n   `~/annovar/humandb/`\n\n## Usage\n\nExpansionHunter Denovo [case-control](03_Case_control_quickstart.md) or\n[outlier](04_Outlier_quickstart.md) locus-based analysis is performed as\ndescribed elsewhere in [documentation](00_Introduction.md).\n\nThe following command annotates an EHdn results file called\n`locus_output.tsv` to create an annotated output file\n`locus_output_annotated.tsv`.\n\n```bash\nbash annotate_ehdn.sh \\\n    --ehdn-results locus_output.tsv \\\n    --ehdn-annotated-results locus_output_annotated.tsv \\\n    --annovar-annotate-variation ~/annovar/annotate_variation.pl \\\n    --annovar-humandb ~/annovar/humandb \\\n    --annovar-buildver hg19\n```\n\nHere is a description of the required arguments.\n\n| Parameter                  | Description                                                          |\n|----------------------------|----------------------------------------------------------------------|\n| ehdn-results               | Input filename of EHdn locus analysis results                        |\n| ehdn-annotated-results     | Output filename for annotated EHdn locus analysis results            |\n| annovar-annotate-variation | location of annotate_variation.pl ANNOVAR script                     |\n| annovar-humandb            | location of directory containing ANNOVAR refGene annotation database |\n| annovar-builder            | reference genome build used by ANNOVAR ('hg18', 'hg19' or 'hg38')    |\n"
+          },
+          {
+            "file": "documentation/09_Repeat_prioritization_strategies.md",
+            "origin": "repo",
+            "text": "# Repeat prioritization strategies during locus outlier analysis\n\nThe main takeaway from this document is that it may be reasonable to\nrestrict the repeat expansion search space to genic regions or even a small\nsubset of the relevant genes. This may help to increase the detection power when\nanalyzing data sets containing a small number of case samples. In this document\nwe detail the impact of genic filtering, and inform relevant cutoffs for Z-score\nthresholds when analyzing outlier samples at the locus level. \n\n## Known pathogenic repeats are located in genic regions\n\nWe used [ANNOVAR-based annotation script](08_Annotation.md) to annotate the output locus\nfiles from simulations of 35 known pathogenic repeats. Here is the breakdown of annotations:\n\n| Annotation    | Repeat gene                                     |\n|---------------|-------------------------------------------------|\n| Exonic        | *AR*, *ARX*, *ATN1*, *ATXN1*, *ATXN2*, *ATXN7*, *CACNA1A*, *COMP*, *DMPK*, *HTT*, *JPH3*, *PPP2R2B*, *ATXN3*, *C11orf80*, *CBL*, *CSTB*, *DIP2B*, *FMR1*, *GLS*, *LRP12*, *NOP56*, *TMEM185A*, *XYLT1* |\n| UTR           | *TCF4*, *AFF2*, *C9orf72*, *FRA10AC1*, *ZNF713* |\n| Splicing      | *AFF3*                                          |\n| Intronic      | *ATXN10*, *CNBP*, *FXN*                         |\n| ncRNA\\_exonic | *ATXN8/ATXN8OS*                                 |\n| No annotation | *NUTMB1*, *NOTCH2NLC*                           |\n\nThe table shows that most known pathogenic repeats are located in genic regions. Note,\nExpansionHunter Denovo locus script outputs a ~1kb region centered on the identified repeat, \nso if a repeat is within ~500bp of an exon then it will be labeled as exonic. \n\n## Rare expansions in healthy individuals\n\nFor this analysis we used [Illumina Polaris Diversity Cohort](https://github.com/Illumina/Polaris/wiki/HiSeqX-Diversity-Cohort)\nconsisting of 150 samples selected from the [International Genome Sample Resource](https://www.internationalgenome.org/)\n(formerly the 1000 Genomes Project) based on population diversity.\n\nAfter [STR profiles](05_Computing_profiles.md) have been generated for all\nsamples, we repeatedly ran the [outlier analysis](04_Outlier_quickstart.md)\ndesignating each sample as the \"case\" and using the remaining 149 samples as\n\"controls\". We then collected the Z-scores produced by this analysis.\n\nAs shown in the Panel A of the figure below, the vast majority of Z-scores \nis less than 10, with only about 5 repeats, on average,\nexceeding this threshold. The Panel B shows that the vast majority of the\nidentified repeats in this healthy population cohort fall within intergenic \nand intronic regions. \n\n![PolarisRepeats](./images/zscores-in-controls.png)\n\n## Large pathogenic expansions correspond to high Z-scores\n\nTo show that large pathogenic expansions correspond to high Z-scores, we\nsimulated expansions of the 35 pathogenic repeats. The relationship between\nZ-scores, ranks, and repeat sizes (in base pairs) is shown in the figure below.\n\nPanel A shows that with a few exceptions as the repeat size exceeds the read\nlength (150bp, dashed vertical line), the Z-score increases above 10 (an upper\nbound for the vast majority of rare expansions in controls). Panel B shows that\nrepeats corresponding to the Z-score of 10 or above will almost always\ncorrespond to a outlier ranking in the top 5, with many expansions ranked first. \n\n![SimulatedRepeats](./images/zscores-ranks-sizes.png)\n"
+          }
+        ],
+        "tool_names": [
+          ".gitignore",
+          "ExpansionHunterDenovo",
+          "__init__.py",
+          "annotate_ehdn",
+          "annotate_ehdn.sh",
+          "casecontrol",
+          "casecontrol.py",
+          "common",
+          "common.py",
+          "context",
+          "context.py",
+          "expansionhunterdenovo",
+          "locusworkflow",
+          "locusworkflow.py",
+          "make-bamlet",
+          "make-bamlet.py",
+          "motifworkflow",
+          "motifworkflow.py",
+          "outlier",
+          "outlier.py",
+          "regiontools",
+          "regiontools.py",
+          "run-analysis",
+          "run-analysis.sh",
+          "test_regions.py",
+          "test_wilcoxon.py",
+          "wilcoxontest",
+          "wilcoxontest.py"
+        ],
+        "tree_paths": [
+          ".gitignore",
+          "COPYRIGHT.txt",
+          "LICENSE.txt",
+          "README.md",
+          "documentation/00_Introduction.md",
+          "documentation/01_Before_you_begin.md",
+          "documentation/02_Installation.md",
+          "documentation/03_Case_control_quickstart.md",
+          "documentation/04_Outlier_quickstart.md",
+          "documentation/05_Computing_profiles.md",
+          "documentation/06_Merging_profiles.md",
+          "documentation/07_Case_control_analysis.md",
+          "documentation/08_Annotation.md",
+          "documentation/09_Repeat_prioritization_strategies.md",
+          "documentation/images/analysis-types.png",
+          "documentation/images/str-profile.png",
+          "documentation/images/workflow.png",
+          "documentation/images/zscores-in-controls.png",
+          "documentation/images/zscores-ranks-sizes.png",
+          "examples/case-control/bamlets/sample1.bam",
+          "examples/case-control/bamlets/sample1.bam.bai",
+          "examples/case-control/bamlets/sample2.bam",
+          "examples/case-control/bamlets/sample2.bam.bai",
+          "examples/case-control/bamlets/sample3.bam",
+          "examples/case-control/bamlets/sample3.bam.bai",
+          "examples/case-control/bamlets/sample4.bam",
+          "examples/case-control/bamlets/sample4.bam.bai",
+          "examples/case-control/bamlets/sample5.bam",
+          "examples/case-control/bamlets/sample5.bam.bai",
+          "examples/case-control/bamlets/sample6.bam",
+          "examples/case-control/bamlets/sample6.bam.bai",
+          "examples/case-control/bamlets/sample7.bam",
+          "examples/case-control/bamlets/sample7.bam.bai",
+          "examples/case-control/example_dataset.casecontrol_locus.tsv",
+          "examples/case-control/example_dataset.casecontrol_motif.tsv",
+          "examples/case-control/example_dataset.multisample_profile.json",
+          "examples/case-control/manifest.tsv",
+          "examples/case-control/reference.fasta",
+          "examples/case-control/reference.fasta.fai",
+          "examples/case-control/run-analysis.sh",
+          "examples/case-control/str-profiles/sample1.locus.tsv",
+          "examples/case-control/str-profiles/sample1.motif.tsv",
+          "examples/case-control/str-profiles/sample1.str_profile.json",
+          "examples/case-control/str-profiles/sample2.locus.tsv",
+          "examples/case-control/str-profiles/sample2.motif.tsv",
+          "examples/case-control/str-profiles/sample2.str_profile.json",
+          "examples/case-control/str-profiles/sample3.locus.tsv",
+          "examples/case-control/str-profiles/sample3.motif.tsv",
+          "examples/case-control/str-profiles/sample3.str_profile.json",
+          "examples/case-control/str-profiles/sample4.locus.tsv",
+          "examples/case-control/str-profiles/sample4.motif.tsv",
+          "examples/case-control/str-profiles/sample4.str_profile.json",
+          "examples/case-control/str-profiles/sample5.locus.tsv",
+          "examples/case-control/str-profiles/sample5.motif.tsv",
+          "examples/case-control/str-profiles/sample5.str_profile.json",
+          "examples/case-control/str-profiles/sample6.locus.tsv",
+          "examples/case-control/str-profiles/sample6.motif.tsv",
+          "examples/case-control/str-profiles/sample6.str_profile.json",
+          "examples/case-control/str-profiles/sample7.locus.tsv",
+          "examples/case-control/str-profiles/sample7.motif.tsv",
+          "examples/case-control/str-profiles/sample7.str_profile.json",
+          "examples/outlier/bamlets/sample1.bam",
+          "examples/outlier/bamlets/sample1.bam.bai",
+          "examples/outlier/bamlets/sample10.bam",
+          "examples/outlier/bamlets/sample10.bam.bai",
+          "examples/outlier/bamlets/sample11.bam",
+          "examples/outlier/bamlets/sample11.bam.bai",
+          "examples/outlier/bamlets/sample12.bam",
+          "examples/outlier/bamlets/sample12.bam.bai",
+          "examples/outlier/bamlets/sample13.bam",
+          "examples/outlier/bamlets/sample13.bam.bai",
+          "examples/outlier/bamlets/sample14.bam",
+          "examples/outlier/bamlets/sample14.bam.bai",
+          "examples/outlier/bamlets/sample15.bam",
+          "examples/outlier/bamlets/sample15.bam.bai",
+          "examples/outlier/bamlets/sample16.bam",
+          "examples/outlier/bamlets/sample16.bam.bai",
+          "examples/outlier/bamlets/sample17.bam",
+          "examples/outlier/bamlets/sample17.bam.bai",
+          "examples/outlier/bamlets/sample18.bam",
+          "examples/outlier/bamlets/sample18.bam.bai",
+          "examples/outlier/bamlets/sample19.bam",
+          "examples/outlier/bamlets/sample19.bam.bai",
+          "examples/outlier/bamlets/sample2.bam",
+          "examples/outlier/bamlets/sample2.bam.bai",
+          "examples/outlier/bamlets/sample20.bam",
+          "examples/outlier/bamlets/sample20.bam.bai",
+          "examples/outlier/bamlets/sample21.bam",
+          "examples/outlier/bamlets/sample21.bam.bai",
+          "examples/outlier/bamlets/sample3.bam",
+          "examples/outlier/bamlets/sample3.bam.bai",
+          "examples/outlier/bamlets/sample4.bam",
+          "examples/outlier/bamlets/sample4.bam.bai",
+          "examples/outlier/bamlets/sample5.bam",
+          "examples/outlier/bamlets/sample5.bam.bai",
+          "examples/outlier/bamlets/sample6.bam",
+          "examples/outlier/bamlets/sample6.bam.bai",
+          "examples/outlier/bamlets/sample7.bam",
+          "examples/outlier/bamlets/sample7.bam.bai",
+          "examples/outlier/bamlets/sample8.bam",
+          "examples/outlier/bamlets/sample8.bam.bai",
+          "examples/outlier/bamlets/sample9.bam",
+          "examples/outlier/bamlets/sample9.bam.bai",
+          "examples/outlier/example_dataset.multisample_profile.json",
+          "examples/outlier/example_dataset.outlier_locus.tsv",
+          "examples/outlier/example_dataset.outlier_motif.tsv",
+          "examples/outlier/manifest.tsv",
+          "examples/outlier/reference.fasta",
+          "examples/outlier/reference.fasta.fai",
+          "examples/outlier/run-analysis.sh",
+          "examples/outlier/str-profiles/sample1.locus.tsv",
+          "examples/outlier/str-profiles/sample1.motif.tsv",
+          "examples/outlier/str-profiles/sample1.str_profile.json",
+          "examples/outlier/str-profiles/sample10.locus.tsv",
+          "examples/outlier/str-profiles/sample10.motif.tsv",
+          "examples/outlier/str-profiles/sample10.str_profile.json",
+          "examples/outlier/str-profiles/sample11.locus.tsv",
+          "examples/outlier/str-profiles/sample11.motif.tsv",
+          "examples/outlier/str-profiles/sample11.str_profile.json",
+          "examples/outlier/str-profiles/sample12.locus.tsv",
+          "examples/outlier/str-profiles/sample12.motif.tsv",
+          "examples/outlier/str-profiles/sample12.str_profile.json",
+          "examples/outlier/str-profiles/sample13.locus.tsv",
+          "examples/outlier/str-profiles/sample13.motif.tsv",
+          "examples/outlier/str-profiles/sample13.str_profile.json",
+          "examples/outlier/str-profiles/sample14.locus.tsv",
+          "examples/outlier/str-profiles/sample14.motif.tsv",
+          "examples/outlier/str-profiles/sample14.str_profile.json",
+          "examples/outlier/str-profiles/sample15.locus.tsv",
+          "examples/outlier/str-profiles/sample15.motif.tsv",
+          "examples/outlier/str-profiles/sample15.str_profile.json",
+          "examples/outlier/str-profiles/sample16.locus.tsv",
+          "examples/outlier/str-profiles/sample16.motif.tsv",
+          "examples/outlier/str-profiles/sample16.str_profile.json",
+          "examples/outlier/str-profiles/sample17.locus.tsv",
+          "examples/outlier/str-profiles/sample17.motif.tsv",
+          "examples/outlier/str-profiles/sample17.str_profile.json",
+          "examples/outlier/str-profiles/sample18.locus.tsv",
+          "examples/outlier/str-profiles/sample18.motif.tsv",
+          "examples/outlier/str-profiles/sample18.str_profile.json",
+          "examples/outlier/str-profiles/sample19.locus.tsv",
+          "examples/outlier/str-profiles/sample19.motif.tsv",
+          "examples/outlier/str-profiles/sample19.str_profile.json",
+          "examples/outlier/str-profiles/sample2.locus.tsv",
+          "examples/outlier/str-profiles/sample2.motif.tsv",
+          "examples/outlier/str-profiles/sample2.str_profile.json",
+          "examples/outlier/str-profiles/sample20.locus.tsv",
+          "examples/outlier/str-profiles/sample20.motif.tsv",
+          "examples/outlier/str-profiles/sample20.str_profile.json",
+          "examples/outlier/str-profiles/sample21.locus.tsv",
+          "examples/outlier/str-profiles/sample21.motif.tsv",
+          "examples/outlier/str-profiles/sample21.str_profile.json",
+          "examples/outlier/str-profiles/sample3.locus.tsv",
+          "examples/outlier/str-profiles/sample3.motif.tsv",
+          "examples/outlier/str-profiles/sample3.str_profile.json",
+          "examples/outlier/str-profiles/sample4.locus.tsv",
+          "examples/outlier/str-profiles/sample4.motif.tsv",
+          "examples/outlier/str-profiles/sample4.str_profile.json",
+          "examples/outlier/str-profiles/sample5.locus.tsv",
+          "examples/outlier/str-profiles/sample5.motif.tsv",
+          "examples/outlier/str-profiles/sample5.str_profile.json",
+          "examples/outlier/str-profiles/sample6.locus.tsv",
+          "examples/outlier/str-profiles/sample6.motif.tsv",
+          "examples/outlier/str-profiles/sample6.str_profile.json",
+          "examples/outlier/str-profiles/sample7.locus.tsv",
+          "examples/outlier/str-profiles/sample7.motif.tsv",
+          "examples/outlier/str-profiles/sample7.str_profile.json",
+          "examples/outlier/str-profiles/sample8.locus.tsv",
+          "examples/outlier/str-profiles/sample8.motif.tsv",
+          "examples/outlier/str-profiles/sample8.str_profile.json",
+          "examples/outlier/str-profiles/sample9.locus.tsv",
+          "examples/outlier/str-profiles/sample9.motif.tsv",
+          "examples/outlier/str-profiles/sample9.str_profile.json",
+          "scripts/.gitignore",
+          "scripts/annotate_ehdn.sh",
+          "scripts/casecontrol.py",
+          "scripts/casecontrol/__init__.py",
+          "scripts/casecontrol/locusworkflow.py",
+          "scripts/casecontrol/motifworkflow.py",
+          "scripts/core/__init__.py",
+          "scripts/core/common.py",
+          "scripts/core/regiontools.py",
+          "scripts/core/wilcoxontest.py",
+          "scripts/make-bamlet.py",
+          "scripts/outlier.py",
+          "scripts/outlier/__init__.py",
+          "scripts/outlier/locusworkflow.py",
+          "scripts/outlier/motifworkflow.py",
+          "scripts/requirements.txt",
+          "scripts/tests/__init__.py",
+          "scripts/tests/context.py",
+          "scripts/tests/test_regions.py",
+          "scripts/tests/test_wilcoxon.py",
+          "source/.clang-format",
+          "source/.gitignore",
+          "source/CMakeLists.txt",
+          "source/Makefile",
+          "source/app/ExpansionHunterDenovo.cpp",
+          "source/app/GatherParameters.cpp",
+          "source/app/GatherParameters.hh",
+          "source/app/Version.hh",
+          "source/common/CMakeLists.txt",
+          "source/common/Interval.cpp",
+          "source/common/Interval.hh",
+          "source/common/Parameters.hh",
+          "source/common/SequenceUtils.cpp",
+          "source/common/SequenceUtils.hh",
+          "source/io/CMakeLists.txt",
+          "source/io/HtsFileStreamer.cpp",
+          "source/io/HtsFileStreamer.hh",
+          "source/io/HtsHelpers.cpp",
+          "source/io/HtsHelpers.hh",
+          "source/io/Reference.cpp",
+          "source/io/Reference.hh",
+          "source/merge/CMakeLists.txt",
+          "source/merge/MergeParameters.cpp",
+          "source/merge/MergeParameters.hh",
+          "source/merge/MergeWorkflow.cpp",
+          "source/merge/MergeWorkflow.hh",
+          "source/merge/MultisampleProfile.cpp",
+          "source/merge/MultisampleProfile.hh",
+          "source/profile/CMakeLists.txt",
+          "source/profile/PairCollector.cpp",
+          "source/profile/PairCollector.hh",
+          "source/profile/ProfileParameters.cpp",
+          "source/profile/ProfileParameters.hh",
+          "source/profile/ProfileWorkflow.cpp",
+          "source/profile/ProfileWorkflow.hh",
+          "source/profile/ReadClassification.cpp",
+          "source/profile/ReadClassification.hh",
+          "source/profile/SampleRunStats.cpp",
+          "source/profile/SampleRunStats.hh",
+          "source/reads/CMakeLists.txt",
+          "source/reads/IrrFinder.cpp",
+          "source/reads/IrrFinder.hh",
+          "source/reads/Purity.cpp",
+          "source/reads/Purity.hh",
+          "source/reads/Read.cpp",
+          "source/reads/Read.hh",
+          "source/reads/unit_tests/CMakeLists.txt",
+          "source/reads/unit_tests/pair_collector_test.cc",
+          "source/region/CMakeLists.txt",
+          "source/region/GenomicRegion.cpp",
+          "source/region/GenomicRegion.hh",
+          "source/region/ReferenceContigInfo.cpp",
+          "source/region/ReferenceContigInfo.hh",
+          "source/tests/GenomicRegionTest.cpp",
+          "source/tests/IrrFinderTest.cpp",
+          "source/tests/PurityScoreTest.cpp",
+          "source/tests/SequenceUtilsTest.cpp",
+          "source/tests/UnitTests.cpp"
+        ],
+        "tree_truncated": false,
+        "upstream_files": {}
+      },
+      "limitations": [],
+      "caveat_items": [
+        "Environment: STRhub transcribed the documented installation commands unchanged into its own carrier (Ubuntu 22.04, package lists refreshed, apt answering yes, plus minimal build toolchain (build-essential, cmake, git, ca-certificates; no tool-specific libraries)).",
+        "Run command: the one documented in documentation/05_Computing_profiles.md (line 35), rewritten to STRhub's mounts; the capture wrapper is planned only if the procedure review passes."
+      ]
+    }
+  },
+  "provenance": {
+    "from_upstream": {
+      "install": {
+        "method": "release_binary",
+        "evidence_source": "documentation/02_Installation.md:L19-L30"
+      },
+      "command": {
+        "value": "ExpansionHunterDenovo profile --reads input.bam --reference reference.fasta --output-prefix output --min-anchor-mapq 50 --max-irr-mapq 40",
+        "evidence_source": "documentation/05_Computing_profiles.md:L35"
+      },
+      "input_kind": {
+        "value": "bam",
+        "evidence_source": null
+      },
+      "supported_platforms": [],
+      "assembly": {
+        "declared": "both",
+        "evidence_source": "documentation/08_Annotation.md:L41"
+      },
+      "regions_schema": null,
+      "output_format": {
+        "glob": "**/*.json",
+        "evidence_source": "documentation/03_Case_control_quickstart.md:L25"
+      }
+    },
+    "derived": {
+      "command_rewrites": [],
+      "regions_layout_binding": null,
+      "single_sample_adaptation": null
+    },
+    "harness_choices": {
+      "dataset": null,
+      "platform": {
+        "selected": "illumina",
+        "basis": "counted_unproven",
+        "supported_platforms": []
+      },
+      "assembly": {
+        "selected": null,
+        "basis": "upstream_stated",
+        "note": null
+      },
+      "regions_layout": null,
+      "base_environment": {
+        "image": "ubuntu:22.04",
+        "description": "Ubuntu 22.04, package lists refreshed, apt answering yes, plus minimal build toolchain (build-essential, cmake, git, ca-certificates; no tool-specific libraries)",
+        "added_packages": [
+          "build-essential",
+          "cmake",
+          "git",
+          "ca-certificates"
+        ],
+        "miniforge": false,
+        "submodules": false
+      }
+    }
+  },
+  "procedure_validation": {
+    "schema": "strhub-procedure-evidence/1",
+    "valid": true,
+    "reason": "Procedure evidence matches the effective manifest and recomputed decision."
+  },
+  "verdict": {
+    "code": "fails",
+    "title": "Fails",
+    "basis": "gates",
+    "reason": "The environment did not build from the declared install steps.",
+    "readme_gaps": [],
+    "status_code": "FAILED_EXECUTION",
+    "blockers": [
+      {
+        "code": "build_failed",
+        "what": "The environment did not build from the install steps found in the repository.",
+        "ask_owner": {
+          "title": "Build fails from a clean checkout",
+          "body": "STRhub Verified tried to build the tool from a clean checkout at the pinned commit, following the repository's own install steps, and the build failed. The build log is linked from the run."
+        }
+      }
+    ]
+  },
+  "step1": {
+    "code": "does_not_run",
+    "headline": "As documented, it does not run.",
+    "body": "The environment did not build from the declared install steps. That does not mean the tool does not work. It means a third party following the README at this commit did not reach the end. Fix the documentation, or the step that broke, and try the link again on the new commit.",
+    "missing": [],
+    "missing_text": [],
+    "guide": "docs/GUIA-PASO-1.md"
+  },
+  "certificate": {
+    "schema": "strhub-verified/certificate/1",
+    "label": "Does not run as documented: stops at install",
+    "reached": "Available",
+    "stages": [
+      {
+        "key": "available",
+        "label": "Source available",
+        "status": "PASS"
+      },
+      {
+        "key": "installs",
+        "label": "Installation",
+        "status": "FAIL"
+      },
+      {
+        "key": "runs",
+        "label": "End-to-end execution",
+        "status": "NOT ATTEMPTED"
+      },
+      {
+        "key": "output",
+        "label": "Output generated",
+        "status": "NOT ATTEMPTED"
+      }
+    ],
+    "summary": {
+      "purpose": "Evaluate whether the tool installs, runs end-to-end, and produces structurally valid output.",
+      "result": "Does not run as documented: stops at install",
+      "reached": "Available, 1/5 gates passed",
+      "why": "The environment did not build from the declared install steps.",
+      "scope": "Installation, execution, and output structure evaluation.",
+      "not_evaluated": [
+        "Genotype accuracy",
+        "Concordance",
+        "Forensic validity",
+        "Regulatory compliance"
+      ]
+    },
+    "conclusion": [
+      {
+        "title": "Does not install",
+        "body": "The environment for ExpansionHunterDenovo v0.9.0 could not be built from the declared install steps, so nothing further was attempted."
+      },
+      {
+        "title": "No output produced",
+        "body": "No file in the declared format was written, so nothing could be checked for structure or content. This says the run did not get that far; it is not a finding about the quality of the software."
+      },
+      {
+        "title": "Verdict: Fails",
+        "body": "The environment did not build from the declared install steps."
+      },
+      {
+        "title": "Repository test data not used",
+        "body": "The repository ships example data (30 file(s)), which was not used. STRhub Verified selected a public reference dataset as the reference dataset, but it was not processed because the installation did not complete."
+      },
+      {
+        "title": "Repeatability of this build attempt",
+        "body": "The pinned commit, declared base environment, executed installation commands, carrier Dockerfile, and CI build log recorded in this report document the build attempt. Because base image and system package versions are not pinned by the commands, exact long-term reproduction is not guaranteed; the documented analysis command was not executed."
+      }
+    ],
+    "out_of_scope": [
+      "Genotype correctness or accuracy",
+      "Concordance against known truth sets",
+      "Sensitivity, specificity, or stutter performance",
+      "Allele calling accuracy or forensic casework suitability",
+      "Regulatory compliance or ISO accreditation",
+      "Multi-laboratory or multi-dataset reproducibility"
+    ],
+    "limitations": [
+      "Single reference dataset per input type",
+      "Single containerized environment (Docker / ubuntu-22.04)",
+      "No truth-set comparison or ground-truth genotypes",
+      "No accuracy or concordance assessment",
+      "No forensic or clinical validation of results",
+      "No sequencing data were processed because execution did not complete"
+    ],
+    "scope": {
+      "statement": "Independent automated evaluation of reproducible execution. It checks whether the tool installs, runs end-to-end, and produces structurally valid output in a standardized environment.",
+      "not": "This is not an analytical validation. Genotype accuracy, concordance, forensic suitability, and regulatory compliance are out of scope.",
+      "disclaimer": "Each result is a dated snapshot, verified on the tool's public repository at a pinned commit. STRhub does not store tool source code."
+    }
+  }
+}
