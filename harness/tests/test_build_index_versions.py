@@ -44,3 +44,21 @@ def test_commit_directories_are_not_listed_as_tools(tmp_path):
     assert cat["count"] == 1 and [t["slug"] for t in cat["tools"]] == [SLUG]
     index_json = json.loads(json.dumps(cat))   # serialisable as written
     assert index_json["tools"][0]["versions"][0]["sha"] == NEW
+
+
+def test_manual_curated_runs_are_preserved_in_versions_without_changing_alias(tmp_path):
+    site = tmp_path / "site"; site.mkdir()
+    pl.place(site, _run(tmp_path, NEW, "2026-02-01T00:00:00Z", "2026-09-01T00:00:00+00:00"), SLUG)
+    manual_src = _run(tmp_path, NEW, "2026-02-01T00:00:00Z", "2026-09-02T00:00:00+00:00",
+                      name="manual", instrument="curated")
+    manual_dst = site / SLUG / f"{NEW}-curated"
+    pl._copy_set(pl.report_files(manual_src, SLUG), manual_dst)
+
+    # Alias stays strictly documented.
+    assert pl.alias_source(site, SLUG)[0] == NEW
+    (entry,) = build_index.build_catalogue(site)["tools"]
+    assert entry["instrument"] == "documented"
+    assert len(entry["versions"]) == 2
+    curated = next(v for v in entry["versions"] if v["instrument"] == "curated")
+    assert curated["sha"] == NEW
+    assert curated["report"] == f"{SLUG}/{NEW}-curated/{SLUG}.json"

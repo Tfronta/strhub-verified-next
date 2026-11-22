@@ -164,13 +164,37 @@ def _version_entry(slug: str, sha: str | None, r: dict, prefix: str) -> dict:
     }
 
 
+def _scan_manual(reports: pathlib.Path, slug: str) -> list[tuple[str, str | None, dict]]:
+    """Manual verification runs placed alongside documented runs under
+    `<slug>/*-curated/<slug>.json`. Preserved in index.json's `versions` list
+    on every rebuild, while never eligible for `publish_layout.alias_source`."""
+    found: list[tuple[str, str | None, dict]] = []
+    base = reports / slug
+    if not base.is_dir():
+        return found
+    for d in sorted(base.iterdir()):
+        if not d.is_dir() or not d.name.endswith("-curated"):
+            continue
+        r = publish_layout._read(d / f"{slug}.json")
+        if r and r.get("instrument") == "curated":
+            sha = publish_layout.sha_of(r)
+            found.append((d.name, sha, publish_layout._with_tombstone(d, r)))
+    found.sort(key=lambda item: publish_layout.rank(item[2]), reverse=True)
+    return found
+
+
 def versions_of(reports: pathlib.Path, slug: str, root: dict) -> list[dict]:
     """Every commit verified for `slug`, newest commit first. A slug with no
     directory yet is its own single version, at the root."""
     found = publish_layout.scan(reports, slug)
-    if not found:
-        return [_version_entry(slug, root.get("source", {}).get("ref_resolved"), root, "")]
-    return [_version_entry(slug, sha, r, f"{slug}/{sha}/") for sha, r in found]
+    entries = (
+        [_version_entry(slug, sha, r, f"{slug}/{sha}/") for sha, r in found]
+        if found
+        else [_version_entry(slug, root.get("source", {}).get("ref_resolved"), root, "")]
+    )
+    for folder_name, sha, r in _scan_manual(reports, slug):
+        entries.append(_version_entry(slug, sha, r, f"{slug}/{folder_name}/"))
+    return entries
 
 
 def build_catalogue(reports: pathlib.Path) -> dict:
