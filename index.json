@@ -1,7 +1,7 @@
 {
   "schema": "strhub-verified/index/3",
-  "generated": "2026-11-22T19:14:31+00:00",
-  "count": 11,
+  "generated": "2026-11-22T19:14:38+00:00",
+  "count": 12,
   "tools": [
     {
       "slug": "expansionhunter",
@@ -392,6 +392,48 @@
           "report": "strspy-ont/cbf650081e92f5d36eb7409d7208dbde425fdf95/strspy-ont.json",
           "page": "strspy-ont/cbf650081e92f5d36eb7409d7208dbde425fdf95/strspy-ont.html",
           "pdf": "strspy-ont/cbf650081e92f5d36eb7409d7208dbde425fdf95/strspy-ont.pdf"
+        }
+      ]
+    },
+    {
+      "slug": "tandem-genotypes",
+      "name": "tandem-genotypes",
+      "version": "1.9.2",
+      "variant": null,
+      "sha": "706a6b6a134788afb689e35445c67b4c2ae40666",
+      "committed": "2024-06-25T08:52:29Z",
+      "instrument": "documented",
+      "level": "available",
+      "label": "Could not be determined",
+      "verdict": "undetermined",
+      "errors_reported": false,
+      "generated": "2026-11-22T19:14:10+00:00",
+      "source_repo": "https://github.com/mcfrith/tandem-genotypes",
+      "source_ref": "706a6b6a134788afb689e35445c67b4c2ae40666",
+      "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/45059506033",
+      "distinct_str_loci": null,
+      "distinct_snp_markers": null,
+      "total_reads": null,
+      "external_state": "na",
+      "dataset_types": [],
+      "report": "tandem-genotypes.json",
+      "page": "tandem-genotypes.html",
+      "versions": [
+        {
+          "sha": "706a6b6a134788afb689e35445c67b4c2ae40666",
+          "instrument": "documented",
+          "version": "1.9.2",
+          "variant": null,
+          "committed": "2024-06-25T08:52:29Z",
+          "generated": "2026-11-22T19:14:10+00:00",
+          "level": "available",
+          "label": "Could not be determined",
+          "verdict": "undetermined",
+          "errors_reported": false,
+          "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/45059506033",
+          "report": "tandem-genotypes/706a6b6a134788afb689e35445c67b4c2ae40666/tandem-genotypes.json",
+          "page": "tandem-genotypes/706a6b6a134788afb689e35445c67b4c2ae40666/tandem-genotypes.html",
+          "pdf": "tandem-genotypes/706a6b6a134788afb689e35445c67b4c2ae40666/tandem-genotypes.pdf"
         }
       ]
     },

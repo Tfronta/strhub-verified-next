@@ -1,0 +1,1041 @@
+{
+  "schema": "strhub-verified/1",
+  "mode": "publish",
+  "tool": {
+    "name": "tandem-genotypes",
+    "version": "1.9.2",
+    "contact": "https://github.com/mcfrith/tandem-genotypes/issues"
+  },
+  "submission": {
+    "by": "third_party"
+  },
+  "source": {
+    "repo": "https://github.com/mcfrith/tandem-genotypes",
+    "ref": "706a6b6a134788afb689e35445c67b4c2ae40666",
+    "ref_resolved": "706a6b6a134788afb689e35445c67b4c2ae40666",
+    "committed": "2024-06-25T08:52:29Z"
+  },
+  "environment": {
+    "dockerfile": "Dockerfile",
+    "os": [
+      "ubuntu-22.04"
+    ],
+    "source": "generated"
+  },
+  "generated": "2026-11-22T19:14:10+00:00",
+  "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/45059506033",
+  "run": {
+    "cmd": "tandem-genotypes -g refGene.txt microsat.txt alignments.maf > tg.txt",
+    "cwd": ".",
+    "effective_cmd": "cd '.' && touch /tmp/.strhub_mark && ( tandem-genotypes -g refGene.txt microsat.txt alignments.maf > tg.txt ); rc=$?; find . -xdev -type f -newer /tmp/.strhub_mark -size +0 ! -path './.git/*' ! -path './proc/*' ! -path './sys/*' ! -path './dev/*' ! -path './data/*' ! -path '*/__pycache__/*' ! -name '*.pyc' ! -name '*.pyo' 2>/dev/null | head -500 | while IFS= read -r f; do mkdir -p \"/data/out/$(dirname \"$f\")\" && cp \"$f\" \"/data/out/$f\"; done; exit $rc",
+    "step_outcome": "skipped"
+  },
+  "instrument": "documented",
+  "recipe": {
+    "origin": "proposed"
+  },
+  "gates": {
+    "available": true,
+    "installs": false,
+    "runs": false,
+    "io": false,
+    "content": false
+  },
+  "input_contract": {},
+  "level": "available",
+  "io_detail": {},
+  "content_detail": {},
+  "example_detail": null,
+  "datasets": [
+    {
+      "leg": "external",
+      "label": "External data",
+      "available": false,
+      "type": null,
+      "dataset": null,
+      "io": false,
+      "content": false,
+      "passed": false
+    },
+    {
+      "leg": "example",
+      "label": "Tool's own example",
+      "available": false,
+      "io": false,
+      "content": null,
+      "passed": false,
+      "matches_expected": null,
+      "produced_count": null
+    }
+  ],
+  "scope": "Assessment of documented execution in the stated environment and output format. Concerns reproducible execution only; no claim of accuracy, casework fitness, or regulatory validation.",
+  "upstream": {
+    "checked": "2026-11-22T19:14:10+00:00",
+    "repo_exists": true,
+    "ref_exists": true,
+    "default_branch": "master",
+    "status": "identical",
+    "behind_by": 0
+  },
+  "author_known_issues": [
+    {
+      "heading": "Limitations",
+      "line": 317,
+      "text": "* `tandem-genotypes` doesn't work for tandem repeats at (or extremely\nnear) the edge of a sequence. This is because it uses DNA reads\nthat clearly align beyond both sides of the repeat.",
+      "truncated": false,
+      "url": "https://github.com/mcfrith/tandem-genotypes/blob/706a6b6a134788afb689e35445c67b4c2ae40666/README.md#L317"
+    }
+  ],
+  "evidence": [
+    {
+      "claim": "bioconda_package",
+      "kind": "readme",
+      "path": "README.md",
+      "line": 13,
+      "text": "`tandem-genotypes` from [bioconda](https://bioconda.github.io/).",
+      "url": "https://github.com/mcfrith/tandem-genotypes/blob/706a6b6a134788afb689e35445c67b4c2ae40666/README.md#L13"
+    },
+    {
+      "claim": "run_command",
+      "kind": "readme",
+      "path": "README.md",
+      "line": 21,
+      "text": "tandem-genotypes -g refGene.txt microsat.txt alignments.maf > tg.txt",
+      "url": "https://github.com/mcfrith/tandem-genotypes/blob/706a6b6a134788afb689e35445c67b4c2ae40666/README.md#L21"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "tests/near-beg.bed",
+      "text": "bed",
+      "url": "https://github.com/mcfrith/tandem-genotypes/blob/706a6b6a134788afb689e35445c67b4c2ae40666/tests/near-beg.bed"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "tests/small-rep.bed",
+      "text": "bed",
+      "url": "https://github.com/mcfrith/tandem-genotypes/blob/706a6b6a134788afb689e35445c67b4c2ae40666/tests/small-rep.bed"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "tests/far.bed",
+      "text": "bed",
+      "url": "https://github.com/mcfrith/tandem-genotypes/blob/706a6b6a134788afb689e35445c67b4c2ae40666/tests/far.bed"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "tests/slop3.bed",
+      "text": "bed",
+      "url": "https://github.com/mcfrith/tandem-genotypes/blob/706a6b6a134788afb689e35445c67b4c2ae40666/tests/slop3.bed"
+    },
+    {
+      "claim": "known_issue",
+      "kind": "readme",
+      "path": "README.md",
+      "line": 317,
+      "text": "Limitations",
+      "url": "https://github.com/mcfrith/tandem-genotypes/blob/706a6b6a134788afb689e35445c67b4c2ae40666/README.md#L317"
+    },
+    {
+      "claim": "documented_input",
+      "kind": "readme",
+      "path": "README.md",
+      "line": 103,
+      "text": "This uses 3 input files: the read sequences (in fastq or fasta",
+      "url": "https://github.com/mcfrith/tandem-genotypes/blob/706a6b6a134788afb689e35445c67b4c2ae40666/README.md#L103"
+    }
+  ],
+  "repo_test_data": {
+    "known": true,
+    "present": true,
+    "count": 4,
+    "examples": [
+      "tests/near-beg.bed",
+      "tests/small-rep.bed",
+      "tests/far.bed",
+      "tests/slop3.bed"
+    ]
+  },
+  "caveats": {
+    "source": "detect_recipe",
+    "items": [
+      "Environment: no proven installation profile; STRhub did not manufacture installation steps.",
+      "Run command: the README's own command, rewritten to STRhub's mounts; the capture wrapper is planned only if the procedure review passes."
+    ]
+  },
+  "install_detail": {
+    "passed": false,
+    "diagnostics": [],
+    "faults": []
+  },
+  "procedure_review": {
+    "may_say_runs": false,
+    "status_code": "UNVERIFIED_INSUFFICIENT_DOCS",
+    "basis": "recipe",
+    "attribution": "strhub",
+    "blocker": "missing_input",
+    "reason": "STRhub holds no reference sample of the kind this procedure reads, and the repository ships no example to run, so nothing was executed.",
+    "amendments": [
+      {
+        "code": "install_not_copyable",
+        "what": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub."
+      },
+      {
+        "code": "published_image",
+        "what": "The install named here is a published image or package. That is a claim about the image, not about this commit, and it was not counted as the commit running."
+      }
+    ],
+    "inferences": {
+      "install": {
+        "evidence_source": "README.md:L13",
+        "verified": false
+      },
+      "run_command": {
+        "evidence_source": "README.md:L21",
+        "verified": true,
+        "kind": "doc",
+        "path": "README.md",
+        "document_sha256": "b97def1a95cffba6bac27e7bd6533ae950ca9e12dc5128c2c3c962db0a1cee2c"
+      },
+      "output": {
+        "verified": true,
+        "kind": "doc",
+        "path": "README.md",
+        "line": 21,
+        "end_line": 21,
+        "document_sha256": "b97def1a95cffba6bac27e7bd6533ae950ca9e12dc5128c2c3c962db0a1cee2c",
+        "evidence_source": "README.md:L21"
+      }
+    },
+    "unbacked_inferences": [
+      "install"
+    ],
+    "provenance": {
+      "from_upstream": {
+        "install": {
+          "method": "bioconda",
+          "evidence_source": "README.md:L13"
+        },
+        "command": {
+          "value": "tandem-genotypes -g refGene.txt microsat.txt alignments.maf > tg.txt",
+          "evidence_source": "README.md:L21"
+        },
+        "input_kind": {
+          "value": "fastq",
+          "evidence_source": null
+        },
+        "supported_platforms": [],
+        "assembly": {
+          "declared": "both",
+          "evidence_source": "README.md:L122"
+        },
+        "regions_schema": null,
+        "output_format": {
+          "glob": "**/*.t[sx][vt]",
+          "evidence_source": "README.md:L21"
+        }
+      },
+      "derived": {
+        "command_rewrites": [],
+        "regions_layout_binding": null,
+        "single_sample_adaptation": null
+      },
+      "harness_choices": {
+        "dataset": null,
+        "platform": {
+          "selected": "ont",
+          "basis": "counted_unproven",
+          "supported_platforms": []
+        },
+        "assembly": {
+          "selected": null,
+          "basis": "upstream_stated",
+          "note": null
+        },
+        "regions_layout": null,
+        "base_environment": null
+      }
+    },
+    "install_method": "bioconda",
+    "citable_install": false,
+    "input_type": null,
+    "output_glob": "**/*.t[sx][vt]",
+    "profile": "strhub-upstream-procedure/1",
+    "install_ready": false,
+    "example_ready": false,
+    "installation": {
+      "profile": "strhub-upstream-procedure/1",
+      "ready": false,
+      "method": "bioconda",
+      "reason": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub.",
+      "gap": "commit"
+    },
+    "command_review": {
+      "profile": "strhub-upstream-procedure/1",
+      "cited": "tandem-genotypes -g refGene.txt microsat.txt alignments.maf > tg.txt",
+      "command": "tandem-genotypes -g refGene.txt microsat.txt alignments.maf > tg.txt",
+      "substitutions": [],
+      "read_bindings": [],
+      "limitations": [],
+      "expected": "tandem-genotypes -g refGene.txt microsat.txt alignments.maf > tg.txt",
+      "executed": "tandem-genotypes -g refGene.txt microsat.txt alignments.maf > tg.txt",
+      "cited_sha256": "092452c2aa0afea6bed5b69be43661e4e8836fd53951aab37644e5a18aa9bedb",
+      "executed_sha256": "092452c2aa0afea6bed5b69be43661e4e8836fd53951aab37644e5a18aa9bedb",
+      "citations": [
+        {
+          "repo": "https://github.com/mcfrith/tandem-genotypes",
+          "ref": "706a6b6a134788afb689e35445c67b4c2ae40666",
+          "path": "README.md",
+          "line": 21,
+          "verified": true,
+          "document_sha256": "b97def1a95cffba6bac27e7bd6533ae950ca9e12dc5128c2c3c962db0a1cee2c",
+          "command_sha256": "092452c2aa0afea6bed5b69be43661e4e8836fd53951aab37644e5a18aa9bedb"
+        }
+      ]
+    },
+    "manifest_sha256": "923f9b0cae695dd348ca61baccf75ec146bf75778d8ef3a0e36646494f600cec",
+    "evidence_sha256": "4934dea8e17f7d9ee6d020b4b3ca0084c618c5da824e261c2900415fada5845d",
+    "evidence": {
+      "schema": "strhub-procedure-evidence/1",
+      "manifest": {
+        "caveats": {
+          "items": [
+            "Environment: no proven installation profile; STRhub did not manufacture installation steps.",
+            "Run command: the README's own command, rewritten to STRhub's mounts; the capture wrapper is planned only if the procedure review passes."
+          ],
+          "source": "detect_recipe"
+        },
+        "environment": {
+          "dockerfile": "Dockerfile",
+          "os": [
+            "ubuntu-22.04"
+          ],
+          "source": "generated"
+        },
+        "inputs": {},
+        "outputs": [
+          {
+            "format": "tsv",
+            "min_records": 1,
+            "path": "**/*.t[sx][vt]"
+          }
+        ],
+        "recipe": {
+          "origin": "proposed"
+        },
+        "report": {
+          "slug": "tandem-genotypes"
+        },
+        "run": {
+          "cmd": "cd '.' && touch /tmp/.strhub_mark && ( tandem-genotypes -g refGene.txt microsat.txt alignments.maf > tg.txt ); rc=$?; find . -xdev -type f -newer /tmp/.strhub_mark -size +0 ! -path './.git/*' ! -path './proc/*' ! -path './sys/*' ! -path './dev/*' ! -path './data/*' ! -path '*/__pycache__/*' ! -name '*.pyc' ! -name '*.pyo' 2>/dev/null | head -500 | while IFS= read -r f; do mkdir -p \"/data/out/$(dirname \"$f\")\" && cp \"$f\" \"/data/out/$f\"; done; exit $rc",
+          "timeout_minutes": 20
+        },
+        "source": {
+          "ref": "706a6b6a134788afb689e35445c67b4c2ae40666",
+          "repo": "https://github.com/mcfrith/tandem-genotypes"
+        },
+        "submission": {
+          "by": "third_party"
+        },
+        "tool": {
+          "contact": "https://github.com/mcfrith/tandem-genotypes/issues",
+          "name": "tandem-genotypes",
+          "version": "1.9.2"
+        }
+      },
+      "proposal": {
+        "build": {
+          "also_published": null,
+          "asset": null,
+          "candidates": [
+            {
+              "file": null,
+              "method": "bioconda",
+              "package": "tandem-genotypes",
+              "readme_line": 13
+            }
+          ],
+          "digest": null,
+          "dir": null,
+          "evidence_source": "README.md:L13",
+          "file": null,
+          "image": null,
+          "method": "bioconda",
+          "package": "tandem-genotypes",
+          "readme_install_lines": [],
+          "readme_line": 13,
+          "spec_list": false,
+          "ssh_urls_in": [],
+          "tag": null,
+          "then": [],
+          "url": null
+        },
+        "commands": [
+          {
+            "cmd": "tandem-genotypes -g refGene.txt microsat.txt alignments.maf > tg.txt",
+            "entry_point": true,
+            "evidence_source": "README.md:L21",
+            "file": "README.md",
+            "has_input_flag": false,
+            "has_output_flag": true,
+            "help_only": false,
+            "invokes": "tandem-genotypes",
+            "line": 21,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "readme",
+            "piped": false,
+            "rst": false,
+            "source_rank": 0,
+            "subcommand": null,
+            "synopsis": false
+          },
+          {
+            "cmd": "tandem-genotypes -o2 -g refGene.txt microsat.txt alignments.maf > tg2.txt",
+            "entry_point": true,
+            "evidence_source": "README.md:L88",
+            "file": "README.md",
+            "has_input_flag": false,
+            "has_output_flag": true,
+            "help_only": false,
+            "invokes": "tandem-genotypes",
+            "line": 88,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "readme",
+            "piped": false,
+            "rst": false,
+            "source_rank": 0,
+            "subcommand": null,
+            "synopsis": false
+          },
+          {
+            "cmd": "tandem-genotypes hg38-disease-tr.txt alignments.maf",
+            "entry_point": true,
+            "evidence_source": "README.md:L152",
+            "file": "README.md",
+            "has_input_flag": false,
+            "has_output_flag": false,
+            "help_only": false,
+            "invokes": "tandem-genotypes",
+            "line": 152,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "readme",
+            "piped": false,
+            "rst": false,
+            "source_rank": 0,
+            "subcommand": null,
+            "synopsis": false
+          },
+          {
+            "cmd": "tandem-genotypes -g refGene.txt microsat.txt hg38-panTro5-1.maf > chimp.txt",
+            "entry_point": true,
+            "evidence_source": "README.md:L191",
+            "file": "README.md",
+            "has_input_flag": false,
+            "has_output_flag": true,
+            "help_only": false,
+            "invokes": "tandem-genotypes",
+            "line": 191,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "readme",
+            "piped": false,
+            "rst": false,
+            "source_rank": 0,
+            "subcommand": null,
+            "synopsis": false
+          },
+          {
+            "cmd": "tandem-genotypes-merge reads.fq myseq.par tg2.txt > merged.fa",
+            "entry_point": true,
+            "evidence_source": "README.md:L101",
+            "file": "README.md",
+            "has_input_flag": true,
+            "has_output_flag": true,
+            "help_only": true,
+            "invokes": "tandem-genotypes-merge",
+            "line": 101,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "readme",
+            "piped": false,
+            "rst": false,
+            "source_rank": 0,
+            "subcommand": null,
+            "synopsis": false
+          },
+          {
+            "cmd": "tandem-genotypes-plot --reads myseq.fa tg.txt",
+            "entry_point": true,
+            "evidence_source": "README.md:L78",
+            "file": "README.md",
+            "has_input_flag": true,
+            "has_output_flag": false,
+            "help_only": true,
+            "invokes": "tandem-genotypes-plot",
+            "line": 78,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "readme",
+            "piped": false,
+            "rst": false,
+            "source_rank": 0,
+            "subcommand": null,
+            "synopsis": false
+          },
+          {
+            "cmd": "tandem-genotypes-plot tg.txt",
+            "entry_point": true,
+            "evidence_source": "README.md:L53",
+            "file": "README.md",
+            "has_input_flag": false,
+            "has_output_flag": false,
+            "help_only": true,
+            "invokes": "tandem-genotypes-plot",
+            "line": 53,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "readme",
+            "piped": false,
+            "rst": false,
+            "source_rank": 0,
+            "subcommand": null,
+            "synopsis": false
+          },
+          {
+            "cmd": "tandem-genotypes-plot -n50 tg.txt",
+            "entry_point": true,
+            "evidence_source": "README.md:L61",
+            "file": "README.md",
+            "has_input_flag": false,
+            "has_output_flag": false,
+            "help_only": true,
+            "invokes": "tandem-genotypes-plot",
+            "line": 61,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "readme",
+            "piped": false,
+            "rst": false,
+            "source_rank": 0,
+            "subcommand": null,
+            "synopsis": false
+          },
+          {
+            "cmd": "tandem-genotypes-plot --help",
+            "entry_point": true,
+            "evidence_source": "README.md:L65",
+            "file": "README.md",
+            "has_input_flag": false,
+            "has_output_flag": false,
+            "help_only": true,
+            "invokes": "tandem-genotypes-plot",
+            "line": 65,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "readme",
+            "piped": false,
+            "rst": false,
+            "source_rank": 0,
+            "subcommand": null,
+            "synopsis": false
+          },
+          {
+            "cmd": "tandem-genotypes-join patient.txt : healthy1.txt healthy2.txt > out.txt",
+            "entry_point": true,
+            "evidence_source": "README.md:L168",
+            "file": "README.md",
+            "has_input_flag": false,
+            "has_output_flag": true,
+            "help_only": true,
+            "invokes": "tandem-genotypes-join",
+            "line": 168,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "readme",
+            "piped": false,
+            "rst": false,
+            "source_rank": 0,
+            "subcommand": null,
+            "synopsis": false
+          }
+        ],
+        "dockerfile": null,
+        "docs_read": [],
+        "docs_text": "",
+        "evidence": [
+          {
+            "claim": "bioconda_package",
+            "kind": "readme",
+            "line": 13,
+            "path": "README.md",
+            "text": "`tandem-genotypes` from [bioconda](https://bioconda.github.io/).",
+            "url": "https://github.com/mcfrith/tandem-genotypes/blob/706a6b6a134788afb689e35445c67b4c2ae40666/README.md#L13"
+          },
+          {
+            "claim": "run_command",
+            "kind": "readme",
+            "line": 21,
+            "path": "README.md",
+            "text": "tandem-genotypes -g refGene.txt microsat.txt alignments.maf > tg.txt",
+            "url": "https://github.com/mcfrith/tandem-genotypes/blob/706a6b6a134788afb689e35445c67b4c2ae40666/README.md#L21"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "tests/near-beg.bed",
+            "text": "bed",
+            "url": "https://github.com/mcfrith/tandem-genotypes/blob/706a6b6a134788afb689e35445c67b4c2ae40666/tests/near-beg.bed"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "tests/small-rep.bed",
+            "text": "bed",
+            "url": "https://github.com/mcfrith/tandem-genotypes/blob/706a6b6a134788afb689e35445c67b4c2ae40666/tests/small-rep.bed"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "tests/far.bed",
+            "text": "bed",
+            "url": "https://github.com/mcfrith/tandem-genotypes/blob/706a6b6a134788afb689e35445c67b4c2ae40666/tests/far.bed"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "tests/slop3.bed",
+            "text": "bed",
+            "url": "https://github.com/mcfrith/tandem-genotypes/blob/706a6b6a134788afb689e35445c67b4c2ae40666/tests/slop3.bed"
+          },
+          {
+            "claim": "known_issue",
+            "kind": "readme",
+            "line": 317,
+            "path": "README.md",
+            "text": "Limitations",
+            "url": "https://github.com/mcfrith/tandem-genotypes/blob/706a6b6a134788afb689e35445c67b4c2ae40666/README.md#L317"
+          },
+          {
+            "claim": "documented_input",
+            "kind": "readme",
+            "line": 103,
+            "path": "README.md",
+            "text": "This uses 3 input files: the read sequences (in fastq or fasta",
+            "url": "https://github.com/mcfrith/tandem-genotypes/blob/706a6b6a134788afb689e35445c67b4c2ae40666/README.md#L103"
+          }
+        ],
+        "example": null,
+        "example_data": [
+          {
+            "in_example_dir": true,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "tests/near-beg.bed",
+            "size": 18
+          },
+          {
+            "in_example_dir": true,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "tests/small-rep.bed",
+            "size": 19
+          },
+          {
+            "in_example_dir": true,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "tests/far.bed",
+            "size": 27
+          },
+          {
+            "in_example_dir": true,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "tests/slop3.bed",
+            "size": 78
+          }
+        ],
+        "inferences": {
+          "build": "README.md:L13",
+          "example": null,
+          "input_type": "README.md:L21",
+          "output": "README.md:L21",
+          "platform": null,
+          "regions": null,
+          "run_command": "README.md:L21",
+          "single_sample_bams": null
+        },
+        "input_type": {
+          "assembly": {
+            "against_hg38": null,
+            "declared": "both",
+            "evidence_source": "README.md:L122",
+            "hg19_evidence_source": "README.md:L120",
+            "hg19_hits": 8,
+            "hg38_evidence_source": "README.md:L122",
+            "hg38_hits": 12,
+            "incompatible_with_hg38": false
+          },
+          "best": null,
+          "candidates": [],
+          "evidence_source": "README.md:L21",
+          "how": "command",
+          "platform": "ont",
+          "platform_evidence_source": null,
+          "platform_how": "counted",
+          "signals": {
+            "bam": 0,
+            "ce": 0,
+            "fastq": 3,
+            "hg19": 8,
+            "hg38": 12,
+            "illumina": 0,
+            "ont": 1,
+            "snp": 0,
+            "ystr": 0
+          },
+          "statements": {
+            "against": [],
+            "determined": true,
+            "inputs": [
+              {
+                "kind": "fastq",
+                "line": 103,
+                "text": "This uses 3 input files: the read sequences (in fastq or fasta"
+              }
+            ],
+            "platform": [],
+            "recommendation": null
+          },
+          "statements_file": null,
+          "supported_platforms": [],
+          "unsupported": {
+            "kinds": [
+              "maf"
+            ],
+            "platform": "ont"
+          },
+          "warnings": []
+        },
+        "known_issues": [
+          {
+            "heading": "Limitations",
+            "line": 317,
+            "text": "* `tandem-genotypes` doesn't work for tandem repeats at (or extremely\nnear) the edge of a sequence. This is because it uses DNA reads\nthat clearly align beyond both sides of the repeat.",
+            "truncated": false,
+            "url": "https://github.com/mcfrith/tandem-genotypes/blob/706a6b6a134788afb689e35445c67b4c2ae40666/README.md#L317"
+          }
+        ],
+        "limitations": [
+          "install_profile_unsupported",
+          "no_reference_dataset"
+        ],
+        "output": {
+          "evidence_source": "README.md:L21",
+          "format": "tsv",
+          "signals": {
+            "csv": 0,
+            "json": 0,
+            "tsv": 77,
+            "vcf": 0
+          }
+        },
+        "packaging": {
+          "executables": [
+            "tandem-genotypes",
+            "tandem-genotypes-join",
+            "tandem-genotypes-merge",
+            "tandem-genotypes-plot"
+          ],
+          "packages": [
+            "tandem-genotypes"
+          ]
+        },
+        "readme": {
+          "gaps": [],
+          "name": "README.md",
+          "sufficient_to_attempt": true
+        },
+        "readme_name": "README.md",
+        "readme_text": "# tandem-genotypes\n\n`tandem-genotypes` finds changes in length of tandem repeats, from\n\"long\" DNA reads aligned to a genome.\n\n## Requirements & installation\n\n[Python](https://www.python.org/) (>= 2.6 or 3) needs to be installed\non your computer.  To draw histograms, [R](https://www.r-project.org/)\nneeds to be installed on your computer.  You can download\n`tandem-genotypes` to your computer, put the programs in any\nconvenient directory, and use them as-is.  You can also get\n`tandem-genotypes` from [bioconda](https://bioconda.github.io/).\n\n## Usage\n\nFirst, align your sequences as described\n[here](https://github.com/mcfrith/last-rna/blob/master/last-long-reads.md).\nThen, do:\n\n    tandem-genotypes -g refGene.txt microsat.txt alignments.maf > tg.txt\n\nThis will check the tandem repeats in `microsat.txt`, annotate them\nwith the genes in `refGene.txt`, and create an output file `tg.txt`.\n\n* It's OK to omit `-g refGene.txt`.\n* It's OK to use gzipped (`.gz`) files.\n\n## Output\n\nThe output looks like this:\n\n    chr22  41914573  41914611  GCGCGA  SHISA8  coding  -2,-2,0,0   -2,-2,0,0,0\n    chr22  41994883  41994923  TG      SEPT3   3'UTR   -7,-3,-1,0  -3,-1,0,1\n\nEach line shows one tandem repeat.  The first 3 columns show its\nlocation in [BED3](https://genome.ucsc.edu/FAQ/FAQformat.html#format1)\nformat, column 4 shows the repeating unit, column 5 shows the gene\nname, and column 6 the gene part.  Column 7 shows the copy number\nchange in each DNA read that covers the repeat's forward strand: for\nexample -2 means the read has 2 fewer copies than the reference.\nColumn 8 has the same thing for reverse strands.  Here, the first line\nis a nice example with 2 clear alleles, and the second line is a nasty\nexample without clear alleles.\n\nThe output lines are in descending order of \"importance\", based on\nsize change and gene part.\n\n## Drawing histograms\n\nYou can draw histograms of the output like this:\n\n    tandem-genotypes-plot tg.txt\n\nThis will make a file `tg.pdf` with histograms of the top 16 repeats.\nThe x-axis is copy number change.  Each histogram bar has a red part\nindicating the number of forward-strand reads, and a blue part\nindicating the number of reverse-strand reads.  Instead of 16, you can\nget (e.g.) the top 50:\n\n    tandem-genotypes-plot -n50 tg.txt\n\nYou can see all options like this:\n\n    tandem-genotypes-plot --help\n\nYou can choose subsets of repeats with standard command-line tools\nlike `grep`:\n\n    grep \"coding\" tg.txt | tandem-genotypes-plot - coding.pdf\n\n### Expected coverage drop for longer repeats\n\nLonger repeats are likely to be fully covered by fewer reads.  You can\nshow the expected drop in coverage, for a set of reads (in FASTA or\nFASTQ format):\n\n    tandem-genotypes-plot --reads myseq.fa tg.txt\n\nThis shows the expected coverage drop as a gray line (whose absolute\nheight is meaningless, only its relative height within each histogram\nis meaningful).\n\n## Crude allele prediction\n\nYou can predict 2 alleles per repeat, with option `-o2`:\n\n    tandem-genotypes -o2 -g refGene.txt microsat.txt alignments.maf > tg2.txt\n\nThis adds 2 extra columns to the output, with predicted copy number\nchange per allele.  These predictions are crude.  If there is really 1\nallele (homozygous), but the DNA reads vary due to sequencing errors,\nprobably 2 close alleles will be predicted.  The possibility of strand\nbias is not taken into account.\n\n## Merging allele reads into a consensus sequence\n\nYou can extract the DNA reads of each allele (for the top 16 repeats\nby default), and merge them into a consensus sequence, like this:\n\n    tandem-genotypes-merge reads.fq myseq.par tg2.txt > merged.fa\n\nThis uses 3 input files: the read sequences (in fastq or fasta\nformat), `myseq.par` from the alignment step, and the\n`tandem-genotypes` output file.  You must first run `tandem-genotypes`\nwith option `-o2` (to predict alleles) and option `-v` (to show read\nnames).  This merging requires [lamassemble][] to be installed on your\ncomputer.  Run `tandem-genotypes-merge --help` to see the options\n(most of which are described at the [lamassemble][] site).\n\n## Tandem repeat input\n\nYou can supply tandem repeat locations by any of these files (which\ncan be got from the [UCSC genome\ndatabase](http://hgdownload.cse.ucsc.edu/downloads.html)):\nsimpleRepeat.txt, microsat.txt, rmsk.txt, RepeatMasker .out.\n\n* `simpleRepeat`: repeats with unit length from 1 to >1000.  Made with\n  [Tandem Repeats Finder](http://tandem.bu.edu/trf/trf.html).  \n  Direct links: hg19\n  [simpleRepeat.txt.gz](http://hgdownload.soe.ucsc.edu/goldenPath/hg19/database/simpleRepeat.txt.gz),\n  hg38\n  [simpleRepeat.txt.gz](http://hgdownload.soe.ucsc.edu/goldenPath/hg38/database/simpleRepeat.txt.gz)\n\n* `microsat`: a subset of `simpleRepeat` with perfect di- and\n  tri-nucleotide repeats.  Not comprehensive, but small and fast to\n  analyze.  \n  Direct links: hg19\n  [microsat.txt.gz](http://hgdownload.soe.ucsc.edu/goldenPath/hg19/database/microsat.txt.gz),\n  hg38\n  [microsat.txt.gz](http://hgdownload.soe.ucsc.edu/goldenPath/hg38/database/microsat.txt.gz)\n\n* `rmsk`: includes tandem repeats with unit length from 1 to ~13.\n  Made with [RepeatMasker](http://www.repeatmasker.org/).  \n  Direct links: hg19\n  [rmsk.txt.gz](http://hgdownload.soe.ucsc.edu/goldenPath/hg19/database/rmsk.txt.gz),\n  hg38\n  [rmsk.txt.gz](http://hgdownload.soe.ucsc.edu/goldenPath/hg38/database/rmsk.txt.gz)\n\nYou can also supply repeats found by [tantan][] `-f4`.\n\nYou can also supply repeats by the first 4 (or more) columns of the\noutput format:\n\n    chr22  41914573  41914611  GCGCGA\n    chr22  41994883  41994923  TG\n\nIf you are using the \"hg19\" or \"hg38\" human genome, you can supply\nrepeats with the included files `hg19-disease-tr.txt` and\n`hg38-disease-tr.txt`, which have a few disease-associated repeats:\n\n    tandem-genotypes hg38-disease-tr.txt alignments.maf\n\nThese files have \"gene names\" like: `ATXN7:SCA7`.  The 1st part is the\nactual gene name, and the 2nd part is the disease\n(e.g. spinocerebellar ataxia 7).\n\n## Gene input\n\nYou can supply genes in these formats: refGene.txt, refFlat.txt,\n[BED](https://genome.ucsc.edu/FAQ/FAQformat.html#format1).\n\n## Joining and re-ranking `tandem-genotypes` outputs\n\nSuppose you have DNA reads from 1 patient and 2 healthy controls.  You\ncan join their `tandem-genotypes` outputs like this:\n\n    tandem-genotypes-join patient.txt : healthy1.txt healthy2.txt > out.txt\n\nEach output line shows: 1 tandem repeat with copy number changes for\nall inputs (in the order that you specified them).\n\nThe output lines are in descending order of \"importance\": large\nchanges in the patient are prioritized, and large changes in the\ncontrols are de-prioritized.\n\nYou can run `tandem-genotypes-plot` on this output: it will show the\nfirst (left-most) dataset.\n\nYou can use any number of patients and controls (separated by `:`).\nYou can also use concatenated files:\n\n    cat healthy1.txt healthy2.txt > controls.txt\n    tandem-genotypes-join patient.txt : controls.txt > out.txt\n\n## Using a genome instead of reads\n\nYou can also find repeat length changes in a genome.  For example, in\na chimpanzee genome relative to human:\n\n    tandem-genotypes -g refGene.txt microsat.txt hg38-panTro5-1.maf > chimp.txt\n\nThese human-chimp alignments are available\n[here](https://github.com/mcfrith/last-genome-alignments).  You could\nuse the output as a \"healthy control\":\n\n    tandem-genotypes-join patient.txt : controls.txt chimp.txt > out.txt\n\nPoints to be careful of:\n\n* Make sure all files use the same \"reference\" genome.\n\n* `tandem-genotypes` requires that the alignments are in the order\n  produced by `last-split`.  So `hg38-panTro5-2.maf` from the above\n  website won't work.\n\n## Control files\n\nYou can use control files in the `controls` directory:\n\n    tandem-genotypes-join patient.txt : hg38-microsat-control201808.txt > out.txt\n\nEach file has 3 controls:\n\n* PacBio reads from a human (NA12878 / SRR3197748)\n* PromethION reads from a different human (NA19240 / ERR258112-5)\n* A chimp genome (panTro5)\n\nNo doubt this will soon be outdated, but it should remain useful, if\nnot ideal.\n\nThese control files have been shrunk by keeping just one\nrepresentative copy number change per repeat per control, which does\nnot affect `tandem-genotypes-join` rankings.  They were made by\ncommands like:\n\n    tandem-genotypes-join -ss SRR3197748-rmsk.txt ERR258112-5-rmsk.txt panTro5-rmsk.txt > rmsk-control.txt\n\nOne `-s` gets representative copy number changes, and a doubled `-ss`\nalso omits gene annotations.\n\n## `tandem-genotypes` options\n\n- `-h`, `--help`: show a help message and exit.\n\n- `-g FILE`, `--genes=FILE`: read genes from a genePred or BED file.\n\n- `-o NUM`, `--output=NUM`: output format: 1=original, 2=alleles\n  (default=1).\n\n- `-m PROB`, `--mismap=PROB`: ignore any alignment with mismap\n  probability > `PROB` (default=1e-6).\n\n- `--postmask=NUMBER`: by default, `tandem-genotypes` ignores\n  mostly-lowercase alignments (using the method of\n  [`last-postmask`](https://gitlab.com/mcfrith/last/-/blob/main/doc/last-postmask.rst)).\n  This is because lowercase indicates repetitive sequence, and\n  alignments without a significant amount of non-repetitive sequence\n  are less reliable.  You can turn this off with `--postmask=0`.\n\n- `-p BP`, `--promoter=BP`: promoter length (default=300).  This is\n  used for gene annotation.\n\n- `-s N`, `--select=N`: select: all repeats (0), non-intergenic\n  repeats (1), non-intergenic non-intronic repeats (2) (default=0).\n\n- `-u BP`, `--min-unit=BP`: ignore repeats with unit shorter than `BP`\n  (default=2).\n\n- `-f BP`, `--far=BP`: use DNA reads whose alignments extend at least\n  this far beyond both sides of the repeat (default=100).\n\n- `-n BP`, `--near=BP`: count insertions <= BP beyond a repeat\n  (default=60).\n\n- `--mode=LETTER`: L=lenient, S=strict (default=L).  The non-default S\n  mode has stricter requirements for using an alignment to a tandem\n  repeat (such as requiring the alignment to actually cover the repeat\n  at least a little bit).  This might be good for high-quality\n  sequence data of the future, but is not recommended as of early\n  2018.\n\n- `-v`, `--verbose`: show more details.  `-v` shows the name of the\n  DNA read with each copy number change.  `-vv` shows output for all\n  repeats, including ones not covered by any DNA read.\n\n## `tandem-genotypes-join` options\n\n- `-h`, `--help`: show a help message and exit.\n\n- `-c N`, `--change=N`: which size change to use for \"importance\" of\n  each tandem repeat, for each patient or control.\n\n    * \"0\" means to use the most-changed DNA read.  To avoid outliers:\n      if the average number of reads covering each repeat (for repeats\n      with at least 1 read) is &ge; 3, the most extreme expansion and\n      contraction per repeat are ignored.  This is the method\n      described in the [paper][].\n    * \"1\" means to use the most-changed allele.  But if this would\n      have greater magnitude than the \"0\" change, use the \"0\" change.\n    * \"2\" means to use the least-changed allele.  But if this would\n      have greater magnitude than the \"0\" change, use the \"0\" change.\n\n- `-s`, `--shrink`: shrink the output (see above).\n\n- `-m NUM`, `--mean=NUM`: how to summarize the \"importance\" across\n  multiple patients of changes in a tandem repeat.  \"3\" means to use\n  the cubic mean of each patient's importance score: this was the\n  method used before version 1.5.0 and described in the [paper][].\n  \"1\" means to use the ordinary mean: this is now the default.  The\n  importance across controls is always summarized by cubic mean.\n\n- `--scores=FILE`: override importance scores for gene parts, with a\n  file like this:\n\n      coding   50\n      5'UTR    20\n      3'UTR    20\n      exon     15\n      promoter 15\n      intron   5\n\n- `-v`, `--verbose`: prepend to each line: the importance score, the\n  gene part importance score, the importance score from patients, the\n  importance score from controls.\n\n## Limitations\n\n* `tandem-genotypes` doesn't work for tandem repeats at (or extremely\n  near) the edge of a sequence.  This is because it uses DNA reads\n  that clearly align beyond both sides of the repeat.\n\n## Paper\n\nFor more details, please see: [Robust detection of tandem repeat\nexpansions from long DNA reads][paper] by S Mitsuhashi, MC Frith, et\nal.\n\n[lamassemble]: https://gitlab.com/mcfrith/lamassemble\n[paper]: https://doi.org/10.1186/s13059-019-1667-6\n[tantan]: https://gitlab.com/mcfrith/tantan\n",
+        "ref": "706a6b6a134788afb689e35445c67b4c2ae40666",
+        "regions": {
+          "ambiguous": false,
+          "candidates": [],
+          "end_line": null,
+          "evidence_source": null,
+          "file": null,
+          "format": null,
+          "line": null,
+          "text": null
+        },
+        "registry": {
+          "bioconda": {
+            "tandem-genotypes": {
+              "has_tag_version": true,
+              "latest": "1.9.2",
+              "versions": 13
+            }
+          },
+          "documented": [
+            "tandem-genotypes"
+          ]
+        },
+        "repo": "https://github.com/mcfrith/tandem-genotypes",
+        "schema": "strhub-verified/recipe-proposal/1",
+        "single_sample_bams": {
+          "allowed": false,
+          "evidence_source": null,
+          "file": null,
+          "line": null,
+          "paired_flags": [],
+          "text": null
+        },
+        "source_documents": [
+          {
+            "file": "README.md",
+            "origin": "readme",
+            "text": "# tandem-genotypes\n\n`tandem-genotypes` finds changes in length of tandem repeats, from\n\"long\" DNA reads aligned to a genome.\n\n## Requirements & installation\n\n[Python](https://www.python.org/) (>= 2.6 or 3) needs to be installed\non your computer.  To draw histograms, [R](https://www.r-project.org/)\nneeds to be installed on your computer.  You can download\n`tandem-genotypes` to your computer, put the programs in any\nconvenient directory, and use them as-is.  You can also get\n`tandem-genotypes` from [bioconda](https://bioconda.github.io/).\n\n## Usage\n\nFirst, align your sequences as described\n[here](https://github.com/mcfrith/last-rna/blob/master/last-long-reads.md).\nThen, do:\n\n    tandem-genotypes -g refGene.txt microsat.txt alignments.maf > tg.txt\n\nThis will check the tandem repeats in `microsat.txt`, annotate them\nwith the genes in `refGene.txt`, and create an output file `tg.txt`.\n\n* It's OK to omit `-g refGene.txt`.\n* It's OK to use gzipped (`.gz`) files.\n\n## Output\n\nThe output looks like this:\n\n    chr22  41914573  41914611  GCGCGA  SHISA8  coding  -2,-2,0,0   -2,-2,0,0,0\n    chr22  41994883  41994923  TG      SEPT3   3'UTR   -7,-3,-1,0  -3,-1,0,1\n\nEach line shows one tandem repeat.  The first 3 columns show its\nlocation in [BED3](https://genome.ucsc.edu/FAQ/FAQformat.html#format1)\nformat, column 4 shows the repeating unit, column 5 shows the gene\nname, and column 6 the gene part.  Column 7 shows the copy number\nchange in each DNA read that covers the repeat's forward strand: for\nexample -2 means the read has 2 fewer copies than the reference.\nColumn 8 has the same thing for reverse strands.  Here, the first line\nis a nice example with 2 clear alleles, and the second line is a nasty\nexample without clear alleles.\n\nThe output lines are in descending order of \"importance\", based on\nsize change and gene part.\n\n## Drawing histograms\n\nYou can draw histograms of the output like this:\n\n    tandem-genotypes-plot tg.txt\n\nThis will make a file `tg.pdf` with histograms of the top 16 repeats.\nThe x-axis is copy number change.  Each histogram bar has a red part\nindicating the number of forward-strand reads, and a blue part\nindicating the number of reverse-strand reads.  Instead of 16, you can\nget (e.g.) the top 50:\n\n    tandem-genotypes-plot -n50 tg.txt\n\nYou can see all options like this:\n\n    tandem-genotypes-plot --help\n\nYou can choose subsets of repeats with standard command-line tools\nlike `grep`:\n\n    grep \"coding\" tg.txt | tandem-genotypes-plot - coding.pdf\n\n### Expected coverage drop for longer repeats\n\nLonger repeats are likely to be fully covered by fewer reads.  You can\nshow the expected drop in coverage, for a set of reads (in FASTA or\nFASTQ format):\n\n    tandem-genotypes-plot --reads myseq.fa tg.txt\n\nThis shows the expected coverage drop as a gray line (whose absolute\nheight is meaningless, only its relative height within each histogram\nis meaningful).\n\n## Crude allele prediction\n\nYou can predict 2 alleles per repeat, with option `-o2`:\n\n    tandem-genotypes -o2 -g refGene.txt microsat.txt alignments.maf > tg2.txt\n\nThis adds 2 extra columns to the output, with predicted copy number\nchange per allele.  These predictions are crude.  If there is really 1\nallele (homozygous), but the DNA reads vary due to sequencing errors,\nprobably 2 close alleles will be predicted.  The possibility of strand\nbias is not taken into account.\n\n## Merging allele reads into a consensus sequence\n\nYou can extract the DNA reads of each allele (for the top 16 repeats\nby default), and merge them into a consensus sequence, like this:\n\n    tandem-genotypes-merge reads.fq myseq.par tg2.txt > merged.fa\n\nThis uses 3 input files: the read sequences (in fastq or fasta\nformat), `myseq.par` from the alignment step, and the\n`tandem-genotypes` output file.  You must first run `tandem-genotypes`\nwith option `-o2` (to predict alleles) and option `-v` (to show read\nnames).  This merging requires [lamassemble][] to be installed on your\ncomputer.  Run `tandem-genotypes-merge --help` to see the options\n(most of which are described at the [lamassemble][] site).\n\n## Tandem repeat input\n\nYou can supply tandem repeat locations by any of these files (which\ncan be got from the [UCSC genome\ndatabase](http://hgdownload.cse.ucsc.edu/downloads.html)):\nsimpleRepeat.txt, microsat.txt, rmsk.txt, RepeatMasker .out.\n\n* `simpleRepeat`: repeats with unit length from 1 to >1000.  Made with\n  [Tandem Repeats Finder](http://tandem.bu.edu/trf/trf.html).  \n  Direct links: hg19\n  [simpleRepeat.txt.gz](http://hgdownload.soe.ucsc.edu/goldenPath/hg19/database/simpleRepeat.txt.gz),\n  hg38\n  [simpleRepeat.txt.gz](http://hgdownload.soe.ucsc.edu/goldenPath/hg38/database/simpleRepeat.txt.gz)\n\n* `microsat`: a subset of `simpleRepeat` with perfect di- and\n  tri-nucleotide repeats.  Not comprehensive, but small and fast to\n  analyze.  \n  Direct links: hg19\n  [microsat.txt.gz](http://hgdownload.soe.ucsc.edu/goldenPath/hg19/database/microsat.txt.gz),\n  hg38\n  [microsat.txt.gz](http://hgdownload.soe.ucsc.edu/goldenPath/hg38/database/microsat.txt.gz)\n\n* `rmsk`: includes tandem repeats with unit length from 1 to ~13.\n  Made with [RepeatMasker](http://www.repeatmasker.org/).  \n  Direct links: hg19\n  [rmsk.txt.gz](http://hgdownload.soe.ucsc.edu/goldenPath/hg19/database/rmsk.txt.gz),\n  hg38\n  [rmsk.txt.gz](http://hgdownload.soe.ucsc.edu/goldenPath/hg38/database/rmsk.txt.gz)\n\nYou can also supply repeats found by [tantan][] `-f4`.\n\nYou can also supply repeats by the first 4 (or more) columns of the\noutput format:\n\n    chr22  41914573  41914611  GCGCGA\n    chr22  41994883  41994923  TG\n\nIf you are using the \"hg19\" or \"hg38\" human genome, you can supply\nrepeats with the included files `hg19-disease-tr.txt` and\n`hg38-disease-tr.txt`, which have a few disease-associated repeats:\n\n    tandem-genotypes hg38-disease-tr.txt alignments.maf\n\nThese files have \"gene names\" like: `ATXN7:SCA7`.  The 1st part is the\nactual gene name, and the 2nd part is the disease\n(e.g. spinocerebellar ataxia 7).\n\n## Gene input\n\nYou can supply genes in these formats: refGene.txt, refFlat.txt,\n[BED](https://genome.ucsc.edu/FAQ/FAQformat.html#format1).\n\n## Joining and re-ranking `tandem-genotypes` outputs\n\nSuppose you have DNA reads from 1 patient and 2 healthy controls.  You\ncan join their `tandem-genotypes` outputs like this:\n\n    tandem-genotypes-join patient.txt : healthy1.txt healthy2.txt > out.txt\n\nEach output line shows: 1 tandem repeat with copy number changes for\nall inputs (in the order that you specified them).\n\nThe output lines are in descending order of \"importance\": large\nchanges in the patient are prioritized, and large changes in the\ncontrols are de-prioritized.\n\nYou can run `tandem-genotypes-plot` on this output: it will show the\nfirst (left-most) dataset.\n\nYou can use any number of patients and controls (separated by `:`).\nYou can also use concatenated files:\n\n    cat healthy1.txt healthy2.txt > controls.txt\n    tandem-genotypes-join patient.txt : controls.txt > out.txt\n\n## Using a genome instead of reads\n\nYou can also find repeat length changes in a genome.  For example, in\na chimpanzee genome relative to human:\n\n    tandem-genotypes -g refGene.txt microsat.txt hg38-panTro5-1.maf > chimp.txt\n\nThese human-chimp alignments are available\n[here](https://github.com/mcfrith/last-genome-alignments).  You could\nuse the output as a \"healthy control\":\n\n    tandem-genotypes-join patient.txt : controls.txt chimp.txt > out.txt\n\nPoints to be careful of:\n\n* Make sure all files use the same \"reference\" genome.\n\n* `tandem-genotypes` requires that the alignments are in the order\n  produced by `last-split`.  So `hg38-panTro5-2.maf` from the above\n  website won't work.\n\n## Control files\n\nYou can use control files in the `controls` directory:\n\n    tandem-genotypes-join patient.txt : hg38-microsat-control201808.txt > out.txt\n\nEach file has 3 controls:\n\n* PacBio reads from a human (NA12878 / SRR3197748)\n* PromethION reads from a different human (NA19240 / ERR258112-5)\n* A chimp genome (panTro5)\n\nNo doubt this will soon be outdated, but it should remain useful, if\nnot ideal.\n\nThese control files have been shrunk by keeping just one\nrepresentative copy number change per repeat per control, which does\nnot affect `tandem-genotypes-join` rankings.  They were made by\ncommands like:\n\n    tandem-genotypes-join -ss SRR3197748-rmsk.txt ERR258112-5-rmsk.txt panTro5-rmsk.txt > rmsk-control.txt\n\nOne `-s` gets representative copy number changes, and a doubled `-ss`\nalso omits gene annotations.\n\n## `tandem-genotypes` options\n\n- `-h`, `--help`: show a help message and exit.\n\n- `-g FILE`, `--genes=FILE`: read genes from a genePred or BED file.\n\n- `-o NUM`, `--output=NUM`: output format: 1=original, 2=alleles\n  (default=1).\n\n- `-m PROB`, `--mismap=PROB`: ignore any alignment with mismap\n  probability > `PROB` (default=1e-6).\n\n- `--postmask=NUMBER`: by default, `tandem-genotypes` ignores\n  mostly-lowercase alignments (using the method of\n  [`last-postmask`](https://gitlab.com/mcfrith/last/-/blob/main/doc/last-postmask.rst)).\n  This is because lowercase indicates repetitive sequence, and\n  alignments without a significant amount of non-repetitive sequence\n  are less reliable.  You can turn this off with `--postmask=0`.\n\n- `-p BP`, `--promoter=BP`: promoter length (default=300).  This is\n  used for gene annotation.\n\n- `-s N`, `--select=N`: select: all repeats (0), non-intergenic\n  repeats (1), non-intergenic non-intronic repeats (2) (default=0).\n\n- `-u BP`, `--min-unit=BP`: ignore repeats with unit shorter than `BP`\n  (default=2).\n\n- `-f BP`, `--far=BP`: use DNA reads whose alignments extend at least\n  this far beyond both sides of the repeat (default=100).\n\n- `-n BP`, `--near=BP`: count insertions <= BP beyond a repeat\n  (default=60).\n\n- `--mode=LETTER`: L=lenient, S=strict (default=L).  The non-default S\n  mode has stricter requirements for using an alignment to a tandem\n  repeat (such as requiring the alignment to actually cover the repeat\n  at least a little bit).  This might be good for high-quality\n  sequence data of the future, but is not recommended as of early\n  2018.\n\n- `-v`, `--verbose`: show more details.  `-v` shows the name of the\n  DNA read with each copy number change.  `-vv` shows output for all\n  repeats, including ones not covered by any DNA read.\n\n## `tandem-genotypes-join` options\n\n- `-h`, `--help`: show a help message and exit.\n\n- `-c N`, `--change=N`: which size change to use for \"importance\" of\n  each tandem repeat, for each patient or control.\n\n    * \"0\" means to use the most-changed DNA read.  To avoid outliers:\n      if the average number of reads covering each repeat (for repeats\n      with at least 1 read) is &ge; 3, the most extreme expansion and\n      contraction per repeat are ignored.  This is the method\n      described in the [paper][].\n    * \"1\" means to use the most-changed allele.  But if this would\n      have greater magnitude than the \"0\" change, use the \"0\" change.\n    * \"2\" means to use the least-changed allele.  But if this would\n      have greater magnitude than the \"0\" change, use the \"0\" change.\n\n- `-s`, `--shrink`: shrink the output (see above).\n\n- `-m NUM`, `--mean=NUM`: how to summarize the \"importance\" across\n  multiple patients of changes in a tandem repeat.  \"3\" means to use\n  the cubic mean of each patient's importance score: this was the\n  method used before version 1.5.0 and described in the [paper][].\n  \"1\" means to use the ordinary mean: this is now the default.  The\n  importance across controls is always summarized by cubic mean.\n\n- `--scores=FILE`: override importance scores for gene parts, with a\n  file like this:\n\n      coding   50\n      5'UTR    20\n      3'UTR    20\n      exon     15\n      promoter 15\n      intron   5\n\n- `-v`, `--verbose`: prepend to each line: the importance score, the\n  gene part importance score, the importance score from patients, the\n  importance score from controls.\n\n## Limitations\n\n* `tandem-genotypes` doesn't work for tandem repeats at (or extremely\n  near) the edge of a sequence.  This is because it uses DNA reads\n  that clearly align beyond both sides of the repeat.\n\n## Paper\n\nFor more details, please see: [Robust detection of tandem repeat\nexpansions from long DNA reads][paper] by S Mitsuhashi, MC Frith, et\nal.\n\n[lamassemble]: https://gitlab.com/mcfrith/lamassemble\n[paper]: https://doi.org/10.1186/s13059-019-1667-6\n[tantan]: https://gitlab.com/mcfrith/tantan\n"
+          }
+        ],
+        "tool_names": [
+          "LICENSE",
+          "tandem-genotypes",
+          "tandem-genotypes-join",
+          "tandem-genotypes-merge",
+          "tandem-genotypes-plot"
+        ],
+        "tree_paths": [
+          ".gitattributes",
+          "LICENSE",
+          "README.md",
+          "controls/hg19-microsat-control201808.txt",
+          "controls/hg19-rmsk-control201808.txt",
+          "controls/hg19-simpleRepeat-control201808.txt",
+          "controls/hg38-microsat-control201808.txt",
+          "controls/hg38-rmsk-control201808.txt",
+          "controls/hg38-simpleRepeat-control201808.txt",
+          "hg19-disease-tr.txt",
+          "hg38-disease-tr.txt",
+          "setup.py",
+          "tandem-genotypes",
+          "tandem-genotypes-join",
+          "tandem-genotypes-merge",
+          "tandem-genotypes-plot",
+          "tests/ape.txt",
+          "tests/far.bed",
+          "tests/far.maf",
+          "tests/microsat.txt",
+          "tests/min.txt",
+          "tests/nano.maf",
+          "tests/nano.txt",
+          "tests/near-beg.bed",
+          "tests/near-beg.maf",
+          "tests/pro.txt",
+          "tests/refFlat.txt",
+          "tests/refGene.txt",
+          "tests/rmsk.out",
+          "tests/rmsk.txt",
+          "tests/simpleRepeat.txt",
+          "tests/slop3.bed",
+          "tests/slop3.maf",
+          "tests/small-rep.bed",
+          "tests/small-rep.maf",
+          "tests/tantan.txt",
+          "tests/tests.out",
+          "tests/tests.sh"
+        ],
+        "tree_truncated": false,
+        "upstream_files": {}
+      },
+      "limitations": [
+        "install_profile_unsupported",
+        "no_reference_dataset"
+      ],
+      "caveat_items": [
+        "Environment: no proven installation profile; STRhub did not manufacture installation steps.",
+        "Run command: the README's own command, rewritten to STRhub's mounts; the capture wrapper is planned only if the procedure review passes."
+      ]
+    }
+  },
+  "provenance": {
+    "from_upstream": {
+      "install": {
+        "method": "bioconda",
+        "evidence_source": "README.md:L13"
+      },
+      "command": {
+        "value": "tandem-genotypes -g refGene.txt microsat.txt alignments.maf > tg.txt",
+        "evidence_source": "README.md:L21"
+      },
+      "input_kind": {
+        "value": "fastq",
+        "evidence_source": null
+      },
+      "supported_platforms": [],
+      "assembly": {
+        "declared": "both",
+        "evidence_source": "README.md:L122"
+      },
+      "regions_schema": null,
+      "output_format": {
+        "glob": "**/*.t[sx][vt]",
+        "evidence_source": "README.md:L21"
+      }
+    },
+    "derived": {
+      "command_rewrites": [],
+      "regions_layout_binding": null,
+      "single_sample_adaptation": null
+    },
+    "harness_choices": {
+      "dataset": null,
+      "platform": {
+        "selected": "ont",
+        "basis": "counted_unproven",
+        "supported_platforms": []
+      },
+      "assembly": {
+        "selected": null,
+        "basis": "upstream_stated",
+        "note": null
+      },
+      "regions_layout": null,
+      "base_environment": null
+    }
+  },
+  "procedure_validation": {
+    "schema": "strhub-procedure-evidence/1",
+    "valid": true,
+    "reason": "Procedure evidence matches the effective manifest and recomputed decision."
+  },
+  "verdict": {
+    "code": "undetermined",
+    "title": "Could not be determined",
+    "basis": "recipe",
+    "reason": "STRhub holds no reference sample of the kind this procedure reads, and the repository ships no example to run, so nothing was executed.",
+    "readme_gaps": [],
+    "status_code": "UNVERIFIED_INSUFFICIENT_DOCS",
+    "blockers": [
+      {
+        "code": "no_reference_dataset",
+        "what": "STRhub has no reference sample of the kind this tool reads, and the repository ships no example to run, so nothing was executed.",
+        "ask_owner": {
+          "title": "Ship a small example dataset",
+          "body": "STRhub Verified could not run the tool: it holds no public reference sample of the input type the README describes, and the repository ships no example data. A small example (a few reads and the expected output) would let a new user, and STRhub, run it end-to-end."
+        }
+      },
+      {
+        "code": "build_failed",
+        "what": "The environment did not build from the install steps found in the repository.",
+        "ask_owner": {
+          "title": "Build fails from a clean checkout",
+          "body": "STRhub Verified tried to build the tool from a clean checkout at the pinned commit, following the repository's own install steps, and the build failed. The build log is linked from the run."
+        }
+      }
+    ]
+  },
+  "step1": {
+    "code": "ours",
+    "headline": "STRhub could not attempt the documented run.",
+    "body": "STRhub holds no reference sample of the kind this procedure reads, and the repository ships no example to run, so nothing was executed. The limitation is ours. Nothing here is a finding about the tool.",
+    "missing": [],
+    "missing_text": [],
+    "guide": "docs/GUIA-PASO-1.md"
+  },
+  "certificate": {
+    "schema": "strhub-verified/certificate/1",
+    "label": "Could not be determined",
+    "reached": "Available",
+    "stages": [
+      {
+        "key": "available",
+        "label": "Source available",
+        "status": "PASS"
+      },
+      {
+        "key": "installs",
+        "label": "Installation",
+        "status": "NOT ATTEMPTED"
+      },
+      {
+        "key": "runs",
+        "label": "End-to-end execution",
+        "status": "NOT ATTEMPTED"
+      },
+      {
+        "key": "output",
+        "label": "Output generated",
+        "status": "NOT ATTEMPTED"
+      }
+    ],
+    "summary": {
+      "purpose": "Evaluate whether the tool installs, runs end-to-end, and produces structurally valid output.",
+      "result": "Could not be determined",
+      "reached": "Available, 1/5 gates passed",
+      "why": "STRhub holds no reference sample of the kind this procedure reads, and the repository ships no example to run, so nothing was executed.",
+      "scope": "Installation, execution, and output structure evaluation.",
+      "not_evaluated": [
+        "Genotype accuracy",
+        "Concordance",
+        "Forensic validity",
+        "Regulatory compliance"
+      ]
+    },
+    "conclusion": [
+      {
+        "title": "Procedure not established",
+        "body": "The recorded gate observations do not establish whether the documented procedure succeeded or failed."
+      },
+      {
+        "title": "Observations retained",
+        "body": "The supplied run and output observations remain in the report; they do not replace procedure evidence."
+      },
+      {
+        "title": "Verdict: Could not be determined",
+        "body": "STRhub holds no reference sample of the kind this procedure reads, and the repository ships no example to run, so nothing was executed."
+      },
+      {
+        "title": "Reproducibility not established",
+        "body": "These observations are insufficient to establish a reproducible documented execution finding."
+      }
+    ],
+    "out_of_scope": [
+      "Genotype correctness or accuracy",
+      "Concordance against known truth sets",
+      "Sensitivity, specificity, or stutter performance",
+      "Allele calling accuracy or forensic casework suitability",
+      "Regulatory compliance or ISO accreditation",
+      "Multi-laboratory or multi-dataset reproducibility"
+    ],
+    "limitations": [
+      "Single reference dataset per input type",
+      "Single containerized environment (Docker / ubuntu-22.04)",
+      "No truth-set comparison or ground-truth genotypes",
+      "No accuracy or concordance assessment",
+      "No forensic or clinical validation of results",
+      "No sequencing data were processed because execution did not complete"
+    ],
+    "scope": {
+      "statement": "Independent automated evaluation of reproducible execution. It checks whether the tool installs, runs end-to-end, and produces structurally valid output in a standardized environment.",
+      "not": "This is not an analytical validation. Genotype accuracy, concordance, forensic suitability, and regulatory compliance are out of scope.",
+      "disclaimer": "Each result is a dated snapshot, verified on the tool's public repository at a pinned commit. STRhub does not store tool source code."
+    }
+  }
+}
