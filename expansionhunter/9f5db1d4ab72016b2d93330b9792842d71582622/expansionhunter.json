@@ -1,0 +1,1370 @@
+{
+  "schema": "strhub-verified/1",
+  "mode": "publish",
+  "tool": {
+    "name": "ExpansionHunter",
+    "version": "v5.0.0",
+    "contact": "https://github.com/Illumina/ExpansionHunter/issues"
+  },
+  "submission": {
+    "by": "third_party"
+  },
+  "source": {
+    "repo": "https://github.com/Illumina/ExpansionHunter",
+    "ref": "9f5db1d4ab72016b2d93330b9792842d71582622",
+    "ref_resolved": "9f5db1d4ab72016b2d93330b9792842d71582622",
+    "committed": "2021-08-20T00:22:50Z"
+  },
+  "environment": {
+    "dockerfile": "Dockerfile",
+    "os": [
+      "ubuntu-22.04"
+    ],
+    "source": "documented"
+  },
+  "generated": "2026-11-22T19:12:10+00:00",
+  "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/45059275700",
+  "run": {
+    "cmd": "ExpansionHunter --reads /data/in/input.bam --reference /data/ref/hg38.fa --variant-catalog /data/in/regions.json --output-prefix sample",
+    "cwd": ".",
+    "effective_cmd": "cd '.' && touch /tmp/.strhub_mark && ( ExpansionHunter --reads /data/in/input.bam --reference /data/ref/hg38.fa --variant-catalog /data/in/regions.json --output-prefix sample ); rc=$?; find . -xdev -type f -newer /tmp/.strhub_mark -size +0 ! -path './.git/*' ! -path './proc/*' ! -path './sys/*' ! -path './dev/*' ! -path './data/*' ! -path '*/__pycache__/*' ! -name '*.pyc' ! -name '*.pyo' 2>/dev/null | head -500 | while IFS= read -r f; do mkdir -p \"/data/out/$(dirname \"$f\")\" && cp \"$f\" \"/data/out/$f\"; done; exit $rc",
+    "step_outcome": "skipped"
+  },
+  "instrument": "documented",
+  "recipe": {
+    "origin": "proposed"
+  },
+  "gates": {
+    "available": true,
+    "installs": false,
+    "runs": false,
+    "io": false,
+    "content": false
+  },
+  "input_contract": {
+    "type": "illumina-bam-hg38",
+    "regions": "eh_catalog"
+  },
+  "level": "available",
+  "io_detail": {},
+  "content_detail": {},
+  "example_detail": null,
+  "datasets": [
+    {
+      "leg": "external",
+      "label": "External data",
+      "available": true,
+      "type": "illumina-bam-hg38",
+      "dataset": "Illumina BAM (hg38), NA12878 (autosomal, female)",
+      "io": false,
+      "content": false,
+      "passed": false
+    },
+    {
+      "leg": "example",
+      "label": "Tool's own example",
+      "available": false,
+      "io": false,
+      "content": null,
+      "passed": false,
+      "matches_expected": null,
+      "produced_count": null
+    }
+  ],
+  "scope": "Assessment of documented execution in the stated environment and output format. Concerns reproducible execution only; no claim of accuracy, casework fitness, or regulatory validation.",
+  "upstream": {
+    "checked": "2026-11-22T19:12:10+00:00",
+    "repo_exists": true,
+    "ref_exists": true,
+    "default_branch": "master",
+    "status": "ahead",
+    "behind_by": 8
+  },
+  "needed_beyond_repo": [
+    "Test data: a public reference sample was selected, but was not executed because installation did not complete.",
+    "A base environment for the documented installation: STRhub ran the repository's install commands unchanged on Ubuntu 22.04, package lists refreshed, apt answering yes, plus minimal build toolchain (build-essential, cmake, git, ca-certificates; no tool-specific libraries). Base-image and package versions are not frozen by the commands."
+  ],
+  "evidence": [
+    {
+      "claim": "run_command",
+      "kind": "doc",
+      "path": "docs/03_Usage.md",
+      "line": 15,
+      "text": "ExpansionHunter --reads <BAM/CRAM file with aligned reads> \\",
+      "url": "https://github.com/Illumina/ExpansionHunter/blob/9f5db1d4ab72016b2d93330b9792842d71582622/docs/03_Usage.md#L15"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "example/input/reference.fa",
+      "text": "fasta",
+      "url": "https://github.com/Illumina/ExpansionHunter/blob/9f5db1d4ab72016b2d93330b9792842d71582622/example/input/reference.fa"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "example/input/variants.bam",
+      "text": "bam",
+      "url": "https://github.com/Illumina/ExpansionHunter/blob/9f5db1d4ab72016b2d93330b9792842d71582622/example/input/variants.bam"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "example/output/repeats.vcf",
+      "text": "vcf",
+      "url": "https://github.com/Illumina/ExpansionHunter/blob/9f5db1d4ab72016b2d93330b9792842d71582622/example/output/repeats.vcf"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "example/output/repeats_realigned.bam",
+      "text": "bam",
+      "url": "https://github.com/Illumina/ExpansionHunter/blob/9f5db1d4ab72016b2d93330b9792842d71582622/example/output/repeats_realigned.bam"
+    },
+    {
+      "claim": "documented_input",
+      "kind": "readme",
+      "path": "README.md",
+      "line": 15,
+      "text": "ExpansionHunter --reads <BAM/CRAM file with aligned reads> \\",
+      "url": "https://github.com/Illumina/ExpansionHunter/blob/9f5db1d4ab72016b2d93330b9792842d71582622/README.md#L15"
+    }
+  ],
+  "repo_test_data": {
+    "known": true,
+    "present": true,
+    "count": 4,
+    "examples": [
+      "example/input/reference.fa",
+      "example/input/variants.bam",
+      "example/output/repeats.vcf",
+      "example/output/repeats_realigned.bam"
+    ]
+  },
+  "caveats": {
+    "source": "detect_recipe",
+    "items": [
+      "Environment: STRhub transcribed the documented installation commands unchanged into its own carrier (Ubuntu 22.04, package lists refreshed, apt answering yes, plus minimal build toolchain (build-essential, cmake, git, ca-certificates; no tool-specific libraries)).",
+      "Input: the README documents BAM (line 15); this plan selects STRhub's illumina-bam-hg38 reference data.",
+      "read_path: <BAM/CRAM file with aligned reads> -> /data/in/input.bam.",
+      "reference_path: <FASTA file with reference genome> -> /data/ref/hg38.fa.",
+      "regions_path: <JSON file specifying variants to genotype> -> /data/in/regions.json.",
+      "output_placeholder: <Prefix for the output files> -> sample.",
+      "Run command: the one documented in docs/03_Usage.md (line 15), rewritten to STRhub's mounts; the capture wrapper is planned only if the procedure review passes."
+    ]
+  },
+  "logs": {
+    "build": "expansionhunter.log-build.txt"
+  },
+  "terminals": {
+    "build": "expansionhunter.terminal-build.txt"
+  },
+  "install_detail": {
+    "passed": false,
+    "diagnostics": [
+      {
+        "id": "cmake_package_missing",
+        "severity": "error",
+        "title": "CMake could not find a required system library: ZLIB",
+        "count": 2,
+        "examples": [
+          "ZLIB"
+        ],
+        "suggestion": "Observed: CMake reported missing 'ZLIB' development components (ZLIB_LIBRARY ZLIB_INCLUDE_DIR) after running the executed installation steps. Inferred: installing the corresponding system '-dev' package (such as zlib1g-dev, libbz2-dev, or liblzma-dev, rather than only a runtime package like zlib1g) may resolve this build stop. Not determined automatically: whether the omission sits in the upstream documentation, an implicit system prerequisite, or the base environment."
+      }
+    ],
+    "faults": [
+      "author"
+    ]
+  },
+  "procedure_review": {
+    "may_say_runs": true,
+    "status_code": "VERIFIED_PROCEDURE_READY",
+    "basis": "gates",
+    "attribution": "tool",
+    "blocker": "ready",
+    "reason": "The repository states how to install (release_binary) and STRhub holds the sample. The container is that install, packaged. If the documented command then fails, the failure is that command's.",
+    "amendments": [],
+    "inferences": {
+      "install": {
+        "evidence_source": "docs/02_Installation.md:L19-L35",
+        "verified": true
+      },
+      "run_command": {
+        "evidence_source": "docs/03_Usage.md:L15",
+        "verified": true,
+        "kind": "doc",
+        "path": "docs/03_Usage.md",
+        "document_sha256": "5d8832f0b1b40e2c3745875bd0f2b07e4d210b5b6fed092103fadc8e72c5c062"
+      },
+      "input_type": {
+        "verified": true,
+        "kind": "doc",
+        "path": "docs/03_Usage.md",
+        "line": 15,
+        "end_line": 15,
+        "document_sha256": "5d8832f0b1b40e2c3745875bd0f2b07e4d210b5b6fed092103fadc8e72c5c062",
+        "evidence_source": "docs/03_Usage.md:L15",
+        "upstream_input_kind": "bam",
+        "selected_dataset": "illumina-bam-hg38"
+      },
+      "platform": {
+        "verified": true,
+        "kind": "doc",
+        "path": "README.md",
+        "line": 37,
+        "end_line": 37,
+        "document_sha256": "d7828d80c9800f3eb7fcbc5d24336dd4dbf964015981c7913446bce51bdad120",
+        "evidence_source": "README.md:L37",
+        "selected": "illumina",
+        "selection_basis": "upstream_single_platform",
+        "supported_platforms": [
+          "illumina"
+        ]
+      },
+      "regions": {
+        "verified": true,
+        "kind": "doc",
+        "path": "docs/04_VariantCatalogFiles.md",
+        "line": 17,
+        "end_line": 27,
+        "document_sha256": "fc4cbaa8cb4c8377b7cc8e7d08cecb8111c81316da5af2cae00b22963d934165",
+        "evidence_source": "docs/04_VariantCatalogFiles.md:L17-L27"
+      },
+      "output": {
+        "verified": true,
+        "kind": "doc",
+        "path": "docs/01_Introduction.md",
+        "line": 20,
+        "end_line": 20,
+        "document_sha256": "cac8532da25d73885179666887943adb7feaf9a641e6fb4a3246e2e080d7f913",
+        "evidence_source": "docs/01_Introduction.md:L20"
+      }
+    },
+    "unbacked_inferences": [],
+    "provenance": {
+      "from_upstream": {
+        "install": {
+          "method": "release_binary",
+          "evidence_source": "docs/02_Installation.md:L19-L35"
+        },
+        "command": {
+          "value": "ExpansionHunter --reads <BAM/CRAM file with aligned reads> --reference <FASTA file with reference genome> --variant-catalog <JSON file specifying variants to genotype> --output-prefix <Prefix for the output files>",
+          "evidence_source": "docs/03_Usage.md:L15"
+        },
+        "input_kind": {
+          "value": "bam",
+          "evidence_source": "docs/03_Usage.md:L15"
+        },
+        "supported_platforms": [
+          {
+            "platform": "illumina",
+            "evidence_source": "README.md:L37"
+          }
+        ],
+        "assembly": {
+          "declared": null,
+          "evidence_source": null
+        },
+        "regions_schema": {
+          "format": "eh_catalog",
+          "evidence_source": "docs/04_VariantCatalogFiles.md:L17-L27"
+        },
+        "output_format": {
+          "glob": "**/*.vcf*",
+          "evidence_source": "docs/01_Introduction.md:L20"
+        }
+      },
+      "derived": {
+        "command_rewrites": [
+          {
+            "role": "read_path",
+            "original": "<BAM/CRAM file with aligned reads>",
+            "replacement": "/data/in/input.bam",
+            "basis": "declared dataset mount"
+          },
+          {
+            "role": "reference_path",
+            "original": "<FASTA file with reference genome>",
+            "replacement": "/data/ref/hg38.fa",
+            "basis": "registered reference genome mount"
+          },
+          {
+            "role": "regions_path",
+            "original": "<JSON file specifying variants to genotype>",
+            "replacement": "/data/in/regions.json",
+            "basis": "registered regions file (eh_catalog)"
+          },
+          {
+            "role": "output_placeholder",
+            "original": "<Prefix for the output files>",
+            "replacement": "sample",
+            "basis": "explicit output-path placeholder"
+          }
+        ],
+        "regions_layout_binding": {
+          "documented_schema": "eh_catalog",
+          "evidence_source": "docs/04_VariantCatalogFiles.md:L17-L27",
+          "strhub_regions_layout": "eh_catalog"
+        },
+        "single_sample_adaptation": null
+      },
+      "harness_choices": {
+        "dataset": {
+          "selected": "illumina-bam-hg38",
+          "reason": "STRhub selected 'illumina-bam-hg38' as compatible with upstream input 'bam' and platform 'illumina'"
+        },
+        "platform": {
+          "selected": "illumina",
+          "basis": "upstream_single_platform",
+          "supported_platforms": [
+            "illumina"
+          ]
+        },
+        "assembly": {
+          "selected": "hg38",
+          "basis": "harness_choice_unstated",
+          "note": "Upstream did not specify an assembly; STRhub supplied an internally coherent hg38 BAM, FASTA and regions set"
+        },
+        "regions_layout": "eh_catalog",
+        "base_environment": {
+          "image": "ubuntu:22.04",
+          "description": "Ubuntu 22.04, package lists refreshed, apt answering yes, plus minimal build toolchain (build-essential, cmake, git, ca-certificates; no tool-specific libraries)",
+          "added_packages": [
+            "build-essential",
+            "cmake",
+            "git",
+            "ca-certificates"
+          ],
+          "miniforge": false,
+          "submodules": false
+        }
+      }
+    },
+    "install_method": "release_binary",
+    "citable_install": true,
+    "input_type": "illumina-bam-hg38",
+    "output_glob": "**/*.vcf*",
+    "profile": "strhub-upstream-procedure/1",
+    "install_ready": true,
+    "example_ready": false,
+    "installation": {
+      "profile": "strhub-documented-install/1",
+      "ready": true,
+      "method": "release_binary",
+      "reason": "Transcribe the installation commands the repository documents, unchanged and in order, into a fixed evaluator carrier; no step, dependency, option or choice was added.",
+      "repo": "https://github.com/Illumina/ExpansionHunter",
+      "ref": "9f5db1d4ab72016b2d93330b9792842d71582622",
+      "documents": [
+        {
+          "path": "README.md",
+          "sha256": "d7828d80c9800f3eb7fcbc5d24336dd4dbf964015981c7913446bce51bdad120"
+        },
+        {
+          "path": "docs/02_Installation.md",
+          "sha256": "c85069647b814ae0a6f96b8aeb0a98ba354da050f15f83abc96f88cf21feac56"
+        }
+      ],
+      "commands": [
+        {
+          "file": "docs/02_Installation.md",
+          "line": 19,
+          "text": "apt install zlib1g libbz2-dev liblzma-dev libcurl4-openssl-dev",
+          "argv": [
+            "apt",
+            "install",
+            "zlib1g",
+            "libbz2-dev",
+            "liblzma-dev",
+            "libcurl4-openssl-dev"
+          ]
+        },
+        {
+          "file": "docs/02_Installation.md",
+          "line": 32,
+          "text": "mkdir build",
+          "argv": [
+            "mkdir",
+            "build"
+          ]
+        },
+        {
+          "file": "docs/02_Installation.md",
+          "line": 33,
+          "text": "cd build",
+          "argv": [
+            "cd",
+            "build"
+          ]
+        },
+        {
+          "file": "docs/02_Installation.md",
+          "line": 34,
+          "text": "cmake ..",
+          "argv": [
+            "cmake",
+            ".."
+          ]
+        },
+        {
+          "file": "docs/02_Installation.md",
+          "line": 35,
+          "text": "make",
+          "argv": [
+            "make"
+          ]
+        }
+      ],
+      "published_alternatives": [],
+      "conda_environment": null,
+      "base_condition": {
+        "image": "ubuntu:22.04",
+        "description": "Ubuntu 22.04, package lists refreshed, apt answering yes, plus minimal build toolchain (build-essential, cmake, git, ca-certificates; no tool-specific libraries)",
+        "role": "evaluator base environment",
+        "added_packages": [
+          "build-essential",
+          "cmake",
+          "git",
+          "ca-certificates"
+        ],
+        "miniforge": false,
+        "submodules": false
+      },
+      "citation": {
+        "repo": "https://github.com/Illumina/ExpansionHunter",
+        "ref": "9f5db1d4ab72016b2d93330b9792842d71582622",
+        "path": "docs/02_Installation.md",
+        "line": 19,
+        "end_line": 35,
+        "verified": true,
+        "document_sha256": "c85069647b814ae0a6f96b8aeb0a98ba354da050f15f83abc96f88cf21feac56"
+      },
+      "carrier_dockerfile": "# Evaluator carrier: strhub-documented-install/1; not an upstream Dockerfile.\nFROM ubuntu:22.04\nENV DEBIAN_FRONTEND=noninteractive\nRUN [\"bash\", \"-c\", \"echo 'APT::Get::Assume-Yes \\\"true\\\";' > /etc/apt/apt.conf.d/90strhub && apt-get update\"]\nRUN [\"bash\", \"-c\", \"apt-get install --no-install-recommends build-essential cmake git ca-certificates\"]\nCOPY [\".\", \"/opt/tool\"]\nWORKDIR /opt/tool\nRUN [\"bash\", \"-lc\", \"set -eo pipefail\\napt install zlib1g libbz2-dev liblzma-dev libcurl4-openssl-dev\\nmkdir build\\ncd build\\ncmake ..\\nmake\\n\"]\nENTRYPOINT [\"/bin/bash\", \"-lc\"]\n",
+      "carrier_sha256": "707314f75b725e5d5b308513518b6466f2f3ad0bda29e0807010b6e4052cbc22"
+    },
+    "command_review": {
+      "profile": "strhub-upstream-procedure/1",
+      "cited": "ExpansionHunter --reads <BAM/CRAM file with aligned reads> --reference <FASTA file with reference genome> --variant-catalog <JSON file specifying variants to genotype> --output-prefix <Prefix for the output files>",
+      "command": "ExpansionHunter --reads /data/in/input.bam --reference /data/ref/hg38.fa --variant-catalog /data/in/regions.json --output-prefix sample",
+      "substitutions": [
+        {
+          "token": 2,
+          "original": "<BAM/CRAM file with aligned reads>",
+          "replacement": "/data/in/input.bam",
+          "role": "read_path",
+          "basis": "declared dataset mount"
+        },
+        {
+          "token": 4,
+          "original": "<FASTA file with reference genome>",
+          "replacement": "/data/ref/hg38.fa",
+          "role": "reference_path",
+          "basis": "registered reference genome mount"
+        },
+        {
+          "token": 6,
+          "original": "<JSON file specifying variants to genotype>",
+          "replacement": "/data/in/regions.json",
+          "role": "regions_path",
+          "basis": "registered regions file (eh_catalog)"
+        },
+        {
+          "token": 8,
+          "original": "<Prefix for the output files>",
+          "replacement": "sample",
+          "role": "output_placeholder",
+          "basis": "explicit output-path placeholder"
+        }
+      ],
+      "read_bindings": [
+        {
+          "token": 2,
+          "original": "<BAM/CRAM file with aligned reads>",
+          "target": "/data/in/input.bam"
+        }
+      ],
+      "limitations": [],
+      "expected": "ExpansionHunter --reads /data/in/input.bam --reference /data/ref/hg38.fa --variant-catalog /data/in/regions.json --output-prefix sample",
+      "executed": "ExpansionHunter --reads /data/in/input.bam --reference /data/ref/hg38.fa --variant-catalog /data/in/regions.json --output-prefix sample",
+      "cited_sha256": "7c656dc3ad5d4b72c4e2934b1650c2eab88103f758d53858c0b0cd999a07e0b0",
+      "executed_sha256": "fd85d9b65867370b87c150448b7c929a30038a371bfb36eae9dc3bd820e3836c",
+      "citations": [
+        {
+          "repo": "https://github.com/Illumina/ExpansionHunter",
+          "ref": "9f5db1d4ab72016b2d93330b9792842d71582622",
+          "path": "docs/03_Usage.md",
+          "line": 15,
+          "verified": true,
+          "document_sha256": "5d8832f0b1b40e2c3745875bd0f2b07e4d210b5b6fed092103fadc8e72c5c062",
+          "command_sha256": "7c656dc3ad5d4b72c4e2934b1650c2eab88103f758d53858c0b0cd999a07e0b0"
+        }
+      ]
+    },
+    "manifest_sha256": "47b668dc55f2eaaac050faddd142f11a4e69f2e26281ca9a9ca75379d373bcbf",
+    "evidence_sha256": "495d0aa73f4e553e340bba00563b7fdee63f178ca0fac6cf522aff7aceb56406",
+    "evidence": {
+      "schema": "strhub-procedure-evidence/1",
+      "manifest": {
+        "caveats": {
+          "items": [
+            "Environment: STRhub transcribed the documented installation commands unchanged into its own carrier (Ubuntu 22.04, package lists refreshed, apt answering yes, plus minimal build toolchain (build-essential, cmake, git, ca-certificates; no tool-specific libraries)).",
+            "Input: the README documents BAM (line 15); this plan selects STRhub's illumina-bam-hg38 reference data.",
+            "read_path: <BAM/CRAM file with aligned reads> -> /data/in/input.bam.",
+            "reference_path: <FASTA file with reference genome> -> /data/ref/hg38.fa.",
+            "regions_path: <JSON file specifying variants to genotype> -> /data/in/regions.json.",
+            "output_placeholder: <Prefix for the output files> -> sample.",
+            "Run command: the one documented in docs/03_Usage.md (line 15), rewritten to STRhub's mounts; the capture wrapper is planned only if the procedure review passes."
+          ],
+          "source": "detect_recipe"
+        },
+        "environment": {
+          "dockerfile": "Dockerfile",
+          "os": [
+            "ubuntu-22.04"
+          ],
+          "source": "documented"
+        },
+        "inputs": {
+          "regions": "eh_catalog",
+          "type": "illumina-bam-hg38"
+        },
+        "outputs": [
+          {
+            "format": "vcf",
+            "min_records": 1,
+            "path": "**/*.vcf*"
+          }
+        ],
+        "recipe": {
+          "origin": "proposed"
+        },
+        "report": {
+          "slug": "expansionhunter"
+        },
+        "run": {
+          "cmd": "cd '.' && touch /tmp/.strhub_mark && ( ExpansionHunter --reads /data/in/input.bam --reference /data/ref/hg38.fa --variant-catalog /data/in/regions.json --output-prefix sample ); rc=$?; find . -xdev -type f -newer /tmp/.strhub_mark -size +0 ! -path './.git/*' ! -path './proc/*' ! -path './sys/*' ! -path './dev/*' ! -path './data/*' ! -path '*/__pycache__/*' ! -name '*.pyc' ! -name '*.pyo' 2>/dev/null | head -500 | while IFS= read -r f; do mkdir -p \"/data/out/$(dirname \"$f\")\" && cp \"$f\" \"/data/out/$f\"; done; exit $rc",
+          "timeout_minutes": 20
+        },
+        "source": {
+          "ref": "9f5db1d4ab72016b2d93330b9792842d71582622",
+          "repo": "https://github.com/Illumina/ExpansionHunter"
+        },
+        "submission": {
+          "by": "third_party"
+        },
+        "tool": {
+          "contact": "https://github.com/Illumina/ExpansionHunter/issues",
+          "name": "ExpansionHunter",
+          "version": "v5.0.0"
+        }
+      },
+      "proposal": {
+        "build": {
+          "also_published": null,
+          "asset": "ExpansionHunter-v5.0.0-linux_x86_64.tar.gz",
+          "candidates": [
+            {
+              "asset": "ExpansionHunter-v5.0.0-linux_x86_64.tar.gz",
+              "digest": null,
+              "file": null,
+              "method": "release_binary",
+              "tag": "v5.0.0",
+              "url": "https://github.com/Illumina/ExpansionHunter/releases/download/v5.0.0/ExpansionHunter-v5.0.0-linux_x86_64.tar.gz"
+            },
+            {
+              "file": "CMakeLists.txt",
+              "method": "cmake"
+            }
+          ],
+          "digest": null,
+          "dir": null,
+          "evidence_source": "release_asset:ExpansionHunter-v5.0.0-linux_x86_64.tar.gz",
+          "file": null,
+          "image": null,
+          "method": "release_binary",
+          "package": null,
+          "readme_install_lines": [],
+          "readme_line": null,
+          "spec_list": false,
+          "ssh_urls_in": [],
+          "tag": "v5.0.0",
+          "then": [],
+          "url": "https://github.com/Illumina/ExpansionHunter/releases/download/v5.0.0/ExpansionHunter-v5.0.0-linux_x86_64.tar.gz"
+        },
+        "commands": [
+          {
+            "cmd": "ExpansionHunter --reads <BAM/CRAM file with aligned reads> --reference <FASTA file with reference genome> --variant-catalog <JSON file specifying variants to genotype> --output-prefix <Prefix for the output files>",
+            "entry_point": true,
+            "evidence_source": "docs/03_Usage.md:L15",
+            "file": "docs/03_Usage.md",
+            "has_input_flag": true,
+            "has_output_flag": true,
+            "help_only": false,
+            "invokes": "ExpansionHunter",
+            "line": 15,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 5,
+            "subcommand": null,
+            "synopsis": false
+          },
+          {
+            "cmd": "build/install/bin/ExpansionHunter",
+            "entry_point": true,
+            "evidence_source": "docs/02_Installation.md:L40",
+            "file": "docs/02_Installation.md",
+            "has_input_flag": false,
+            "has_output_flag": false,
+            "help_only": false,
+            "invokes": "ExpansionHunter",
+            "line": 40,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 4,
+            "subcommand": null,
+            "synopsis": false
+          }
+        ],
+        "dockerfile": null,
+        "docs_read": [
+          {
+            "origin": "repo",
+            "path": "LICENSE.txt"
+          },
+          {
+            "origin": "repo",
+            "path": "COPYRIGHT.txt"
+          },
+          {
+            "origin": "repo",
+            "path": "docs/01_Introduction.md"
+          },
+          {
+            "origin": "repo",
+            "path": "docs/02_Installation.md"
+          },
+          {
+            "origin": "repo",
+            "path": "docs/03_Usage.md"
+          },
+          {
+            "origin": "repo",
+            "path": "docs/04_VariantCatalogFiles.md"
+          },
+          {
+            "origin": "repo",
+            "path": "docs/05_OutputJsonFiles.md"
+          },
+          {
+            "origin": "repo",
+            "path": "docs/06_OutputVcfFiles.md"
+          }
+        ],
+        "docs_text": "\n                                 Apache License\n                           Version 2.0, January 2004\n                        http://www.apache.org/licenses/\n\n   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION\n\n   1. Definitions.\n\n      \"License\" shall mean the terms and conditions for use, reproduction,\n      and distribution as defined by Sections 1 through 9 of this document.\n\n      \"Licensor\" shall mean the copyright owner or entity authorized by\n      the copyright owner that is granting the License.\n\n      \"Legal Entity\" shall mean the union of the acting entity and all\n      other entities that control, are controlled by, or are under common\n      control with that entity. For the purposes of this definition,\n      \"control\" means (i) the power, direct or indirect, to cause the\n      direction or management of such entity, whether by contract or\n      otherwise, or (ii) ownership of fifty percent (50%) or more of the\n      outstanding shares, or (iii) beneficial ownership of such entity.\n\n      \"You\" (or \"Your\") shall mean an individual or Legal Entity\n      exercising permissions granted by this License.\n\n      \"Source\" form shall mean the preferred form for making modifications,\n      including but not limited to software source code, documentation\n      source, and configuration files.\n\n      \"Object\" form shall mean any form resulting from mechanical\n      transformation or translation of a Source form, including but\n      not limited to compiled object code, generated documentation,\n      and conversions to other media types.\n\n      \"Work\" shall mean the work of authorship, whether in Source or\n      Object form, made available under the License, as indicated by a\n      copyright notice that is included in or attached to the work\n      (an example is provided in the Appendix below).\n\n      \"Derivative Works\" shall mean any work, whether in Source or Object\n      form, that is based on (or derived from) the Work and for which the\n      editorial revisions, annotations, elaborations, or other modifications\n      represent, as a whole, an original work of authorship. For the purposes\n      of this License, Derivative Works shall not include works that remain\n      separable from, or merely link (or bind by name) to the interfaces of,\n      the Work and Derivative Works thereof.\n\n      \"Contribution\" shall mean any work of authorship, including\n      the original version of the Work and any modifications or additions\n      to that Work or Derivative Works thereof, that is intentionally\n      submitted to Licensor for inclusion in the Work by the copyright owner\n      or by an individual or Legal Entity authorized to submit on behalf of\n      the copyright owner. For the purposes of this definition, \"submitted\"\n      means any form of electronic, verbal, or written communication sent\n      to the Licensor or its representatives, including but not limited to\n      communication on electronic mailing lists, source code control systems,\n      and issue tracking systems that are managed by, or on behalf of, the\n      Licensor for the purpose of discussing and improving the Work, but\n      excluding communication that is conspicuously marked or otherwise\n      designated in writing by the copyright owner as \"Not a Contribution.\"\n\n      \"Contributor\" shall mean Licensor and any individual or Legal Entity\n      on behalf of whom a Contribution has been received by Licensor and\n      subsequently incorporated within the Work.\n\n   2. Grant of Copyright License. Subject to the terms and conditions of\n      this License, each Contributor hereby grants to You a perpetual,\n      worldwide, non-exclusive, no-charge, royalty-free, irrevocable\n      copyright license to reproduce, prepare Derivative Works of,\n      publicly display, publicly perform, sublicense, and distribute the\n      Work and such Derivative Works in Source or Object form.\n\n   3. Grant of Patent License. Subject to the terms and conditions of\n      this License, each Contributor hereby grants to You a perpetual,\n      worldwide, non-exclusive, no-charge, royalty-free, irrevocable\n      (except as stated in this section) patent license to make, have made,\n      use, offer to sell, sell, import, and otherwise transfer the Work,\n      where such license applies only to those patent claims licensable\n      by such Contributor that are necessarily infringed by their\n      Contribution(s) alone or by combination of their Contribution(s)\n      with the Work to which such Contribution(s) was submitted. If You\n      institute patent litigation against any entity (including a\n      cross-claim or counterclaim in a lawsuit) alleging that the Work\n      or a Contribution incorporated within the Work constitutes direct\n      or contributory patent infringement, then any patent licenses\n      granted to You under this License for that Work shall terminate\n      as of the date such litigation is filed.\n\n   4. Redistribution. You may reproduce and distribute copies of the\n      Work or Derivative Works thereof in any medium, with or without\n      modifications, and in Source or Object form, provided that You\n      meet the following conditions:\n\n      (a) You must give any other recipients of the Work or\n          Derivative Works a copy of this License; and\n\n      (b) You must cause any modified files to carry prominent notices\n          stating that You changed the files; and\n\n      (c) You must retain, in the Source form of any Derivative Works\n          that You distribute, all copyright, patent, trademark, and\n          attribution notices from the Source form of the Work,\n          excluding those notices that do not pertain to any part of\n          the Derivative Works; and\n\n      (d) If the Work includes a \"NOTICE\" text file as part of its\n          distribution, then any Derivative Works that You distribute must\n          include a readable copy of the attribution notices contained\n          within such NOTICE file, excluding those notices that do not\n          pertain to any part of the Derivative Works, in at least one\n          of the following places: within a NOTICE text file distributed\n          as part of the Derivative Works; within the Source form or\n          documentation, if provided along with the Derivative Works; or,\n          within a display generated by the Derivative Works, if and\n          wherever such third-party notices normally appear. The contents\n          of the NOTICE file are for informational purposes only and\n          do not modify the License. You may add Your own attribution\n          notices within Derivative Works that You distribute, alongside\n          or as an addendum to the NOTICE text from the Work, provided\n          that such additional attribution notices cannot be construed\n          as modifying the License.\n\n      You may add Your own copyright statement to Your modifications and\n      may provide additional or different license terms and conditions\n      for use, reproduction, or distribution of Your modifications, or\n      for any such Derivative Works as a whole, provided Your use,\n      reproduction, and distribution of the Work otherwise complies with\n      the conditions stated in this License.\n\n   5. Submission of Contributions. Unless You explicitly state otherwise,\n      any Contribution intentionally submitted for inclusion in the Work\n      by You to the Licensor shall be under the terms and conditions of\n      this License, without any additional terms or conditions.\n      Notwithstanding the above, nothing herein shall supersede or modify\n      the terms of any separate license agreement you may have executed\n      with Licensor regarding such Contributions.\n\n   6. Trademarks. This License does not grant permission to use the trade\n      names, trademarks, service marks, or product names of the Licensor,\n      except as required for reasonable and customary use in describing the\n      origin of the Work and reproducing the content of the NOTICE file.\n\n   7. Disclaimer of Warranty. Unless required by applicable law or\n      agreed to in writing, Licensor provides the Work (and each\n      Contributor provides its Contributions) on an \"AS IS\" BASIS,\n      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or\n      implied, including, without limitation, any warranties or conditions\n      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A\n      PARTICULAR PURPOSE. You are solely responsible for determining the\n      appropriateness of using or redistributing the Work and assume any\n      risks associated with Your exercise of permissions under this License.\n\n   8. Limitation of Liability. In no event and under no legal theory,\n      whether in tort (including negligence), contract, or otherwise,\n      unless required by applicable law (such as deliberate and grossly\n      negligent acts) or agreed to in writing, shall any Contributor be\n      liable to You for damages, including any direct, indirect, special,\n      incidental, or consequential damages of any character arising as a\n      result of this License or out of the use or inability to use the\n      Work (including but not limited to damages for loss of goodwill,\n      work stoppage, computer failure or malfunction, or any and all\n      other commercial damages or losses), even if such Contributor\n      has been advised of the possibility of such damages.\n\n   9. Accepting Warranty or Additional Liability. While redistributing\n      the Work or Derivative Works thereof, You may choose to offer,\n      and charge a fee for, acceptance of support, warranty, indemnity,\n      or other liability obligations and/or rights consistent with this\n      License. However, in accepting such obligations, You may act only\n      on Your own behalf and on Your sole responsibility, not on behalf\n      of any other Contributor, and only if You agree to indemnify,\n      defend, and hold each Contributor harmless for any liability\n      incurred by, or claims asserted against, such Contributor by reason\n      of your accepting any such warranty or additional liability.\n\n   END OF TERMS AND CONDITIONS\n\n   APPENDIX: How to apply the Apache License to your work.\n\n      To apply the Apache License to your work, attach the following\n      boilerplate notice, with the fields enclosed by brackets \"[]\"\n      replaced with your own identifying information. (Don't include\n      the brackets!)  The text should be enclosed in the appropriate\n      comment syntax for the file format. We also recommend that a\n      file or class name and description of purpose be included on the\n      same \"printed page\" as the copyright notice for easier\n      identification within third-party archives.\n\n   Copyright [yyyy] [name of copyright owner]\n\n   Licensed under the Apache License, Version 2.0 (the \"License\");\n   you may not use this file except in compliance with the License.\n   You may obtain a copy of the License at\n\n       http://www.apache.org/licenses/LICENSE-2.0\n\n   Unless required by applicable law or agreed to in writing, software\n   distributed under the License is distributed on an \"AS IS\" BASIS,\n   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n   See the License for the specific language governing permissions and\n   limitations under the License.\n\nExpansion Hunter\nCopyright (c) 2016 Illumina, Inc.\n\nThis program is free software: you can redistribute it and/or modify\nit under the terms of the GNU General Public License as published by\nthe Free Software Foundation, either version 3 of the License, or\nat your option) any later version.\n\nThis program is distributed in the hope that it will be useful,\nbut WITHOUT ANY WARRANTY; without even the implied warranty of\nMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\nGNU General Public License for more details.\n\nYou should have received a copy of the GNU General Public License\nalong with this program.  If not, see <http://www.gnu.org/licenses/>.\n\n\n******************************************************************\n\nThis distribution relies on the following libraries/external tools.\nThese are distributed according to the licensing terms governing each\nlibrary:\n\n******************************************************************\n\nhtslib 1.3.1\n\nThe MIT/Expat License\n\nCopyright (C) 2012-2014 Genome Research Ltd.\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in\nall copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL\nTHE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING\nFROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER\nDEALINGS IN THE SOFTWARE.\n\n\n[Files within the cram/ subdirectory in this distribution are distributed\naccording to the terms of the following Modified 3-Clause BSD license.]\n\nThe Modified-BSD License\n\nCopyright (C) 2012-2014 Genome Research Ltd.\n\nRedistribution and use in source and binary forms, with or without\nmodification, are permitted provided that the following conditions are met:\n\n1. Redistributions of source code must retain the above copyright notice,\n   this list of conditions and the following disclaimer.\n\n2. Redistributions in binary form must reproduce the above copyright notice,\n   this list of conditions and the following disclaimer in the documentation\n   and/or other materials provided with the distribution.\n\n3. Neither the names Genome Research Ltd and Wellcome Trust Sanger Institute\n   nor the names of its contributors may be used to endorse or promote\nproducts\n   derived from this software without specific prior written permission.\n\nTHIS SOFTWARE IS PROVIDED BY GENOME RESEARCH LTD AND CONTRIBUTORS \"AS IS\"\nAND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\nIMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE\nDISCLAIMED. IN NO EVENT SHALL GENOME RESEARCH LTD OR ITS CONTRIBUTORS BE\nLIABLE\nFOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL\nDAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR\nSERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER\nCAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,\nOR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE\nOF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n\n\n[The use of a range of years within a copyright notice in this distribution\nshould be interpreted as being equivalent to a list of years including the\nfirst and last year specified and all consecutive years between them.\n\nFor example, a copyright notice that reads \"Copyright (C) 2005, 2007-2009,\n2011-2012\" should be interpreted as being identical to a notice that reads\n\"Copyright (C) 2005, 2007, 2008, 2009, 2011, 2012\" and a copyright notice\nthat reads \"Copyright (C) 2005-2012\" should be interpreted as being identical\nto a notice that reads \"Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010,\n2011, 2012\".]\n\n******************************************************************\n\nBoost 1.56.0\n\nBoost Software License - Version 1.0 - August 17th, 2003\n\nPermission is hereby granted, free of charge, to any person or organization\nobtaining a copy of the software and accompanying documentation covered by\nthis license (the \"Software\") to use, reproduce, display, distribute, execute,\nand transmit the Software, and to prepare derivative works of the Software, \nand to permit third-parties to whom the Software is furnished to do so, all \nsubject to the following:\n\nThe copyright notices in the Software and this entire statement, including the \nabove license grant, this restriction and the following disclaimer, must be \nincluded in all copies of the Software, in whole or in part, and all derivative \nworks of the Software, unless such copies or derivative works are solely in the \nform of machine-executable object code generated by a source language processor.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, \nINCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A \nPARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE COPYRIGHT \nHOLDERS OR ANYONE DISTRIBUTING THE SOFTWARE BE LIABLE FOR ANY DAMAGES OR OTHER \nLIABILITY, WHETHER IN CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN \nCONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.\n\n\n******************************************************************\n\nCMake 3.1.0\n\nCMake - Cross Platform Makefile Generator\nCopyright 2000-2011 Kitware, Inc., Insight Software Consortium\nAll rights reserved.\n\nRedistribution and use in source and binary forms, with or without\nmodification, are permitted provided that the following conditions\nare met:\n\nCMake - Cross Platform Makefile Generator\nCopyright 2000-2011 Kitware, Inc., Insight Software Consortium\nAll rights reserved.\n\nRedistribution and use in source and binary forms, with or without\nmodification, are permitted provided that the following conditions\nare met:\n\n* Redistributions of source code must retain the above copyright\n  notice, this list of conditions and the following disclaimer.\n\n* Redistributions in binary form must reproduce the above copyright\n  notice, this list of conditions and the following disclaimer in the\n  documentation and/or other materials provided with the distribution.\n\n* Neither the names of Kitware, Inc., the Insight Software Consortium,\n  nor the names of their contributors may be used to endorse or promote\n  products derived from this software without specific prior written\n  permission.\n\nTHIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS\n\"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT\nLIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR\nA PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT\nHOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,\nSPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT\nLIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,\nDATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY\nTHEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT\n(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE\nOF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n\n------------------------------------------------------------------------------\n\nThe above copyright and license notice applies to distributions of\nCMake in source and binary form.  Some source files contain additional\nnotices of original copyright by their contributors; see each source\nfor details.  Third-party software packages supplied with CMake under\ncompatible licenses provide their own copyright notices documented in\ncorresponding subdirectories.\n\n******************************************************************\n\ncmake-modules\n\nCopyright Iowa State University 2009-2014,\nor Copyright Sensics, Inc. 2014-2015,\nor Copyright Ryan A. Pavlik 2009-2015\n\nDistributed under the Boost Software License, Version 1.0.\n\n(See accompanying file `LICENSE_1_0.txt` or copy at\n<http://www.boost.org/LICENSE_1_0.txt>)\n\n******************************************************************\n\nzlib 1.2.8\n\n (C) 1995-2013 Jean-loup Gailly and Mark Adler\n\n  This software is provided 'as-is', without any express or implied\n  warranty.  In no event will the authors be held liable for any damages\n  arising from the use of this software.\n\n  Permission is granted to anyone to use this software for any purpose,\n  including commercial applications, and to alter it and redistribute it\n  freely, subject to the following restrictions:\n\n  1. The origin of this software must not be misrepresented; you must not\n     claim that you wrote the original software. If you use this software\n     in a product, an acknowledgment in the product documentation would be\n     appreciated but is not required.\n  2. Altered source versions must be plainly marked as such, and must not be\n     misrepresented as being the original software.\n  3. This notice may not be removed or altered from any source distribution.\n\n******************************************************************\n\nJSON for Modern C++ https://nlohmann.github.io/json/\n\nThe class is licensed under the MIT License:\n\nCopyright (C) 2013-2017 Niels Lohmann\n\nPermission is hereby granted, free of charge, to any person obtaining a copy \nof this software and associated documentation files (the \u201cSoftware\u201d), to deal \nin the Software without restriction, including without limitation the rights \nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell \ncopies of the Software, and to permit persons to whom the Software is \nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all \ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \u201cAS IS\u201d, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR \nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS \nFOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR \nCOPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN \nAN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION \nWITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.\n\n******************************************************************\n\nspdlog: Super fast C++ logging library https://github.com/gabime/spdlog\n\nThe MIT License (MIT)\n\nCopyright (c) 2016 Gabi Melman.                                       \n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in\nall copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN\nTHE SOFTWARE.\n# A guide to Expansion Hunter software\n\nExpansion Hunter is a tool for targeted genotyping of short tandem repeats and\nflanking variants. It operates by performing a targeted search through a\nBAM/CRAM file for reads that span, flank, and are fully contained in each\nrepeat. Newer versions of the program provide limited support for insertions,\ndeletions, and substitutions.\n\nIn order to use Expansion Hunter you need to (1) download the latest release or\nbuild the program from source, (2) obtain a set of files specifying repeat\nregions of interest, and (3) have a BAM or a CRAM file with alignments of reads\nfrom a PCR-free WGS sample.\n\nThe following sections will help you to get started.\n\n* [Installation](02_Installation.md)\n* [Usage](03_Usage.md)\n* [Input variant catalogs](04_VariantCatalogFiles.md)\n* [Output JSON files](05_OutputJsonFiles.md)\n* [Output VCF files](06_OutputVcfFiles.md)\n\n# Installation\n\nExpansion Hunter is designed for Linux and macOS operating systems. A compiled\nbinary for the latest release can be downloaded from\n[here](https://github.com/Illumina/ExpansionHunter/releases). If you wish to\nbuild the program from source follow the instructions below.\n\n## Building from source\n\nPrerequisites:\n\n - A recent version of [GCC](https://gcc.gnu.org/) or\n   [clang](http://clang.llvm.org/) compiler supporting the C++11 standard\n - [CMake](https://cmake.org/) version 3.13.0 or above\n - Additional development libraries, which depend on the operating system:\n     - Centos7\n       - `yum install bzip2-devel libcurl-devel libstdc++-static xz-devel zlib-devel`\n     - Ubuntu 20.04\n       - `apt install zlib1g libbz2-dev liblzma-dev libcurl4-openssl-dev`\n     - macOS 10.15\n       - `brew install xz`\n\nIf the above prerequisites are satisfied, you are ready to\nbuild the program. Note that during the build procedure, cmake will\nattempt to download and install `abseil`, `boost`, `googletest`, `htslib`,\nand `spdlog` so an active internet connection is required. Assuming\nthat the source code is contained in a directory `ExpansionHunter/`,\nthe build procedure can be initiated as follows:\n\n```bash\n$ cd ExpansionHunter\n$ mkdir build\n$ cd build\n$ cmake ..\n$ make\n```\n\nIf all the above steps were successful, the ExpansionHunter executable can be found in:\n\n    build/install/bin/ExpansionHunter\n\n# Usage\n\nExpansion Hunter requires an indexed BAM or a CRAM file containing aligned reads\nfrom a PCR-free WGS sample, a FASTA file with a reference genome assembly (which\nmust be the same as the one used to align the reads), and a [variant catalog\nfile](04_VariantCatalogFiles.md).\n\nExpansion Hunter outputs a VCF file and a JSON file with variant genotypes and\nother useful information along with a BAMlet containing alignments of reads that\noverlap or located in close proximity to each variant. The VCF and JSON files\nare largely equivalent, but the JSON file may be easier to parse\nprogrammatically. Here is a template with the names of the required parameters.\n\n```bash\nExpansionHunter --reads <BAM/CRAM file with aligned reads> \\\n                --reference <FASTA file with reference genome> \\\n                --variant-catalog <JSON file specifying variants to genotype> \\\n                --output-prefix <Prefix for the output files>\n```\n\n## Optional arguments\n\nIn addition to the required program options listed above, there are a number of\noptional arguments.\n\n* `--sex <arg>` Specifies sex of the sample; can be either `male` or `female`\n  (default). This parameter only affects repeats on sex chromosomes.\n\n* `--region-extension-length <int>` Specifies how far from on/off-target regions\n   to search for informative reads. Set to 1000 by default.\n\n* `--analysis-mode <mode>` Specify analysis mode, which can be either `seeking` or\n  `streaming`. The default mode is `seeking`. See further description of analysis\n   modes below.\n\n* `--threads <int>` Specifies how many threads to can be used accelerate analysis\n   of large variant catalogs. Set to 1 by default. Typically seeking mode can\n   benefit from relatively high thread counts, while for streaming mode\n   there is limited benefit beyond about 16 threads.\n\nNote that the full list of program options with brief explanations can be\nobtained by running `ExpansionHunter --help`.\n\n### Analysis modes\n\n#### Seeking mode\n\nIn seeking mode, alignment file indexing is used to seek specific read sets for the\nanalysis of each variant. Seeking mode is recommended for analysis of small catalogs.\nThis mode requires that the input BAM or CRAM file is already sorted and indexed.\n\n#### Streaming mode\n\nIn streaming mode, the alignment file is read in a single pass and all variants are\nanalyzed during this reading operation. Streaming mode is recommended for the analysis\nof large catalogs, but does require more memory as a funciton of catalog size. This mode\ndoes not require that the BAM or CRAM file is sorted or indexed.\n\n# Variant catalogs\n\n## Overview\n\nA variant catalog is an essential component of Expansion Hunter's input. It\nspecifies reference coordinates and structure of each locus that the program\nwill analyze. Although the loci usually correspond to repeats, they could also\ncontain other classes of variants such as insertions, deletions, and sequence\nswaps.\n\nThis document describes the format of files that store repeat catalogs. Users\nthat are considering creating new or modifying existing catalog files should\nread this document carefully. Even a minor mistake in locus definition could\nlead to a significant drop in genotyping accuracy.\n\n\n## Variant catalog files\n\nA variant catalog file is a JSON array whose entries specify individual loci\nthat the program will analyze. Here is an example of a catalog consisting of\nthree loci containing repeats.\n\n```json\n[\n{\n    \"LocusId\": \"DMPK\",\n    \"LocusStructure\": \"(CAG)*\",\n    \"ReferenceRegion\": \"19:46273462-46273522\",\n    \"VariantType\": \"Repeat\"\n},\n{\n    \"LocusId\": \"FMR1\",\n    \"LocusStructure\": \"(CGG)*\",\n    \"ReferenceRegion\": \"X:146993568-146993628\",\n    \"VariantType\": \"RareRepeat\",\n    \"OfftargetRegions\": [\n        \"12:7781290-7781350\",\n        \"12:125052154-125052156\",\n        \"16:25703613-25703635\",\n        \"16:28074516-28074518\",\n        \"17:30814024-30814026\",\n        \"17:64298467-64298469\",\n        \"19:2015524-2015526\",\n        \"2:87141540-87141618\",\n        \"2:92230909-92230911\",\n        \"2:211036020-211036032\",\n        \"2:225449878-225449880\",\n        \"20:30865500-30865516\",\n        \"5:443334-443364\",\n        \"7:20824939-20824941\",\n        \"7:100271437-100271439\",\n        \"7:104654597-104654599\",\n        \"7:143059853-143059855\",",
+        "evidence": [
+          {
+            "claim": "run_command",
+            "kind": "doc",
+            "line": 15,
+            "path": "docs/03_Usage.md",
+            "text": "ExpansionHunter --reads <BAM/CRAM file with aligned reads> \\",
+            "url": "https://github.com/Illumina/ExpansionHunter/blob/9f5db1d4ab72016b2d93330b9792842d71582622/docs/03_Usage.md#L15"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "example/input/reference.fa",
+            "text": "fasta",
+            "url": "https://github.com/Illumina/ExpansionHunter/blob/9f5db1d4ab72016b2d93330b9792842d71582622/example/input/reference.fa"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "example/input/variants.bam",
+            "text": "bam",
+            "url": "https://github.com/Illumina/ExpansionHunter/blob/9f5db1d4ab72016b2d93330b9792842d71582622/example/input/variants.bam"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "example/output/repeats.vcf",
+            "text": "vcf",
+            "url": "https://github.com/Illumina/ExpansionHunter/blob/9f5db1d4ab72016b2d93330b9792842d71582622/example/output/repeats.vcf"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "example/output/repeats_realigned.bam",
+            "text": "bam",
+            "url": "https://github.com/Illumina/ExpansionHunter/blob/9f5db1d4ab72016b2d93330b9792842d71582622/example/output/repeats_realigned.bam"
+          },
+          {
+            "claim": "documented_input",
+            "kind": "readme",
+            "line": 15,
+            "path": "README.md",
+            "text": "ExpansionHunter --reads <BAM/CRAM file with aligned reads> \\",
+            "url": "https://github.com/Illumina/ExpansionHunter/blob/9f5db1d4ab72016b2d93330b9792842d71582622/README.md#L15"
+          }
+        ],
+        "example": null,
+        "example_data": [
+          {
+            "in_example_dir": true,
+            "kind": "fasta",
+            "looks_like_output": false,
+            "path": "example/input/reference.fa",
+            "size": 4016
+          },
+          {
+            "in_example_dir": true,
+            "kind": "bam",
+            "looks_like_output": false,
+            "path": "example/input/variants.bam",
+            "size": 158779
+          },
+          {
+            "in_example_dir": true,
+            "kind": "vcf",
+            "looks_like_output": true,
+            "path": "example/output/repeats.vcf",
+            "size": 2139
+          },
+          {
+            "in_example_dir": true,
+            "kind": "bam",
+            "looks_like_output": true,
+            "path": "example/output/repeats_realigned.bam",
+            "size": 75248
+          }
+        ],
+        "inferences": {
+          "build": "release_asset:ExpansionHunter-v5.0.0-linux_x86_64.tar.gz",
+          "example": null,
+          "input_type": "docs/03_Usage.md:L15",
+          "output": "docs/01_Introduction.md:L20",
+          "platform": "README.md:L37",
+          "regions": "docs/04_VariantCatalogFiles.md:L17-L27",
+          "run_command": "docs/03_Usage.md:L15",
+          "single_sample_bams": null
+        },
+        "input_type": {
+          "assembly": {
+            "against_hg38": null,
+            "declared": null,
+            "evidence_source": null,
+            "hg19_evidence_source": null,
+            "hg19_hits": 0,
+            "hg38_evidence_source": null,
+            "hg38_hits": 0,
+            "incompatible_with_hg38": false
+          },
+          "best": "illumina-bam-hg38",
+          "candidates": [
+            "illumina-bam-hg38"
+          ],
+          "evidence_source": "docs/03_Usage.md:L15",
+          "how": "read",
+          "platform": "illumina",
+          "platform_evidence_source": "README.md:L37",
+          "platform_how": "stated",
+          "signals": {
+            "bam": 0,
+            "ce": 0,
+            "fastq": 0,
+            "hg19": 0,
+            "hg38": 0,
+            "illumina": 0,
+            "ont": 0,
+            "snp": 0,
+            "ystr": 0
+          },
+          "statements": {
+            "against": [],
+            "determined": true,
+            "inputs": [
+              {
+                "kind": "bam",
+                "line": 15,
+                "text": "ExpansionHunter --reads <BAM/CRAM file with aligned reads> \\"
+              }
+            ],
+            "platform": [
+              {
+                "historical": false,
+                "line": 37,
+                "platform": "illumina",
+                "text": "[Detection of long repeat expansions from PCR-free whole-genome sequence data](http://genome.cshlp.org/content/27/11/1895),"
+              }
+            ],
+            "platform_file": null,
+            "recommendation": null
+          },
+          "statements_file": "docs/03_Usage.md",
+          "supported_platforms": [
+            {
+              "evidence_source": "README.md:L37",
+              "historical": false,
+              "line": 37,
+              "platform": "illumina",
+              "text": "[Detection of long repeat expansions from PCR-free whole-genome sequence data](http://genome.cshlp.org/content/27/11/1895),"
+            }
+          ],
+          "unsupported": null,
+          "warnings": []
+        },
+        "known_issues": [],
+        "limitations": [],
+        "output": {
+          "evidence_source": "docs/01_Introduction.md:L20",
+          "format": "vcf",
+          "signals": {
+            "csv": 0,
+            "json": 0,
+            "tsv": 4,
+            "vcf": 7
+          }
+        },
+        "packaging": {
+          "executables": [
+            "ExpansionHunter"
+          ],
+          "packages": []
+        },
+        "readme": {
+          "gaps": [],
+          "name": "README.md",
+          "sufficient_to_attempt": true
+        },
+        "readme_name": "README.md",
+        "readme_text": "# Expansion Hunter: a tool for estimating repeat sizes\n\nThere are a number of regions in the human genome consisting of repetitions of\nshort unit sequence (commonly a trimer). Such repeat regions can expand to a\nsize much larger than the read length and thereby cause a disease.\n[Fragile X Syndrome](https://en.wikipedia.org/wiki/Fragile_X_syndrome),\n[ALS](https://en.wikipedia.org/wiki/Amyotrophic_lateral_sclerosis), and\n[Huntington's Disease](https://en.wikipedia.org/wiki/Huntington%27s_disease)\nare well known examples.\n\nExpansion Hunter aims to estimate sizes of such repeats by performing a targeted\nsearch through a BAM/CRAM file for reads that span, flank, and are fully\ncontained in each repeat.\n\nLinux and macOS operating systems are currently supported.\n\n\n## License\n\nExpansion Hunter is provided under the terms and conditions of the\n[Apache License Version 2.0](LICENSE.txt). It relies on several third party\npackages provided under other open source licenses, please see\n[COPYRIGHT.txt](COPYRIGHT.txt) for additional details.\n\n\n## Documentation\n\nInstallation instructions, usage guide, and description of file formats are\ncontained in the [docs folder](docs/01_Introduction.md).\n\n\n## Method\n\nThe method is described in the following papers:\n\n- Egor Dolzhenko, Joke van Vugt, Richard Shaw, Mitch Bekritsky, and others,\n  [Detection of long repeat expansions from PCR-free whole-genome sequence data](http://genome.cshlp.org/content/27/11/1895),\n  Genome Research 2017\n\n- Egor Dolzhenko, Viraj Deshpande, Felix Schlesinger, Peter Krusche, Roman Petrovski, and others,\n[ExpansionHunter: A sequence-graph based tool to analyze variation in short tandem repeat regions](https://academic.oup.com/bioinformatics/article/doi/10.1093/bioinformatics/btz431/5499079),\nBioinformatics 2019\n",
+        "ref": "9f5db1d4ab72016b2d93330b9792842d71582622",
+        "regions": {
+          "ambiguous": false,
+          "candidates": [
+            {
+              "end_line": 27,
+              "evidence_source": "docs/04_VariantCatalogFiles.md:L17-L27",
+              "file": "docs/04_VariantCatalogFiles.md",
+              "format": "eh_catalog",
+              "line": 17,
+              "text": "\"LocusStructure\": \"(CAG)*\","
+            }
+          ],
+          "end_line": 27,
+          "evidence_source": "docs/04_VariantCatalogFiles.md:L17-L27",
+          "file": "docs/04_VariantCatalogFiles.md",
+          "format": "eh_catalog",
+          "line": 17,
+          "text": "\"LocusStructure\": \"(CAG)*\","
+        },
+        "registry": {
+          "bioconda": {
+            "expansionhunter": {
+              "has_tag_version": true,
+              "latest": "5.0.0",
+              "versions": 10
+            }
+          },
+          "documented": []
+        },
+        "repo": "https://github.com/Illumina/ExpansionHunter",
+        "schema": "strhub-verified/recipe-proposal/1",
+        "single_sample_bams": {
+          "allowed": false,
+          "evidence_source": null,
+          "file": null,
+          "line": null,
+          "paired_flags": [],
+          "text": null
+        },
+        "source_documents": [
+          {
+            "file": "README.md",
+            "origin": "readme",
+            "text": "# Expansion Hunter: a tool for estimating repeat sizes\n\nThere are a number of regions in the human genome consisting of repetitions of\nshort unit sequence (commonly a trimer). Such repeat regions can expand to a\nsize much larger than the read length and thereby cause a disease.\n[Fragile X Syndrome](https://en.wikipedia.org/wiki/Fragile_X_syndrome),\n[ALS](https://en.wikipedia.org/wiki/Amyotrophic_lateral_sclerosis), and\n[Huntington's Disease](https://en.wikipedia.org/wiki/Huntington%27s_disease)\nare well known examples.\n\nExpansion Hunter aims to estimate sizes of such repeats by performing a targeted\nsearch through a BAM/CRAM file for reads that span, flank, and are fully\ncontained in each repeat.\n\nLinux and macOS operating systems are currently supported.\n\n\n## License\n\nExpansion Hunter is provided under the terms and conditions of the\n[Apache License Version 2.0](LICENSE.txt). It relies on several third party\npackages provided under other open source licenses, please see\n[COPYRIGHT.txt](COPYRIGHT.txt) for additional details.\n\n\n## Documentation\n\nInstallation instructions, usage guide, and description of file formats are\ncontained in the [docs folder](docs/01_Introduction.md).\n\n\n## Method\n\nThe method is described in the following papers:\n\n- Egor Dolzhenko, Joke van Vugt, Richard Shaw, Mitch Bekritsky, and others,\n  [Detection of long repeat expansions from PCR-free whole-genome sequence data](http://genome.cshlp.org/content/27/11/1895),\n  Genome Research 2017\n\n- Egor Dolzhenko, Viraj Deshpande, Felix Schlesinger, Peter Krusche, Roman Petrovski, and others,\n[ExpansionHunter: A sequence-graph based tool to analyze variation in short tandem repeat regions](https://academic.oup.com/bioinformatics/article/doi/10.1093/bioinformatics/btz431/5499079),\nBioinformatics 2019\n"
+          },
+          {
+            "file": "LICENSE.txt",
+            "origin": "repo",
+            "text": "\n                                 Apache License\n                           Version 2.0, January 2004\n                        http://www.apache.org/licenses/\n\n   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION\n\n   1. Definitions.\n\n      \"License\" shall mean the terms and conditions for use, reproduction,\n      and distribution as defined by Sections 1 through 9 of this document.\n\n      \"Licensor\" shall mean the copyright owner or entity authorized by\n      the copyright owner that is granting the License.\n\n      \"Legal Entity\" shall mean the union of the acting entity and all\n      other entities that control, are controlled by, or are under common\n      control with that entity. For the purposes of this definition,\n      \"control\" means (i) the power, direct or indirect, to cause the\n      direction or management of such entity, whether by contract or\n      otherwise, or (ii) ownership of fifty percent (50%) or more of the\n      outstanding shares, or (iii) beneficial ownership of such entity.\n\n      \"You\" (or \"Your\") shall mean an individual or Legal Entity\n      exercising permissions granted by this License.\n\n      \"Source\" form shall mean the preferred form for making modifications,\n      including but not limited to software source code, documentation\n      source, and configuration files.\n\n      \"Object\" form shall mean any form resulting from mechanical\n      transformation or translation of a Source form, including but\n      not limited to compiled object code, generated documentation,\n      and conversions to other media types.\n\n      \"Work\" shall mean the work of authorship, whether in Source or\n      Object form, made available under the License, as indicated by a\n      copyright notice that is included in or attached to the work\n      (an example is provided in the Appendix below).\n\n      \"Derivative Works\" shall mean any work, whether in Source or Object\n      form, that is based on (or derived from) the Work and for which the\n      editorial revisions, annotations, elaborations, or other modifications\n      represent, as a whole, an original work of authorship. For the purposes\n      of this License, Derivative Works shall not include works that remain\n      separable from, or merely link (or bind by name) to the interfaces of,\n      the Work and Derivative Works thereof.\n\n      \"Contribution\" shall mean any work of authorship, including\n      the original version of the Work and any modifications or additions\n      to that Work or Derivative Works thereof, that is intentionally\n      submitted to Licensor for inclusion in the Work by the copyright owner\n      or by an individual or Legal Entity authorized to submit on behalf of\n      the copyright owner. For the purposes of this definition, \"submitted\"\n      means any form of electronic, verbal, or written communication sent\n      to the Licensor or its representatives, including but not limited to\n      communication on electronic mailing lists, source code control systems,\n      and issue tracking systems that are managed by, or on behalf of, the\n      Licensor for the purpose of discussing and improving the Work, but\n      excluding communication that is conspicuously marked or otherwise\n      designated in writing by the copyright owner as \"Not a Contribution.\"\n\n      \"Contributor\" shall mean Licensor and any individual or Legal Entity\n      on behalf of whom a Contribution has been received by Licensor and\n      subsequently incorporated within the Work.\n\n   2. Grant of Copyright License. Subject to the terms and conditions of\n      this License, each Contributor hereby grants to You a perpetual,\n      worldwide, non-exclusive, no-charge, royalty-free, irrevocable\n      copyright license to reproduce, prepare Derivative Works of,\n      publicly display, publicly perform, sublicense, and distribute the\n      Work and such Derivative Works in Source or Object form.\n\n   3. Grant of Patent License. Subject to the terms and conditions of\n      this License, each Contributor hereby grants to You a perpetual,\n      worldwide, non-exclusive, no-charge, royalty-free, irrevocable\n      (except as stated in this section) patent license to make, have made,\n      use, offer to sell, sell, import, and otherwise transfer the Work,\n      where such license applies only to those patent claims licensable\n      by such Contributor that are necessarily infringed by their\n      Contribution(s) alone or by combination of their Contribution(s)\n      with the Work to which such Contribution(s) was submitted. If You\n      institute patent litigation against any entity (including a\n      cross-claim or counterclaim in a lawsuit) alleging that the Work\n      or a Contribution incorporated within the Work constitutes direct\n      or contributory patent infringement, then any patent licenses\n      granted to You under this License for that Work shall terminate\n      as of the date such litigation is filed.\n\n   4. Redistribution. You may reproduce and distribute copies of the\n      Work or Derivative Works thereof in any medium, with or without\n      modifications, and in Source or Object form, provided that You\n      meet the following conditions:\n\n      (a) You must give any other recipients of the Work or\n          Derivative Works a copy of this License; and\n\n      (b) You must cause any modified files to carry prominent notices\n          stating that You changed the files; and\n\n      (c) You must retain, in the Source form of any Derivative Works\n          that You distribute, all copyright, patent, trademark, and\n          attribution notices from the Source form of the Work,\n          excluding those notices that do not pertain to any part of\n          the Derivative Works; and\n\n      (d) If the Work includes a \"NOTICE\" text file as part of its\n          distribution, then any Derivative Works that You distribute must\n          include a readable copy of the attribution notices contained\n          within such NOTICE file, excluding those notices that do not\n          pertain to any part of the Derivative Works, in at least one\n          of the following places: within a NOTICE text file distributed\n          as part of the Derivative Works; within the Source form or\n          documentation, if provided along with the Derivative Works; or,\n          within a display generated by the Derivative Works, if and\n          wherever such third-party notices normally appear. The contents\n          of the NOTICE file are for informational purposes only and\n          do not modify the License. You may add Your own attribution\n          notices within Derivative Works that You distribute, alongside\n          or as an addendum to the NOTICE text from the Work, provided\n          that such additional attribution notices cannot be construed\n          as modifying the License.\n\n      You may add Your own copyright statement to Your modifications and\n      may provide additional or different license terms and conditions\n      for use, reproduction, or distribution of Your modifications, or\n      for any such Derivative Works as a whole, provided Your use,\n      reproduction, and distribution of the Work otherwise complies with\n      the conditions stated in this License.\n\n   5. Submission of Contributions. Unless You explicitly state otherwise,\n      any Contribution intentionally submitted for inclusion in the Work\n      by You to the Licensor shall be under the terms and conditions of\n      this License, without any additional terms or conditions.\n      Notwithstanding the above, nothing herein shall supersede or modify\n      the terms of any separate license agreement you may have executed\n      with Licensor regarding such Contributions.\n\n   6. Trademarks. This License does not grant permission to use the trade\n      names, trademarks, service marks, or product names of the Licensor,\n      except as required for reasonable and customary use in describing the\n      origin of the Work and reproducing the content of the NOTICE file.\n\n   7. Disclaimer of Warranty. Unless required by applicable law or\n      agreed to in writing, Licensor provides the Work (and each\n      Contributor provides its Contributions) on an \"AS IS\" BASIS,\n      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or\n      implied, including, without limitation, any warranties or conditions\n      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A\n      PARTICULAR PURPOSE. You are solely responsible for determining the\n      appropriateness of using or redistributing the Work and assume any\n      risks associated with Your exercise of permissions under this License.\n\n   8. Limitation of Liability. In no event and under no legal theory,\n      whether in tort (including negligence), contract, or otherwise,\n      unless required by applicable law (such as deliberate and grossly\n      negligent acts) or agreed to in writing, shall any Contributor be\n      liable to You for damages, including any direct, indirect, special,\n      incidental, or consequential damages of any character arising as a\n      result of this License or out of the use or inability to use the\n      Work (including but not limited to damages for loss of goodwill,\n      work stoppage, computer failure or malfunction, or any and all\n      other commercial damages or losses), even if such Contributor\n      has been advised of the possibility of such damages.\n\n   9. Accepting Warranty or Additional Liability. While redistributing\n      the Work or Derivative Works thereof, You may choose to offer,\n      and charge a fee for, acceptance of support, warranty, indemnity,\n      or other liability obligations and/or rights consistent with this\n      License. However, in accepting such obligations, You may act only\n      on Your own behalf and on Your sole responsibility, not on behalf\n      of any other Contributor, and only if You agree to indemnify,\n      defend, and hold each Contributor harmless for any liability\n      incurred by, or claims asserted against, such Contributor by reason\n      of your accepting any such warranty or additional liability.\n\n   END OF TERMS AND CONDITIONS\n\n   APPENDIX: How to apply the Apache License to your work.\n\n      To apply the Apache License to your work, attach the following\n      boilerplate notice, with the fields enclosed by brackets \"[]\"\n      replaced with your own identifying information. (Don't include\n      the brackets!)  The text should be enclosed in the appropriate\n      comment syntax for the file format. We also recommend that a\n      file or class name and description of purpose be included on the\n      same \"printed page\" as the copyright notice for easier\n      identification within third-party archives.\n\n   Copyright [yyyy] [name of copyright owner]\n\n   Licensed under the Apache License, Version 2.0 (the \"License\");\n   you may not use this file except in compliance with the License.\n   You may obtain a copy of the License at\n\n       http://www.apache.org/licenses/LICENSE-2.0\n\n   Unless required by applicable law or agreed to in writing, software\n   distributed under the License is distributed on an \"AS IS\" BASIS,\n   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n   See the License for the specific language governing permissions and\n   limitations under the License.\n"
+          },
+          {
+            "file": "COPYRIGHT.txt",
+            "origin": "repo",
+            "text": "Expansion Hunter\nCopyright (c) 2016 Illumina, Inc.\n\nThis program is free software: you can redistribute it and/or modify\nit under the terms of the GNU General Public License as published by\nthe Free Software Foundation, either version 3 of the License, or\nat your option) any later version.\n\nThis program is distributed in the hope that it will be useful,\nbut WITHOUT ANY WARRANTY; without even the implied warranty of\nMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\nGNU General Public License for more details.\n\nYou should have received a copy of the GNU General Public License\nalong with this program.  If not, see <http://www.gnu.org/licenses/>.\n\n\n******************************************************************\n\nThis distribution relies on the following libraries/external tools.\nThese are distributed according to the licensing terms governing each\nlibrary:\n\n******************************************************************\n\nhtslib 1.3.1\n\nThe MIT/Expat License\n\nCopyright (C) 2012-2014 Genome Research Ltd.\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in\nall copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL\nTHE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING\nFROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER\nDEALINGS IN THE SOFTWARE.\n\n\n[Files within the cram/ subdirectory in this distribution are distributed\naccording to the terms of the following Modified 3-Clause BSD license.]\n\nThe Modified-BSD License\n\nCopyright (C) 2012-2014 Genome Research Ltd.\n\nRedistribution and use in source and binary forms, with or without\nmodification, are permitted provided that the following conditions are met:\n\n1. Redistributions of source code must retain the above copyright notice,\n   this list of conditions and the following disclaimer.\n\n2. Redistributions in binary form must reproduce the above copyright notice,\n   this list of conditions and the following disclaimer in the documentation\n   and/or other materials provided with the distribution.\n\n3. Neither the names Genome Research Ltd and Wellcome Trust Sanger Institute\n   nor the names of its contributors may be used to endorse or promote\nproducts\n   derived from this software without specific prior written permission.\n\nTHIS SOFTWARE IS PROVIDED BY GENOME RESEARCH LTD AND CONTRIBUTORS \"AS IS\"\nAND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\nIMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE\nDISCLAIMED. IN NO EVENT SHALL GENOME RESEARCH LTD OR ITS CONTRIBUTORS BE\nLIABLE\nFOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL\nDAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR\nSERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER\nCAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,\nOR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE\nOF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n\n\n[The use of a range of years within a copyright notice in this distribution\nshould be interpreted as being equivalent to a list of years including the\nfirst and last year specified and all consecutive years between them.\n\nFor example, a copyright notice that reads \"Copyright (C) 2005, 2007-2009,\n2011-2012\" should be interpreted as being identical to a notice that reads\n\"Copyright (C) 2005, 2007, 2008, 2009, 2011, 2012\" and a copyright notice\nthat reads \"Copyright (C) 2005-2012\" should be interpreted as being identical\nto a notice that reads \"Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010,\n2011, 2012\".]\n\n******************************************************************\n\nBoost 1.56.0\n\nBoost Software License - Version 1.0 - August 17th, 2003\n\nPermission is hereby granted, free of charge, to any person or organization\nobtaining a copy of the software and accompanying documentation covered by\nthis license (the \"Software\") to use, reproduce, display, distribute, execute,\nand transmit the Software, and to prepare derivative works of the Software, \nand to permit third-parties to whom the Software is furnished to do so, all \nsubject to the following:\n\nThe copyright notices in the Software and this entire statement, including the \nabove license grant, this restriction and the following disclaimer, must be \nincluded in all copies of the Software, in whole or in part, and all derivative \nworks of the Software, unless such copies or derivative works are solely in the \nform of machine-executable object code generated by a source language processor.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, \nINCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A \nPARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE COPYRIGHT \nHOLDERS OR ANYONE DISTRIBUTING THE SOFTWARE BE LIABLE FOR ANY DAMAGES OR OTHER \nLIABILITY, WHETHER IN CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN \nCONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.\n\n\n******************************************************************\n\nCMake 3.1.0\n\nCMake - Cross Platform Makefile Generator\nCopyright 2000-2011 Kitware, Inc., Insight Software Consortium\nAll rights reserved.\n\nRedistribution and use in source and binary forms, with or without\nmodification, are permitted provided that the following conditions\nare met:\n\nCMake - Cross Platform Makefile Generator\nCopyright 2000-2011 Kitware, Inc., Insight Software Consortium\nAll rights reserved.\n\nRedistribution and use in source and binary forms, with or without\nmodification, are permitted provided that the following conditions\nare met:\n\n* Redistributions of source code must retain the above copyright\n  notice, this list of conditions and the following disclaimer.\n\n* Redistributions in binary form must reproduce the above copyright\n  notice, this list of conditions and the following disclaimer in the\n  documentation and/or other materials provided with the distribution.\n\n* Neither the names of Kitware, Inc., the Insight Software Consortium,\n  nor the names of their contributors may be used to endorse or promote\n  products derived from this software without specific prior written\n  permission.\n\nTHIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS\n\"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT\nLIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR\nA PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT\nHOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,\nSPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT\nLIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,\nDATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY\nTHEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT\n(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE\nOF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n\n------------------------------------------------------------------------------\n\nThe above copyright and license notice applies to distributions of\nCMake in source and binary form.  Some source files contain additional\nnotices of original copyright by their contributors; see each source\nfor details.  Third-party software packages supplied with CMake under\ncompatible licenses provide their own copyright notices documented in\ncorresponding subdirectories.\n\n******************************************************************\n\ncmake-modules\n\nCopyright Iowa State University 2009-2014,\nor Copyright Sensics, Inc. 2014-2015,\nor Copyright Ryan A. Pavlik 2009-2015\n\nDistributed under the Boost Software License, Version 1.0.\n\n(See accompanying file `LICENSE_1_0.txt` or copy at\n<http://www.boost.org/LICENSE_1_0.txt>)\n\n******************************************************************\n\nzlib 1.2.8\n\n (C) 1995-2013 Jean-loup Gailly and Mark Adler\n\n  This software is provided 'as-is', without any express or implied\n  warranty.  In no event will the authors be held liable for any damages\n  arising from the use of this software.\n\n  Permission is granted to anyone to use this software for any purpose,\n  including commercial applications, and to alter it and redistribute it\n  freely, subject to the following restrictions:\n\n  1. The origin of this software must not be misrepresented; you must not\n     claim that you wrote the original software. If you use this software\n     in a product, an acknowledgment in the product documentation would be\n     appreciated but is not required.\n  2. Altered source versions must be plainly marked as such, and must not be\n     misrepresented as being the original software.\n  3. This notice may not be removed or altered from any source distribution.\n\n******************************************************************\n\nJSON for Modern C++ https://nlohmann.github.io/json/\n\nThe class is licensed under the MIT License:\n\nCopyright (C) 2013-2017 Niels Lohmann\n\nPermission is hereby granted, free of charge, to any person obtaining a copy \nof this software and associated documentation files (the \u201cSoftware\u201d), to deal \nin the Software without restriction, including without limitation the rights \nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell \ncopies of the Software, and to permit persons to whom the Software is \nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all \ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \u201cAS IS\u201d, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR \nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS \nFOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR \nCOPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN \nAN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION \nWITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.\n\n******************************************************************\n\nspdlog: Super fast C++ logging library https://github.com/gabime/spdlog\n\nThe MIT License (MIT)\n\nCopyright (c) 2016 Gabi Melman.                                       \n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in\nall copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN\nTHE SOFTWARE."
+          },
+          {
+            "file": "docs/01_Introduction.md",
+            "origin": "repo",
+            "text": "# A guide to Expansion Hunter software\n\nExpansion Hunter is a tool for targeted genotyping of short tandem repeats and\nflanking variants. It operates by performing a targeted search through a\nBAM/CRAM file for reads that span, flank, and are fully contained in each\nrepeat. Newer versions of the program provide limited support for insertions,\ndeletions, and substitutions.\n\nIn order to use Expansion Hunter you need to (1) download the latest release or\nbuild the program from source, (2) obtain a set of files specifying repeat\nregions of interest, and (3) have a BAM or a CRAM file with alignments of reads\nfrom a PCR-free WGS sample.\n\nThe following sections will help you to get started.\n\n* [Installation](02_Installation.md)\n* [Usage](03_Usage.md)\n* [Input variant catalogs](04_VariantCatalogFiles.md)\n* [Output JSON files](05_OutputJsonFiles.md)\n* [Output VCF files](06_OutputVcfFiles.md)\n"
+          },
+          {
+            "file": "docs/02_Installation.md",
+            "origin": "repo",
+            "text": "# Installation\n\nExpansion Hunter is designed for Linux and macOS operating systems. A compiled\nbinary for the latest release can be downloaded from\n[here](https://github.com/Illumina/ExpansionHunter/releases). If you wish to\nbuild the program from source follow the instructions below.\n\n## Building from source\n\nPrerequisites:\n\n - A recent version of [GCC](https://gcc.gnu.org/) or\n   [clang](http://clang.llvm.org/) compiler supporting the C++11 standard\n - [CMake](https://cmake.org/) version 3.13.0 or above\n - Additional development libraries, which depend on the operating system:\n     - Centos7\n       - `yum install bzip2-devel libcurl-devel libstdc++-static xz-devel zlib-devel`\n     - Ubuntu 20.04\n       - `apt install zlib1g libbz2-dev liblzma-dev libcurl4-openssl-dev`\n     - macOS 10.15\n       - `brew install xz`\n\nIf the above prerequisites are satisfied, you are ready to\nbuild the program. Note that during the build procedure, cmake will\nattempt to download and install `abseil`, `boost`, `googletest`, `htslib`,\nand `spdlog` so an active internet connection is required. Assuming\nthat the source code is contained in a directory `ExpansionHunter/`,\nthe build procedure can be initiated as follows:\n\n```bash\n$ cd ExpansionHunter\n$ mkdir build\n$ cd build\n$ cmake ..\n$ make\n```\n\nIf all the above steps were successful, the ExpansionHunter executable can be found in:\n\n    build/install/bin/ExpansionHunter\n"
+          },
+          {
+            "file": "docs/03_Usage.md",
+            "origin": "repo",
+            "text": "# Usage\n\nExpansion Hunter requires an indexed BAM or a CRAM file containing aligned reads\nfrom a PCR-free WGS sample, a FASTA file with a reference genome assembly (which\nmust be the same as the one used to align the reads), and a [variant catalog\nfile](04_VariantCatalogFiles.md).\n\nExpansion Hunter outputs a VCF file and a JSON file with variant genotypes and\nother useful information along with a BAMlet containing alignments of reads that\noverlap or located in close proximity to each variant. The VCF and JSON files\nare largely equivalent, but the JSON file may be easier to parse\nprogrammatically. Here is a template with the names of the required parameters.\n\n```bash\nExpansionHunter --reads <BAM/CRAM file with aligned reads> \\\n                --reference <FASTA file with reference genome> \\\n                --variant-catalog <JSON file specifying variants to genotype> \\\n                --output-prefix <Prefix for the output files>\n```\n\n## Optional arguments\n\nIn addition to the required program options listed above, there are a number of\noptional arguments.\n\n* `--sex <arg>` Specifies sex of the sample; can be either `male` or `female`\n  (default). This parameter only affects repeats on sex chromosomes.\n\n* `--region-extension-length <int>` Specifies how far from on/off-target regions\n   to search for informative reads. Set to 1000 by default.\n\n* `--analysis-mode <mode>` Specify analysis mode, which can be either `seeking` or\n  `streaming`. The default mode is `seeking`. See further description of analysis\n   modes below.\n\n* `--threads <int>` Specifies how many threads to can be used accelerate analysis\n   of large variant catalogs. Set to 1 by default. Typically seeking mode can\n   benefit from relatively high thread counts, while for streaming mode\n   there is limited benefit beyond about 16 threads.\n\nNote that the full list of program options with brief explanations can be\nobtained by running `ExpansionHunter --help`.\n\n### Analysis modes\n\n#### Seeking mode\n\nIn seeking mode, alignment file indexing is used to seek specific read sets for the\nanalysis of each variant. Seeking mode is recommended for analysis of small catalogs.\nThis mode requires that the input BAM or CRAM file is already sorted and indexed.\n\n#### Streaming mode\n\nIn streaming mode, the alignment file is read in a single pass and all variants are\nanalyzed during this reading operation. Streaming mode is recommended for the analysis\nof large catalogs, but does require more memory as a funciton of catalog size. This mode\ndoes not require that the BAM or CRAM file is sorted or indexed.\n"
+          },
+          {
+            "file": "docs/04_VariantCatalogFiles.md",
+            "origin": "repo",
+            "text": "# Variant catalogs\n\n## Overview\n\nA variant catalog is an essential component of Expansion Hunter's input. It\nspecifies reference coordinates and structure of each locus that the program\nwill analyze. Although the loci usually correspond to repeats, they could also\ncontain other classes of variants such as insertions, deletions, and sequence\nswaps.\n\nThis document describes the format of files that store repeat catalogs. Users\nthat are considering creating new or modifying existing catalog files should\nread this document carefully. Even a minor mistake in locus definition could\nlead to a significant drop in genotyping accuracy.\n\n\n## Variant catalog files\n\nA variant catalog file is a JSON array whose entries specify individual loci\nthat the program will analyze. Here is an example of a catalog consisting of\nthree loci containing repeats.\n\n```json\n[\n{\n    \"LocusId\": \"DMPK\",\n    \"LocusStructure\": \"(CAG)*\",\n    \"ReferenceRegion\": \"19:46273462-46273522\",\n    \"VariantType\": \"Repeat\"\n},\n{\n    \"LocusId\": \"FMR1\",\n    \"LocusStructure\": \"(CGG)*\",\n    \"ReferenceRegion\": \"X:146993568-146993628\",\n    \"VariantType\": \"RareRepeat\",\n    \"OfftargetRegions\": [\n        \"12:7781290-7781350\",\n        \"12:125052154-125052156\",\n        \"16:25703613-25703635\",\n        \"16:28074516-28074518\",\n        \"17:30814024-30814026\",\n        \"17:64298467-64298469\",\n        \"19:2015524-2015526\",\n        \"2:87141540-87141618\",\n        \"2:92230909-92230911\",\n        \"2:211036020-211036032\",\n        \"2:225449878-225449880\",\n        \"20:30865500-30865516\",\n        \"5:443334-443364\",\n        \"7:20824939-20824941\",\n        \"7:100271437-100271439\",\n        \"7:104654597-104654599\",\n        \"7:143059853-143059855\",\n        \"9:100616695-100616697\",\n        \"X:20009036-20009046\"\n    ]\n},\n{\n    \"LocusId\": \"HTT\",\n    \"LocusStructure\": \"(CAG)*CAACAG(CCG)*\",\n    \"ReferenceRegion\": [\"4:3076604-3076660\", \"4:3076666-3076693\"],\n    \"VariantType\": [\"Repeat\", \"Repeat\"]\n}\n]\n```\n\nThe first entry in this catalog specifies a locus containing a single short\ntandem repeat. The identifier of this locus is DMPK (field `LocusId`). The\nregular expression `(CAG)*` means that it is comprised of zero or more\nrepetitions of the CAG repeat unit (field `LocusStructure`). The reference\ncoordinates of this repeat are 19:46273462-46273522 (field  `ReferenceRegion`).\nThe `VariantType` field specifies that it is an ordinary STR meaning that we\nexpect the genome to contain multiple long repeats (whose size is close to\nfragment length and longer) with this repeat unit. For ordinary `Repeat`s\nExpansion Hunter limits the types of reads that are used used to infer the size\nof the repeat. As a result, regular repeats are genotyped up to the fragment\nlength and if a repeat is reported to have a size estimate close to the fragment\nlength then this number should be treated as a lower bound for its true size.\n\nThe second entry is similar to the first. The only difference is that the\nvariant type of the second repeat is set to `RareRepeat`. This means that the\nuser is *confident* that there are no other long (fragment length or longer)\nrepeats with the same repeat unit elsewhere in the genome. This information\npermits the program to use additional read-level evidence to potentially\nestimate the length of the repeat past the fragment length. For \"rare\" repeats,\noff-target regions (field `OfftargetRegions`) specify regions of the genome that\nmay contain misaligned reads.\n\nThe final entry describes a repeat region containing multiple short tandem\nrepeats in close proximity to each other. The regular expression\n`(CAG)*CAACAG(CCG)*` specifies that this region consists of two short tandem\nrepeats with repeat units CAG and CCG separated by the sequence CAACAG.\nFields `ReferenceRegion` and `VariantStatus` contain reference region and status\nof each constituent repeat. By default, the program assigns an identifier to\neach variant consisting of the locus id and reference region. So the two repeats\nreceive ids HTT_4:3076603-3076660 and HTT_4:3076666-3076693 respectively. An\noptional field `VariantId` allows to assign custom variant ids to each\nvariant.\n\nThe following section describes loci-specification records that the catalogs are\ncomprised of.\n\n\n## Structure of a locus-specification record\n\nWhen locus contains a single variant, there is no difference between the\nvariant and the locus containing it. So field names refer to the variant\nitself.\n\n* `LocusId` Unique identifier of the entire locus\n\n* `LocusStructure` Regular expression defining the structure of the locus. When\n  the locus contains multiple variants, ReferenceRegion and VariantStatus are\n  arrays with associated information for each variant in the same order.\n\n* `ReferenceRegion` 0-based half open reference coordinates of the variant\n  formatted as `chrom:start-end`.\n\n* `VariantType` Can be either `Repeat`, `RareRepeat`, or `SmallVariant`\n  with the latter corresponding to insertions deletions or sequence swaps.\n\n* `VariantId` Optional array of unique variant ids. If missing, variant ids\n  are synthesized according to this rule: If there is only one variant in\n  a locus then it gets the same id as the locus itself. If locus contains\n  multiple variants, each one of them gets id of the form `<LocusId>_<ReferenceRegionOfTheVariant>`.\n\n* `OfftargetRegions` Array of regions where informative reads may misalign;\n   only used for variants of type `RareRepeat`.\n\n\n## Using regular expressions to define locus structure\n\nExpansionHunter supports a very limited subset of regular expressions to\ndefine the structure of each locus. These expressions can consist of\nsub-expressions listed in the table bellow, possibly separated by\ninterrupting DNA sequences.\n\n\n| Variant                                            | Regular expression |\n|----------------------------------------------------|--------------------|\n| Short tandem repeat that can occur 0 or more times | (CCG)*             |\n| Short tandem repeat that can occur 1 or more times | (CCG)+             |\n| Single nucleotide variant                          | (C\\|T)             |\n| Sequence swap                                      | (CAGT\\|CGTTG)      |\n| Deletion or insertion\t                             | (CTGGC)\\?          |\n\n\nFor example, a CAG repeat flanked by a CAG/CAT swap\tis defined by expression\n(CAG)+CTGT(CAG|CAT).\n\n\n## A note on creating custom variant catalogs\n\nCreating custom variant catalogs is relatively straightforward for \"common\"\nvariants. Defining \"rare\" variants is much harder because some data analysis is\nrequired to prove that the variant is indeed rare. Users who are looking to\ndefine custom catalogs are encouraged to contact the developers for assistance.\n"
+          },
+          {
+            "file": "docs/05_OutputJsonFiles.md",
+            "origin": "repo",
+            "text": "# JSON files output by Expansion Hunter\n\nJSON files generated by Expansion Hunter contain information about sample\nparameters (`SampleParameters` field) and analysis results summarized by\nlocus (`LocusResults` field). The locus results contain these fields\n * `AlleleCount` The expected number of alleles at the locus\n * `Coverage` Estimated read coverage at the locus\n * `LocusId` Locus identifier\n * `ReadLength` Mean read length at the locus\n * `Variants` Genotypes and other information describing each variant\n   analyzed at the locus\n\nThe structure of records in the `Variant` field  is different for repeats and\nsmall variants (insertions, deletions, and swaps).\n\n## Repeat records\n\nRepeat records contain the following fields.\n* `VariantId` Unique variant identifier\n* `RepeatUnit` Repeat unit in the reference orientation\n* `VariantType` Always set to \"Repeat\"\n* `VariantSubtype` Either \"Repeat\" or \"RareRepeat\"\n* `Genotype` Repeat genotype given by the size of each repeat allele\n* `GenotypeConfidenceInterval` Size confidence interval for each repeat allele\n* `CountsOfSpanningReads` Summary of identified spanning reads given as an\n   array with entries `(n, m)` where `n` is the number of repeat units spanned\n   by the flanking read and `m` is the number of such reads\n* `CountsOfFlankingReads` An analog of `CountsOfSpanningReads` for in-repeat\n  reads\n* `CountsOfInrepeatReads` An analog of `CountsOfSpanningReads` for spanning\n  reads\n* `ReferenceRegion` 0-based half-open reference coordinates of the repeat region\n  (`chrom:start-end`)\n\n## Small variant records\n\nRecords for small variants contain the following fields.\n* `VariantId` Unique variant identifier\n* `VariantType` Always set to \"SmallVariant\"\n* `VariantSubtype` Either \"Insertion\", \"Deletion\", or \"Swap\" \n* `RepeatUnit` Repeat unit in the reference orientation\n* `Genotype` Formed, as usual, from `0`s and `1`s corresponding to ref and alt\n  alleles\n* `CountOfAltReads` Number of reads supporting the alt allele\n* `CountOfRefReads` Number of reads supporting the ref allele\n* `ReferenceRegion` Reference region of the variant\n"
+          },
+          {
+            "file": "docs/06_OutputVcfFiles.md",
+            "origin": "repo",
+            "text": "# VCF files output by Expansion Hunter\n\nExpansion Hunter generates a separate VCF record for each repeat with\ninformation about repeat's location and genotype. The records for non hom-ref\nrepeats are demarcated by `<STRn>` symbolic alleles where `n` is the number of\nrepeat units that the corresponding allele spans.\n\nThe header of the VCF file contains a detailed description of each record.\n\n## Example\n\nThe following VCF entry describes the state of *C9orf72* repeat in a sample with\nname/barcode LP6005616-DNA_A03.\n\n```\n#CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  LP6005616-DNA_A03\nchr9    27573526        .       C       <STR2>,<STR349> .       PASS    SVTYPE=STR;END=27573544;REF=3;RL=18;RU=GGCCCC;REPID=ALS GT:SO:CN:CI:AD_SP:AD_FL:AD_IR   1/2:SPANNING/INREPEAT:2/349:2-2/323-376:19/0:3/6:0/459\n```\n\nThis line tells us that first allele spans 2 repeat units while the second\nallele spans 349 repeat units. The repeat unit is GGCCCC (`RU` INFO field), so\nthe sequence of the first allele is GGCCCCGGCCCC and the sequence of the second\nallele is GGCCCC x 349. The repeat spans three repeat units in the reference\n(`REF` INFO field). The length of the short allele was estimated from spanning\nreads (`SPANNING`) while the length of the expanded allele was estimated from\nin-repeat reads (`INREPEAT`). The confidence interval for the size of the\nexpanded allele is (323,376). There are 19 spanning and 3 flanking reads\nconsistent with the repeat allele of size 2 (that is 19 reads fully contain the\nrepeat of size 2 and 2 flanking reads overlap at most 2 repeat units). Also,\nthere are 6 flanking and 459 in-repeat reads consistent with the repeat allele\nof size 349.\n"
+          }
+        ],
+        "tool_names": [
+          "ExpansionHunter",
+          "expansionhunter",
+          "run",
+          "run.sh"
+        ],
+        "tree_paths": [
+          ".gitattributes",
+          ".gitignore",
+          ".travis.yml",
+          "CMakeLists.txt",
+          "COPYRIGHT.txt",
+          "LICENSE.txt",
+          "README.md",
+          "docs/01_Introduction.md",
+          "docs/02_Installation.md",
+          "docs/03_Usage.md",
+          "docs/04_VariantCatalogFiles.md",
+          "docs/05_OutputJsonFiles.md",
+          "docs/06_OutputVcfFiles.md",
+          "ehunter/.clang-format",
+          "ehunter/CMakeLists.txt",
+          "ehunter/alignment/AlignmentClassifier.cpp",
+          "ehunter/alignment/AlignmentClassifier.hh",
+          "ehunter/alignment/AlignmentFilters.cpp",
+          "ehunter/alignment/AlignmentFilters.hh",
+          "ehunter/alignment/ClassifierOfAlignmentsToVariant.cpp",
+          "ehunter/alignment/ClassifierOfAlignmentsToVariant.hh",
+          "ehunter/alignment/GraphVariantAlignmentStats.cpp",
+          "ehunter/alignment/GraphVariantAlignmentStats.hh",
+          "ehunter/alignment/GreedyAlignmentIntersector.cpp",
+          "ehunter/alignment/GreedyAlignmentIntersector.hh",
+          "ehunter/alignment/HighQualityBaseRunFinder.cpp",
+          "ehunter/alignment/HighQualityBaseRunFinder.hh",
+          "ehunter/alignment/OperationsOnAlignments.cpp",
+          "ehunter/alignment/OperationsOnAlignments.hh",
+          "ehunter/alignment/OrientationPredictor.cpp",
+          "ehunter/alignment/OrientationPredictor.hh",
+          "ehunter/alignment/SoftclippingAligner.cpp",
+          "ehunter/alignment/SoftclippingAligner.hh",
+          "ehunter/app/ExpansionHunter.cpp",
+          "ehunter/app/Version.hh",
+          "ehunter/core/Common.cpp",
+          "ehunter/core/Common.hh",
+          "ehunter/core/ConcurrentQueue.hh",
+          "ehunter/core/CountTable.cpp",
+          "ehunter/core/CountTable.hh",
+          "ehunter/core/GenomicRegion.cpp",
+          "ehunter/core/GenomicRegion.hh",
+          "ehunter/core/HtsHelpers.cpp",
+          "ehunter/core/HtsHelpers.hh",
+          "ehunter/core/LocusStats.cpp",
+          "ehunter/core/LocusStats.hh",
+          "ehunter/core/LogSum.hh",
+          "ehunter/core/Parameters.cpp",
+          "ehunter/core/Parameters.hh",
+          "ehunter/core/Read.cpp",
+          "ehunter/core/Read.hh",
+          "ehunter/core/ReadPairs.cpp",
+          "ehunter/core/ReadPairs.hh",
+          "ehunter/core/ReadSupportCalculator.cpp",
+          "ehunter/core/ReadSupportCalculator.hh",
+          "ehunter/core/Reference.cpp",
+          "ehunter/core/Reference.hh",
+          "ehunter/core/ReferenceContigInfo.cpp",
+          "ehunter/core/ReferenceContigInfo.hh",
+          "ehunter/core/ThreadPool.hh",
+          "ehunter/core/WeightedPurityCalculator.cpp",
+          "ehunter/core/WeightedPurityCalculator.hh",
+          "ehunter/genotyping/AlignMatrix.cpp",
+          "ehunter/genotyping/AlignMatrix.hh",
+          "ehunter/genotyping/AlignMatrixFiltering.cpp",
+          "ehunter/genotyping/AlignMatrixFiltering.hh",
+          "ehunter/genotyping/AlleleChecker.cpp",
+          "ehunter/genotyping/AlleleChecker.hh",
+          "ehunter/genotyping/FragLogliks.cpp",
+          "ehunter/genotyping/FragLogliks.hh",
+          "ehunter/genotyping/OneAlleleStrGenotyper.cpp",
+          "ehunter/genotyping/OneAlleleStrGenotyper.hh",
+          "ehunter/genotyping/RepeatGenotype.cpp",
+          "ehunter/genotyping/RepeatGenotype.hh",
+          "ehunter/genotyping/SmallVariantGenotype.cpp",
+          "ehunter/genotyping/SmallVariantGenotype.hh",
+          "ehunter/genotyping/SmallVariantGenotyper.cpp",
+          "ehunter/genotyping/SmallVariantGenotyper.hh",
+          "ehunter/genotyping/StrAlign.cpp",
+          "ehunter/genotyping/StrAlign.hh",
+          "ehunter/genotyping/StrGenotyper.cpp",
+          "ehunter/genotyping/StrGenotyper.hh",
+          "ehunter/genotyping/TwoAlleleStrGenotyper.cpp",
+          "ehunter/genotyping/TwoAlleleStrGenotyper.hh",
+          "ehunter/io/BamletWriter.cpp",
+          "ehunter/io/BamletWriter.hh",
+          "ehunter/io/CatalogLoading.cpp",
+          "ehunter/io/CatalogLoading.hh",
+          "ehunter/io/GraphBlueprint.cpp",
+          "ehunter/io/GraphBlueprint.hh",
+          "ehunter/io/JsonWriter.cpp",
+          "ehunter/io/JsonWriter.hh",
+          "ehunter/io/LocusSpecDecoding.cpp",
+          "ehunter/io/LocusSpecDecoding.hh",
+          "ehunter/io/ParameterLoading.cpp",
+          "ehunter/io/ParameterLoading.hh",
+          "ehunter/io/RegionGraph.cpp",
+          "ehunter/io/RegionGraph.hh",
+          "ehunter/io/SampleStats.cpp",
+          "ehunter/io/SampleStats.hh",
+          "ehunter/io/VcfHeader.cpp",
+          "ehunter/io/VcfHeader.hh",
+          "ehunter/io/VcfWriter.cpp",
+          "ehunter/io/VcfWriter.hh",
+          "ehunter/io/VcfWriterHelpers.cpp",
+          "ehunter/io/VcfWriterHelpers.hh",
+          "ehunter/locus/CMakeLists.txt",
+          "ehunter/locus/Definitions.hh",
+          "ehunter/locus/IrrPairFinder.cpp",
+          "ehunter/locus/IrrPairFinder.hh",
+          "ehunter/locus/IrrPairFinderTest.cpp",
+          "ehunter/locus/LocusAligner.cpp",
+          "ehunter/locus/LocusAligner.hh",
+          "ehunter/locus/LocusAlignerTest.cpp",
+          "ehunter/locus/LocusAnalyzer.cpp",
+          "ehunter/locus/LocusAnalyzer.hh",
+          "ehunter/locus/LocusAnalyzerTest.cpp",
+          "ehunter/locus/LocusAnalyzerUtil.cpp",
+          "ehunter/locus/LocusAnalyzerUtil.hh",
+          "ehunter/locus/LocusFindings.cpp",
+          "ehunter/locus/LocusFindings.hh",
+          "ehunter/locus/LocusSpecification.cpp",
+          "ehunter/locus/LocusSpecification.hh",
+          "ehunter/locus/RepeatAnalyzer.cpp",
+          "ehunter/locus/RepeatAnalyzer.hh",
+          "ehunter/locus/SmallVariantAnalyzer.cpp",
+          "ehunter/locus/SmallVariantAnalyzer.hh",
+          "ehunter/locus/VariantAnalyzer.cpp",
+          "ehunter/locus/VariantAnalyzer.hh",
+          "ehunter/locus/VariantFindings.cpp",
+          "ehunter/locus/VariantFindings.hh",
+          "ehunter/locus/VariantSpecification.cpp",
+          "ehunter/locus/VariantSpecification.hh",
+          "ehunter/sample/AnalyzerFinder.cpp",
+          "ehunter/sample/AnalyzerFinder.hh",
+          "ehunter/sample/GenomeMask.cpp",
+          "ehunter/sample/GenomeMask.hh",
+          "ehunter/sample/GenomeQueryCollection.cpp",
+          "ehunter/sample/GenomeQueryCollection.hh",
+          "ehunter/sample/HtsFileSeeker.cpp",
+          "ehunter/sample/HtsFileSeeker.hh",
+          "ehunter/sample/HtsFileStreamer.cpp",
+          "ehunter/sample/HtsFileStreamer.hh",
+          "ehunter/sample/HtsSeekingSampleAnalysis.cpp",
+          "ehunter/sample/HtsSeekingSampleAnalysis.hh",
+          "ehunter/sample/HtsStreamingReadPairQueue.cpp",
+          "ehunter/sample/HtsStreamingReadPairQueue.hh",
+          "ehunter/sample/HtsStreamingSampleAnalysis.cpp",
+          "ehunter/sample/HtsStreamingSampleAnalysis.hh",
+          "ehunter/sample/IndexBasedDepthEstimate.cpp",
+          "ehunter/sample/IndexBasedDepthEstimate.hh",
+          "ehunter/sample/MateExtractor.cpp",
+          "ehunter/sample/MateExtractor.hh",
+          "ehunter/tests/AlignMatrixTest.cpp",
+          "ehunter/tests/AlignmentClassifierTest.cpp",
+          "ehunter/tests/AlignmentSummaryTest.cpp",
+          "ehunter/tests/AlleleCheckerTest.cpp",
+          "ehunter/tests/ClassifierOfAlignmentsToVariantTest.cpp",
+          "ehunter/tests/ConcurrentQueueTest.cpp",
+          "ehunter/tests/CountTableTest.cpp",
+          "ehunter/tests/FragLogliksTest.cpp",
+          "ehunter/tests/GenomeMaskTest.cpp",
+          "ehunter/tests/GenomicRegionTest.cpp",
+          "ehunter/tests/GraphAlignmentOperationsTest.cpp",
+          "ehunter/tests/GraphBlueprintTest.cpp",
+          "ehunter/tests/GreedyAlignmentIntersectorTest.cpp",
+          "ehunter/tests/HighQualityBaseRunFinderTest.cpp",
+          "ehunter/tests/LocusStatsTest.cpp",
+          "ehunter/tests/ReadSupportCalculatorTest.cpp",
+          "ehunter/tests/ReadTest.cpp",
+          "ehunter/tests/RegionGraphTest.cpp",
+          "ehunter/tests/RepeatAnalyzerTest.cpp",
+          "ehunter/tests/RepeatGenotypeTest.cpp",
+          "ehunter/tests/SmallVariantGenotyperTest.cpp",
+          "ehunter/tests/SoftclippingAlignerTest.cpp",
+          "ehunter/tests/StrAlignTest.cpp",
+          "ehunter/tests/StrGenotyperTest.cpp",
+          "ehunter/tests/UnitTests.cpp",
+          "ehunter/tests/WeightedPurityCalculatorTest.cpp",
+          "ehunter/tools/README.md",
+          "ehunter/tools/clang-format",
+          "ehunter/tools/updateSourceFormatting.bash",
+          "example/input/reference.fa",
+          "example/input/variants.bam",
+          "example/input/variants.bam.bai",
+          "example/input/variants.json",
+          "example/output/repeats.json",
+          "example/output/repeats.vcf",
+          "example/output/repeats_realigned.bam",
+          "example/run.sh",
+          "tools/README.md",
+          "tools/docker/debug/mallinfo2/Dockerfile",
+          "tools/docker/debug/mallinfo2/README.md",
+          "tools/docker/debug/mallinfo2/setup-docker-image-and-build.bash",
+          "variant_catalog/grch37/variant_catalog.json",
+          "variant_catalog/grch38/variant_catalog.json",
+          "variant_catalog/hg19/variant_catalog.json",
+          "variant_catalog/hg38/variant_catalog.json"
+        ],
+        "tree_truncated": false,
+        "upstream_files": {}
+      },
+      "limitations": [],
+      "caveat_items": [
+        "Environment: STRhub transcribed the documented installation commands unchanged into its own carrier (Ubuntu 22.04, package lists refreshed, apt answering yes, plus minimal build toolchain (build-essential, cmake, git, ca-certificates; no tool-specific libraries)).",
+        "Input: the README documents BAM (line 15); this plan selects STRhub's illumina-bam-hg38 reference data.",
+        "read_path: <BAM/CRAM file with aligned reads> -> /data/in/input.bam.",
+        "reference_path: <FASTA file with reference genome> -> /data/ref/hg38.fa.",
+        "regions_path: <JSON file specifying variants to genotype> -> /data/in/regions.json.",
+        "output_placeholder: <Prefix for the output files> -> sample.",
+        "Run command: the one documented in docs/03_Usage.md (line 15), rewritten to STRhub's mounts; the capture wrapper is planned only if the procedure review passes."
+      ]
+    }
+  },
+  "provenance": {
+    "from_upstream": {
+      "install": {
+        "method": "release_binary",
+        "evidence_source": "docs/02_Installation.md:L19-L35"
+      },
+      "command": {
+        "value": "ExpansionHunter --reads <BAM/CRAM file with aligned reads> --reference <FASTA file with reference genome> --variant-catalog <JSON file specifying variants to genotype> --output-prefix <Prefix for the output files>",
+        "evidence_source": "docs/03_Usage.md:L15"
+      },
+      "input_kind": {
+        "value": "bam",
+        "evidence_source": "docs/03_Usage.md:L15"
+      },
+      "supported_platforms": [
+        {
+          "platform": "illumina",
+          "evidence_source": "README.md:L37"
+        }
+      ],
+      "assembly": {
+        "declared": null,
+        "evidence_source": null
+      },
+      "regions_schema": {
+        "format": "eh_catalog",
+        "evidence_source": "docs/04_VariantCatalogFiles.md:L17-L27"
+      },
+      "output_format": {
+        "glob": "**/*.vcf*",
+        "evidence_source": "docs/01_Introduction.md:L20"
+      }
+    },
+    "derived": {
+      "command_rewrites": [
+        {
+          "role": "read_path",
+          "original": "<BAM/CRAM file with aligned reads>",
+          "replacement": "/data/in/input.bam",
+          "basis": "declared dataset mount"
+        },
+        {
+          "role": "reference_path",
+          "original": "<FASTA file with reference genome>",
+          "replacement": "/data/ref/hg38.fa",
+          "basis": "registered reference genome mount"
+        },
+        {
+          "role": "regions_path",
+          "original": "<JSON file specifying variants to genotype>",
+          "replacement": "/data/in/regions.json",
+          "basis": "registered regions file (eh_catalog)"
+        },
+        {
+          "role": "output_placeholder",
+          "original": "<Prefix for the output files>",
+          "replacement": "sample",
+          "basis": "explicit output-path placeholder"
+        }
+      ],
+      "regions_layout_binding": {
+        "documented_schema": "eh_catalog",
+        "evidence_source": "docs/04_VariantCatalogFiles.md:L17-L27",
+        "strhub_regions_layout": "eh_catalog"
+      },
+      "single_sample_adaptation": null
+    },
+    "harness_choices": {
+      "dataset": {
+        "selected": "illumina-bam-hg38",
+        "reason": "STRhub selected 'illumina-bam-hg38' as compatible with upstream input 'bam' and platform 'illumina'"
+      },
+      "platform": {
+        "selected": "illumina",
+        "basis": "upstream_single_platform",
+        "supported_platforms": [
+          "illumina"
+        ]
+      },
+      "assembly": {
+        "selected": "hg38",
+        "basis": "harness_choice_unstated",
+        "note": "Upstream did not specify an assembly; STRhub supplied an internally coherent hg38 BAM, FASTA and regions set"
+      },
+      "regions_layout": "eh_catalog",
+      "base_environment": {
+        "image": "ubuntu:22.04",
+        "description": "Ubuntu 22.04, package lists refreshed, apt answering yes, plus minimal build toolchain (build-essential, cmake, git, ca-certificates; no tool-specific libraries)",
+        "added_packages": [
+          "build-essential",
+          "cmake",
+          "git",
+          "ca-certificates"
+        ],
+        "miniforge": false,
+        "submodules": false
+      }
+    }
+  },
+  "procedure_validation": {
+    "schema": "strhub-procedure-evidence/1",
+    "valid": true,
+    "reason": "Procedure evidence matches the effective manifest and recomputed decision."
+  },
+  "verdict": {
+    "code": "fails",
+    "title": "Fails",
+    "basis": "gates",
+    "reason": "The environment did not build from the declared install steps.",
+    "readme_gaps": [],
+    "status_code": "FAILED_EXECUTION",
+    "blockers": [
+      {
+        "code": "build_failed",
+        "what": "The environment did not build from the install steps found in the repository.",
+        "ask_owner": {
+          "title": "Build fails from a clean checkout",
+          "body": "STRhub Verified tried to build the tool from a clean checkout at the pinned commit, following the repository's own install steps, and the build failed. The build log is linked from the run."
+        }
+      }
+    ]
+  },
+  "step1": {
+    "code": "does_not_run",
+    "headline": "As documented, it does not run.",
+    "body": "The environment did not build from the declared install steps. That does not mean the tool does not work. It means a third party following the README at this commit did not reach the end. Fix the documentation, or the step that broke, and try the link again on the new commit.",
+    "missing": [],
+    "missing_text": [],
+    "guide": "docs/GUIA-PASO-1.md"
+  },
+  "certificate": {
+    "schema": "strhub-verified/certificate/1",
+    "label": "Does not run as documented: stops at install",
+    "reached": "Available",
+    "stages": [
+      {
+        "key": "available",
+        "label": "Source available",
+        "status": "PASS"
+      },
+      {
+        "key": "installs",
+        "label": "Installation",
+        "status": "FAIL"
+      },
+      {
+        "key": "runs",
+        "label": "End-to-end execution",
+        "status": "NOT ATTEMPTED"
+      },
+      {
+        "key": "output",
+        "label": "Output generated",
+        "status": "NOT ATTEMPTED"
+      }
+    ],
+    "summary": {
+      "purpose": "Evaluate whether the tool installs, runs end-to-end, and produces structurally valid output.",
+      "result": "Does not run as documented: stops at install",
+      "reached": "Available, 1/5 gates passed",
+      "why": "The environment did not build from the declared install steps.",
+      "scope": "Installation, execution, and output structure evaluation.",
+      "not_evaluated": [
+        "Genotype accuracy",
+        "Concordance",
+        "Forensic validity",
+        "Regulatory compliance"
+      ]
+    },
+    "conclusion": [
+      {
+        "title": "Does not install",
+        "body": "The environment for ExpansionHunter v5.0.0 could not be built from the declared install steps, so nothing further was attempted."
+      },
+      {
+        "title": "No output produced",
+        "body": "No file in the declared format was written, so nothing could be checked for structure or content. This says the run did not get that far; it is not a finding about the quality of the software."
+      },
+      {
+        "title": "Verdict: Fails",
+        "body": "The environment did not build from the declared install steps."
+      },
+      {
+        "title": "Repository test data not used",
+        "body": "The repository ships example data (4 file(s)), which was not used. STRhub Verified selected Illumina BAM (hg38), NA12878 (autosomal, female) as the reference dataset, but it was not processed because the installation did not complete."
+      },
+      {
+        "title": "Repeatability of this build attempt",
+        "body": "The pinned commit, declared base environment, executed installation commands, carrier Dockerfile, and CI build log recorded in this report document the build attempt. Because base image and system package versions are not pinned by the commands, exact long-term reproduction is not guaranteed; the documented analysis command was not executed."
+      }
+    ],
+    "out_of_scope": [
+      "Genotype correctness or accuracy",
+      "Concordance against known truth sets",
+      "Sensitivity, specificity, or stutter performance",
+      "Allele calling accuracy or forensic casework suitability",
+      "Regulatory compliance or ISO accreditation",
+      "Multi-laboratory or multi-dataset reproducibility"
+    ],
+    "limitations": [
+      "Single reference dataset per input type",
+      "Single containerized environment (Docker / ubuntu-22.04)",
+      "No truth-set comparison or ground-truth genotypes",
+      "No accuracy or concordance assessment",
+      "No forensic or clinical validation of results",
+      "No sequencing data were processed because execution did not complete"
+    ],
+    "scope": {
+      "statement": "Independent automated evaluation of reproducible execution. It checks whether the tool installs, runs end-to-end, and produces structurally valid output in a standardized environment.",
+      "not": "This is not an analytical validation. Genotype accuracy, concordance, forensic suitability, and regulatory compliance are out of scope.",
+      "disclaimer": "Each result is a dated snapshot, verified on the tool's public repository at a pinned commit. STRhub does not store tool source code."
+    }
+  }
+}

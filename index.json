@@ -1,8 +1,52 @@
 {
   "schema": "strhub-verified/index/3",
-  "generated": "2026-11-22T19:12:17+00:00",
-  "count": 2,
+  "generated": "2026-11-22T19:12:28+00:00",
+  "count": 3,
   "tools": [
+    {
+      "slug": "expansionhunter",
+      "name": "ExpansionHunter",
+      "version": "v5.0.0",
+      "variant": null,
+      "sha": "9f5db1d4ab72016b2d93330b9792842d71582622",
+      "committed": "2021-08-20T00:22:50Z",
+      "instrument": "documented",
+      "level": "available",
+      "label": "Does not run as documented: stops at install",
+      "verdict": "fails",
+      "errors_reported": false,
+      "generated": "2026-11-22T19:12:10+00:00",
+      "source_repo": "https://github.com/Illumina/ExpansionHunter",
+      "source_ref": "9f5db1d4ab72016b2d93330b9792842d71582622",
+      "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/45059275700",
+      "distinct_str_loci": null,
+      "distinct_snp_markers": null,
+      "total_reads": null,
+      "external_state": "fail",
+      "dataset_types": [
+        "illumina-bam-hg38"
+      ],
+      "report": "expansionhunter.json",
+      "page": "expansionhunter.html",
+      "versions": [
+        {
+          "sha": "9f5db1d4ab72016b2d93330b9792842d71582622",
+          "instrument": "documented",
+          "version": "v5.0.0",
+          "variant": null,
+          "committed": "2021-08-20T00:22:50Z",
+          "generated": "2026-11-22T19:12:10+00:00",
+          "level": "available",
+          "label": "Does not run as documented: stops at install",
+          "verdict": "fails",
+          "errors_reported": false,
+          "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/45059275700",
+          "report": "expansionhunter/9f5db1d4ab72016b2d93330b9792842d71582622/expansionhunter.json",
+          "page": "expansionhunter/9f5db1d4ab72016b2d93330b9792842d71582622/expansionhunter.html",
+          "pdf": "expansionhunter/9f5db1d4ab72016b2d93330b9792842d71582622/expansionhunter.pdf"
+        }
+      ]
+    },
     {
       "slug": "expansionhunterdenovo",
       "name": "ExpansionHunterDenovo",
