@@ -23,7 +23,7 @@
     "source": "prepared"
   },
   "generated": "2026-11-22T19:40:48+00:00",
-  "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/44934862541",
+  "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/44405857190",
   "run": {
     "cmd": "bash src/STRspy_Normal_v2.0_Args.sh -i /data/in/input.bam -r yes -t ont -f db-v2/STRspy2.0-DB-fixed -b db-v2/STRspy2.0-DB-fixed -l db-v2/STRspy_v2.DB.sort.bed -k 0.4 -o Results -c config/UserToolsConfig.txt -d 4",
     "cwd": ".",
