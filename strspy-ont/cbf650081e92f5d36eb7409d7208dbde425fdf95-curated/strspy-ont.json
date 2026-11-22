@@ -22,7 +22,7 @@
     ],
     "source": "prepared"
   },
-  "generated": "2026-11-22T19:40:48+00:00",
+  "generated": "2026-11-22T20:08:53+00:00",
   "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/44405857190",
   "run": {
     "cmd": "bash src/STRspy_Normal_v2.0_Args.sh -i /data/in/input.bam -r yes -t ont -f db-v2/STRspy2.0-DB-fixed -b db-v2/STRspy2.0-DB-fixed -l db-v2/STRspy_v2.DB.sort.bed -k 0.4 -o Results -c config/UserToolsConfig.txt -d 4",
@@ -1449,7 +1449,7 @@
     "code": "fails",
     "title": "Fails in manual verification",
     "basis": "gates",
-    "reason": "Even after preparing the Conda environment manually, the unmodified upstream STRspy script fails to run: the unpinned Conda environment pulls a broken OpenSSL 1.0 samtools build, and src/STRspy_Normal_v2.0_Args.sh fails on single-file -i BAM inputs or when the -o output directory does not already exist (requiring code changes to run).",
+    "reason": "Unmodified upstream STRspy fails in manual verification (2/5 gates, stops at Runs) due to bugs in the repository's code and environment definition: src/STRspy_Normal_v2.0_Args.sh rejects single-file -i input (`illegal option -- i`, expecting an input folder via -s), exits when the -o output directory does not already exist (`#Output directory does not exist !!`), and the unpinned Conda environment resolves a broken OpenSSL 1.0 samtools build.",
     "readme_gaps": []
   },
   "step1": null,
@@ -1459,7 +1459,7 @@
     "reached": "Runs + Plausible output",
     "summary": {
       "purpose": "Verify that the tool installs, runs end-to-end, and produces structurally valid output.",
-      "result": "Manual verification confirmed that unmodified upstream code fails after environment preparation (2/5 gates: stops at Runs). A separate reproducibility fork with 3 code fixes is documented inside the report.",
+      "result": "Unmodified upstream STRspy fails in manual verification (2/5 gates, stops at Runs) due to bugs in the repository's code and environment definition: src/STRspy_Normal_v2.0_Args.sh rejects single-file -i input (`illegal option -- i`, expecting an input folder via -s), exits when the -o output directory does not already exist (`#Output directory does not exist !!`), and the unpinned Conda environment resolves a broken OpenSSL 1.0 samtools build.",
       "reached": "Installs (stops at Runs on unmodified upstream code)",
       "why": "The tool installed and its run produced its documented output.",
       "scope": "Installation, execution, and output structure verification.",
@@ -1543,7 +1543,7 @@
       }
     ],
     "fork_url": "https://github.com/Tfronta/strspy",
-    "fork_note": "Con 3 modificaciones de c\u00f3digo en el fork reproducible (Tfronta/strspy, commit 14d5494) y el entorno Conda fijado (python>=3.9, samtools>=1.12), la ejecuci\u00f3n en CI (run 44934862541) complet\u00f3 5/5 compuertas y gener\u00f3 22 loci STR forenses sobre 1000 Genomes ONT hg38. Esto no aprueba el commit oficial upstream."
+    "fork_note": "After applying 3 targeted code fixes in the STRhub reproducibility fork (Tfronta/strspy, commit 14d5494) and pinning python>=3.9 and samtools>=1.12, CI run 44934862541 completed all 5/5 gates and produced 22 forensic STR loci on 1000 Genomes ONT hg38. Because code modifications were required, the official upstream commit remains marked as Manual \u00b7 Fails."
   },
   "recommendations": [
     "Publish a tagged GitHub release for STRspy v2.0 so users and automated evaluators resolve the maintained version by default instead of v1.1.1 (2021).",
