@@ -1,7 +1,7 @@
 {
   "schema": "strhub-verified/index/3",
-  "generated": "2026-11-22T19:14:01+00:00",
-  "count": 7,
+  "generated": "2026-11-22T19:14:14+00:00",
+  "count": 8,
   "tools": [
     {
       "slug": "expansionhunter",
@@ -174,6 +174,48 @@
           "report": "straitrazor/b618e9345ab40f348b504083ae8de2b39abb60fa/straitrazor.json",
           "page": "straitrazor/b618e9345ab40f348b504083ae8de2b39abb60fa/straitrazor.html",
           "pdf": "straitrazor/b618e9345ab40f348b504083ae8de2b39abb60fa/straitrazor.pdf"
+        }
+      ]
+    },
+    {
+      "slug": "strique",
+      "name": "STRique",
+      "version": "v0.4.2",
+      "variant": null,
+      "sha": "ade4589ecb2bf6672c839e31b80b7cc0c0d7b084",
+      "committed": "2019-12-16T14:13:15Z",
+      "instrument": "documented",
+      "level": "available",
+      "label": "Could not be determined",
+      "verdict": "undetermined",
+      "errors_reported": false,
+      "generated": "2026-11-22T19:13:55+00:00",
+      "source_repo": "https://github.com/giesselmann/STRique",
+      "source_ref": "ade4589ecb2bf6672c839e31b80b7cc0c0d7b084",
+      "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/45059500100",
+      "distinct_str_loci": null,
+      "distinct_snp_markers": null,
+      "total_reads": null,
+      "external_state": "na",
+      "dataset_types": [],
+      "report": "strique.json",
+      "page": "strique.html",
+      "versions": [
+        {
+          "sha": "ade4589ecb2bf6672c839e31b80b7cc0c0d7b084",
+          "instrument": "documented",
+          "version": "v0.4.2",
+          "variant": null,
+          "committed": "2019-12-16T14:13:15Z",
+          "generated": "2026-11-22T19:13:55+00:00",
+          "level": "available",
+          "label": "Could not be determined",
+          "verdict": "undetermined",
+          "errors_reported": false,
+          "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/45059500100",
+          "report": "strique/ade4589ecb2bf6672c839e31b80b7cc0c0d7b084/strique.json",
+          "page": "strique/ade4589ecb2bf6672c839e31b80b7cc0c0d7b084/strique.html",
+          "pdf": "strique/ade4589ecb2bf6672c839e31b80b7cc0c0d7b084/strique.pdf"
         }
       ]
     },

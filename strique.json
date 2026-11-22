@@ -1,0 +1,1046 @@
+{
+  "schema": "strhub-verified/1",
+  "mode": "publish",
+  "tool": {
+    "name": "STRique",
+    "version": "v0.4.2",
+    "contact": "https://github.com/giesselmann/STRique/issues"
+  },
+  "submission": {
+    "by": "third_party"
+  },
+  "source": {
+    "repo": "https://github.com/giesselmann/STRique",
+    "ref": "ade4589ecb2bf6672c839e31b80b7cc0c0d7b084",
+    "ref_resolved": "ade4589ecb2bf6672c839e31b80b7cc0c0d7b084",
+    "committed": "2019-12-16T14:13:15Z"
+  },
+  "environment": {
+    "dockerfile": "Dockerfile",
+    "os": [
+      "ubuntu-22.04"
+    ],
+    "source": "generated"
+  },
+  "generated": "2026-11-22T19:13:55+00:00",
+  "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/45059500100",
+  "run": {
+    "cmd": "cat /host/my_data.hg19.sam | python3 scripts/STRique.py count /host/my_data/reads.fofn models/r9_4_450bps.model configs/repeat_config.tsv > /host/my_data.hg19.strique.tsv",
+    "cwd": ".",
+    "effective_cmd": "cd '.' && touch /tmp/.strhub_mark && ( cat /host/my_data.hg19.sam | python3 scripts/STRique.py count /host/my_data/reads.fofn models/r9_4_450bps.model configs/repeat_config.tsv > /host/my_data.hg19.strique.tsv ); rc=$?; find . -xdev -type f -newer /tmp/.strhub_mark -size +0 ! -path './.git/*' ! -path './proc/*' ! -path './sys/*' ! -path './dev/*' ! -path './data/*' ! -path '*/__pycache__/*' ! -name '*.pyc' ! -name '*.pyo' 2>/dev/null | head -500 | while IFS= read -r f; do mkdir -p \"/data/out/$(dirname \"$f\")\" && cp \"$f\" \"/data/out/$f\"; done; exit $rc",
+    "step_outcome": "skipped"
+  },
+  "instrument": "documented",
+  "recipe": {
+    "origin": "proposed"
+  },
+  "gates": {
+    "available": true,
+    "installs": false,
+    "runs": false,
+    "io": false,
+    "content": false
+  },
+  "input_contract": {},
+  "level": "available",
+  "io_detail": {},
+  "content_detail": {},
+  "example_detail": null,
+  "datasets": [
+    {
+      "leg": "external",
+      "label": "External data",
+      "available": false,
+      "type": null,
+      "dataset": null,
+      "io": false,
+      "content": false,
+      "passed": false
+    },
+    {
+      "leg": "example",
+      "label": "Tool's own example",
+      "available": false,
+      "io": false,
+      "content": null,
+      "passed": false,
+      "matches_expected": null,
+      "produced_count": null
+    }
+  ],
+  "scope": "Assessment of documented execution in the stated environment and output format. Concerns reproducible execution only; no claim of accuracy, casework fitness, or regulatory validation.",
+  "upstream": {
+    "checked": "2026-11-22T19:13:56+00:00",
+    "repo_exists": true,
+    "ref_exists": true,
+    "default_branch": "master",
+    "status": "ahead",
+    "behind_by": 12
+  },
+  "evidence": [
+    {
+      "claim": "install_method",
+      "kind": "tree",
+      "path": "Dockerfile",
+      "text": "dockerfile",
+      "url": "https://github.com/giesselmann/STRique/blob/ade4589ecb2bf6672c839e31b80b7cc0c0d7b084/Dockerfile"
+    },
+    {
+      "claim": "fallback_environment",
+      "kind": "readme",
+      "path": "README.md",
+      "line": 4,
+      "text": "[![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/giesselmann/strique.svg)](https://hub.docker.com/r/giesselmann/strique/)",
+      "url": "https://github.com/giesselmann/STRique/blob/ade4589ecb2bf6672c839e31b80b7cc0c0d7b084/README.md#L4"
+    },
+    {
+      "claim": "run_command",
+      "kind": "doc",
+      "path": "docs/examples/intro.md",
+      "line": 86,
+      "text": "cat /host/my_data.hg19.sam | python3 scripts/STRique.py count \\",
+      "url": "https://github.com/giesselmann/STRique/blob/ade4589ecb2bf6672c839e31b80b7cc0c0d7b084/docs/examples/intro.md#L86"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "data/c9orf72.fa",
+      "text": "fasta",
+      "url": "https://github.com/giesselmann/STRique/blob/ade4589ecb2bf6672c839e31b80b7cc0c0d7b084/data/c9orf72.fa"
+    }
+  ],
+  "repo_test_data": {
+    "known": true,
+    "present": true,
+    "count": 1,
+    "examples": [
+      "data/c9orf72.fa"
+    ]
+  },
+  "caveats": {
+    "source": "detect_recipe",
+    "items": [
+      "Environment: no proven installation profile; STRhub did not manufacture installation steps. STRhub does not build a Dockerfile shipped in a repository.",
+      "Run command: the one documented in docs/examples/intro.md (line 86), rewritten to STRhub's mounts; the capture wrapper is planned only if the procedure review passes.",
+      "Documentation mentions hg19/GRCh37 only; STRhub reference BAMs are hg38"
+    ]
+  },
+  "install_detail": {
+    "passed": false,
+    "diagnostics": [],
+    "faults": []
+  },
+  "procedure_review": {
+    "may_say_runs": false,
+    "status_code": "UNVERIFIED_INSUFFICIENT_DOCS",
+    "basis": "recipe",
+    "attribution": "strhub",
+    "blocker": "missing_input",
+    "reason": "STRhub holds no reference sample of the kind this procedure reads, and the repository ships no example to run, so nothing was executed.",
+    "amendments": [
+      {
+        "code": "install_profile_unsupported",
+        "what": "The repository ships a .dockerignore, which would change what the evaluator's carrier copies. A Dockerfile shipped in the repository is not built."
+      },
+      {
+        "code": "input_not_substituted",
+        "what": "The command still names the repository's own file paths, not STRhub's sample. Running it would not be the reference-sample test."
+      }
+    ],
+    "inferences": {
+      "install": {
+        "evidence_source": "repo_file:Dockerfile",
+        "verified": false
+      },
+      "run_command": {
+        "evidence_source": "docs/examples/intro.md:L86",
+        "verified": true,
+        "kind": "doc",
+        "path": "docs/examples/intro.md",
+        "document_sha256": "798f16e5d5305e2ed9a7fc7a5a894eacdf17b4d17b5f8b5929b234287daee164"
+      },
+      "output": {
+        "verified": true,
+        "kind": "doc",
+        "path": "docs/examples/intro.md",
+        "line": 86,
+        "end_line": 86,
+        "document_sha256": "798f16e5d5305e2ed9a7fc7a5a894eacdf17b4d17b5f8b5929b234287daee164",
+        "evidence_source": "docs/examples/intro.md:L86"
+      }
+    },
+    "unbacked_inferences": [
+      "install"
+    ],
+    "provenance": {
+      "from_upstream": {
+        "install": {
+          "method": "dockerfile",
+          "evidence_source": "repo_file:Dockerfile"
+        },
+        "command": {
+          "value": "cat /host/my_data.hg19.sam | python3 scripts/STRique.py count /host/my_data/reads.fofn models/r9_4_450bps.model configs/repeat_config.tsv > /host/my_data.hg19.strique.tsv",
+          "evidence_source": "docs/examples/intro.md:L86"
+        },
+        "input_kind": null,
+        "supported_platforms": [
+          {
+            "platform": "ont",
+            "evidence_source": "README.md:L9"
+          }
+        ],
+        "assembly": {
+          "declared": "hg19_only",
+          "evidence_source": "docs/examples/intro.md:L42"
+        },
+        "regions_schema": null,
+        "output_format": {
+          "glob": "**/*.t[sx][vt]",
+          "evidence_source": "docs/examples/intro.md:L86"
+        }
+      },
+      "derived": {
+        "command_rewrites": [],
+        "regions_layout_binding": null,
+        "single_sample_adaptation": null
+      },
+      "harness_choices": {
+        "dataset": null,
+        "platform": {
+          "selected": "ont",
+          "basis": "counted_unproven",
+          "supported_platforms": [
+            "ont"
+          ]
+        },
+        "assembly": {
+          "selected": null,
+          "basis": "incompatible",
+          "note": null
+        },
+        "regions_layout": null,
+        "base_environment": null
+      }
+    },
+    "install_method": "dockerfile",
+    "citable_install": false,
+    "input_type": null,
+    "output_glob": "**/*.t[sx][vt]",
+    "profile": "strhub-upstream-procedure/1",
+    "install_ready": false,
+    "example_ready": false,
+    "installation": {
+      "profile": "strhub-upstream-procedure/1",
+      "ready": false,
+      "method": "dockerfile",
+      "reason": "The repository ships a .dockerignore, which would change what the evaluator's carrier copies. A Dockerfile shipped in the repository is not built.",
+      "gap": "strhub"
+    },
+    "command_review": {
+      "profile": "strhub-upstream-procedure/1",
+      "cited": "cat /host/my_data.hg19.sam | python3 scripts/STRique.py count /host/my_data/reads.fofn models/r9_4_450bps.model configs/repeat_config.tsv > /host/my_data.hg19.strique.tsv",
+      "command": "cat /host/my_data.hg19.sam | python3 scripts/STRique.py count /host/my_data/reads.fofn models/r9_4_450bps.model configs/repeat_config.tsv > /host/my_data.hg19.strique.tsv",
+      "substitutions": [],
+      "read_bindings": [],
+      "limitations": [],
+      "expected": "cat /host/my_data.hg19.sam | python3 scripts/STRique.py count /host/my_data/reads.fofn models/r9_4_450bps.model configs/repeat_config.tsv > /host/my_data.hg19.strique.tsv",
+      "executed": "cat /host/my_data.hg19.sam | python3 scripts/STRique.py count /host/my_data/reads.fofn models/r9_4_450bps.model configs/repeat_config.tsv > /host/my_data.hg19.strique.tsv",
+      "cited_sha256": "a2f3870b4beaf30ef8eee84221c4eed47ad5199ec12d2aeb0039085de1581725",
+      "executed_sha256": "a2f3870b4beaf30ef8eee84221c4eed47ad5199ec12d2aeb0039085de1581725",
+      "citations": [
+        {
+          "repo": "https://github.com/giesselmann/STRique",
+          "ref": "ade4589ecb2bf6672c839e31b80b7cc0c0d7b084",
+          "path": "docs/examples/intro.md",
+          "line": 86,
+          "verified": true,
+          "document_sha256": "798f16e5d5305e2ed9a7fc7a5a894eacdf17b4d17b5f8b5929b234287daee164",
+          "command_sha256": "a2f3870b4beaf30ef8eee84221c4eed47ad5199ec12d2aeb0039085de1581725"
+        }
+      ]
+    },
+    "manifest_sha256": "bd15a473ed7cfe25e9e3c706b5717651cf6a4e29ceea8ecf60ea749589ce4ffe",
+    "evidence_sha256": "c7206987d9b1db0be6d0b56220761cc0dc612c8a95d6744c58db5e13b9b5f834",
+    "evidence": {
+      "schema": "strhub-procedure-evidence/1",
+      "manifest": {
+        "caveats": {
+          "items": [
+            "Environment: no proven installation profile; STRhub did not manufacture installation steps. STRhub does not build a Dockerfile shipped in a repository.",
+            "Run command: the one documented in docs/examples/intro.md (line 86), rewritten to STRhub's mounts; the capture wrapper is planned only if the procedure review passes.",
+            "Documentation mentions hg19/GRCh37 only; STRhub reference BAMs are hg38"
+          ],
+          "source": "detect_recipe"
+        },
+        "environment": {
+          "dockerfile": "Dockerfile",
+          "os": [
+            "ubuntu-22.04"
+          ],
+          "source": "generated"
+        },
+        "inputs": {},
+        "outputs": [
+          {
+            "format": "tsv",
+            "min_records": 1,
+            "path": "**/*.t[sx][vt]"
+          }
+        ],
+        "recipe": {
+          "origin": "proposed"
+        },
+        "report": {
+          "slug": "strique"
+        },
+        "run": {
+          "cmd": "cd '.' && touch /tmp/.strhub_mark && ( cat /host/my_data.hg19.sam | python3 scripts/STRique.py count /host/my_data/reads.fofn models/r9_4_450bps.model configs/repeat_config.tsv > /host/my_data.hg19.strique.tsv ); rc=$?; find . -xdev -type f -newer /tmp/.strhub_mark -size +0 ! -path './.git/*' ! -path './proc/*' ! -path './sys/*' ! -path './dev/*' ! -path './data/*' ! -path '*/__pycache__/*' ! -name '*.pyc' ! -name '*.pyo' 2>/dev/null | head -500 | while IFS= read -r f; do mkdir -p \"/data/out/$(dirname \"$f\")\" && cp \"$f\" \"/data/out/$f\"; done; exit $rc",
+          "timeout_minutes": 20
+        },
+        "source": {
+          "ref": "ade4589ecb2bf6672c839e31b80b7cc0c0d7b084",
+          "repo": "https://github.com/giesselmann/STRique"
+        },
+        "submission": {
+          "by": "third_party"
+        },
+        "tool": {
+          "contact": "https://github.com/giesselmann/STRique/issues",
+          "name": "STRique",
+          "version": "v0.4.2"
+        }
+      },
+      "proposal": {
+        "build": {
+          "also_published": {
+            "file": null,
+            "image": "giesselmann/strique",
+            "method": "docker_image",
+            "readme_line": 4
+          },
+          "asset": null,
+          "candidates": [
+            {
+              "file": "Dockerfile",
+              "method": "dockerfile"
+            },
+            {
+              "file": "setup.py",
+              "method": "pip"
+            },
+            {
+              "file": "requirements.txt",
+              "method": "pip"
+            },
+            {
+              "file": "CMakeLists.txt",
+              "method": "cmake"
+            },
+            {
+              "file": null,
+              "image": "giesselmann/strique",
+              "method": "docker_image",
+              "readme_line": 4
+            }
+          ],
+          "digest": null,
+          "dir": null,
+          "evidence_source": "repo_file:Dockerfile",
+          "file": "Dockerfile",
+          "image": null,
+          "method": "dockerfile",
+          "package": null,
+          "readme_install_lines": [],
+          "readme_line": null,
+          "spec_list": false,
+          "ssh_urls_in": [],
+          "tag": null,
+          "then": [],
+          "url": null
+        },
+        "commands": [
+          {
+            "cmd": "cat /host/my_data.hg19.sam | python3 scripts/STRique.py count /host/my_data/reads.fofn models/r9_4_450bps.model configs/repeat_config.tsv > /host/my_data.hg19.strique.tsv",
+            "entry_point": false,
+            "evidence_source": "docs/examples/intro.md:L86",
+            "file": "docs/examples/intro.md",
+            "has_input_flag": true,
+            "has_output_flag": true,
+            "help_only": false,
+            "invokes": "STRique.py",
+            "line": 86,
+            "main_verb": true,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": true,
+            "rst": false,
+            "source_rank": 1,
+            "subcommand": "count",
+            "synopsis": false
+          },
+          {
+            "cmd": "cat ~/my_data.hg19.sam | python3 ~/src/STRique/scripts/STRique.py count ~/my_data/reads.fofn ~/src/STRique/models/r9_4_450bps.model ~/src/STRique/configs/repeat_config.tsv ~/my_data.hg19.strique.tsv",
+            "entry_point": false,
+            "evidence_source": "docs/examples/intro.md:L75",
+            "file": "docs/examples/intro.md",
+            "has_input_flag": true,
+            "has_output_flag": false,
+            "help_only": false,
+            "invokes": "STRique.py",
+            "line": 75,
+            "main_verb": true,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": true,
+            "rst": false,
+            "source_rank": 1,
+            "subcommand": "count",
+            "synopsis": false
+          },
+          {
+            "cmd": "cat data/c9orf72.sam | python3 scripts/STRique.py count ./data/reads.fofn ./models/r9_4_450bps.model ./configs/repeat_config.tsv --config ./configs/STRique.json",
+            "entry_point": false,
+            "evidence_source": "docs/installation/test.md:L9",
+            "file": "docs/installation/test.md",
+            "has_input_flag": true,
+            "has_output_flag": false,
+            "help_only": false,
+            "invokes": "STRique.py",
+            "line": 9,
+            "main_verb": true,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": true,
+            "rst": false,
+            "source_rank": 5,
+            "subcommand": "count",
+            "synopsis": false
+          },
+          {
+            "cmd": "python3 scripts/STRique.py count [OPTIONS] f5Index model repeat",
+            "entry_point": false,
+            "evidence_source": "docs/examples/intro.md:L56",
+            "file": "docs/examples/intro.md",
+            "has_input_flag": false,
+            "has_output_flag": false,
+            "help_only": false,
+            "invokes": "STRique.py",
+            "line": 56,
+            "main_verb": true,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 1,
+            "subcommand": "count",
+            "synopsis": false
+          },
+          {
+            "cmd": "python3 ~/src/STRique/scripts/STRique.py index --recursive ~/my_data > ~/my_data/reads.fofn",
+            "entry_point": false,
+            "evidence_source": "docs/examples/intro.md:L23",
+            "file": "docs/examples/intro.md",
+            "has_input_flag": true,
+            "has_output_flag": true,
+            "help_only": false,
+            "invokes": "STRique.py",
+            "line": 23,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 1,
+            "subcommand": "index",
+            "synopsis": false
+          },
+          {
+            "cmd": "python3 scripts/STRique.py index data/ > data/reads.fofn",
+            "entry_point": false,
+            "evidence_source": "docs/installation/test.md:L8",
+            "file": "docs/installation/test.md",
+            "has_input_flag": true,
+            "has_output_flag": true,
+            "help_only": false,
+            "invokes": "STRique.py",
+            "line": 8,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 5,
+            "subcommand": "index",
+            "synopsis": false
+          },
+          {
+            "cmd": "python3 scripts/STRique.py index [OPTIONS] input",
+            "entry_point": false,
+            "evidence_source": "docs/examples/intro.md:L8",
+            "file": "docs/examples/intro.md",
+            "has_input_flag": true,
+            "has_output_flag": false,
+            "help_only": false,
+            "invokes": "STRique.py",
+            "line": 8,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 1,
+            "subcommand": "index",
+            "synopsis": false
+          },
+          {
+            "cmd": "python3 ~/src/STRique/scripts/STRique.py index --recursive --out_prefix my_sample ~/my_data/my_sample > ~/my_data/my_sample.fofn",
+            "entry_point": false,
+            "evidence_source": "docs/examples/intro.md:L30",
+            "file": "docs/examples/intro.md",
+            "has_input_flag": false,
+            "has_output_flag": true,
+            "help_only": false,
+            "invokes": "STRique.py",
+            "line": 30,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 1,
+            "subcommand": "index",
+            "synopsis": false
+          },
+          {
+            "cmd": "cat ~/my_data.hg19.strique.tsv | python3 ~/src/STRique/scripts/STRique.py plot ~/my_data/reads.fofn",
+            "entry_point": false,
+            "evidence_source": "docs/examples/intro.md:L140",
+            "file": "docs/examples/intro.md",
+            "has_input_flag": true,
+            "has_output_flag": false,
+            "help_only": true,
+            "invokes": "STRique.py",
+            "line": 140,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": true,
+            "rst": false,
+            "source_rank": 1,
+            "subcommand": "plot",
+            "synopsis": false
+          },
+          {
+            "cmd": "python3 scripts/STRique.py plot [OPTIONS] f5Index",
+            "entry_point": false,
+            "evidence_source": "docs/examples/intro.md:L118",
+            "file": "docs/examples/intro.md",
+            "has_input_flag": false,
+            "has_output_flag": false,
+            "help_only": true,
+            "invokes": "STRique.py",
+            "line": 118,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 1,
+            "subcommand": "plot",
+            "synopsis": false
+          }
+        ],
+        "dockerfile": null,
+        "docs_read": [
+          {
+            "origin": "repo",
+            "path": "docs/examples/intro.md"
+          },
+          {
+            "origin": "repo",
+            "path": "docs/installation/docker.md"
+          },
+          {
+            "origin": "repo",
+            "path": "docs/installation/prerequisites.md"
+          },
+          {
+            "origin": "repo",
+            "path": "docs/installation/src.md"
+          },
+          {
+            "origin": "repo",
+            "path": "docs/installation/test.md"
+          },
+          {
+            "origin": "repo",
+            "path": "docs/citation.md"
+          },
+          {
+            "origin": "repo",
+            "path": "docs/index.md"
+          }
+        ],
+        "docs_text": "# Usage\n\n## Preparation\n\nSTRique works on raw nanopore read data in either single or bulk fast5 format. Batches of single reads in tar archives work as well. Before starting the repeat detection the raw data folder must be indexed to enable extraction of single reads. The index file contains relative paths to the reads and must be saved in the indexed directory.\n\n```\npython3 scripts/STRique.py index [OPTIONS] input\n\npositional arguments:\n  input                 \tInput batch or directory of batches\n\noptional arguments:\n  --recursive           \tRecursively scan input\n  --out_prefix OUT_PREFIX\tPrefix for file paths in output\n  --tmp_prefix TMP_PREFIX\tPrefix for temporary data\n```\n\n\nThe command to recursively index the raw data archive could look similar to the following. Indexing is only required once after the sequencing is completed.\n\n```\npython3 ~/src/STRique/scripts/STRique.py index \\\n--recursive ~/my_data > ~/my_data/reads.fofn\n```\n\nThe index file *reads.fofn* contains relative paths to the raw files and **must** therefore be saved in the right location. You can configure an *--out_prefix* to be prepended to each entry in the index. This is useful to index sub-directories while storing indices at a central location e.g.:\n\n```\npython3 ~/src/STRique/scripts/STRique.py index \\\n--recursive --out_prefix my_sample ~/my_data/my_sample > ~/my_data/my_sample.fofn\n```\n\n## Configuration\n\nTargeted repeats are configured in a tab-separated (.tsv) file with columns\n\n```\nchr  begin  end  name  repeat  prefix  suffix\n```\n\nThe file **must** have the header line and **can** contain as many repeats as present/targeted by enrichment. For the hexanucleotide repeat at the c9orf72 locus the (truncated) config for hg19 alignments looks like this (A complete example file is in the config folder of the STRique repository):\n\n```\nchr9  27573527  27573544  c9orf72  GGCCCC  ...GCCCCGACCACGCCCC  TAGCGCGCGACTCCTG...\n```\n\nSTRique will only consider aligned reads where the mapping including soft-clipping at least partially covers one of the configured targets. The longer the prefix/ suffix sequences, the more reliable the signal alignment at the cost of a longer runtime. A good estimate is 150 Bp for prefix and suffix. Repeat, prefix and suffix sequence are always on template strand.\n\n\n## Repeat Counting\n\nThe repeat detection requires an indexed raw data archive and the alignment of the reads:\n\n```\npython3 scripts/STRique.py count [OPTIONS] f5Index model repeat\n\npositional arguments:\n  f5Index          Fast5 index\n  model            pore model\n  repeat           repeat region config file\n\noptional arguments:\n  --out OUT               output file name, if not given print to stdout\n  --algn ALGN             alignment in sam format, if not given read from stdin\n  --mod_model MOD_MODEL   Base modification pore model\n  --config CONFIG         Config file with HMM transition probabilities\n  --t T                   Number of processes to use in parallel\n  --log_level             Log level {error,warning,info,debug}\n```\n\nThe command to detect repeat lengths could look similar to:\n\n```\ncat ~/my_data.hg19.sam | python3 ~/src/STRique/scripts/STRique.py count \\\n~/my_data/reads.fofn ~/src/STRique/models/r9_4_450bps.model \\\n~/src/STRique/configs/repeat_config.tsv \\\n> ~/my_data.hg19.strique.tsv\n```\n\nFor Docker users the container needs to mount the host file system to access the raw data. To process the same dataset as above run:\n\n```\ndocker run -it --mount type=bind,source=${HOME},target=/host \\\ngiesselmann/strique:v0.3.0\ncat /host/my_data.hg19.sam | python3 scripts/STRique.py count \\\n/host/my_data/reads.fofn models/r9_4_450bps.model \\\nconfigs/repeat_config.tsv > /host/my_data.hg19.strique.tsv\n```\n\nPlease note that changes made to the Docker filesystem are not persistent and will be lost after exiting the container. Make sure to write the output to a file on the host.\n\n## Output\n\nThe output of STRique is a tsv file with repeat counts per read covering at least one region specified in the repeat config file. Reads are reported as soon as they overlap one of the regions, even if the repeat detection was not successful or not reliable. It is therefore suggested to filter the raw output. The columns of the output stream are as follows:\n\n\n  * ID: The read identifier from MinKNOW\n  * target: The repeat expansion target specified in the config file\n  * strand: + or -\n  * count: Repeat count as number of occurrences of the configured repeat sequence\n  * score_prefix and score_suffix: Signal alignment scores for post processing\n  * log_p: HMM log-likelihood over the repeat, generally larger for longer repeats\n  * offset, ticks: Offset and length of the repeat in the raw signal fast5 file, for debugging and visualization\n  * mod: Base modification string if --mod_model was provided e.g. '0001000' for a mostly unmethylated repeat\n\n\nIn a first step reads with zero repeat count can be discarded, this happens for instance, if prefix and suffix sequence are found in the wrong order in the raw signal. Secondly it is reasonable to further filter for the signal alignment scores **score_prefix** and **score_suffix**. These are indicators for the quality of the prefix and suffix mappings and have strong impact on the subsequent repeat counting. For the c9orf72 and FMR1 samples tested in our publication, a threshold of 4.0 was chosen. This value might change for other targets and configurations and is in general a tradeoff between number of evaluated repeats and their quality.\n\nThe base modification string contains one character per repeat instance with zeros for the base model and ones for the modification model to be more likely. Since the HMM for repeat base modifications is slightly different, the length of the string is not always exactly equal to the reported repeat count. It is recommended to further compute a per read mean repeat methylation.\n\n\n## Plot\n\nSTRique comes with a basic visualization of the repetitive signal. After raw indexing and counting you can plot the raw nanopore traces of the repeat with the following command:\n\n```\npython3 scripts/STRique.py plot [OPTIONS] f5Index\n\npositional arguments:\n  f5Index                   Fast5 index\n\noptional arguments:\n  -h, --help                show this help message and exit\n  --counts COUNTS           Repeat count output from STRique, if not given read from stdin\n  --output OUTPUT           Output directory for plots, use instead of interactive GUI\n  --format                  Output format when writing to files {pdf,svg,png}, default=png\n  --width WIDTH             Plot width, default=16\n  --height HEIGHT           Plot height, default=9\n  --dpi DPI                 Resolution of plot, default=80\n  --extension EXTENSION     Extension as fraction of repeat signal around STR region to plot\n  --zoom ZOOM               Region around prefix and suffix to plot\n  --log_level               Log level {error,warning,info,debug}\n\n```\n\nFor example:\n\n```\ncat ~/my_data.hg19.strique.tsv | python3 ~/src/STRique/scripts/STRique.py plot ~/my_data/reads.fofn\n```\n\nYou can either read the STRique counts from stdin or specify a file with the --counts flag. The plots get displayed in a matplotlib GUI. Alternatively you can specify --output to write each plot to a separate file. The filename is ```target_count_ID.format```. The output for the provided example data looks like this:\n\n<img src=\"../../images/signal_plot.png\"width=\"100%\" hspace=\"20\">\n\n!!! warning \"Docker\"\n    The plot commands tries to open an interactive GUI per default. If you use STRique from within a Docker container please\n    specify the --output argument to write the plots to disk. From within the container it is non-trivial to forward graphical output\n    to the host.\n\n# Docker\n\nThe all-in-one Docker image of STRique contains all its dependencies and is build automatically on [dockerHub](https://hub.docker.com/r/giesselmann/STRique). The compressed docker image size is ~700 MB. From the Docker shell run:\n\n    docker pull giesselmann/strique\n\nThe container is tagged with the package version. To obtain a specific version run e.g.:\n\n    docker pull giesselmann/strique:v0.3.0\n\nDocker images can get access to the hosts file system with mounts of type *bind*. Test the container by mounting your current directory:\n\n    docker run -it --mount type=bind,source=$(pwd),target=/host giesselmann/strique:v0.3.0\n\nInside of the container type\n\n    ls -l /host\n\nto see the files of the host system from where the container was started. Leave a running container with *exit*.\n\nYou may want to test the container on the included example data. After starting the container with\n\n    docker run -it giesselmann/strique:v0.3.0\n\nyou can use the commands listed under [test](test.md) except that you don't need to change the directory anymore.\n\n# Installation\n\n*Important*: If you encounter any trouble within the installation, open an issue on [github](https://github.com/giesselmann/STRique/issues) to make others aware of the problem or write an E-Mail to ```giesselmann[at]molgen.mpg.de```. There is nothing more annoying than software that does not work.\n\nIn general STRique is python based and therefore available on Windows, MacOS and Linux. However the included signal alignment is a C++ extension which needs to be build on the target system. We support and test the fully featured package on Linux and MacOS and through containerization on Windows.\n\n<center>\n\n| Method   | Source \t| Docker \t|\n|---------|:------:\t|:------:\t|\n| Linux   |   yes  \t|   yes  \t|\n| MacOS   |   yes  \t|   yes  \t|\n| Windows |   no   \t|   yes  \t|\n\n</center>\n\n**Recommendation:** If possible use the Docker version of STRique. Singularity might be an alternative in case the root access required by Docker is not possible on your machine. Lastly with the source build you can integrate STRique in any (virtual) python3 environment.\n\n# Source\n\nSTRique can be installed without root privileges as it's maintaining its dependencies by building required libraries from source in a user accessible path. Currently the following list of system wide packages is required to build STRique (names on macOS might be different):\n\n* git wget\n* gcc-6 g++-6 (C++14 support)\n* make cmake\n* python3-dev\n* zlib1g-dev, libbz2-dev\n\nThese packages are likely present in most production environments. Please also refer to the Dockerfile of the package repository for minimal system requirements.\n\n??? info \"Python3 macOS\"\n    While git, gcc and make are present on macOS, cmake and python3 might not be. If not already done consider  installing the [brew](https://wsvincent.com/install-python3-mac/) package management and run ```brew install  cmake python3``` afterwards. It can be necessary to modify your PATH variable to find the python3 interpreter.  Before continuing with this guide make sure that either ```python --version``` or ```python3 --version```   yields the expected result of 3.x.x\n\n## Dependencies\n**Python 3.5 or higher**\n\n    wheel cython\n    pomegranate\n    numpy, scipy, scikit-image\n    h5py\n\n**C++**\n\n    SeqAn2\n    Pybind11\n\nDependencies get downloaded and build by the setup script.\n\n## Installation\n\nPlease consider to install STRique into a separate virtual environment to avoid conflicting dependencies with other packages or if you don't have root access.\nUpdate pip and install virtual environment:\n\n```\npython3 -m pip install --user --upgrade pip\npython3 -m pip install --user virtualenv\n```\n\nCreate a virtual python environment:\n\n```\npython3 -m venv /path/to/your/environment\ncd /path/to/your/environment\nsource bin/activate\n```\n\nIn order to download, build and install STRique, execute the following commands:\n\n```\nmkdir -p ~/src && cd ~/src\ngit clone --recursive https://github.com/giesselmann/STRique\ncd STRique\npip3 install -r requirements.txt\npython3 setup.py install\n```\n\nIf the process didn't report any errors, continue in the [test](test.md) section to verify the installation.\n\n# Tests\n\nAfter installation, the successful setup can be tested with sample data included in the STRique repository. Test the pipeline with the following commands in the cloned repository:\n\n```\ncd ~/src/STRique\npython3 scripts/STRique_test.py\npython3 scripts/STRique.py index data/ > data/reads.fofn\ncat data/c9orf72.sam | python3 scripts/STRique.py count ./data/reads.fofn ./models/r9_4_450bps.model ./configs/repeat_config.tsv --config ./configs/STRique.json\n```\n\nYou should see output similar to\n\n```\nID      target strand count score_prefix score_suffix log_p offset ticks mod\nce47b364-ed6e-4409-808a-1041c0b5aac2 c9orf72 - 735 6.3155927807600545 6.031860427335506 -119860.52066647023 1633 40758 -\n```\n\nRun time <1 min for this dataset on a typical desktop computer.\n\n# Citation\n\nIf you use STRique in your work please cite:\n\n> Giesselmann, P., Br\u00e4ndl, B., Raimondeau, E. et al. Analysis of short tandem repeat expansions and their methylation state with nanopore sequencing. Nat Biotechnol (2019) doi:10.1038/s41587-019-0293-x\n\n# Introduction\n\n<img style=\"float: right;\" src=\"images/workflow.png\"width=\"30%\" hspace=\"20\">\n\nSTRique is a python package to analyze repeat expansion and methylation states of short tandem repeats (STR) in Oxford Nanopore Technology (ONT) long read sequencing data.\n\nTo get started the **[installation](installation/prerequisites.md)** chapter describes the available installation options depending on the operation system, available hardware and already existing environments.\n\nIn the **[Usage](examples/intro.md)** chapter the stepwise analysis of nanopore reads covering repeat expansions is demonstrated.\n",
+        "evidence": [
+          {
+            "claim": "install_method",
+            "kind": "tree",
+            "path": "Dockerfile",
+            "text": "dockerfile",
+            "url": "https://github.com/giesselmann/STRique/blob/ade4589ecb2bf6672c839e31b80b7cc0c0d7b084/Dockerfile"
+          },
+          {
+            "claim": "fallback_environment",
+            "kind": "readme",
+            "line": 4,
+            "path": "README.md",
+            "text": "[![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/giesselmann/strique.svg)](https://hub.docker.com/r/giesselmann/strique/)",
+            "url": "https://github.com/giesselmann/STRique/blob/ade4589ecb2bf6672c839e31b80b7cc0c0d7b084/README.md#L4"
+          },
+          {
+            "claim": "run_command",
+            "kind": "doc",
+            "line": 86,
+            "path": "docs/examples/intro.md",
+            "text": "cat /host/my_data.hg19.sam | python3 scripts/STRique.py count \\",
+            "url": "https://github.com/giesselmann/STRique/blob/ade4589ecb2bf6672c839e31b80b7cc0c0d7b084/docs/examples/intro.md#L86"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "data/c9orf72.fa",
+            "text": "fasta",
+            "url": "https://github.com/giesselmann/STRique/blob/ade4589ecb2bf6672c839e31b80b7cc0c0d7b084/data/c9orf72.fa"
+          }
+        ],
+        "example": null,
+        "example_data": [
+          {
+            "in_example_dir": true,
+            "kind": "fasta",
+            "looks_like_output": false,
+            "path": "data/c9orf72.fa",
+            "size": 35873
+          }
+        ],
+        "inferences": {
+          "build": "repo_file:Dockerfile",
+          "example": null,
+          "input_type": null,
+          "output": "docs/examples/intro.md:L86",
+          "platform": null,
+          "regions": null,
+          "run_command": "docs/examples/intro.md:L86",
+          "single_sample_bams": null
+        },
+        "input_type": {
+          "assembly": {
+            "against_hg38": null,
+            "declared": "hg19_only",
+            "evidence_source": "docs/examples/intro.md:L42",
+            "hg19_evidence_source": "docs/examples/intro.md:L42",
+            "hg19_hits": 6,
+            "hg38_evidence_source": null,
+            "hg38_hits": 0,
+            "incompatible_with_hg38": true
+          },
+          "best": null,
+          "candidates": [],
+          "evidence_source": null,
+          "how": "counted",
+          "platform": "ont",
+          "platform_evidence_source": null,
+          "platform_how": "counted",
+          "signals": {
+            "bam": 0,
+            "ce": 0,
+            "fastq": 0,
+            "hg19": 6,
+            "hg38": 0,
+            "illumina": 0,
+            "ont": 5,
+            "snp": 0,
+            "ystr": 0
+          },
+          "statements": {
+            "against": [],
+            "determined": false,
+            "inputs": [],
+            "platform": [
+              {
+                "historical": false,
+                "line": 9,
+                "platform": "ont",
+                "text": "STRique is a python package to analyze repeat expansion and methylation states of short tandem repeats (STR) in Oxford Nanopore Technology (ONT) long read sequencing data."
+              }
+            ],
+            "recommendation": null
+          },
+          "statements_file": null,
+          "supported_platforms": [
+            {
+              "evidence_source": "README.md:L9",
+              "historical": false,
+              "line": 9,
+              "platform": "ont",
+              "text": "STRique is a python package to analyze repeat expansion and methylation states of short tandem repeats (STR) in Oxford Nanopore Technology (ONT) long read sequencing data."
+            }
+          ],
+          "unsupported": null,
+          "warnings": [
+            "Documentation mentions hg19/GRCh37 only; STRhub reference BAMs are hg38"
+          ]
+        },
+        "known_issues": [],
+        "limitations": [
+          "install_profile_unsupported",
+          "no_reference_dataset"
+        ],
+        "output": {
+          "evidence_source": "docs/examples/intro.md:L86",
+          "format": "tsv",
+          "signals": {
+            "csv": 0,
+            "json": 2,
+            "tsv": 14,
+            "vcf": 0
+          }
+        },
+        "packaging": {
+          "executables": [],
+          "packages": [
+            "STRique"
+          ]
+        },
+        "readme": {
+          "gaps": [
+            {
+              "item": "input",
+              "text": "The README does not say what kind of data the tool takes (FASTQ or BAM; Illumina or nanopore; reference build)."
+            }
+          ],
+          "name": "README.md",
+          "sufficient_to_attempt": true
+        },
+        "readme_name": "README.md",
+        "readme_text": "# STRique\n[![Latest GitHub release](https://img.shields.io/github/release-pre/giesselmann/STRique.svg)](https://github.com/giesselmann/STRique/releases/latest)\n[![Build Status](https://travis-ci.org/giesselmann/STRique.svg?branch=master)](https://travis-ci.org/giesselmann/STRique)\n[![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/giesselmann/strique.svg)](https://hub.docker.com/r/giesselmann/strique/)\n[![Documentation Status](https://readthedocs.org/projects/strique/badge/?version=latest)](https://strique.readthedocs.io/en/latest/?badge=latest)\n\n<img align=\"right\" src=\"https://github.com/giesselmann/strique/blob/master/docs/images/workflow.png\" width=\"30%\" hspace=\"20\">\n\nSTRique is a python package to analyze repeat expansion and methylation states of short tandem repeats (STR) in Oxford Nanopore Technology (ONT) long read sequencing data.\n\nPlease refer to the **[documentation](https://strique.readthedocs.io/en/latest/)** for installation and usage instructions.\n\nTo get started the **[installation](https://strique.readthedocs.io/en/latest/installation/prerequisites/)** chapter describes the available installation options depending on the operation system and already existing environments.\n\nIn the **[Usage](https://strique.readthedocs.io/en/latest/examples/intro/)** chapter the stepwise analysis of nanopore reads covering repeat expansions is demonstrated.\n\n## Citation\n\nIf you use STRique in your work please cite:\n\n> Giesselmann, P., Br\u00e4ndl, B., Raimondeau, E. et al. Analysis of short tandem repeat expansions and their methylation state with nanopore sequencing. Nat Biotechnol (2019) doi:10.1038/s41587-019-0293-x\n",
+        "ref": "ade4589ecb2bf6672c839e31b80b7cc0c0d7b084",
+        "regions": {
+          "ambiguous": false,
+          "candidates": [],
+          "end_line": null,
+          "evidence_source": null,
+          "file": null,
+          "format": null,
+          "line": null,
+          "text": null
+        },
+        "registry": {
+          "bioconda": {},
+          "documented": []
+        },
+        "repo": "https://github.com/giesselmann/STRique",
+        "schema": "strhub-verified/recipe-proposal/1",
+        "single_sample_bams": {
+          "allowed": false,
+          "evidence_source": null,
+          "file": null,
+          "line": null,
+          "paired_flags": [],
+          "text": null
+        },
+        "source_documents": [
+          {
+            "file": "README.md",
+            "origin": "readme",
+            "text": "# STRique\n[![Latest GitHub release](https://img.shields.io/github/release-pre/giesselmann/STRique.svg)](https://github.com/giesselmann/STRique/releases/latest)\n[![Build Status](https://travis-ci.org/giesselmann/STRique.svg?branch=master)](https://travis-ci.org/giesselmann/STRique)\n[![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/giesselmann/strique.svg)](https://hub.docker.com/r/giesselmann/strique/)\n[![Documentation Status](https://readthedocs.org/projects/strique/badge/?version=latest)](https://strique.readthedocs.io/en/latest/?badge=latest)\n\n<img align=\"right\" src=\"https://github.com/giesselmann/strique/blob/master/docs/images/workflow.png\" width=\"30%\" hspace=\"20\">\n\nSTRique is a python package to analyze repeat expansion and methylation states of short tandem repeats (STR) in Oxford Nanopore Technology (ONT) long read sequencing data.\n\nPlease refer to the **[documentation](https://strique.readthedocs.io/en/latest/)** for installation and usage instructions.\n\nTo get started the **[installation](https://strique.readthedocs.io/en/latest/installation/prerequisites/)** chapter describes the available installation options depending on the operation system and already existing environments.\n\nIn the **[Usage](https://strique.readthedocs.io/en/latest/examples/intro/)** chapter the stepwise analysis of nanopore reads covering repeat expansions is demonstrated.\n\n## Citation\n\nIf you use STRique in your work please cite:\n\n> Giesselmann, P., Br\u00e4ndl, B., Raimondeau, E. et al. Analysis of short tandem repeat expansions and their methylation state with nanopore sequencing. Nat Biotechnol (2019) doi:10.1038/s41587-019-0293-x\n"
+          },
+          {
+            "file": "docs/examples/intro.md",
+            "origin": "repo",
+            "text": "# Usage\n\n## Preparation\n\nSTRique works on raw nanopore read data in either single or bulk fast5 format. Batches of single reads in tar archives work as well. Before starting the repeat detection the raw data folder must be indexed to enable extraction of single reads. The index file contains relative paths to the reads and must be saved in the indexed directory.\n\n```\npython3 scripts/STRique.py index [OPTIONS] input\n\npositional arguments:\n  input                 \tInput batch or directory of batches\n\noptional arguments:\n  --recursive           \tRecursively scan input\n  --out_prefix OUT_PREFIX\tPrefix for file paths in output\n  --tmp_prefix TMP_PREFIX\tPrefix for temporary data\n```\n\n\nThe command to recursively index the raw data archive could look similar to the following. Indexing is only required once after the sequencing is completed.\n\n```\npython3 ~/src/STRique/scripts/STRique.py index \\\n--recursive ~/my_data > ~/my_data/reads.fofn\n```\n\nThe index file *reads.fofn* contains relative paths to the raw files and **must** therefore be saved in the right location. You can configure an *--out_prefix* to be prepended to each entry in the index. This is useful to index sub-directories while storing indices at a central location e.g.:\n\n```\npython3 ~/src/STRique/scripts/STRique.py index \\\n--recursive --out_prefix my_sample ~/my_data/my_sample > ~/my_data/my_sample.fofn\n```\n\n## Configuration\n\nTargeted repeats are configured in a tab-separated (.tsv) file with columns\n\n```\nchr  begin  end  name  repeat  prefix  suffix\n```\n\nThe file **must** have the header line and **can** contain as many repeats as present/targeted by enrichment. For the hexanucleotide repeat at the c9orf72 locus the (truncated) config for hg19 alignments looks like this (A complete example file is in the config folder of the STRique repository):\n\n```\nchr9  27573527  27573544  c9orf72  GGCCCC  ...GCCCCGACCACGCCCC  TAGCGCGCGACTCCTG...\n```\n\nSTRique will only consider aligned reads where the mapping including soft-clipping at least partially covers one of the configured targets. The longer the prefix/ suffix sequences, the more reliable the signal alignment at the cost of a longer runtime. A good estimate is 150 Bp for prefix and suffix. Repeat, prefix and suffix sequence are always on template strand.\n\n\n## Repeat Counting\n\nThe repeat detection requires an indexed raw data archive and the alignment of the reads:\n\n```\npython3 scripts/STRique.py count [OPTIONS] f5Index model repeat\n\npositional arguments:\n  f5Index          Fast5 index\n  model            pore model\n  repeat           repeat region config file\n\noptional arguments:\n  --out OUT               output file name, if not given print to stdout\n  --algn ALGN             alignment in sam format, if not given read from stdin\n  --mod_model MOD_MODEL   Base modification pore model\n  --config CONFIG         Config file with HMM transition probabilities\n  --t T                   Number of processes to use in parallel\n  --log_level             Log level {error,warning,info,debug}\n```\n\nThe command to detect repeat lengths could look similar to:\n\n```\ncat ~/my_data.hg19.sam | python3 ~/src/STRique/scripts/STRique.py count \\\n~/my_data/reads.fofn ~/src/STRique/models/r9_4_450bps.model \\\n~/src/STRique/configs/repeat_config.tsv \\\n> ~/my_data.hg19.strique.tsv\n```\n\nFor Docker users the container needs to mount the host file system to access the raw data. To process the same dataset as above run:\n\n```\ndocker run -it --mount type=bind,source=${HOME},target=/host \\\ngiesselmann/strique:v0.3.0\ncat /host/my_data.hg19.sam | python3 scripts/STRique.py count \\\n/host/my_data/reads.fofn models/r9_4_450bps.model \\\nconfigs/repeat_config.tsv > /host/my_data.hg19.strique.tsv\n```\n\nPlease note that changes made to the Docker filesystem are not persistent and will be lost after exiting the container. Make sure to write the output to a file on the host.\n\n## Output\n\nThe output of STRique is a tsv file with repeat counts per read covering at least one region specified in the repeat config file. Reads are reported as soon as they overlap one of the regions, even if the repeat detection was not successful or not reliable. It is therefore suggested to filter the raw output. The columns of the output stream are as follows:\n\n\n  * ID: The read identifier from MinKNOW\n  * target: The repeat expansion target specified in the config file\n  * strand: + or -\n  * count: Repeat count as number of occurrences of the configured repeat sequence\n  * score_prefix and score_suffix: Signal alignment scores for post processing\n  * log_p: HMM log-likelihood over the repeat, generally larger for longer repeats\n  * offset, ticks: Offset and length of the repeat in the raw signal fast5 file, for debugging and visualization\n  * mod: Base modification string if --mod_model was provided e.g. '0001000' for a mostly unmethylated repeat\n\n\nIn a first step reads with zero repeat count can be discarded, this happens for instance, if prefix and suffix sequence are found in the wrong order in the raw signal. Secondly it is reasonable to further filter for the signal alignment scores **score_prefix** and **score_suffix**. These are indicators for the quality of the prefix and suffix mappings and have strong impact on the subsequent repeat counting. For the c9orf72 and FMR1 samples tested in our publication, a threshold of 4.0 was chosen. This value might change for other targets and configurations and is in general a tradeoff between number of evaluated repeats and their quality.\n\nThe base modification string contains one character per repeat instance with zeros for the base model and ones for the modification model to be more likely. Since the HMM for repeat base modifications is slightly different, the length of the string is not always exactly equal to the reported repeat count. It is recommended to further compute a per read mean repeat methylation.\n\n\n## Plot\n\nSTRique comes with a basic visualization of the repetitive signal. After raw indexing and counting you can plot the raw nanopore traces of the repeat with the following command:\n\n```\npython3 scripts/STRique.py plot [OPTIONS] f5Index\n\npositional arguments:\n  f5Index                   Fast5 index\n\noptional arguments:\n  -h, --help                show this help message and exit\n  --counts COUNTS           Repeat count output from STRique, if not given read from stdin\n  --output OUTPUT           Output directory for plots, use instead of interactive GUI\n  --format                  Output format when writing to files {pdf,svg,png}, default=png\n  --width WIDTH             Plot width, default=16\n  --height HEIGHT           Plot height, default=9\n  --dpi DPI                 Resolution of plot, default=80\n  --extension EXTENSION     Extension as fraction of repeat signal around STR region to plot\n  --zoom ZOOM               Region around prefix and suffix to plot\n  --log_level               Log level {error,warning,info,debug}\n\n```\n\nFor example:\n\n```\ncat ~/my_data.hg19.strique.tsv | python3 ~/src/STRique/scripts/STRique.py plot ~/my_data/reads.fofn\n```\n\nYou can either read the STRique counts from stdin or specify a file with the --counts flag. The plots get displayed in a matplotlib GUI. Alternatively you can specify --output to write each plot to a separate file. The filename is ```target_count_ID.format```. The output for the provided example data looks like this:\n\n<img src=\"../../images/signal_plot.png\"width=\"100%\" hspace=\"20\">\n\n!!! warning \"Docker\"\n    The plot commands tries to open an interactive GUI per default. If you use STRique from within a Docker container please\n    specify the --output argument to write the plots to disk. From within the container it is non-trivial to forward graphical output\n    to the host.\n"
+          },
+          {
+            "file": "docs/installation/docker.md",
+            "origin": "repo",
+            "text": "# Docker\n\nThe all-in-one Docker image of STRique contains all its dependencies and is build automatically on [dockerHub](https://hub.docker.com/r/giesselmann/STRique). The compressed docker image size is ~700 MB. From the Docker shell run:\n\n    docker pull giesselmann/strique\n\nThe container is tagged with the package version. To obtain a specific version run e.g.:\n\n    docker pull giesselmann/strique:v0.3.0\n\nDocker images can get access to the hosts file system with mounts of type *bind*. Test the container by mounting your current directory:\n\n    docker run -it --mount type=bind,source=$(pwd),target=/host giesselmann/strique:v0.3.0\n\nInside of the container type\n\n    ls -l /host\n\nto see the files of the host system from where the container was started. Leave a running container with *exit*.\n\nYou may want to test the container on the included example data. After starting the container with\n\n    docker run -it giesselmann/strique:v0.3.0\n\nyou can use the commands listed under [test](test.md) except that you don't need to change the directory anymore.\n"
+          },
+          {
+            "file": "docs/installation/prerequisites.md",
+            "origin": "repo",
+            "text": "# Installation\n\n*Important*: If you encounter any trouble within the installation, open an issue on [github](https://github.com/giesselmann/STRique/issues) to make others aware of the problem or write an E-Mail to ```giesselmann[at]molgen.mpg.de```. There is nothing more annoying than software that does not work.\n\nIn general STRique is python based and therefore available on Windows, MacOS and Linux. However the included signal alignment is a C++ extension which needs to be build on the target system. We support and test the fully featured package on Linux and MacOS and through containerization on Windows.\n\n<center>\n\n| Method   | Source \t| Docker \t|\n|---------|:------:\t|:------:\t|\n| Linux   |   yes  \t|   yes  \t|\n| MacOS   |   yes  \t|   yes  \t|\n| Windows |   no   \t|   yes  \t|\n\n</center>\n\n**Recommendation:** If possible use the Docker version of STRique. Singularity might be an alternative in case the root access required by Docker is not possible on your machine. Lastly with the source build you can integrate STRique in any (virtual) python3 environment.\n"
+          },
+          {
+            "file": "docs/installation/src.md",
+            "origin": "repo",
+            "text": "# Source\n\nSTRique can be installed without root privileges as it's maintaining its dependencies by building required libraries from source in a user accessible path. Currently the following list of system wide packages is required to build STRique (names on macOS might be different):\n\n* git wget\n* gcc-6 g++-6 (C++14 support)\n* make cmake\n* python3-dev\n* zlib1g-dev, libbz2-dev\n\nThese packages are likely present in most production environments. Please also refer to the Dockerfile of the package repository for minimal system requirements.\n\n??? info \"Python3 macOS\"\n    While git, gcc and make are present on macOS, cmake and python3 might not be. If not already done consider  installing the [brew](https://wsvincent.com/install-python3-mac/) package management and run ```brew install  cmake python3``` afterwards. It can be necessary to modify your PATH variable to find the python3 interpreter.  Before continuing with this guide make sure that either ```python --version``` or ```python3 --version```   yields the expected result of 3.x.x\n\n## Dependencies\n**Python 3.5 or higher**\n\n    wheel cython\n    pomegranate\n    numpy, scipy, scikit-image\n    h5py\n\n**C++**\n\n    SeqAn2\n    Pybind11\n\nDependencies get downloaded and build by the setup script.\n\n## Installation\n\nPlease consider to install STRique into a separate virtual environment to avoid conflicting dependencies with other packages or if you don't have root access.\nUpdate pip and install virtual environment:\n\n```\npython3 -m pip install --user --upgrade pip\npython3 -m pip install --user virtualenv\n```\n\nCreate a virtual python environment:\n\n```\npython3 -m venv /path/to/your/environment\ncd /path/to/your/environment\nsource bin/activate\n```\n\nIn order to download, build and install STRique, execute the following commands:\n\n```\nmkdir -p ~/src && cd ~/src\ngit clone --recursive https://github.com/giesselmann/STRique\ncd STRique\npip3 install -r requirements.txt\npython3 setup.py install\n```\n\nIf the process didn't report any errors, continue in the [test](test.md) section to verify the installation.\n"
+          },
+          {
+            "file": "docs/installation/test.md",
+            "origin": "repo",
+            "text": "# Tests\n\nAfter installation, the successful setup can be tested with sample data included in the STRique repository. Test the pipeline with the following commands in the cloned repository:\n\n```\ncd ~/src/STRique\npython3 scripts/STRique_test.py\npython3 scripts/STRique.py index data/ > data/reads.fofn\ncat data/c9orf72.sam | python3 scripts/STRique.py count ./data/reads.fofn ./models/r9_4_450bps.model ./configs/repeat_config.tsv --config ./configs/STRique.json\n```\n\nYou should see output similar to\n\n```\nID      target strand count score_prefix score_suffix log_p offset ticks mod\nce47b364-ed6e-4409-808a-1041c0b5aac2 c9orf72 - 735 6.3155927807600545 6.031860427335506 -119860.52066647023 1633 40758 -\n```\n\nRun time <1 min for this dataset on a typical desktop computer.\n"
+          },
+          {
+            "file": "docs/citation.md",
+            "origin": "repo",
+            "text": "# Citation\n\nIf you use STRique in your work please cite:\n\n> Giesselmann, P., Br\u00e4ndl, B., Raimondeau, E. et al. Analysis of short tandem repeat expansions and their methylation state with nanopore sequencing. Nat Biotechnol (2019) doi:10.1038/s41587-019-0293-x\n"
+          },
+          {
+            "file": "docs/index.md",
+            "origin": "repo",
+            "text": "# Introduction\n\n<img style=\"float: right;\" src=\"images/workflow.png\"width=\"30%\" hspace=\"20\">\n\nSTRique is a python package to analyze repeat expansion and methylation states of short tandem repeats (STR) in Oxford Nanopore Technology (ONT) long read sequencing data.\n\nTo get started the **[installation](installation/prerequisites.md)** chapter describes the available installation options depending on the operation system, available hardware and already existing environments.\n\nIn the **[Usage](examples/intro.md)** chapter the stepwise analysis of nanopore reads covering repeat expansions is demonstrated.\n"
+          }
+        ],
+        "tool_names": [
+          "STRique",
+          "STRique.py",
+          "STRique_test",
+          "STRique_test.py",
+          "fast5Index",
+          "fast5Index.py",
+          "fast5Masker",
+          "fast5Masker.py",
+          "strique"
+        ],
+        "tree_paths": [
+          ".dockerignore",
+          ".gitignore",
+          ".gitmodules",
+          ".travis.yml",
+          "CMakeLists.txt",
+          "Dockerfile",
+          "LICENSE",
+          "README.md",
+          "STRique_lib/__init__.py",
+          "STRique_lib/fast5Index.py",
+          "configs/STRique.json",
+          "configs/repeat_config.tsv",
+          "data/c9orf72.fa",
+          "data/c9orf72.fast5",
+          "data/c9orf72.sam",
+          "docs/citation.md",
+          "docs/examples/intro.md",
+          "docs/images/signal_plot.png",
+          "docs/images/workflow.png",
+          "docs/index.md",
+          "docs/installation/docker.md",
+          "docs/installation/prerequisites.md",
+          "docs/installation/src.md",
+          "docs/installation/test.md",
+          "docs/license.md",
+          "docs/release-notes.md",
+          "docs/requirements.txt",
+          "mkdocs.yml",
+          "models/r9_4_450bps.model",
+          "models/r9_4_450bps_mCpG.model",
+          "requirements.txt",
+          "scripts/STRique.py",
+          "scripts/STRique_test.py",
+          "scripts/fast5Masker.py",
+          "setup.py",
+          "src/CMakeLists.txt",
+          "src/align_raw.h",
+          "src/pyalign.cpp",
+          "src/score_distance.h"
+        ],
+        "tree_truncated": false,
+        "upstream_files": {
+          "Dockerfile": "# \\BUILD\\---------------------------------------------------------------\n#\n#  CONTENTS      : STRique repeat detection pipeline\n#\n#  DESCRIPTION   : Dockerfile\n#\n#  RESTRICTIONS  : none\n#\n#  REQUIRES      : none\n#\n# -----------------------------------------------------------------------\n# Copyright (c) 2018-2019, Pay Giesselmann, Max Planck Institute for Molecular Genetics\n#\n# Permission is hereby granted, free of charge, to any person obtaining a copy\n# of this software and associated documentation files (the \"Software\"), to deal\n# in the Software without restriction, including without limitation the rights\n# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n# copies of the Software, and to permit persons to whom the Software is\n# furnished to do so, subject to the following conditions:\n#\n# The above copyright notice and this permission notice shall be included in all\n# copies or substantial portions of the Software.\n#\n# THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\n# SOFTWARE.\n#\n# Written by Pay Giesselmann\n# ---------------------------------------------------------------------------------\n\n# STRique Dockerfile\n\n# PACKAGE STAGE\nFROM ubuntu:16.04\nMAINTAINER Pay Giesselmann <giesselmann@molgen.mpg.de>\n\n## packages\nRUN apt-get --yes update && \\\n    apt-get install -y --no-install-recommends wget locales \\\n    git gcc g++ make cmake python3-dev \\\n    ca-certificates apt-transport-https \\\n    && rm -rf /var/lib/apt/lists/*\n\nRUN update-ca-certificates\nRUN locale-gen en_US.UTF-8\nENV LANG en_US.UTF-8\nENV LANGUAGE en_US:en\nENV LC_ALL en_US.UTF-8\n\nRUN mkdir -p /app\nCOPY . /app/\nWORKDIR /app\n\nRUN wget https://bootstrap.pypa.io/get-pip.py\nRUN python3 get-pip.py\nRUN pip3 install -r requirements.txt\nRUN python3 setup.py install\nRUN rm -rf build\nRUN rm -rf submodules/seqan\n\nWORKDIR /app\n# CMD python3 /app/scripts/STRique.py\n# default entrypoint is /bin/sh\n"
+        }
+      },
+      "limitations": [
+        "install_profile_unsupported",
+        "no_reference_dataset"
+      ],
+      "caveat_items": [
+        "Environment: no proven installation profile; STRhub did not manufacture installation steps. STRhub does not build a Dockerfile shipped in a repository.",
+        "Run command: the one documented in docs/examples/intro.md (line 86), rewritten to STRhub's mounts; the capture wrapper is planned only if the procedure review passes.",
+        "Documentation mentions hg19/GRCh37 only; STRhub reference BAMs are hg38"
+      ]
+    }
+  },
+  "provenance": {
+    "from_upstream": {
+      "install": {
+        "method": "dockerfile",
+        "evidence_source": "repo_file:Dockerfile"
+      },
+      "command": {
+        "value": "cat /host/my_data.hg19.sam | python3 scripts/STRique.py count /host/my_data/reads.fofn models/r9_4_450bps.model configs/repeat_config.tsv > /host/my_data.hg19.strique.tsv",
+        "evidence_source": "docs/examples/intro.md:L86"
+      },
+      "input_kind": null,
+      "supported_platforms": [
+        {
+          "platform": "ont",
+          "evidence_source": "README.md:L9"
+        }
+      ],
+      "assembly": {
+        "declared": "hg19_only",
+        "evidence_source": "docs/examples/intro.md:L42"
+      },
+      "regions_schema": null,
+      "output_format": {
+        "glob": "**/*.t[sx][vt]",
+        "evidence_source": "docs/examples/intro.md:L86"
+      }
+    },
+    "derived": {
+      "command_rewrites": [],
+      "regions_layout_binding": null,
+      "single_sample_adaptation": null
+    },
+    "harness_choices": {
+      "dataset": null,
+      "platform": {
+        "selected": "ont",
+        "basis": "counted_unproven",
+        "supported_platforms": [
+          "ont"
+        ]
+      },
+      "assembly": {
+        "selected": null,
+        "basis": "incompatible",
+        "note": null
+      },
+      "regions_layout": null,
+      "base_environment": null
+    }
+  },
+  "procedure_validation": {
+    "schema": "strhub-procedure-evidence/1",
+    "valid": true,
+    "reason": "Procedure evidence matches the effective manifest and recomputed decision."
+  },
+  "verdict": {
+    "code": "undetermined",
+    "title": "Could not be determined",
+    "basis": "recipe",
+    "reason": "STRhub holds no reference sample of the kind this procedure reads, and the repository ships no example to run, so nothing was executed.",
+    "readme_gaps": [
+      {
+        "item": "input",
+        "text": "The README does not say what kind of data the tool takes (FASTQ or BAM; Illumina or nanopore; reference build)."
+      }
+    ],
+    "status_code": "UNVERIFIED_INSUFFICIENT_DOCS",
+    "blockers": [
+      {
+        "code": "no_reference_dataset",
+        "what": "STRhub has no reference sample of the kind this tool reads, and the repository ships no example to run, so nothing was executed.",
+        "ask_owner": {
+          "title": "Ship a small example dataset",
+          "body": "STRhub Verified could not run the tool: it holds no public reference sample of the input type the README describes, and the repository ships no example data. A small example (a few reads and the expected output) would let a new user, and STRhub, run it end-to-end."
+        }
+      },
+      {
+        "code": "build_failed",
+        "what": "The environment did not build from the install steps found in the repository.",
+        "ask_owner": {
+          "title": "Build fails from a clean checkout",
+          "body": "STRhub Verified tried to build the tool from a clean checkout at the pinned commit, following the repository's own install steps, and the build failed. The build log is linked from the run."
+        }
+      }
+    ]
+  },
+  "step1": {
+    "code": "ours",
+    "headline": "STRhub could not attempt the documented run.",
+    "body": "STRhub holds no reference sample of the kind this procedure reads, and the repository ships no example to run, so nothing was executed. The limitation is ours. Nothing here is a finding about the tool.",
+    "missing": [],
+    "missing_text": [],
+    "guide": "docs/GUIA-PASO-1.md"
+  },
+  "certificate": {
+    "schema": "strhub-verified/certificate/1",
+    "label": "Could not be determined",
+    "reached": "Available",
+    "stages": [
+      {
+        "key": "available",
+        "label": "Source available",
+        "status": "PASS"
+      },
+      {
+        "key": "installs",
+        "label": "Installation",
+        "status": "NOT ATTEMPTED"
+      },
+      {
+        "key": "runs",
+        "label": "End-to-end execution",
+        "status": "NOT ATTEMPTED"
+      },
+      {
+        "key": "output",
+        "label": "Output generated",
+        "status": "NOT ATTEMPTED"
+      }
+    ],
+    "summary": {
+      "purpose": "Evaluate whether the tool installs, runs end-to-end, and produces structurally valid output.",
+      "result": "Could not be determined",
+      "reached": "Available, 1/5 gates passed",
+      "why": "STRhub holds no reference sample of the kind this procedure reads, and the repository ships no example to run, so nothing was executed.",
+      "scope": "Installation, execution, and output structure evaluation.",
+      "not_evaluated": [
+        "Genotype accuracy",
+        "Concordance",
+        "Forensic validity",
+        "Regulatory compliance"
+      ]
+    },
+    "conclusion": [
+      {
+        "title": "Procedure not established",
+        "body": "The recorded gate observations do not establish whether the documented procedure succeeded or failed."
+      },
+      {
+        "title": "Observations retained",
+        "body": "The supplied run and output observations remain in the report; they do not replace procedure evidence."
+      },
+      {
+        "title": "Verdict: Could not be determined",
+        "body": "STRhub holds no reference sample of the kind this procedure reads, and the repository ships no example to run, so nothing was executed."
+      },
+      {
+        "title": "Reproducibility not established",
+        "body": "These observations are insufficient to establish a reproducible documented execution finding."
+      }
+    ],
+    "out_of_scope": [
+      "Genotype correctness or accuracy",
+      "Concordance against known truth sets",
+      "Sensitivity, specificity, or stutter performance",
+      "Allele calling accuracy or forensic casework suitability",
+      "Regulatory compliance or ISO accreditation",
+      "Multi-laboratory or multi-dataset reproducibility"
+    ],
+    "limitations": [
+      "Single reference dataset per input type",
+      "Single containerized environment (Docker / ubuntu-22.04)",
+      "No truth-set comparison or ground-truth genotypes",
+      "No accuracy or concordance assessment",
+      "No forensic or clinical validation of results",
+      "No sequencing data were processed because execution did not complete"
+    ],
+    "scope": {
+      "statement": "Independent automated evaluation of reproducible execution. It checks whether the tool installs, runs end-to-end, and produces structurally valid output in a standardized environment.",
+      "not": "This is not an analytical validation. Genotype accuracy, concordance, forensic suitability, and regulatory compliance are out of scope.",
+      "disclaimer": "Each result is a dated snapshot, verified on the tool's public repository at a pinned commit. STRhub does not store tool source code."
+    }
+  }
+}
