@@ -22,7 +22,7 @@
     ],
     "source": "prepared"
   },
-  "generated": "2026-11-22T19:24:15+00:00",
+  "generated": "2026-11-22T19:40:48+00:00",
   "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/44934862541",
   "run": {
     "cmd": "bash src/STRspy_Normal_v2.0_Args.sh -i /data/in/input.bam -r yes -t ont -f db-v2/STRspy2.0-DB-fixed -b db-v2/STRspy2.0-DB-fixed -l db-v2/STRspy_v2.DB.sort.bed -k 0.4 -o Results -c config/UserToolsConfig.txt -d 4",
@@ -54,234 +54,14 @@
   "gates": {
     "available": true,
     "installs": true,
-    "runs": true,
-    "io": true,
-    "content": true
+    "runs": false,
+    "io": false,
+    "content": false
   },
   "input_contract": {
     "type": "ont-bam-hg38"
   },
-  "level": "content",
-  "io_detail": {
-    "gate": "io",
-    "passed": true,
-    "outputs": [
-      {
-        "path": "**/*.t[sx][vt]",
-        "format": "tsv",
-        "checks": {
-          "confined": true,
-          "exists": true,
-          "non_empty": true,
-          "parses_as_tsv": true,
-          "min_records": true
-        },
-        "resolved": "Results/input.bam_All_Loci_Summary.tsv",
-        "records": 40,
-        "passed": true
-      }
-    ]
-  },
-  "content_detail": {
-    "gate": "content",
-    "applicable": true,
-    "passed": true,
-    "outputs": [
-      {
-        "path": "**/*.t[sx][vt]",
-        "resolved": "Results/input.bam_All_Loci_Summary.tsv",
-        "mode": "auto",
-        "checks": {
-          "records_present": true,
-          "locus_column_found": true,
-          "loci_recognised": true,
-          "calls_or_counts_present": true
-        },
-        "stats": {
-          "rows": 40,
-          "header_row_dropped": true,
-          "malformed_rows": 0,
-          "dna_invalid_rows": 0,
-          "count_invalid_rows": 0,
-          "distinct_loci": 22,
-          "distinct_str_loci": 22,
-          "distinct_snp_markers": 0,
-          "loci": [
-            "CSF1PO",
-            "D10S1248",
-            "D12S391",
-            "D13S317",
-            "D16S539",
-            "D18S51",
-            "D19S433",
-            "D1S1656",
-            "D21S11",
-            "D22S1045",
-            "D2S1338",
-            "D2S441",
-            "D3S1358",
-            "D5S818",
-            "D7S820",
-            "D8S1179",
-            "DYS391",
-            "DYS393",
-            "FGA",
-            "TH01",
-            "TPOX",
-            "vWA"
-          ],
-          "str_loci": [
-            "CSF1PO",
-            "D10S1248",
-            "D12S391",
-            "D13S317",
-            "D16S539",
-            "D18S51",
-            "D19S433",
-            "D1S1656",
-            "D21S11",
-            "D22S1045",
-            "D2S1338",
-            "D2S441",
-            "D3S1358",
-            "D5S818",
-            "D7S820",
-            "D8S1179",
-            "DYS391",
-            "DYS393",
-            "FGA",
-            "TH01",
-            "TPOX",
-            "vWA"
-          ],
-          "snp_markers": [],
-          "total_reads": 0,
-          "max_sequence_depth": 0,
-          "top_loci_by_depth": [
-            [
-              "CSF1PO",
-              0
-            ],
-            [
-              "D10S1248",
-              0
-            ],
-            [
-              "D12S391",
-              0
-            ],
-            [
-              "D13S317",
-              0
-            ],
-            [
-              "D16S539",
-              0
-            ],
-            [
-              "D18S51",
-              0
-            ],
-            [
-              "D19S433",
-              0
-            ],
-            [
-              "D1S1656",
-              0
-            ],
-            [
-              "D21S11",
-              0
-            ],
-            [
-              "D22S1045",
-              0
-            ],
-            [
-              "D2S1338",
-              0
-            ],
-            [
-              "D2S441",
-              0
-            ],
-            [
-              "D3S1358",
-              0
-            ],
-            [
-              "D5S818",
-              0
-            ],
-            [
-              "D7S820",
-              0
-            ],
-            [
-              "D8S1179",
-              0
-            ],
-            [
-              "DYS391",
-              0
-            ],
-            [
-              "DYS393",
-              0
-            ],
-            [
-              "FGA",
-              0
-            ],
-            [
-              "TH01",
-              0
-            ],
-            [
-              "TPOX",
-              0
-            ],
-            [
-              "vWA",
-              0
-            ]
-          ],
-          "locus_column_found": true,
-          "locus_column": 0,
-          "dna_columns": [],
-          "count_columns": [],
-          "allele_columns": [
-            1,
-            2
-          ],
-          "panel_loci_present": [
-            "CSF1PO",
-            "D10S1248",
-            "D12S391",
-            "D13S317",
-            "D16S539",
-            "D18S51",
-            "D19S433",
-            "D1S1656",
-            "D21S11",
-            "D22S1045",
-            "D2S1338",
-            "D2S441",
-            "D3S1358",
-            "D5S818",
-            "D7S820",
-            "D8S1179",
-            "FGA",
-            "TH01",
-            "TPOX",
-            "vWA"
-          ]
-        },
-        "passed": true
-      }
-    ]
-  },
+  "level": "installs",
   "example_detail": null,
   "datasets": [
     {
@@ -290,19 +70,9 @@
       "available": true,
       "type": "ont-bam-hg38",
       "dataset": "1000 Genomes ONT, hg38 CODIS slice (R10 SUP)",
-      "io": true,
-      "content": true,
-      "passed": true
-    },
-    {
-      "leg": "example",
-      "label": "Tool's own example",
-      "available": false,
       "io": false,
-      "content": null,
-      "passed": false,
-      "matches_expected": null,
-      "produced_count": null
+      "content": false,
+      "passed": false
     }
   ],
   "scope": "Assessment of documented execution in the stated environment and output format. Concerns reproducible execution only; no claim of accuracy, casework fitness, or regulatory validation.",
@@ -1676,21 +1446,21 @@
     ]
   },
   "verdict": {
-    "code": "runs",
-    "title": "Runs with manual preparation",
+    "code": "fails",
+    "title": "Fails in manual verification",
     "basis": "gates",
-    "reason": "Manual verification succeeded on 1000 Genomes ONT (hg38 CODIS) using STRhub's prepared Conda environment and patched STRspy v2.0 runner script, producing 22 distinct forensic STR loci.",
+    "reason": "Even after preparing the Conda environment manually, the unmodified upstream STRspy script fails to run: the unpinned Conda environment pulls a broken OpenSSL 1.0 samtools build, and src/STRspy_Normal_v2.0_Args.sh fails on single-file -i BAM inputs or when the -o output directory does not already exist (requiring code changes to run).",
     "readme_gaps": []
   },
   "step1": null,
   "certificate": {
     "schema": "strhub-verified/certificate/1",
-    "label": "Not verified as documented",
+    "label": "Manual verification: fails",
     "reached": "Runs + Plausible output",
     "summary": {
       "purpose": "Verify that the tool installs, runs end-to-end, and produces structurally valid output.",
-      "result": "Manual verification reached Runs + Plausible output (5/5 gates; 22 forensic STR loci) using STRhub's prepared Conda environment and reproducibility fork. Does not alter the automatic verdict.",
-      "reached": "Runs + Plausible output, 5/5 gates passed",
+      "result": "Manual verification confirmed that unmodified upstream code fails after environment preparation (2/5 gates: stops at Runs). A separate reproducibility fork with 3 code fixes is documented inside the report.",
+      "reached": "Installs (stops at Runs on unmodified upstream code)",
       "why": "The tool installed and its run produced its documented output.",
       "scope": "Installation, execution, and output structure verification.",
       "not_evaluated": [
@@ -1773,7 +1543,7 @@
       }
     ],
     "fork_url": "https://github.com/Tfronta/strspy",
-    "fork_note": "Fork reproducible basado en STRspy v2.0 (unique379r/strspy) con el entorno Conda fijado (python>=3.9, samtools>=1.12) y los ajustes del script bash verificados en CI (run 44934862541: 5/5 compuertas, 22 loci STR forenses sobre 1000 Genomes ONT hg38)."
+    "fork_note": "Con 3 modificaciones de c\u00f3digo en el fork reproducible (Tfronta/strspy, commit 14d5494) y el entorno Conda fijado (python>=3.9, samtools>=1.12), la ejecuci\u00f3n en CI (run 44934862541) complet\u00f3 5/5 compuertas y gener\u00f3 22 loci STR forenses sobre 1000 Genomes ONT hg38. Esto no aprueba el commit oficial upstream."
   },
   "recommendations": [
     "Publish a tagged GitHub release for STRspy v2.0 so users and automated evaluators resolve the maintained version by default instead of v1.1.1 (2021).",
