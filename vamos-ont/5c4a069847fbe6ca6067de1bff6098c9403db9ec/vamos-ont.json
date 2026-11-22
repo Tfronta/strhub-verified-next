@@ -1,0 +1,1360 @@
+{
+  "schema": "strhub-verified/1",
+  "mode": "publish",
+  "tool": {
+    "name": "vamos",
+    "version": "vamos-v3.1.1",
+    "contact": "https://github.com/ChaissonLab/vamos/issues"
+  },
+  "submission": {
+    "by": "third_party"
+  },
+  "source": {
+    "repo": "https://github.com/ChaissonLab/vamos",
+    "ref": "5c4a069847fbe6ca6067de1bff6098c9403db9ec",
+    "ref_resolved": "5c4a069847fbe6ca6067de1bff6098c9403db9ec",
+    "committed": "2026-05-25T03:58:10Z"
+  },
+  "environment": {
+    "dockerfile": "Dockerfile",
+    "os": [
+      "ubuntu-22.04"
+    ],
+    "source": "generated"
+  },
+  "generated": "2026-11-22T19:14:15+00:00",
+  "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/45059523245",
+  "run": {
+    "cmd": "vamos --read -b /data/in/input.bam -r vamos.effMotifs-0.1.GRCh38.tsv -s NA24385_CCS_h1 -o reads.vcf -t 8",
+    "cwd": ".",
+    "effective_cmd": "cd '.' && touch /tmp/.strhub_mark && ( vamos --read -b /data/in/input.bam -r vamos.effMotifs-0.1.GRCh38.tsv -s NA24385_CCS_h1 -o reads.vcf -t 8 ); rc=$?; find . -xdev -type f -newer /tmp/.strhub_mark -size +0 ! -path './.git/*' ! -path './proc/*' ! -path './sys/*' ! -path './dev/*' ! -path './data/*' ! -path '*/__pycache__/*' ! -name '*.pyc' ! -name '*.pyo' 2>/dev/null | head -500 | while IFS= read -r f; do mkdir -p \"/data/out/$(dirname \"$f\")\" && cp \"$f\" \"/data/out/$f\"; done; exit $rc",
+    "step_outcome": "skipped"
+  },
+  "instrument": "documented",
+  "recipe": {
+    "origin": "proposed"
+  },
+  "gates": {
+    "available": true,
+    "installs": false,
+    "runs": false,
+    "io": false,
+    "content": false
+  },
+  "input_contract": {
+    "type": "ont-bam-hg38"
+  },
+  "level": "available",
+  "io_detail": {},
+  "content_detail": {},
+  "example_detail": null,
+  "datasets": [
+    {
+      "leg": "external",
+      "label": "External data",
+      "available": false,
+      "type": "ont-bam-hg38",
+      "dataset": null,
+      "io": false,
+      "content": false,
+      "passed": false
+    },
+    {
+      "leg": "example",
+      "label": "Tool's own example",
+      "available": false,
+      "io": false,
+      "content": null,
+      "passed": false,
+      "matches_expected": null,
+      "produced_count": null
+    }
+  ],
+  "scope": "Assessment of documented execution in the stated environment and output format. Concerns reproducible execution only; no claim of accuracy, casework fitness, or regulatory validation.",
+  "upstream": {
+    "checked": "2026-11-22T19:14:15+00:00",
+    "repo_exists": true,
+    "ref_exists": true,
+    "default_branch": "master",
+    "status": "ahead",
+    "behind_by": 3
+  },
+  "evidence": [
+    {
+      "claim": "install_method",
+      "kind": "tree",
+      "path": "requirements.txt",
+      "text": "conda",
+      "url": "https://github.com/ChaissonLab/vamos/blob/5c4a069847fbe6ca6067de1bff6098c9403db9ec/requirements.txt"
+    },
+    {
+      "claim": "run_command",
+      "kind": "readme",
+      "path": "README.md",
+      "line": 69,
+      "text": "vamos --read -b ../example/demo.aln.bam -r vamos.effMotifs-0.1.GRCh38.tsv -s NA24385_CCS_h1 -o reads.vcf -t 8",
+      "url": "https://github.com/ChaissonLab/vamos/blob/5c4a069847fbe6ca6067de1bff6098c9403db9ec/README.md#L69"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "tryvamos/example/loci_for_waterfall.bed",
+      "text": "bed",
+      "url": "https://github.com/ChaissonLab/vamos/blob/5c4a069847fbe6ca6067de1bff6098c9403db9ec/tryvamos/example/loci_for_waterfall.bed"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "example/one_region_motif.bed",
+      "text": "bed",
+      "url": "https://github.com/ChaissonLab/vamos/blob/5c4a069847fbe6ca6067de1bff6098c9403db9ec/example/one_region_motif.bed"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "tryvamos/example/HPRC_HG005_h2.contig.vcf",
+      "text": "vcf",
+      "url": "https://github.com/ChaissonLab/vamos/blob/5c4a069847fbe6ca6067de1bff6098c9403db9ec/tryvamos/example/HPRC_HG005_h2.contig.vcf"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "tryvamos/example/HPRC_HG002_h2.contig.vcf",
+      "text": "vcf",
+      "url": "https://github.com/ChaissonLab/vamos/blob/5c4a069847fbe6ca6067de1bff6098c9403db9ec/tryvamos/example/HPRC_HG002_h2.contig.vcf"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "tryvamos/example/HPRC_HG005_h1.contig.vcf",
+      "text": "vcf",
+      "url": "https://github.com/ChaissonLab/vamos/blob/5c4a069847fbe6ca6067de1bff6098c9403db9ec/tryvamos/example/HPRC_HG005_h1.contig.vcf"
+    },
+    {
+      "claim": "documented_input",
+      "kind": "readme",
+      "path": "README.md",
+      "line": 18,
+      "text": "Most functionality of *tryvamos* uses multi-sample diploid vcf(s) as input.",
+      "url": "https://github.com/ChaissonLab/vamos/blob/5c4a069847fbe6ca6067de1bff6098c9403db9ec/README.md#L18"
+    }
+  ],
+  "repo_test_data": {
+    "known": true,
+    "present": true,
+    "count": 9,
+    "examples": [
+      "tryvamos/example/loci_for_waterfall.bed",
+      "example/one_region_motif.bed",
+      "tryvamos/example/HPRC_HG005_h2.contig.vcf",
+      "tryvamos/example/HPRC_HG002_h2.contig.vcf",
+      "tryvamos/example/HPRC_HG005_h1.contig.vcf"
+    ]
+  },
+  "caveats": {
+    "source": "detect_recipe",
+    "items": [
+      "Environment: no proven installation profile; STRhub did not manufacture installation steps.",
+      "Input: the documented command takes BAM (README.md, line 69); no sentence says so, so the command is what was read. This plan selects STRhub's ont-bam-hg38 reference data.",
+      "read_path: ../example/demo.aln.bam -> /data/in/input.bam.",
+      "Run command: the README's own command, rewritten to STRhub's mounts; the capture wrapper is planned only if the procedure review passes.",
+      "File: the documented command reads vamos.effMotifs-0.1.GRCh38.tsv (after -r), which is neither in the repository nor among STRhub's data."
+    ]
+  },
+  "install_detail": {
+    "passed": false,
+    "diagnostics": [],
+    "faults": []
+  },
+  "procedure_review": {
+    "may_say_runs": false,
+    "status_code": "UNVERIFIED_INSUFFICIENT_DOCS",
+    "basis": "recipe",
+    "attribution": "strhub",
+    "blocker": "install_not_copyable",
+    "reason": "An installation step is outside this profile (README.md, line 32: `cd vamos*/src/ && make`); STRhub does not interpret, complete or skip it.",
+    "amendments": [
+      {
+        "code": "input_platform_unproven",
+        "what": "Counting platform mentions does not establish which shared dataset this procedure reads."
+      },
+      {
+        "code": "install_not_copyable",
+        "what": "An installation step is outside this profile (README.md, line 32: `cd vamos*/src/ && make`); STRhub does not interpret, complete or skip it."
+      }
+    ],
+    "inferences": {
+      "install": {
+        "evidence_source": "repo_file:requirements.txt",
+        "verified": false
+      },
+      "run_command": {
+        "evidence_source": "README.md:L69",
+        "verified": true,
+        "kind": "doc",
+        "path": "README.md",
+        "document_sha256": "b4c60f6d981caa2fe1f7938c2908aee9da6391fb453f737eb56963a1627d9f2c"
+      },
+      "input_type": {
+        "verified": true,
+        "kind": "doc",
+        "path": "README.md",
+        "line": 69,
+        "end_line": 69,
+        "document_sha256": "b4c60f6d981caa2fe1f7938c2908aee9da6391fb453f737eb56963a1627d9f2c",
+        "evidence_source": "README.md:L69",
+        "upstream_input_kind": "vcf",
+        "selected_dataset": "ont-bam-hg38"
+      },
+      "output": {
+        "verified": true,
+        "kind": "doc",
+        "path": "README.md",
+        "line": 69,
+        "end_line": 69,
+        "document_sha256": "b4c60f6d981caa2fe1f7938c2908aee9da6391fb453f737eb56963a1627d9f2c",
+        "evidence_source": "README.md:L69"
+      }
+    },
+    "unbacked_inferences": [
+      "install"
+    ],
+    "provenance": {
+      "from_upstream": {
+        "install": {
+          "method": "conda",
+          "evidence_source": "repo_file:requirements.txt"
+        },
+        "command": {
+          "value": "vamos --read -b ../example/demo.aln.bam -r vamos.effMotifs-0.1.GRCh38.tsv -s NA24385_CCS_h1 -o reads.vcf -t 8",
+          "evidence_source": "README.md:L69"
+        },
+        "input_kind": {
+          "value": "vcf",
+          "evidence_source": "README.md:L69"
+        },
+        "supported_platforms": [],
+        "assembly": {
+          "declared": "hg38",
+          "evidence_source": "README.md:L52"
+        },
+        "regions_schema": {
+          "format": "motif",
+          "evidence_source": "README.md:L45"
+        },
+        "output_format": {
+          "glob": "**/*.vcf*",
+          "evidence_source": "README.md:L69"
+        }
+      },
+      "derived": {
+        "command_rewrites": [
+          {
+            "role": "read_path",
+            "original": "../example/demo.aln.bam",
+            "replacement": "/data/in/input.bam",
+            "basis": "declared dataset mount"
+          }
+        ],
+        "regions_layout_binding": null,
+        "single_sample_adaptation": null
+      },
+      "harness_choices": {
+        "dataset": {
+          "selected": "ont-bam-hg38",
+          "reason": "STRhub selected 'ont-bam-hg38' as compatible with upstream input 'vcf' and platform 'ont'"
+        },
+        "platform": {
+          "selected": "ont",
+          "basis": "counted_unproven",
+          "supported_platforms": []
+        },
+        "assembly": {
+          "selected": "hg38",
+          "basis": "upstream_stated",
+          "note": null
+        },
+        "regions_layout": null,
+        "base_environment": null
+      }
+    },
+    "install_method": "conda",
+    "citable_install": false,
+    "input_type": "ont-bam-hg38",
+    "output_glob": "**/*.vcf*",
+    "profile": "strhub-upstream-procedure/1",
+    "install_ready": false,
+    "example_ready": false,
+    "installation": {
+      "profile": "strhub-upstream-procedure/1",
+      "ready": false,
+      "method": "conda",
+      "reason": "An installation step is outside this profile (README.md, line 32: `cd vamos*/src/ && make`); STRhub does not interpret, complete or skip it.",
+      "gap": "commit"
+    },
+    "command_review": {
+      "profile": "strhub-upstream-procedure/1",
+      "cited": "vamos --read -b ../example/demo.aln.bam -r vamos.effMotifs-0.1.GRCh38.tsv -s NA24385_CCS_h1 -o reads.vcf -t 8",
+      "command": "vamos --read -b /data/in/input.bam -r vamos.effMotifs-0.1.GRCh38.tsv -s NA24385_CCS_h1 -o reads.vcf -t 8",
+      "substitutions": [
+        {
+          "token": 3,
+          "original": "../example/demo.aln.bam",
+          "replacement": "/data/in/input.bam",
+          "role": "read_path",
+          "basis": "declared dataset mount"
+        }
+      ],
+      "read_bindings": [
+        {
+          "token": 3,
+          "original": "../example/demo.aln.bam",
+          "target": "/data/in/input.bam"
+        }
+      ],
+      "limitations": [],
+      "expected": "vamos --read -b /data/in/input.bam -r vamos.effMotifs-0.1.GRCh38.tsv -s NA24385_CCS_h1 -o reads.vcf -t 8",
+      "executed": "vamos --read -b /data/in/input.bam -r vamos.effMotifs-0.1.GRCh38.tsv -s NA24385_CCS_h1 -o reads.vcf -t 8",
+      "cited_sha256": "6910096a8e674c51524d3f426f3842ce6d53aab60b1f6bcf20af1befa52c3f2c",
+      "executed_sha256": "fb21ebf0301f5ef536a2f8cef8964fd585d8a1b8d78418b78bd330656d35ec8a",
+      "citations": [
+        {
+          "repo": "https://github.com/ChaissonLab/vamos",
+          "ref": "5c4a069847fbe6ca6067de1bff6098c9403db9ec",
+          "path": "README.md",
+          "line": 69,
+          "verified": true,
+          "document_sha256": "b4c60f6d981caa2fe1f7938c2908aee9da6391fb453f737eb56963a1627d9f2c",
+          "command_sha256": "6910096a8e674c51524d3f426f3842ce6d53aab60b1f6bcf20af1befa52c3f2c"
+        }
+      ]
+    },
+    "manifest_sha256": "b84494b18971ca2f6d0a2eb811afaa3fa32af7609a5a874fc1933f45768e7ebc",
+    "evidence_sha256": "8d970065416508f60e6c1f39bd5a1c05af429219c831fb87d735bf3e82a55ebe",
+    "evidence": {
+      "schema": "strhub-procedure-evidence/1",
+      "manifest": {
+        "caveats": {
+          "items": [
+            "Environment: no proven installation profile; STRhub did not manufacture installation steps.",
+            "Input: the documented command takes BAM (README.md, line 69); no sentence says so, so the command is what was read. This plan selects STRhub's ont-bam-hg38 reference data.",
+            "read_path: ../example/demo.aln.bam -> /data/in/input.bam.",
+            "Run command: the README's own command, rewritten to STRhub's mounts; the capture wrapper is planned only if the procedure review passes.",
+            "File: the documented command reads vamos.effMotifs-0.1.GRCh38.tsv (after -r), which is neither in the repository nor among STRhub's data."
+          ],
+          "source": "detect_recipe"
+        },
+        "environment": {
+          "dockerfile": "Dockerfile",
+          "os": [
+            "ubuntu-22.04"
+          ],
+          "source": "generated"
+        },
+        "example": {
+          "cmd": "vamos --read -b ../example/demo.aln.bam -r vamos.effMotifs-0.1.GRCh38.tsv -s NA24385_CCS_h1 -o reads.vcf -t 8",
+          "cwd": "/opt/tool",
+          "source": "detected"
+        },
+        "inputs": {
+          "type": "ont-bam-hg38"
+        },
+        "outputs": [
+          {
+            "format": "vcf",
+            "min_records": 1,
+            "path": "**/*.vcf*"
+          }
+        ],
+        "recipe": {
+          "origin": "proposed"
+        },
+        "report": {
+          "slug": "vamos-ont"
+        },
+        "run": {
+          "cmd": "cd '.' && touch /tmp/.strhub_mark && ( vamos --read -b /data/in/input.bam -r vamos.effMotifs-0.1.GRCh38.tsv -s NA24385_CCS_h1 -o reads.vcf -t 8 ); rc=$?; find . -xdev -type f -newer /tmp/.strhub_mark -size +0 ! -path './.git/*' ! -path './proc/*' ! -path './sys/*' ! -path './dev/*' ! -path './data/*' ! -path '*/__pycache__/*' ! -name '*.pyc' ! -name '*.pyo' 2>/dev/null | head -500 | while IFS= read -r f; do mkdir -p \"/data/out/$(dirname \"$f\")\" && cp \"$f\" \"/data/out/$f\"; done; exit $rc",
+          "timeout_minutes": 20
+        },
+        "source": {
+          "ref": "5c4a069847fbe6ca6067de1bff6098c9403db9ec",
+          "repo": "https://github.com/ChaissonLab/vamos"
+        },
+        "submission": {
+          "by": "third_party"
+        },
+        "tool": {
+          "contact": "https://github.com/ChaissonLab/vamos/issues",
+          "name": "vamos",
+          "version": "vamos-v3.1.1"
+        }
+      },
+      "proposal": {
+        "build": {
+          "also_published": null,
+          "asset": null,
+          "candidates": [
+            {
+              "file": "requirements.txt",
+              "method": "conda",
+              "spec_list": true
+            },
+            {
+              "dir": "src",
+              "file": "src/Makefile",
+              "method": "make"
+            }
+          ],
+          "digest": null,
+          "dir": null,
+          "evidence_source": "repo_file:requirements.txt",
+          "file": "requirements.txt",
+          "image": null,
+          "method": "conda",
+          "package": null,
+          "readme_install_lines": [
+            "conda create --name vamos python=3.10",
+            "conda install -c bioconda --file requirements.txt",
+            "cd vamos*/src/ && make"
+          ],
+          "readme_line": null,
+          "spec_list": true,
+          "ssh_urls_in": [],
+          "tag": null,
+          "then": [
+            "make -C src"
+          ],
+          "url": null
+        },
+        "commands": [
+          {
+            "cmd": "vamos --read -b ../example/demo.aln.bam -r vamos.effMotifs-0.1.GRCh38.tsv -s NA24385_CCS_h1 -o reads.vcf -t 8",
+            "entry_point": false,
+            "evidence_source": "README.md:L69",
+            "file": "README.md",
+            "has_input_flag": true,
+            "has_output_flag": true,
+            "help_only": false,
+            "invokes": "vamos",
+            "line": 69,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "readme",
+            "piped": false,
+            "rst": false,
+            "source_rank": 0,
+            "subcommand": null,
+            "synopsis": false
+          },
+          {
+            "cmd": "vamos --contig -b assembly.hap1.mapped_to_grch38.bam -r vamos.effMotifs-0.1.GRCh38.tsv -s sample_name -o assembly.hap1.vcf -t 8",
+            "entry_point": false,
+            "evidence_source": "README.md:L64",
+            "file": "README.md",
+            "has_input_flag": true,
+            "has_output_flag": true,
+            "help_only": false,
+            "invokes": "vamos",
+            "line": 64,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "readme",
+            "piped": false,
+            "rst": false,
+            "source_rank": 0,
+            "subcommand": null,
+            "synopsis": false
+          },
+          {
+            "cmd": "vamos --contig -b assembly.hap2.mapped_to_grch38.bam -r vamos.effMotifs-0.1.GRCh38.tsv -s sample_name -o assembly.hap2.vcf -t 8",
+            "entry_point": false,
+            "evidence_source": "README.md:L65",
+            "file": "README.md",
+            "has_input_flag": true,
+            "has_output_flag": true,
+            "help_only": false,
+            "invokes": "vamos",
+            "line": 65,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "readme",
+            "piped": false,
+            "rst": false,
+            "source_rank": 0,
+            "subcommand": null,
+            "synopsis": false
+          },
+          {
+            "cmd": "python tryvamos.py combineVCF example/example.list example/example.vcf",
+            "entry_point": false,
+            "evidence_source": "tryvamos/README.md:L20",
+            "file": "tryvamos/README.md",
+            "has_input_flag": false,
+            "has_output_flag": false,
+            "help_only": false,
+            "invokes": "tryvamos.py",
+            "line": 20,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 1,
+            "subcommand": null,
+            "synopsis": false
+          },
+          {
+            "cmd": "python tryvamos.py quickFeature example/example.vcf example/example.topCount.tsv --feature topCount",
+            "entry_point": false,
+            "evidence_source": "tryvamos/README.md:L40",
+            "file": "tryvamos/README.md",
+            "has_input_flag": false,
+            "has_output_flag": false,
+            "help_only": false,
+            "invokes": "tryvamos.py",
+            "line": 40,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 1,
+            "subcommand": null,
+            "synopsis": false
+          },
+          {
+            "cmd": "python tryvamos.py waterfallPlot example/example.vcf example/plot --useLoci example/loci_for_waterfall.bed",
+            "entry_point": false,
+            "evidence_source": "tryvamos/README.md:L45",
+            "file": "tryvamos/README.md",
+            "has_input_flag": false,
+            "has_output_flag": false,
+            "help_only": false,
+            "invokes": "tryvamos.py",
+            "line": 45,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 1,
+            "subcommand": null,
+            "synopsis": false
+          },
+          {
+            "cmd": "python tryvamos.py testTwoPanels panel1.vcf panel2.vcf",
+            "entry_point": false,
+            "evidence_source": "tryvamos/README.md:L50",
+            "file": "tryvamos/README.md",
+            "has_input_flag": false,
+            "has_output_flag": false,
+            "help_only": false,
+            "invokes": "tryvamos.py",
+            "line": 50,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 1,
+            "subcommand": null,
+            "synopsis": false
+          },
+          {
+            "cmd": "python tryvamos.py pairwiseCompare sample1.vcf sample2.vcf",
+            "entry_point": false,
+            "evidence_source": "tryvamos/README.md:L55",
+            "file": "tryvamos/README.md",
+            "has_input_flag": false,
+            "has_output_flag": false,
+            "help_only": false,
+            "invokes": "tryvamos.py",
+            "line": 55,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 1,
+            "subcommand": null,
+            "synopsis": false
+          },
+          {
+            "cmd": "python tryvamos.py -h",
+            "entry_point": false,
+            "evidence_source": "tryvamos/README.md:L12",
+            "file": "tryvamos/README.md",
+            "has_input_flag": false,
+            "has_output_flag": false,
+            "help_only": true,
+            "invokes": "tryvamos.py",
+            "line": 12,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 1,
+            "subcommand": null,
+            "synopsis": false
+          }
+        ],
+        "dockerfile": null,
+        "docs_read": [
+          {
+            "origin": "repo",
+            "path": "tryvamos/README.md"
+          }
+        ],
+        "docs_text": "# *tryvamos*: <ins>t</ins>andem <ins>r</ins>epeat anal<ins>y</ins>sis using *<ins>vamos</ins>* outputs\n\n*tryvamos* is a toolkit designed to perform quick visualization, result transformation, and statistical analysis for tandem repeats using annotations generated from *vamos*.\n\n\n## Preparation\n```\nconda create --name tryvamos python=3.10\nconda activate tryvamos\nconda install --file requirements.txt\n\npython tryvamos.py -h\n```\n\n## Usage\n\n### Generate diploid vcf for a panel of samples from haploid/diploid vcfs of individual samples\nCombination of vcfs of individual samples is usually the first step after annotation. Most functionality of *tryvamos* uses multi-sample diploid vcf(s) as input. To generate a multi-sample diploid vcf, paths of single-sample vcfs need to be written in a \"csv\" file, with each line having the two haploid vcfs of one sample (separated by \",\") or a single diploid vcf of one sample.\n```\npython tryvamos.py combineVCF example/example.list example/example.vcf\n```\nExplanation of \"INFO\" field of a multi-sample vcf\n\n| Field | Explanation |\n|:-------|:---|\n| END     | Ending position of the locus |\n| RU      | All repeating units (motifs) of the locus (\",\" separated) |\n| SVTYPE  | VNTR |\n| ALTANNO | All motif annotations (allels) of the locus (\",\" separated), motifs are indexed from \"0\" as ordered in the \"RU\" field |\n\nDiploid genotype of a sample is recorded as indices of the alleles of each haplotype as ordered in the \"ALTANNO\" field (start from 1). Unannotated haplotype is denoted as \".\".\n```\n#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\tHPRC_HG002_h1/HPRC_HG002_h2\tHPRC_HG005_h1/HPRC_HG005_h2\nchr1\t9240\t.\tN\t<VNTR>\t.\tPASS\tEND=9259;RU=GATGAGCAGC,ATGAGCAGC,GATGAGCAG;SVTYPE=VNTR;ALTANNO=0-2\tGT\t1/1\t1/1\nchr1\t52377\t.\tN\t<VNTR>\t.\tPASS\tEND=52421;RU=GT;SVTYPE=VNTR;ALTANNO=0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0,0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0\tGT\t1/1\t2/1\n```\n### Generate feature matrix from combined vcf\nParsing combined vcf of large number of samples for all TR annotations is time consuming. To facilitate repetitive analysis using the combined vcf, we developed the quickFeature module in *tryvamos* to generate sample (row) by feature (column) matrix for convenient high-dimentional data analysis. Currently the following features are supported: \"TR length by number of motifs\" (annoLen), \"TR allele by motif annotations\" (annoStr), \"counts of the most frequent motif\" (topCount), and \"reconstructed nucleotide sequence using motif annotations\" (nt).\n```\npython tryvamos.py quickFeature example/example.vcf example/example.topCount.tsv --feature topCount\n```\n### Visualize landscape of TR alleles by waterfall plot\nWaterfall plot is a plot where TR alleles are visualized as concatenation of variable motifs. It is a good tool to visualize the motif and allele landscape of a TR locus in a population. The waterfallPlot plot module in *tryvamos* provide a quick way to generate waterfall plots for all or selected TR loci.\n```\npython tryvamos.py waterfallPlot example/example.vcf example/plot --useLoci example/loci_for_waterfall.bed\n```\n### Genomew-wide tests of significance of TRs on two panel of samples\nThe testTwoPanels module performs genome-wide tests for input TRs on two panel of samples. Currently the t-test is performed on TR length by motif counts and the KS-test is performed on distibution of motif counts.\n```\npython tryvamos.py testTwoPanels panel1.vcf panel2.vcf\n```\n### Pairwise comparison of TRs on two panel of samples\nThe pairwiseCompare module performs pairwise comparison of TRs for two haplotype vamos vcfs.\n```\npython tryvamos.py pairwiseCompare sample1.vcf sample2.vcf\n```\n",
+        "evidence": [
+          {
+            "claim": "install_method",
+            "kind": "tree",
+            "path": "requirements.txt",
+            "text": "conda",
+            "url": "https://github.com/ChaissonLab/vamos/blob/5c4a069847fbe6ca6067de1bff6098c9403db9ec/requirements.txt"
+          },
+          {
+            "claim": "run_command",
+            "kind": "readme",
+            "line": 69,
+            "path": "README.md",
+            "text": "vamos --read -b ../example/demo.aln.bam -r vamos.effMotifs-0.1.GRCh38.tsv -s NA24385_CCS_h1 -o reads.vcf -t 8",
+            "url": "https://github.com/ChaissonLab/vamos/blob/5c4a069847fbe6ca6067de1bff6098c9403db9ec/README.md#L69"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "tryvamos/example/loci_for_waterfall.bed",
+            "text": "bed",
+            "url": "https://github.com/ChaissonLab/vamos/blob/5c4a069847fbe6ca6067de1bff6098c9403db9ec/tryvamos/example/loci_for_waterfall.bed"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "example/one_region_motif.bed",
+            "text": "bed",
+            "url": "https://github.com/ChaissonLab/vamos/blob/5c4a069847fbe6ca6067de1bff6098c9403db9ec/example/one_region_motif.bed"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "tryvamos/example/HPRC_HG005_h2.contig.vcf",
+            "text": "vcf",
+            "url": "https://github.com/ChaissonLab/vamos/blob/5c4a069847fbe6ca6067de1bff6098c9403db9ec/tryvamos/example/HPRC_HG005_h2.contig.vcf"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "tryvamos/example/HPRC_HG002_h2.contig.vcf",
+            "text": "vcf",
+            "url": "https://github.com/ChaissonLab/vamos/blob/5c4a069847fbe6ca6067de1bff6098c9403db9ec/tryvamos/example/HPRC_HG002_h2.contig.vcf"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "tryvamos/example/HPRC_HG005_h1.contig.vcf",
+            "text": "vcf",
+            "url": "https://github.com/ChaissonLab/vamos/blob/5c4a069847fbe6ca6067de1bff6098c9403db9ec/tryvamos/example/HPRC_HG005_h1.contig.vcf"
+          },
+          {
+            "claim": "documented_input",
+            "kind": "readme",
+            "line": 18,
+            "path": "README.md",
+            "text": "Most functionality of *tryvamos* uses multi-sample diploid vcf(s) as input.",
+            "url": "https://github.com/ChaissonLab/vamos/blob/5c4a069847fbe6ca6067de1bff6098c9403db9ec/README.md#L18"
+          }
+        ],
+        "example": {
+          "cmd": "vamos --read -b ../example/demo.aln.bam -r vamos.effMotifs-0.1.GRCh38.tsv -s NA24385_CCS_h1 -o reads.vcf -t 8",
+          "cwd": "/opt/tool",
+          "evidence_source": "README.md:L69",
+          "inputs_in_repo": [
+            "example/demo.aln.bam"
+          ],
+          "source": "detected"
+        },
+        "example_data": [
+          {
+            "in_example_dir": true,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "tryvamos/example/loci_for_waterfall.bed",
+            "size": 17
+          },
+          {
+            "in_example_dir": true,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "example/one_region_motif.bed",
+            "size": 238
+          },
+          {
+            "in_example_dir": true,
+            "kind": "vcf",
+            "looks_like_output": false,
+            "path": "tryvamos/example/HPRC_HG005_h2.contig.vcf",
+            "size": 22651
+          },
+          {
+            "in_example_dir": true,
+            "kind": "vcf",
+            "looks_like_output": false,
+            "path": "tryvamos/example/HPRC_HG002_h2.contig.vcf",
+            "size": 24774
+          },
+          {
+            "in_example_dir": true,
+            "kind": "vcf",
+            "looks_like_output": false,
+            "path": "tryvamos/example/HPRC_HG005_h1.contig.vcf",
+            "size": 24807
+          },
+          {
+            "in_example_dir": true,
+            "kind": "vcf",
+            "looks_like_output": false,
+            "path": "tryvamos/example/HPRC_HG002_h1.contig.vcf",
+            "size": 24815
+          },
+          {
+            "in_example_dir": true,
+            "kind": "vcf",
+            "looks_like_output": false,
+            "path": "tryvamos/example/example.vcf",
+            "size": 25181
+          },
+          {
+            "in_example_dir": true,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "example/region_motif.bed",
+            "size": 50748580
+          },
+          {
+            "in_example_dir": true,
+            "kind": "bam",
+            "looks_like_output": false,
+            "path": "example/demo.aln.bam",
+            "size": 66409559
+          }
+        ],
+        "inferences": {
+          "build": "repo_file:requirements.txt",
+          "example": "README.md:L69",
+          "input_type": "README.md:L69",
+          "output": "README.md:L69",
+          "platform": null,
+          "regions": "README.md:L45",
+          "run_command": "README.md:L69",
+          "single_sample_bams": null
+        },
+        "input_type": {
+          "assembly": {
+            "against_hg38": null,
+            "declared": "hg38",
+            "evidence_source": "README.md:L52",
+            "hg19_evidence_source": null,
+            "hg19_hits": 0,
+            "hg38_evidence_source": "README.md:L52",
+            "hg38_hits": 7,
+            "incompatible_with_hg38": false
+          },
+          "best": "ont-bam-hg38",
+          "candidates": [
+            "ont-bam-hg38"
+          ],
+          "evidence_source": "README.md:L69",
+          "how": "command",
+          "platform": "ont",
+          "platform_evidence_source": null,
+          "platform_how": "counted",
+          "signals": {
+            "bam": 4,
+            "ce": 0,
+            "fastq": 0,
+            "hg19": 0,
+            "hg38": 7,
+            "illumina": 0,
+            "ont": 3,
+            "snp": 0,
+            "ystr": 0
+          },
+          "statements": {
+            "against": [],
+            "determined": true,
+            "inputs": [
+              {
+                "kind": "vcf",
+                "line": 18,
+                "text": "Most functionality of *tryvamos* uses multi-sample diploid vcf(s) as input."
+              }
+            ],
+            "platform": [],
+            "recommendation": null
+          },
+          "statements_file": "tryvamos/README.md",
+          "supported_platforms": [],
+          "unsupported": null,
+          "warnings": []
+        },
+        "known_issues": [],
+        "limitations": [
+          "install_profile_unsupported",
+          "documented_file_missing"
+        ],
+        "output": {
+          "evidence_source": "README.md:L69",
+          "format": "vcf",
+          "signals": {
+            "csv": 0,
+            "json": 0,
+            "tsv": 14,
+            "vcf": 32
+          }
+        },
+        "packaging": {
+          "executables": [],
+          "packages": []
+        },
+        "readme": {
+          "gaps": [],
+          "name": "README.md",
+          "sufficient_to_attempt": true
+        },
+        "readme_name": "README.md",
+        "readme_text": "\n\n# *vamos*: <ins>V</ins>NTR <ins>a</ins>nnotation tool using efficient <ins>mo</ins>tif <ins>s</ins>ets\n\n*vamos* is a tool to perform motif annotation of VNTR sequences from long-read assemblies or mapped long-read BAMs. Variant calls are produced from BAMs by prephasing sequences if no phase information is available, a max-cut heuristic is applied to phase reads. Annotation is then called on consensus sequences constructed from partial-order alignment of reads in each haplotype (or all reads if in an autozygous region).\n\nThe motifs used to annotate TR sequences are selected from TR annotations of long-read assemblies. An optimization routine is used to select a subset of motifs from all observed motifs at each locus so that the sequences used for annotation likely reflect true motif variation and not sequencing error. \n\nVamos guarantees that the encoding sequence is winthin a bounded edit distance of the original sequence for the genomes used to compile the motif database.\n\nFor example, a VNTR sequence ACGGT|ACTGT|ACGT may be encoded to a more compact representation: ACGGT|AC**G**GT|ACGT using efficient motif set [ACGGT, ACGT]. The edit distance between the original VNTR sequence and encoding sequence is 1. \n\n\n## Latest Updates\nWe have released a version 2.1 of the motif set. This has roughly 1.2m loci and uses an additional motif-harmonization step before efficient motif selection. We additionally supply loci for CHM13.\n\n## Getting Started\nTo install *vamos*, g++ (>= 8.3.0), htslib, abpoa, edlib and alglib are required.\nhtslib and abpoa can be installed through bioconda.\nStatic libraries libalglib.a and libedlib.a are distributed along with *vamos*.\n\nInstall required libraries through conda\n```\nconda create --name vamos python=3.10\nconda activate vamos\nconda install -c bioconda --file requirements.txt\n```\n\nOr download the latest code from github\n```\ngit clone https://github.com/ChaissonLab/vamos.git \ncd vamos*/src/ && make\n```\n\nNext you should download a locus list. These are in BED format, with the coordinates of the tandem repeat as the BED coordinates, and the list of observed motifs from the Human Pangenome Reference Consortium given as the extra field.\n\nThe latest motif sets as of v2.1 can be downloaded via: https://zenodo.org/records/13263615\n\nExplanation of the motif catalog columns:\n| Column | Explanation |\n|:-------|:---|\n| 1 | Chromosome of the locus |\n| 2 | Start coordinate of the locus |\n| 3 | End coordinate of the locus |\n| 4 | Motifs of the locus to be used for annotation (separated by \",\") |\n| 5 | Version of the motif catalog |\n| 6 | Type of the locus (VNTR or STR) |\n| 7 | Period size (bp) of the motif consensus of the locus |\n| 8 | How much proportion the biggest overlap between the locus and a transposable element takes up the TR locus |\n| 9 | How much proportion the biggest overlap between the locus and a transposable element takes up the transposable element |\n\nFor annotation on GRCh38 using the *vamos* **efficient** motifs:\n```\ncurl \"https://zenodo.org/records/13263615/files/vamos.effMotifs-0.1.GRCh38.tsv.gz?download=1\" > vamos.effMotifs-0.1.GRCh38.tsv.gz; gunzip vamos.effMotifs-0.1.GRCh38.tsv.gz;\n ```\nFor annotation on CHM13 using the *vamos* **efficient** motifs\n```\ncurl \"https://zenodo.org/records/13263615/files/vamos.effMotifs-0.1.T2T-CHM13.tsv.gz?download=1\" > vamos.effMotifs-0.1.T2T-CHM13.tsv.gz; gunzip vamos.effMotifs-0.1.T2T-CHM13.tsv.gz\n```\n\n## Running *vamos*\nFor running *vamos* on a haplotype-resolved assembly:\n```\nvamos --contig -b assembly.hap1.mapped_to_grch38.bam -r vamos.effMotifs-0.1.GRCh38.tsv -s sample_name -o assembly.hap1.vcf -t 8\nvamos --contig -b assembly.hap2.mapped_to_grch38.bam -r vamos.effMotifs-0.1.GRCh38.tsv -s sample_name -o assembly.hap2.vcf -t 8\n```\nFor running *vamos* on aligned reads:\n```\nvamos --read -b ../example/demo.aln.bam -r vamos.effMotifs-0.1.GRCh38.tsv -s NA24385_CCS_h1 -o reads.vcf -t 8\n```\nIf the reads are pre-phased using HapCut or WhatsHap, and contain the HA SAM tag, this phasing will be used to call variants from each haplotype. If the reads are unphased, a max-cut heuristic will be used to prephase reads before calling variants.\n\n## Output\n*vamos* generates single-sample diploid vcf (by the ```--read``` mode) or haploid vcf (by the ```--contig``` mode).\n\nExplanation of the \"INFO\" field of an output vcf:\n| Field | Explanation |\n|:-------|:---|\n| END     | Ending position of the locus |\n| RU      | All repeating units (motifs) of the locus (\",\" separated) |\n| SVTYPE  | VNTR |\n| ALTANNO_H1 | Motif annotations (allels) of haplotyp1, motifs are indexed from \"0\" as ordered in the \"RU\" field |\n| LEN_H1 | Total count of motifs of haplotyp1 allele |\n| ALTANNO_H2 | Motif annotations (allels) of haplotyp2, motifs are indexed from \"0\" as ordered in the \"RU\" field |\n| LEN_H2 | Total count of motifs of haplotyp2 allele |\n\n\nThe following shows example entries of a diploid single-sample vcf file\n```\n#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\tsample1\nchr1\t11226\t.\tN\t<VNTR>\t.\tPASS\tEND=11462;RU=AGAGTGGTGGCCAGCGCCCCCTGCTGGCGCCGGGGCACTGCAGGGCCCTCTTGCTT,ACTGTATAGTGGTGGCACGCCGCCTGCTGGCAGCTAGGGACATTGCAGGGTCCTCTTGCTC,AGAGTGGTGGCCACCGCCCCCTGCTGGCGCCGGGGCACTGCAGGGTCCTCTTGCTT,ACTGTATAGTGGTGGCACGCCGCCTGCTGGCAGCTACGGACATTGCAGGGTCCTCTTGCTC,ACTGTATAGTGGTGGCACGCCGCCTGCTGGCAGCTAGGGACATTGCAGGGTCCTCTTGCTCA;SVTYPE=VNTR;ALTANNO_H1=0,0,4,0;LEN_H1=4;\tGT\t1/1\nchr1\t15796\t.\tN\t<VNTR>\t.\tPASS\tEND=15849;RU=CTT,CTC,CTG,CAG,CATG;SVTYPE=VNTR;ALTANNO_H1=0,1,2,1,0,2,0,0,0,1,3,0,2,1,0,4,2;LEN_H1=17;ALTANNO_H2=0,1,2,1,0,2,2,2,0,1,3,0,2,1,0,4,2;LEN_H2=17;\tGT\t1/2\n```\n## Citing vamos\nTo cite vamos, you should use:\nRen, Jingwen, Bida Gu, and Mark JP Chaisson. \"vamos: variable-number tandem repeats annotation using efficient motif sets.\" Genome Biology 24.1 (2023): 175.\n\n\n## Analysis using *vamos* output\nPlease refer to [*tryvamos*](https://github.com/ChaissonLab/vamos/blob/master/tryvamos) for more details.\n",
+        "ref": "5c4a069847fbe6ca6067de1bff6098c9403db9ec",
+        "regions": {
+          "ambiguous": false,
+          "candidates": [
+            {
+              "end_line": 45,
+              "evidence_source": "README.md:L45",
+              "file": "README.md",
+              "format": "motif",
+              "line": 45,
+              "text": "| 4 | Motifs of the locus to be used for annotation (separated by \",\") |"
+            }
+          ],
+          "end_line": 45,
+          "evidence_source": "README.md:L45",
+          "file": "README.md",
+          "format": "motif",
+          "line": 45,
+          "text": "| 4 | Motifs of the locus to be used for annotation (separated by \",\") |"
+        },
+        "registry": {
+          "bioconda": {
+            "vamos": {
+              "has_tag_version": false,
+              "latest": "3.1.1",
+              "versions": 14
+            }
+          },
+          "documented": []
+        },
+        "repo": "https://github.com/ChaissonLab/vamos",
+        "schema": "strhub-verified/recipe-proposal/1",
+        "single_sample_bams": {
+          "allowed": false,
+          "evidence_source": null,
+          "file": null,
+          "line": null,
+          "paired_flags": [],
+          "text": null
+        },
+        "source_documents": [
+          {
+            "file": "README.md",
+            "origin": "readme",
+            "text": "\n\n# *vamos*: <ins>V</ins>NTR <ins>a</ins>nnotation tool using efficient <ins>mo</ins>tif <ins>s</ins>ets\n\n*vamos* is a tool to perform motif annotation of VNTR sequences from long-read assemblies or mapped long-read BAMs. Variant calls are produced from BAMs by prephasing sequences if no phase information is available, a max-cut heuristic is applied to phase reads. Annotation is then called on consensus sequences constructed from partial-order alignment of reads in each haplotype (or all reads if in an autozygous region).\n\nThe motifs used to annotate TR sequences are selected from TR annotations of long-read assemblies. An optimization routine is used to select a subset of motifs from all observed motifs at each locus so that the sequences used for annotation likely reflect true motif variation and not sequencing error. \n\nVamos guarantees that the encoding sequence is winthin a bounded edit distance of the original sequence for the genomes used to compile the motif database.\n\nFor example, a VNTR sequence ACGGT|ACTGT|ACGT may be encoded to a more compact representation: ACGGT|AC**G**GT|ACGT using efficient motif set [ACGGT, ACGT]. The edit distance between the original VNTR sequence and encoding sequence is 1. \n\n\n## Latest Updates\nWe have released a version 2.1 of the motif set. This has roughly 1.2m loci and uses an additional motif-harmonization step before efficient motif selection. We additionally supply loci for CHM13.\n\n## Getting Started\nTo install *vamos*, g++ (>= 8.3.0), htslib, abpoa, edlib and alglib are required.\nhtslib and abpoa can be installed through bioconda.\nStatic libraries libalglib.a and libedlib.a are distributed along with *vamos*.\n\nInstall required libraries through conda\n```\nconda create --name vamos python=3.10\nconda activate vamos\nconda install -c bioconda --file requirements.txt\n```\n\nOr download the latest code from github\n```\ngit clone https://github.com/ChaissonLab/vamos.git \ncd vamos*/src/ && make\n```\n\nNext you should download a locus list. These are in BED format, with the coordinates of the tandem repeat as the BED coordinates, and the list of observed motifs from the Human Pangenome Reference Consortium given as the extra field.\n\nThe latest motif sets as of v2.1 can be downloaded via: https://zenodo.org/records/13263615\n\nExplanation of the motif catalog columns:\n| Column | Explanation |\n|:-------|:---|\n| 1 | Chromosome of the locus |\n| 2 | Start coordinate of the locus |\n| 3 | End coordinate of the locus |\n| 4 | Motifs of the locus to be used for annotation (separated by \",\") |\n| 5 | Version of the motif catalog |\n| 6 | Type of the locus (VNTR or STR) |\n| 7 | Period size (bp) of the motif consensus of the locus |\n| 8 | How much proportion the biggest overlap between the locus and a transposable element takes up the TR locus |\n| 9 | How much proportion the biggest overlap between the locus and a transposable element takes up the transposable element |\n\nFor annotation on GRCh38 using the *vamos* **efficient** motifs:\n```\ncurl \"https://zenodo.org/records/13263615/files/vamos.effMotifs-0.1.GRCh38.tsv.gz?download=1\" > vamos.effMotifs-0.1.GRCh38.tsv.gz; gunzip vamos.effMotifs-0.1.GRCh38.tsv.gz;\n ```\nFor annotation on CHM13 using the *vamos* **efficient** motifs\n```\ncurl \"https://zenodo.org/records/13263615/files/vamos.effMotifs-0.1.T2T-CHM13.tsv.gz?download=1\" > vamos.effMotifs-0.1.T2T-CHM13.tsv.gz; gunzip vamos.effMotifs-0.1.T2T-CHM13.tsv.gz\n```\n\n## Running *vamos*\nFor running *vamos* on a haplotype-resolved assembly:\n```\nvamos --contig -b assembly.hap1.mapped_to_grch38.bam -r vamos.effMotifs-0.1.GRCh38.tsv -s sample_name -o assembly.hap1.vcf -t 8\nvamos --contig -b assembly.hap2.mapped_to_grch38.bam -r vamos.effMotifs-0.1.GRCh38.tsv -s sample_name -o assembly.hap2.vcf -t 8\n```\nFor running *vamos* on aligned reads:\n```\nvamos --read -b ../example/demo.aln.bam -r vamos.effMotifs-0.1.GRCh38.tsv -s NA24385_CCS_h1 -o reads.vcf -t 8\n```\nIf the reads are pre-phased using HapCut or WhatsHap, and contain the HA SAM tag, this phasing will be used to call variants from each haplotype. If the reads are unphased, a max-cut heuristic will be used to prephase reads before calling variants.\n\n## Output\n*vamos* generates single-sample diploid vcf (by the ```--read``` mode) or haploid vcf (by the ```--contig``` mode).\n\nExplanation of the \"INFO\" field of an output vcf:\n| Field | Explanation |\n|:-------|:---|\n| END     | Ending position of the locus |\n| RU      | All repeating units (motifs) of the locus (\",\" separated) |\n| SVTYPE  | VNTR |\n| ALTANNO_H1 | Motif annotations (allels) of haplotyp1, motifs are indexed from \"0\" as ordered in the \"RU\" field |\n| LEN_H1 | Total count of motifs of haplotyp1 allele |\n| ALTANNO_H2 | Motif annotations (allels) of haplotyp2, motifs are indexed from \"0\" as ordered in the \"RU\" field |\n| LEN_H2 | Total count of motifs of haplotyp2 allele |\n\n\nThe following shows example entries of a diploid single-sample vcf file\n```\n#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\tsample1\nchr1\t11226\t.\tN\t<VNTR>\t.\tPASS\tEND=11462;RU=AGAGTGGTGGCCAGCGCCCCCTGCTGGCGCCGGGGCACTGCAGGGCCCTCTTGCTT,ACTGTATAGTGGTGGCACGCCGCCTGCTGGCAGCTAGGGACATTGCAGGGTCCTCTTGCTC,AGAGTGGTGGCCACCGCCCCCTGCTGGCGCCGGGGCACTGCAGGGTCCTCTTGCTT,ACTGTATAGTGGTGGCACGCCGCCTGCTGGCAGCTACGGACATTGCAGGGTCCTCTTGCTC,ACTGTATAGTGGTGGCACGCCGCCTGCTGGCAGCTAGGGACATTGCAGGGTCCTCTTGCTCA;SVTYPE=VNTR;ALTANNO_H1=0,0,4,0;LEN_H1=4;\tGT\t1/1\nchr1\t15796\t.\tN\t<VNTR>\t.\tPASS\tEND=15849;RU=CTT,CTC,CTG,CAG,CATG;SVTYPE=VNTR;ALTANNO_H1=0,1,2,1,0,2,0,0,0,1,3,0,2,1,0,4,2;LEN_H1=17;ALTANNO_H2=0,1,2,1,0,2,2,2,0,1,3,0,2,1,0,4,2;LEN_H2=17;\tGT\t1/2\n```\n## Citing vamos\nTo cite vamos, you should use:\nRen, Jingwen, Bida Gu, and Mark JP Chaisson. \"vamos: variable-number tandem repeats annotation using efficient motif sets.\" Genome Biology 24.1 (2023): 175.\n\n\n## Analysis using *vamos* output\nPlease refer to [*tryvamos*](https://github.com/ChaissonLab/vamos/blob/master/tryvamos) for more details.\n"
+          },
+          {
+            "file": "tryvamos/README.md",
+            "origin": "repo",
+            "text": "# *tryvamos*: <ins>t</ins>andem <ins>r</ins>epeat anal<ins>y</ins>sis using *<ins>vamos</ins>* outputs\n\n*tryvamos* is a toolkit designed to perform quick visualization, result transformation, and statistical analysis for tandem repeats using annotations generated from *vamos*.\n\n\n## Preparation\n```\nconda create --name tryvamos python=3.10\nconda activate tryvamos\nconda install --file requirements.txt\n\npython tryvamos.py -h\n```\n\n## Usage\n\n### Generate diploid vcf for a panel of samples from haploid/diploid vcfs of individual samples\nCombination of vcfs of individual samples is usually the first step after annotation. Most functionality of *tryvamos* uses multi-sample diploid vcf(s) as input. To generate a multi-sample diploid vcf, paths of single-sample vcfs need to be written in a \"csv\" file, with each line having the two haploid vcfs of one sample (separated by \",\") or a single diploid vcf of one sample.\n```\npython tryvamos.py combineVCF example/example.list example/example.vcf\n```\nExplanation of \"INFO\" field of a multi-sample vcf\n\n| Field | Explanation |\n|:-------|:---|\n| END     | Ending position of the locus |\n| RU      | All repeating units (motifs) of the locus (\",\" separated) |\n| SVTYPE  | VNTR |\n| ALTANNO | All motif annotations (allels) of the locus (\",\" separated), motifs are indexed from \"0\" as ordered in the \"RU\" field |\n\nDiploid genotype of a sample is recorded as indices of the alleles of each haplotype as ordered in the \"ALTANNO\" field (start from 1). Unannotated haplotype is denoted as \".\".\n```\n#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\tHPRC_HG002_h1/HPRC_HG002_h2\tHPRC_HG005_h1/HPRC_HG005_h2\nchr1\t9240\t.\tN\t<VNTR>\t.\tPASS\tEND=9259;RU=GATGAGCAGC,ATGAGCAGC,GATGAGCAG;SVTYPE=VNTR;ALTANNO=0-2\tGT\t1/1\t1/1\nchr1\t52377\t.\tN\t<VNTR>\t.\tPASS\tEND=52421;RU=GT;SVTYPE=VNTR;ALTANNO=0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0,0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0\tGT\t1/1\t2/1\n```\n### Generate feature matrix from combined vcf\nParsing combined vcf of large number of samples for all TR annotations is time consuming. To facilitate repetitive analysis using the combined vcf, we developed the quickFeature module in *tryvamos* to generate sample (row) by feature (column) matrix for convenient high-dimentional data analysis. Currently the following features are supported: \"TR length by number of motifs\" (annoLen), \"TR allele by motif annotations\" (annoStr), \"counts of the most frequent motif\" (topCount), and \"reconstructed nucleotide sequence using motif annotations\" (nt).\n```\npython tryvamos.py quickFeature example/example.vcf example/example.topCount.tsv --feature topCount\n```\n### Visualize landscape of TR alleles by waterfall plot\nWaterfall plot is a plot where TR alleles are visualized as concatenation of variable motifs. It is a good tool to visualize the motif and allele landscape of a TR locus in a population. The waterfallPlot plot module in *tryvamos* provide a quick way to generate waterfall plots for all or selected TR loci.\n```\npython tryvamos.py waterfallPlot example/example.vcf example/plot --useLoci example/loci_for_waterfall.bed\n```\n### Genomew-wide tests of significance of TRs on two panel of samples\nThe testTwoPanels module performs genome-wide tests for input TRs on two panel of samples. Currently the t-test is performed on TR length by motif counts and the KS-test is performed on distibution of motif counts.\n```\npython tryvamos.py testTwoPanels panel1.vcf panel2.vcf\n```\n### Pairwise comparison of TRs on two panel of samples\nThe pairwiseCompare module performs pairwise comparison of TRs for two haplotype vamos vcfs.\n```\npython tryvamos.py pairwiseCompare sample1.vcf sample2.vcf\n```\n"
+          }
+        ],
+        "tool_names": [
+          "ANOVA",
+          "ANOVA.py",
+          "Assembly_alleles",
+          "Assembly_alleles.py",
+          "CompareWithGreedy_new",
+          "CompareWithGreedy_new.py",
+          "ILP_Solver.ray.fast",
+          "ILP_Solver.ray.fast.py",
+          "alleles",
+          "alleles.py",
+          "arrange_format_for_Bida",
+          "arrange_format_for_Bida.py",
+          "arrange_ref_asm_fa",
+          "arrange_ref_asm_fa.py",
+          "asm_trf_map_bed",
+          "asm_trf_map_bed.py",
+          "bedIntersect",
+          "bedIntersect.py",
+          "closestRecomb",
+          "closestRecomb.py",
+          "combine_vcf",
+          "combine_vcf.py",
+          "compare_sv_vamos_allele_combineAll",
+          "compare_sv_vamos_allele_combineAll.py",
+          "editSwapVamos",
+          "editSwapVamos.py",
+          "example",
+          "example.sh",
+          "extractRefBySegdup",
+          "extractRefBySegdup.py",
+          "extract_intv_asm_and_ref",
+          "extract_intv_asm_and_ref.py",
+          "filterHotspot",
+          "filterHotspot.py",
+          "filter_SNP_indels",
+          "filter_SNP_indels.py",
+          "flank_coordinate",
+          "flank_coordinate.py",
+          "get_mask_bed.rmDip",
+          "get_mask_bed.rmDip.py",
+          "hotspotPermutation",
+          "hotspotPermutation.py",
+          "hotspotRegions",
+          "hotspotRegions.py",
+          "hotspotTest",
+          "hotspotTest.py",
+          "hotspotWindows",
+          "hotspotWindows.py",
+          "intersectEvan",
+          "intersectEvan.py",
+          "intersectGymrek",
+          "intersectGymrek.py",
+          "intv_length_filter",
+          "intv_length_filter.py",
+          "merge_intv",
+          "merge_intv.py",
+          "merge_ref_intv",
+          "merge_ref_intv.py",
+          "merge_ref_intv_dataset",
+          "merge_ref_intv_dataset.py",
+          "motif_size_comp_plot",
+          "motif_size_comp_plot.py",
+          "parsimony_block",
+          "parsimony_block.py",
+          "patternTRF",
+          "patternTRF.py",
+          "phase",
+          "phase.py",
+          "postprocessing",
+          "postprocessing.py",
+          "process",
+          "process.py",
+          "process_block",
+          "process_block.py",
+          "process_jasmine_out_combineAll",
+          "process_jasmine_out_combineAll.py",
+          "quickFeature_alleleNT",
+          "quickFeature_alleleNT.py",
+          "readwise_anno",
+          "readwise_anno.py",
+          "s01_extractRef",
+          "s01_extractRef.py",
+          "s02_alleles_filter",
+          "s02_alleles_filter.py",
+          "s02_getPositions",
+          "s02_getPositions.py",
+          "s03_summary",
+          "s03_summary.py",
+          "s04_finalTRmap",
+          "s04_finalTRmap.py",
+          "s04_finalTRmap_bio",
+          "s04_finalTRmap_bio.py",
+          "s04_rate_bio_filter",
+          "s04_rate_bio_filter.py",
+          "s04_rate_filter",
+          "s04_rate_filter.py",
+          "split_for_phasing",
+          "split_for_phasing.py",
+          "sum",
+          "sum.py",
+          "summary",
+          "summary.py",
+          "together_editSwapVamos",
+          "together_editSwapVamos.py",
+          "tryvamos",
+          "tryvamos.py",
+          "turnGymrek2bed",
+          "turnGymrek2bed.py",
+          "vAMOSSOMAtic",
+          "vAMOSSOMAtic.py",
+          "vamos",
+          "visualAllele",
+          "visualAllele.py",
+          "windows",
+          "windows.py",
+          "z_combineGenomicTRandVariantCluster",
+          "z_combineGenomicTRandVariantCluster.py",
+          "z_entropy_purity",
+          "z_entropy_purity.py"
+        ],
+        "tree_paths": [
+          ".gitmodules",
+          "LICENSE.txt",
+          "README.md",
+          "analysis/blockParsimony/closestRecomb.py",
+          "analysis/blockParsimony/filterHotspot.py",
+          "analysis/blockParsimony/parsimony_block.py",
+          "analysis/blockParsimony/patternTRF.py",
+          "analysis/blockParsimony/process_block.py",
+          "analysis/blockParsimony/summary.py",
+          "analysis/mutRate/bedIntersect.py",
+          "analysis/mutRate/extractRefBySegdup.py",
+          "analysis/mutRate/get_mask_bed.rmDip.py",
+          "analysis/mutRate/hotspotPermutation.py",
+          "analysis/mutRate/hotspotRegions.py",
+          "analysis/mutRate/hotspotTest.py",
+          "analysis/mutRate/hotspotWindows.py",
+          "analysis/mutRate/intersectEvan.py",
+          "analysis/mutRate/intersectGymrek.py",
+          "analysis/mutRate/process.py",
+          "analysis/mutRate/s01_extractRef.py",
+          "analysis/mutRate/s02_alleles_filter.py",
+          "analysis/mutRate/s02_getPositions.py",
+          "analysis/mutRate/s03_summary.py",
+          "analysis/mutRate/s04_finalTRmap.py",
+          "analysis/mutRate/s04_finalTRmap_bio.py",
+          "analysis/mutRate/s04_rate_bio_filter.py",
+          "analysis/mutRate/s04_rate_filter.py",
+          "analysis/mutRate/sum.py",
+          "analysis/mutRate/turnGymrek2bed.py",
+          "analysis/mutRate/windows.py",
+          "analysis/mutRate/z_combineGenomicTRandVariantCluster.py",
+          "analysis/mutRate/z_entropy_purity.py",
+          "analysis/plots/assembly_stats_alleles.R",
+          "analysis/plots/assembly_stats_coverage.R",
+          "analysis/plots/cluster.R",
+          "analysis/plots/evolution_mutRate.R",
+          "analysis/plots/motifSets.R",
+          "analysis/quickFeature_alleleNT.py",
+          "analysis/variability/ANOVA.py",
+          "analysis/variability/alleles.py",
+          "buildTRs/buildTRs.smk",
+          "buildTRs/example.sh",
+          "buildTRs/example.yaml",
+          "buildTRs/input.csv",
+          "example/demo.aln.bam",
+          "example/demo.aln.bam.bai",
+          "example/one_region_motif.bed",
+          "example/region_motif.bed",
+          "fast_sd/Makefile",
+          "fast_sd/sdpoa.cpp",
+          "misc/annotation.smk",
+          "misc/annotation.yaml",
+          "misc/configs/emotif_ILP.json",
+          "misc/configs/novel_vntr.config",
+          "misc/configs/snakefile.json",
+          "misc/configs/sv-vntr.config",
+          "misc/emotif_ILP.snakefile",
+          "misc/jupyternotebook/Analysis/.ipynb_checkpoints/Emotif_genomeSize_new-checkpoint.ipynb",
+          "misc/jupyternotebook/Analysis/Emotif_genomeSize_new.ipynb",
+          "misc/jupyternotebook/GreedyMotif/.ipynb_checkpoints/GreedyMotifSet-checkpoint.ipynb",
+          "misc/jupyternotebook/GreedyMotif/.ipynb_checkpoints/ParseSummaryBed-checkpoint.ipynb",
+          "misc/jupyternotebook/GreedyMotif/.ipynb_checkpoints/Threading_CompareWithGreedy-checkpoint.ipynb",
+          "misc/jupyternotebook/GreedyMotif/GreedyMotifSet.ipynb",
+          "misc/jupyternotebook/GreedyMotif/ParseSummaryBed.ipynb",
+          "misc/jupyternotebook/GreedyMotif/Threading_CompareWithGreedy.ipynb",
+          "misc/jupyternotebook/SV_allele_comparison/.ipynb_checkpoints/SV_allele_comparison-checkpoint.ipynb",
+          "misc/jupyternotebook/SV_allele_comparison/SV_allele_comparison.ipynb",
+          "misc/jupyternotebook/Simulation/.ipynb_checkpoints/SD_sim_Anno-checkpoint.ipynb",
+          "misc/jupyternotebook/Simulation/SD_sim_Anno.ipynb",
+          "misc/jupyternotebook/Special_loci/.ipynb_checkpoints/SplitSubjectAnno_twoHaps-checkpoint.ipynb",
+          "misc/jupyternotebook/Special_loci/.ipynb_checkpoints/visualize_allele-ABCA7-checkpoint.ipynb",
+          "misc/jupyternotebook/Special_loci/.ipynb_checkpoints/visualize_allele-ABCA7-length-checkpoint.ipynb",
+          "misc/jupyternotebook/Special_loci/.ipynb_checkpoints/visualize_allele-ABCA7_with_diseaseSub-Copy1-checkpoint.ipynb",
+          "misc/jupyternotebook/Special_loci/.ipynb_checkpoints/visualize_allele-checkpoint.ipynb",
+          "misc/jupyternotebook/Special_loci/SplitSubjectAnno_twoHaps.ipynb",
+          "misc/jupyternotebook/Special_loci/visualize_allele-ABCA7-length.ipynb",
+          "misc/jupyternotebook/Special_loci/visualize_allele-ABCA7.ipynb",
+          "misc/jupyternotebook/Special_loci/visualize_allele-ABCA7_with_diseaseSub-Copy1.ipynb",
+          "misc/jupyternotebook/Special_loci/visualize_allele.ipynb",
+          "misc/novel_vntr.step_1.snakefile",
+          "misc/novel_vntr.step_2.snakefile",
+          "misc/plot_special_loci.snakefile",
+          "misc/process_before_sv-vntr.snakefile",
+          "misc/py/CompareWithGreedy_new.py",
+          "misc/py/ILP_Solver.ray.fast.py",
+          "misc/py/arrange_format_for_Bida.py",
+          "misc/py/arrange_ref_asm_fa.py",
+          "misc/py/asm_trf_map_bed.py",
+          "misc/py/compare_sv_vamos_allele_combineAll.py",
+          "misc/py/extract_intv_asm_and_ref.py",
+          "misc/py/filter_SNP_indels.py",
+          "misc/py/flank_coordinate.py",
+          "misc/py/intv_length_filter.py",
+          "misc/py/merge_intv.py",
+          "misc/py/merge_ref_intv.py",
+          "misc/py/merge_ref_intv_dataset.py",
+          "misc/py/postprocessing.py",
+          "misc/py/process_jasmine_out_combineAll.py",
+          "misc/pyscript/Assembly_alleles.py",
+          "misc/pyscript/combine_vcf.py",
+          "misc/pyscript/editSwapVamos.py",
+          "misc/pyscript/motif_size_comp_plot.py",
+          "misc/pyscript/phase.py",
+          "misc/pyscript/readwise_anno.py",
+          "misc/pyscript/split_for_phasing.py",
+          "misc/pyscript/together_editSwapVamos.py",
+          "misc/pyscript/visualAllele.py",
+          "misc/readme.md",
+          "misc/separate_Jasmine_merge_by_chrom_indel20.snakefile",
+          "misc/sv-vntr_combine.snakefile",
+          "misc/vamos.disease.effMotifs-0.1.tsv",
+          "misc/vamos.disease.oriMotifs.tsv",
+          "misc/vamos_greedy_compare.snakefile",
+          "requirements.txt",
+          "src/Makefile",
+          "src/acc_lookup_table.cpp",
+          "src/acc_lookup_table.h",
+          "src/bounded_anno_local.cpp",
+          "src/io.cpp",
+          "src/io.h",
+          "src/io_unrefined.cpp",
+          "src/main.cpp",
+          "src/msa.cpp",
+          "src/msa.h",
+          "src/option.h",
+          "src/phase.cpp",
+          "src/phase.h",
+          "src/read.h",
+          "src/test.cpp",
+          "src/threads.h",
+          "src/v2.6.2.tar.gz",
+          "src/vamos-beta.cpp",
+          "src/vcf.cpp",
+          "src/vcf.h",
+          "src/vntr.cpp",
+          "src/vntr.h",
+          "tryvamos/Makefile",
+          "tryvamos/README.md",
+          "tryvamos/example/HPRC_HG002_h1.contig.vcf",
+          "tryvamos/example/HPRC_HG002_h2.contig.vcf",
+          "tryvamos/example/HPRC_HG005_h1.contig.vcf",
+          "tryvamos/example/HPRC_HG005_h2.contig.vcf",
+          "tryvamos/example/chr1_73337-73514.png",
+          "tryvamos/example/example.list",
+          "tryvamos/example/example.vcf",
+          "tryvamos/example/loci_for_waterfall.bed",
+          "tryvamos/requirements.txt",
+          "tryvamos/tryvamos.py",
+          "tryvamos/vAMOSSOMAtic.py",
+          "tryvamos/vamossomatic.cpp"
+        ],
+        "tree_truncated": false,
+        "upstream_files": {}
+      },
+      "limitations": [
+        "install_profile_unsupported",
+        "documented_file_missing"
+      ],
+      "caveat_items": [
+        "Environment: no proven installation profile; STRhub did not manufacture installation steps.",
+        "Input: the documented command takes BAM (README.md, line 69); no sentence says so, so the command is what was read. This plan selects STRhub's ont-bam-hg38 reference data.",
+        "read_path: ../example/demo.aln.bam -> /data/in/input.bam.",
+        "Run command: the README's own command, rewritten to STRhub's mounts; the capture wrapper is planned only if the procedure review passes.",
+        "File: the documented command reads vamos.effMotifs-0.1.GRCh38.tsv (after -r), which is neither in the repository nor among STRhub's data."
+      ]
+    }
+  },
+  "provenance": {
+    "from_upstream": {
+      "install": {
+        "method": "conda",
+        "evidence_source": "repo_file:requirements.txt"
+      },
+      "command": {
+        "value": "vamos --read -b ../example/demo.aln.bam -r vamos.effMotifs-0.1.GRCh38.tsv -s NA24385_CCS_h1 -o reads.vcf -t 8",
+        "evidence_source": "README.md:L69"
+      },
+      "input_kind": {
+        "value": "vcf",
+        "evidence_source": "README.md:L69"
+      },
+      "supported_platforms": [],
+      "assembly": {
+        "declared": "hg38",
+        "evidence_source": "README.md:L52"
+      },
+      "regions_schema": {
+        "format": "motif",
+        "evidence_source": "README.md:L45"
+      },
+      "output_format": {
+        "glob": "**/*.vcf*",
+        "evidence_source": "README.md:L69"
+      }
+    },
+    "derived": {
+      "command_rewrites": [
+        {
+          "role": "read_path",
+          "original": "../example/demo.aln.bam",
+          "replacement": "/data/in/input.bam",
+          "basis": "declared dataset mount"
+        }
+      ],
+      "regions_layout_binding": null,
+      "single_sample_adaptation": null
+    },
+    "harness_choices": {
+      "dataset": {
+        "selected": "ont-bam-hg38",
+        "reason": "STRhub selected 'ont-bam-hg38' as compatible with upstream input 'vcf' and platform 'ont'"
+      },
+      "platform": {
+        "selected": "ont",
+        "basis": "counted_unproven",
+        "supported_platforms": []
+      },
+      "assembly": {
+        "selected": "hg38",
+        "basis": "upstream_stated",
+        "note": null
+      },
+      "regions_layout": null,
+      "base_environment": null
+    }
+  },
+  "procedure_validation": {
+    "schema": "strhub-procedure-evidence/1",
+    "valid": true,
+    "reason": "Procedure evidence matches the effective manifest and recomputed decision."
+  },
+  "verdict": {
+    "code": "undetermined",
+    "title": "Could not be determined",
+    "basis": "recipe",
+    "reason": "An installation step is outside this profile (README.md, line 32: `cd vamos*/src/ && make`); STRhub does not interpret, complete or skip it.",
+    "readme_gaps": [],
+    "status_code": "UNVERIFIED_INSUFFICIENT_DOCS",
+    "blockers": [
+      {
+        "code": "install_not_copyable",
+        "what": "An installation step is outside this profile (README.md, line 32: `cd vamos*/src/ && make`); STRhub does not interpret, complete or skip it.",
+        "ask_owner": {
+          "title": "Write the installation as commands that can be copied and run",
+          "body": "STRhub Verified reads the installation from the repository's documentation and runs it exactly as written, adding nothing. At this commit it could not follow it. Writing the installation as plain commands in one code block (apt, conda, pip, make or cmake, with the files they name in the repository) lets a new user, a reviewer and STRhub install the tool by copying it. The forms it can follow are listed in the guide: https://github.com/Tfronta/strhub-verified-next/blob/main/docs/GUIA-PASO-1.md What stopped it: An installation step is outside this profile (README.md, line 32: `cd vamos*/src/ && make`); STRhub does not interpret, complete or skip it."
+        }
+      },
+      {
+        "code": "documented_file_missing",
+        "what": "The documented command reads a file that is not in the repository at this commit and that STRhub does not hold, so the command cannot run as written.",
+        "ask_owner": {
+          "title": "Ship, or link from the README, the file the documented command reads",
+          "body": "STRhub Verified tried to run the command the documentation shows, in a clean environment at the pinned commit. The command reads a file that is not in the repository at that commit. Shipping it, or a documented step that fetches it, would let a new user run the command as written."
+        }
+      }
+    ]
+  },
+  "step1": {
+    "code": "cannot_tell",
+    "headline": "As documented, a third party cannot tell how to run it.",
+    "body": "An installation step is outside this profile (README.md, line 32: `cd vamos*/src/ && make`); STRhub does not interpret, complete or skip it. Nothing was executed. That does not mean the tool does not work: what the guide asks for is missing from the README at this commit. Add it and try the link again on the new commit.",
+    "missing": [
+      "install"
+    ],
+    "missing_text": [
+      "Installation, copyable"
+    ],
+    "guide": "docs/GUIA-PASO-1.md"
+  },
+  "certificate": {
+    "schema": "strhub-verified/certificate/1",
+    "label": "Could not be determined",
+    "reached": "Available",
+    "stages": [
+      {
+        "key": "available",
+        "label": "Source available",
+        "status": "PASS"
+      },
+      {
+        "key": "installs",
+        "label": "Installation",
+        "status": "NOT ATTEMPTED"
+      },
+      {
+        "key": "runs",
+        "label": "End-to-end execution",
+        "status": "NOT ATTEMPTED"
+      },
+      {
+        "key": "output",
+        "label": "Output generated",
+        "status": "NOT ATTEMPTED"
+      }
+    ],
+    "summary": {
+      "purpose": "Evaluate whether the tool installs, runs end-to-end, and produces structurally valid output.",
+      "result": "Could not be determined",
+      "reached": "Available, 1/5 gates passed",
+      "why": "An installation step is outside this profile (README.md, line 32: `cd vamos*/src/ && make`); STRhub does not interpret, complete or skip it.",
+      "scope": "Installation, execution, and output structure evaluation.",
+      "not_evaluated": [
+        "Genotype accuracy",
+        "Concordance",
+        "Forensic validity",
+        "Regulatory compliance"
+      ]
+    },
+    "conclusion": [
+      {
+        "title": "Procedure not established",
+        "body": "The recorded gate observations do not establish whether the documented procedure succeeded or failed."
+      },
+      {
+        "title": "Observations retained",
+        "body": "The supplied run and output observations remain in the report; they do not replace procedure evidence."
+      },
+      {
+        "title": "Verdict: Could not be determined",
+        "body": "An installation step is outside this profile (README.md, line 32: `cd vamos*/src/ && make`); STRhub does not interpret, complete or skip it."
+      },
+      {
+        "title": "Reproducibility not established",
+        "body": "These observations are insufficient to establish a reproducible documented execution finding."
+      }
+    ],
+    "out_of_scope": [
+      "Genotype correctness or accuracy",
+      "Concordance against known truth sets",
+      "Sensitivity, specificity, or stutter performance",
+      "Allele calling accuracy or forensic casework suitability",
+      "Regulatory compliance or ISO accreditation",
+      "Multi-laboratory or multi-dataset reproducibility"
+    ],
+    "limitations": [
+      "Single reference dataset per input type",
+      "Single containerized environment (Docker / ubuntu-22.04)",
+      "No truth-set comparison or ground-truth genotypes",
+      "No accuracy or concordance assessment",
+      "No forensic or clinical validation of results",
+      "No sequencing data were processed because execution did not complete"
+    ],
+    "scope": {
+      "statement": "Independent automated evaluation of reproducible execution. It checks whether the tool installs, runs end-to-end, and produces structurally valid output in a standardized environment.",
+      "not": "This is not an analytical validation. Genotype accuracy, concordance, forensic suitability, and regulatory compliance are out of scope.",
+      "disclaimer": "Each result is a dated snapshot, verified on the tool's public repository at a pinned commit. STRhub does not store tool source code."
+    }
+  }
+}

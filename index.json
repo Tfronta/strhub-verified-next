@@ -1,7 +1,7 @@
 {
   "schema": "strhub-verified/index/3",
-  "generated": "2026-11-22T19:14:38+00:00",
-  "count": 12,
+  "generated": "2026-11-22T19:14:40+00:00",
+  "count": 13,
   "tools": [
     {
       "slug": "expansionhunter",
@@ -520,6 +520,50 @@
           "report": "trtools/ce22d847ea954e4f015818dc288dfa87a47761a8/trtools.json",
           "page": "trtools/ce22d847ea954e4f015818dc288dfa87a47761a8/trtools.html",
           "pdf": "trtools/ce22d847ea954e4f015818dc288dfa87a47761a8/trtools.pdf"
+        }
+      ]
+    },
+    {
+      "slug": "vamos-ont",
+      "name": "vamos",
+      "version": "vamos-v3.1.1",
+      "variant": null,
+      "sha": "5c4a069847fbe6ca6067de1bff6098c9403db9ec",
+      "committed": "2026-05-25T03:58:10Z",
+      "instrument": "documented",
+      "level": "available",
+      "label": "Could not be determined",
+      "verdict": "undetermined",
+      "errors_reported": false,
+      "generated": "2026-11-22T19:14:15+00:00",
+      "source_repo": "https://github.com/ChaissonLab/vamos",
+      "source_ref": "5c4a069847fbe6ca6067de1bff6098c9403db9ec",
+      "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/45059523245",
+      "distinct_str_loci": null,
+      "distinct_snp_markers": null,
+      "total_reads": null,
+      "external_state": "na",
+      "dataset_types": [
+        "ont-bam-hg38"
+      ],
+      "report": "vamos-ont.json",
+      "page": "vamos-ont.html",
+      "versions": [
+        {
+          "sha": "5c4a069847fbe6ca6067de1bff6098c9403db9ec",
+          "instrument": "documented",
+          "version": "vamos-v3.1.1",
+          "variant": null,
+          "committed": "2026-05-25T03:58:10Z",
+          "generated": "2026-11-22T19:14:15+00:00",
+          "level": "available",
+          "label": "Could not be determined",
+          "verdict": "undetermined",
+          "errors_reported": false,
+          "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/45059523245",
+          "report": "vamos-ont/5c4a069847fbe6ca6067de1bff6098c9403db9ec/vamos-ont.json",
+          "page": "vamos-ont/5c4a069847fbe6ca6067de1bff6098c9403db9ec/vamos-ont.html",
+          "pdf": "vamos-ont/5c4a069847fbe6ca6067de1bff6098c9403db9ec/vamos-ont.pdf"
         }
       ]
     }
