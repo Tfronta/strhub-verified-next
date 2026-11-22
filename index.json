@@ -1,7 +1,7 @@
 {
   "schema": "strhub-verified/index/3",
-  "generated": "2026-11-22T19:14:59+00:00",
-  "count": 17,
+  "generated": "2026-11-22T19:15:02+00:00",
+  "count": 18,
   "tools": [
     {
       "slug": "expansionhunter",
@@ -306,6 +306,48 @@
           "report": "mahi-mahi-ont-med/861ea09ab44e88424c45b04d8018f3948a8fefbb/mahi-mahi-ont-med.json",
           "page": "mahi-mahi-ont-med/861ea09ab44e88424c45b04d8018f3948a8fefbb/mahi-mahi-ont-med.html",
           "pdf": "mahi-mahi-ont-med/861ea09ab44e88424c45b04d8018f3948a8fefbb/mahi-mahi-ont-med.pdf"
+        }
+      ]
+    },
+    {
+      "slug": "mpsproto",
+      "name": "MPSproto",
+      "version": "v0.9.7",
+      "variant": null,
+      "sha": "16080a8c7a71493d89670ba39f2a33779c62dccf",
+      "committed": "2024-03-17T15:44:27Z",
+      "instrument": "documented",
+      "level": "available",
+      "label": "Could not be determined",
+      "verdict": "undetermined",
+      "errors_reported": false,
+      "generated": "2026-11-22T19:14:34+00:00",
+      "source_repo": "https://github.com/oyvble/MPSproto",
+      "source_ref": "16080a8c7a71493d89670ba39f2a33779c62dccf",
+      "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/45059554498",
+      "distinct_str_loci": null,
+      "distinct_snp_markers": null,
+      "total_reads": null,
+      "external_state": "na",
+      "dataset_types": [],
+      "report": "mpsproto.json",
+      "page": "mpsproto.html",
+      "versions": [
+        {
+          "sha": "16080a8c7a71493d89670ba39f2a33779c62dccf",
+          "instrument": "documented",
+          "version": "v0.9.7",
+          "variant": null,
+          "committed": "2024-03-17T15:44:27Z",
+          "generated": "2026-11-22T19:14:34+00:00",
+          "level": "available",
+          "label": "Could not be determined",
+          "verdict": "undetermined",
+          "errors_reported": false,
+          "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/45059554498",
+          "report": "mpsproto/16080a8c7a71493d89670ba39f2a33779c62dccf/mpsproto.json",
+          "page": "mpsproto/16080a8c7a71493d89670ba39f2a33779c62dccf/mpsproto.html",
+          "pdf": "mpsproto/16080a8c7a71493d89670ba39f2a33779c62dccf/mpsproto.pdf"
         }
       ]
     },

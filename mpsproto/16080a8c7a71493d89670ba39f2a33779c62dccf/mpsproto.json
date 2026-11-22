@@ -1,0 +1,902 @@
+{
+  "schema": "strhub-verified/1",
+  "mode": "publish",
+  "tool": {
+    "name": "MPSproto",
+    "version": "v0.9.7",
+    "contact": "https://github.com/oyvble/MPSproto/issues"
+  },
+  "submission": {
+    "by": "third_party"
+  },
+  "source": {
+    "repo": "https://github.com/oyvble/MPSproto",
+    "ref": "16080a8c7a71493d89670ba39f2a33779c62dccf",
+    "ref_resolved": "16080a8c7a71493d89670ba39f2a33779c62dccf",
+    "committed": "2024-03-17T15:44:27Z"
+  },
+  "environment": {
+    "dockerfile": "Dockerfile",
+    "os": [
+      "ubuntu-22.04"
+    ],
+    "source": "generated"
+  },
+  "generated": "2026-11-22T19:14:34+00:00",
+  "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/45059554498",
+  "run": {
+    "cmd": "mleHp = inferEvidence(evidData,popFreq,refData,hypHp , calibration, verbose=FALSE)",
+    "cwd": ".",
+    "effective_cmd": "cd '.' && touch /tmp/.strhub_mark && ( mleHp = inferEvidence(evidData,popFreq,refData,hypHp , calibration, verbose=FALSE) ); rc=$?; find . -xdev -type f -newer /tmp/.strhub_mark -size +0 ! -path './.git/*' ! -path './proc/*' ! -path './sys/*' ! -path './dev/*' ! -path './data/*' ! -path '*/__pycache__/*' ! -name '*.pyc' ! -name '*.pyo' 2>/dev/null | head -500 | while IFS= read -r f; do mkdir -p \"/data/out/$(dirname \"$f\")\" && cp \"$f\" \"/data/out/$f\"; done; exit $rc",
+    "step_outcome": "skipped"
+  },
+  "instrument": "documented",
+  "recipe": {
+    "origin": "proposed"
+  },
+  "gates": {
+    "available": true,
+    "installs": false,
+    "runs": false,
+    "io": false,
+    "content": false
+  },
+  "input_contract": {},
+  "level": "available",
+  "io_detail": {},
+  "content_detail": {},
+  "example_detail": null,
+  "datasets": [
+    {
+      "leg": "external",
+      "label": "External data",
+      "available": false,
+      "type": null,
+      "dataset": null,
+      "io": false,
+      "content": false,
+      "passed": false
+    },
+    {
+      "leg": "example",
+      "label": "Tool's own example",
+      "available": false,
+      "io": false,
+      "content": null,
+      "passed": false,
+      "matches_expected": null,
+      "produced_count": null
+    }
+  ],
+  "scope": "Assessment of documented execution in the stated environment and output format. Concerns reproducible execution only; no claim of accuracy, casework fitness, or regulatory validation.",
+  "upstream": {
+    "checked": "2026-11-22T19:14:35+00:00",
+    "repo_exists": true,
+    "ref_exists": true,
+    "default_branch": "master",
+    "status": "identical",
+    "behind_by": 0
+  },
+  "evidence": [
+    {
+      "claim": "install_method",
+      "kind": "tree",
+      "path": "DESCRIPTION",
+      "text": "r",
+      "url": "https://github.com/oyvble/MPSproto/blob/16080a8c7a71493d89670ba39f2a33779c62dccf/DESCRIPTION"
+    },
+    {
+      "claim": "run_command",
+      "kind": "doc",
+      "path": "doc/MPSproto_tutorial.Rmd",
+      "line": 181,
+      "text": "mleHp = inferEvidence(evidData,popFreq,refData,hypHp , calibration, verbose=FALSE)",
+      "url": "https://github.com/oyvble/MPSproto/blob/16080a8c7a71493d89670ba39f2a33779c62dccf/doc/MPSproto_tutorial.Rmd#L181"
+    }
+  ],
+  "repo_test_data": {
+    "known": true,
+    "present": false,
+    "count": 0,
+    "examples": []
+  },
+  "caveats": {
+    "source": "detect_recipe",
+    "items": [
+      "Environment: no proven installation profile; STRhub did not manufacture installation steps.",
+      "Run command: the one documented in doc/MPSproto_tutorial.Rmd (line 181), rewritten to STRhub's mounts; the capture wrapper is planned only if the procedure review passes."
+    ]
+  },
+  "install_detail": {
+    "passed": false,
+    "diagnostics": [],
+    "faults": []
+  },
+  "procedure_review": {
+    "may_say_runs": false,
+    "status_code": "UNVERIFIED_INSUFFICIENT_DOCS",
+    "basis": "recipe",
+    "attribution": "strhub",
+    "blocker": "missing_input",
+    "reason": "STRhub holds no reference sample of the kind this procedure reads, and the repository ships no example to run, so nothing was executed.",
+    "amendments": [
+      {
+        "code": "install_not_copyable",
+        "what": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub."
+      }
+    ],
+    "inferences": {
+      "install": {
+        "evidence_source": "repo_file:DESCRIPTION",
+        "verified": false
+      },
+      "run_command": {
+        "evidence_source": "doc/MPSproto_tutorial.Rmd:L181",
+        "verified": true,
+        "kind": "doc",
+        "path": "doc/MPSproto_tutorial.Rmd",
+        "document_sha256": "9eb0046bdf6b1670d9e7a355962b0bbe7744a3f25a4ecb4a8e10eefb9eb4b821"
+      },
+      "output": {
+        "verified": true,
+        "kind": "doc",
+        "path": "doc/MPSproto_tutorial.Rmd",
+        "line": 132,
+        "end_line": 132,
+        "document_sha256": "9eb0046bdf6b1670d9e7a355962b0bbe7744a3f25a4ecb4a8e10eefb9eb4b821",
+        "evidence_source": "doc/MPSproto_tutorial.Rmd:L132"
+      }
+    },
+    "unbacked_inferences": [
+      "install"
+    ],
+    "provenance": {
+      "from_upstream": {
+        "install": {
+          "method": "r",
+          "evidence_source": "repo_file:DESCRIPTION"
+        },
+        "command": {
+          "value": "mleHp = inferEvidence(evidData,popFreq,refData,hypHp , calibration, verbose=FALSE)",
+          "evidence_source": "doc/MPSproto_tutorial.Rmd:L181"
+        },
+        "input_kind": null,
+        "supported_platforms": [],
+        "assembly": {
+          "declared": null,
+          "evidence_source": null
+        },
+        "regions_schema": null,
+        "output_format": {
+          "glob": "**/*.csv",
+          "evidence_source": "doc/MPSproto_tutorial.Rmd:L132"
+        }
+      },
+      "derived": {
+        "command_rewrites": [],
+        "regions_layout_binding": null,
+        "single_sample_adaptation": null
+      },
+      "harness_choices": {
+        "dataset": null,
+        "platform": {
+          "selected": "illumina",
+          "basis": "counted_unproven",
+          "supported_platforms": []
+        },
+        "assembly": null,
+        "regions_layout": null,
+        "base_environment": null
+      }
+    },
+    "install_method": "r",
+    "citable_install": false,
+    "input_type": null,
+    "output_glob": "**/*.csv",
+    "profile": "strhub-upstream-procedure/1",
+    "install_ready": false,
+    "example_ready": false,
+    "installation": {
+      "profile": "strhub-upstream-procedure/1",
+      "ready": false,
+      "method": "r",
+      "reason": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub.",
+      "gap": "commit"
+    },
+    "command_review": {
+      "profile": "strhub-upstream-procedure/1",
+      "cited": "mleHp = inferEvidence(evidData,popFreq,refData,hypHp , calibration, verbose=FALSE)",
+      "command": "mleHp = inferEvidence(evidData,popFreq,refData,hypHp , calibration, verbose=FALSE)",
+      "substitutions": [],
+      "read_bindings": [],
+      "limitations": [],
+      "expected": "mleHp = inferEvidence(evidData,popFreq,refData,hypHp , calibration, verbose=FALSE)",
+      "executed": "mleHp = inferEvidence(evidData,popFreq,refData,hypHp , calibration, verbose=FALSE)",
+      "cited_sha256": "8f256c0a5fb2fc12d9a7a65950ef40210c08a5fdee321ca14367f0ea5f39fe99",
+      "executed_sha256": "8f256c0a5fb2fc12d9a7a65950ef40210c08a5fdee321ca14367f0ea5f39fe99",
+      "citations": [
+        {
+          "repo": "https://github.com/oyvble/MPSproto",
+          "ref": "16080a8c7a71493d89670ba39f2a33779c62dccf",
+          "path": "doc/MPSproto_tutorial.Rmd",
+          "line": 181,
+          "verified": true,
+          "document_sha256": "9eb0046bdf6b1670d9e7a355962b0bbe7744a3f25a4ecb4a8e10eefb9eb4b821",
+          "command_sha256": "8f256c0a5fb2fc12d9a7a65950ef40210c08a5fdee321ca14367f0ea5f39fe99"
+        }
+      ]
+    },
+    "manifest_sha256": "b487ec2b92dbbeb844f8f18b690903c265593586c1f4390da6b8da75fc807d8c",
+    "evidence_sha256": "78f016119179d4e3dd674cf565bf9efae7d54fc4776ea34915bef9886c8c45ff",
+    "evidence": {
+      "schema": "strhub-procedure-evidence/1",
+      "manifest": {
+        "caveats": {
+          "items": [
+            "Environment: no proven installation profile; STRhub did not manufacture installation steps.",
+            "Run command: the one documented in doc/MPSproto_tutorial.Rmd (line 181), rewritten to STRhub's mounts; the capture wrapper is planned only if the procedure review passes."
+          ],
+          "source": "detect_recipe"
+        },
+        "environment": {
+          "dockerfile": "Dockerfile",
+          "os": [
+            "ubuntu-22.04"
+          ],
+          "source": "generated"
+        },
+        "inputs": {},
+        "outputs": [
+          {
+            "format": "csv",
+            "min_records": 1,
+            "path": "**/*.csv"
+          }
+        ],
+        "recipe": {
+          "origin": "proposed"
+        },
+        "report": {
+          "slug": "mpsproto"
+        },
+        "run": {
+          "cmd": "cd '.' && touch /tmp/.strhub_mark && ( mleHp = inferEvidence(evidData,popFreq,refData,hypHp , calibration, verbose=FALSE) ); rc=$?; find . -xdev -type f -newer /tmp/.strhub_mark -size +0 ! -path './.git/*' ! -path './proc/*' ! -path './sys/*' ! -path './dev/*' ! -path './data/*' ! -path '*/__pycache__/*' ! -name '*.pyc' ! -name '*.pyo' 2>/dev/null | head -500 | while IFS= read -r f; do mkdir -p \"/data/out/$(dirname \"$f\")\" && cp \"$f\" \"/data/out/$f\"; done; exit $rc",
+          "timeout_minutes": 20
+        },
+        "source": {
+          "ref": "16080a8c7a71493d89670ba39f2a33779c62dccf",
+          "repo": "https://github.com/oyvble/MPSproto"
+        },
+        "submission": {
+          "by": "third_party"
+        },
+        "tool": {
+          "contact": "https://github.com/oyvble/MPSproto/issues",
+          "name": "MPSproto",
+          "version": "v0.9.7"
+        }
+      },
+      "proposal": {
+        "build": {
+          "also_published": null,
+          "asset": null,
+          "candidates": [
+            {
+              "file": "DESCRIPTION",
+              "method": "r"
+            }
+          ],
+          "digest": null,
+          "dir": null,
+          "evidence_source": "repo_file:DESCRIPTION",
+          "file": "DESCRIPTION",
+          "image": null,
+          "method": "r",
+          "package": null,
+          "readme_install_lines": [],
+          "readme_line": null,
+          "spec_list": false,
+          "ssh_urls_in": [],
+          "tag": null,
+          "then": [],
+          "url": null
+        },
+        "commands": [
+          {
+            "cmd": "mleHp = inferEvidence(evidData,popFreq,refData,hypHp , calibration, verbose=FALSE)",
+            "entry_point": true,
+            "evidence_source": "doc/MPSproto_tutorial.Rmd:L181",
+            "file": "doc/MPSproto_tutorial.Rmd",
+            "has_input_flag": true,
+            "has_output_flag": true,
+            "help_only": false,
+            "invokes": "R",
+            "line": 181,
+            "main_verb": true,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 1,
+            "subcommand": "inferEvidence",
+            "synopsis": false
+          },
+          {
+            "cmd": "mleHd = inferEvidence(evidData,popFreq,refData,hypHd , calibration, verbose=FALSE)",
+            "entry_point": true,
+            "evidence_source": "doc/MPSproto_tutorial.Rmd:L182",
+            "file": "doc/MPSproto_tutorial.Rmd",
+            "has_input_flag": true,
+            "has_output_flag": true,
+            "help_only": false,
+            "invokes": "R",
+            "line": 182,
+            "main_verb": true,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 1,
+            "subcommand": "inferEvidence",
+            "synopsis": false
+          },
+          {
+            "cmd": "mleHp = inferEvidence(evidData,popFreq,refData,hypHp , calibration, verbose=FALSE,model=\"GA\")",
+            "entry_point": true,
+            "evidence_source": "doc/MPSproto_tutorial_advanced.Rmd:L58",
+            "file": "doc/MPSproto_tutorial_advanced.Rmd",
+            "has_input_flag": true,
+            "has_output_flag": true,
+            "help_only": false,
+            "invokes": "R",
+            "line": 58,
+            "main_verb": true,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 2,
+            "subcommand": "inferEvidence",
+            "synopsis": false
+          },
+          {
+            "cmd": "mleHd = inferEvidence(evidData,popFreq,refData,hypHd , calibration, verbose=FALSE,model=\"GA\")",
+            "entry_point": true,
+            "evidence_source": "doc/MPSproto_tutorial_advanced.Rmd:L59",
+            "file": "doc/MPSproto_tutorial_advanced.Rmd",
+            "has_input_flag": true,
+            "has_output_flag": true,
+            "help_only": false,
+            "invokes": "R",
+            "line": 59,
+            "main_verb": true,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 2,
+            "subcommand": "inferEvidence",
+            "synopsis": false
+          },
+          {
+            "cmd": "mleHp = inferEvidence(evidData,popFreq,refData,hypHp , calibration, verbose=FALSE,model=\"NB\")",
+            "entry_point": true,
+            "evidence_source": "doc/MPSproto_tutorial_advanced.Rmd:L86",
+            "file": "doc/MPSproto_tutorial_advanced.Rmd",
+            "has_input_flag": true,
+            "has_output_flag": true,
+            "help_only": false,
+            "invokes": "R",
+            "line": 86,
+            "main_verb": true,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 2,
+            "subcommand": "inferEvidence",
+            "synopsis": false
+          },
+          {
+            "cmd": "mleHd = inferEvidence(evidData,popFreq,refData,hypHd , calibration, verbose=FALSE,model=\"NB\")",
+            "entry_point": true,
+            "evidence_source": "doc/MPSproto_tutorial_advanced.Rmd:L87",
+            "file": "doc/MPSproto_tutorial_advanced.Rmd",
+            "has_input_flag": true,
+            "has_output_flag": true,
+            "help_only": false,
+            "invokes": "R",
+            "line": 87,
+            "main_verb": true,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 2,
+            "subcommand": "inferEvidence",
+            "synopsis": false
+          }
+        ],
+        "dockerfile": null,
+        "docs_read": [
+          {
+            "origin": "repo",
+            "path": "doc/MPSproto_tutorial.Rmd"
+          },
+          {
+            "origin": "repo",
+            "path": "doc/MPSproto_tutorial_advanced.Rmd"
+          }
+        ],
+        "docs_text": "---\ntitle: \"MPSproto tutorial\"\n#date: \"01 08 2022\"\noutput:\n  html_document: default\n  pdf_document: default\n---\n\n```{r setup, include=FALSE}\nknitr::opts_chunk$set(echo = TRUE, warning = FALSE)\n```\n\n\n## About MPSproto\nMPSproto is a R-package for interpreting MPS-STR mixtures. It requires a calibrated model in order to do so.\n\nThe calibrated model ingredients must be: \\\n1) Analytical threshold parameters \\\n2) Marker efficiency parameters \\\n3) Noise parameters \\\n4) Stutter parameters (optional)\n\nThese parameters must be defined per marker and stored in a list structure (calibrated objected): \\\n*calibrated[[marker]]=list(markerEff,nNoiseParam,noiseSizeParam,AT,...)* \\\nwhere *...* is stutter type names (optional).\n\n\n## Calibration\nThe data used for calibration in this tutorial are based on positive control only (reference 2800M).\nSingle source profiles must be provided where the genotype of the contributor is indicated.\n\n### Step 1: Preparing data for calibration\n```{r}\nlibrary(MPSproto) #load package\npkg = path.package(\"MPSproto\") #get package install folder\npath = paste0(pkg,\"/examples\") #path of data to use\n\n#Load data for calibration;\ncalibrationDataFile = paste0(path,\"/tutorialDataCalibration.RDS\") #already stored in package\ndat = readRDS(calibrationDataFile)  #load object\n\n#note the header names must be strictly specified as follows:\ncolnames(dat) \n#Alternatively table data (text format) can be loaded using tableReader()\n\n# Insert missing alleles with dose>0 (true alleles)\ndat = insertMissingTrueAlleles(dat) \n\n#Specify Analytical threshold used (when exporting data)\nAT=11  \n\n#AT must be defined per marker:\nlocNames = unique(dat[,3])  #obtain locus names (Must be upper case)\nif(length(AT)==1) AT = setNames( rep(AT,length(locNames)),locNames)\n\n```\n\n### Step 2: Calibrating marker efficiency\n```{r}\nmarkerEfficiency = inferMarkerEfficiency(dat,AT,verbose = FALSE) #fitting model MLE model\nAmhat = markerEfficiency$MLE$theta2[locNames] #estimated params\n\n```\n\n### Step 3: Preparing stutter data (pre-step)\n```{r}\n#dat2 = getFilteredData(dat) #deprecated since already built into the getStutterData function\nstutterData = getStutterData(dat, minStuttOccurence=5, verbose=FALSE) #obtaining stutter candidates (traversing different stutter types)\nstuttDat = stutterData$stutterdata #obtain stutter data\n```\n\n### Step 4: Infer stutter model and store coefficients\n```{r}\n#A beta regression model is used to fit the stutter proportions\nstuttMod = inferStutterModel(stuttDat)#,print2pdf=\"StutterModel\")\nstuttModTab = stuttMod$betaTable #obtain coefficient table\n\n#Storing model coefficients in a list\nstuttModList = list() #obtain list of coefficients\nfor(i in seq_len(nrow(stuttModTab))) {\n  row = unlist(stuttModTab[i,])\n  loc = row[1] #obtain locus name\n  type = row[2] #obtain stutter type\n  est =  as.numeric( na.omit(row[3:5]))    #obtain estimats\n  if( !loc%in%names(stuttModList)) stuttModList[[loc]] = list()\n  stuttModList[[loc]][[type]] = est\n}\n\n```\n\n\n### Step 5: Calibrate noise model (done after stutter calibration)\n```{r}\nnoiseMod = inferNoiseModel(sampleNames=unique(dat$SampleName), locNames=locNames, noisedata=stutterData$noisedata, AT=AT)#,print2pdf=\"NoiseModel\")\n```\n\n### Step 6: Storing calibration object\n```{r}\ncalibration = list()\nfor(loc in locNames) {\n  markerEff= Amhat[loc] #setNames(c(,AmSD[loc],AmSD[loc]),c(\"est\",\"SD\",\"SD2\"))\n  noiseMods = lapply(noiseMod,function(x) x[loc])\n  stuttMods = stuttModList[[loc]] \n  \n  calibration[[loc]] = list(markerEff=markerEff)  \n  calibration[[loc]] = append(calibration[[loc]],noiseMods)\n  \n  #put stutter model last (requirement!!)\n  calibration[[loc]] = append(calibration[[loc]],stuttMods)\n}\n\n#Store object for later use (mixture interpretation)\nsaveRDS(calibration,\"tutorialDataCalibrated.RDS\")\n```\n\n### A model calibration wrapper function\n```{r, eval=FALSE}\n#It is possible to run the following wrapper function to perform model calibration (still under development):\ncalibrateModel(dat,AT=11,minStuttOccurence=5,verbose=FALSE)\n```\n\n\n## Mixture interpretation\n\n### Step 1: Data import (calibrated model and frequencies)\n```{r}\n#The calibrated model is imported\ncalibratedModelFile = paste0(path,\"/tutorialDataCalibrated.RDS\") #file name for the calibrated model\ncalibration = readRDS(calibratedModelFile) #obtain the calibrated object\n\n#We import the allele frequency\nfreqFile = paste0(path,\"/ForenSeq_NIST1036cauc_FWbrack.csv\") #frequency file to use\npopFreq =  importMPSfreqs(freqFile)[[1]]\n\n#Note: Ensure that the alleles are all in forward direction for all markers (not UAS)\n```\n\n### Step 2: Generating a fictive mixture dataset\n```{r}\n#SETTINGS FOR GENERATED SAMPLE\nNOC = 2 #Number of contributors\nfst0 = 0.01\n\nset.seed(1) #make reproducible\ngen = genMPSevidence(calibration,NOC,popFreq,mu=1000,omega=0.1)\nevidData = gen$samples #this is evidence data\nrefData = gen$refData #this is reference data\n\n#We can Store Sample to text file:\n#write.csv2(sample_listToTable(evidData),file=\"MPS_evid2p.csv\",row.names = FALSE)\n#write.csv2(sample_listToTable(refData),file=\"MPS_evid2p_refs.csv\",row.names = FALSE)\n\n```\n\n\n### Step 3: Import and visualize profiles\n```{r}\n#Samples can also be obtained from a text file:\nevidData = importMPSsample(paste0(path,\"/MPS_evid2p.csv\") ) #LOAD EVIDENCE DATA\nrefData = importMPSsample(paste0(path,\"/MPS_evid2p_refs.csv\") ) #LOAD REFERENCE DATA\nplotMPS(evidData,refData) #Show in graphical interface\n```\n\n### Step 4: Specify hypotheses for interpretation\nHypothesis set: minor as POI \\\nHp: ref1 + 1 unknown \\\nHd: 2 unknowns\n\n```{r}\nhypHp = list(NOC=NOC,cond=c(1,0),fst=fst0) #(also include fst here)\nhypHd = list(NOC=NOC,cond=c(0,0),fst=fst0,knownRef=1) #(also include fst here)\n\n#If the major was evaluated as POI instead then\n#hypHp = list(NOC=NOC,cond=c(0,1),fst=fst0) #(also include fst here)\n#hypHd = list(NOC=NOC,cond=c(0,0),fst=fst0,knownRef=2) #(also include fst here)\n\n```\n\n### Step 5: Model fit of Hp and Hd \n```{r}\nmleHp = inferEvidence(evidData,popFreq,refData,hypHp , calibration, verbose=FALSE)\nmleHd = inferEvidence(evidData,popFreq,refData,hypHd , calibration, verbose=FALSE)\n```\n\n### Step 6: Obtain calculated LR\n```{r}\npar = getPar(mleHp,mleHd) #get estimated parameters\nLR = getLR(mleHp,mleHd) #get calculated LR (unlogged)\nlog10LR = getlog10LR(mleHp,mleHd) #log10 scale\nupperLR = getUpperLR(mleHd) #get upper LR-limit 1/RMP(theta)\n```\n\n### Step 7: Perform model validation\n```{r,fig.show='hide',eval=FALSE}\nvalidhp = validMLE(mleHp,\"Hp\")\nvalidhd = validMLE(mleHd,\"Hd\")\n```\n\n### Step 8: Provide deconvolution\n```{r}\nDCtableHp = deconvolve(mleHp)$table2\nDCtableHd = deconvolve(mleHd)$table2\n```\n\n### Step 9: Show model fit (expectation vs observations)\n```{r}\nplotTopMPS(mleHp)\nplotTopMPS(mleHd)\n```\n\n\n\n---\ntitle: \"MPSproto tutorial (advanced)\"\n#date: \"01 08 2022\"\noutput:\n  html_document: default\n  pdf_document: default\n---\n\n```{r setup, include=FALSE}\nknitr::opts_chunk$set(echo = TRUE, warning = FALSE)\n```\n\n## About MPSproto mixture interpretation\nMPSproto is a R-package for interpreting MPS-STR mixtures. It requires a calibrated model in order to do so.\nThe user can choose between two models for the reads: Gamma or NegativeBinomial.\nThe differences are demonstrated in this tutorial.\n\n### Step 1: Preparing data\n```{r,fig.show='hide'}\nlibrary(MPSproto) #load package\npkg = path.package(\"MPSproto\") #get package install folder\npath = paste0(pkg,\"/examples\") #path of data to use\n\n#Obtain calibrated model\ncalibratedModelFile = paste0(path,\"/tutorialDataCalibrated.RDS\") #file name for the calibrated model\ncalibration = readRDS(calibratedModelFile) #obtain the calibrated object\n\n#We import the allele frequency\nfreqFile = paste0(path,\"/ForenSeq_NIST1036cauc_FWbrack.csv\") #frequency file to use\npopFreq =  importMPSfreqs(freqFile)[[1]]\n\n#import evidence and reference profiles\nevidData = importMPSsample(paste0(path,\"/MPS_evid2p.csv\") ) #LOAD EVIDENCE DATA\nrefData = importMPSsample(paste0(path,\"/MPS_evid2p_refs.csv\") ) #LOAD REFERENCE DATA\nplotMPS(evidData,refData) #Show in graphical interface\n\n#Note: Ensure that the alleles are all in forward direction for all markers (not UAS)\n```\n\n### Step 2: Specify hypotheses for interpretation\nHypothesis set: minor as POI \\\nHp: ref1 + 1 unknown \\\nHd: 2 unknowns\n\n```{r}\nNOC = 2 #Number of contributors\nfst0 = 0.01 #coancestry coefficient\nhypHp = list(NOC=NOC,cond=c(1,0),fst=fst0) #(also include fst here)\nhypHd = list(NOC=NOC,cond=c(0,0),fst=fst0,knownRef=1) #(also include fst here)\n\n#If the major was evaluated as POI instead then\n#hypHp = list(NOC=NOC,cond=c(0,1),fst=fst0) #(also include fst here)\n\n```\n\n### Step 3: Model fit based on gamma\n```{r,fig.show='hide'}\nmleHp = inferEvidence(evidData,popFreq,refData,hypHp , calibration, verbose=FALSE,model=\"GA\")\nmleHd = inferEvidence(evidData,popFreq,refData,hypHd , calibration, verbose=FALSE,model=\"GA\")\n\n#Obtain calculated LR\npar = getPar(mleHp,mleHd) #get estimated parameters\nLR = getLR(mleHp,mleHd) #get calculated LR (unlogged)\nlog10LR = getlog10LR(mleHp,mleHd) #log10 scale\nlog10LR\npar\n\n#Perform model validation\nvalidhp = validMLE(mleHp,\"Hp\",verbose=FALSE)\nvalidhd = validMLE(mleHd,\"Hd\",verbose=FALSE)\n\n#Provide deconvolution\nDCtableHp = deconvolve(mleHp)$table2\nDCtableHd = deconvolve(mleHd)$table2\n\n#Show model fit (expectation vs observations)\nplotTopMPS(mleHp)\nplotTopMPS(mleHd)\n```\n\n\n\n\n### Step 4: Model fit based on negative binomial\n```{r,fig.show='hide'}\nmleHp = inferEvidence(evidData,popFreq,refData,hypHp , calibration, verbose=FALSE,model=\"NB\")\nmleHd = inferEvidence(evidData,popFreq,refData,hypHd , calibration, verbose=FALSE,model=\"NB\")\n\n#Obtain calculated LR\npar = getPar(mleHp,mleHd) #get estimated parameters\nLR = getLR(mleHp,mleHd) #get calculated LR (unlogged)\nlog10LR = getlog10LR(mleHp,mleHd) #log10 scale\nlog10LR\npar\n\n#Perform model validation\nvalidhp = validMLE(mleHp,\"Hp\",verbose=FALSE)\nvalidhd = validMLE(mleHd,\"Hd\",verbose=FALSE)\n\n#Provide deconvolution\nDCtableHp = deconvolve(mleHp)$table2\nDCtableHd = deconvolve(mleHd)$table2\n\n#Show model fit (expectation vs observations)\nplotTopMPS(mleHp)\nplotTopMPS(mleHd)\n```\n\n\n",
+        "evidence": [
+          {
+            "claim": "install_method",
+            "kind": "tree",
+            "path": "DESCRIPTION",
+            "text": "r",
+            "url": "https://github.com/oyvble/MPSproto/blob/16080a8c7a71493d89670ba39f2a33779c62dccf/DESCRIPTION"
+          },
+          {
+            "claim": "run_command",
+            "kind": "doc",
+            "line": 181,
+            "path": "doc/MPSproto_tutorial.Rmd",
+            "text": "mleHp = inferEvidence(evidData,popFreq,refData,hypHp , calibration, verbose=FALSE)",
+            "url": "https://github.com/oyvble/MPSproto/blob/16080a8c7a71493d89670ba39f2a33779c62dccf/doc/MPSproto_tutorial.Rmd#L181"
+          }
+        ],
+        "example": null,
+        "example_data": [],
+        "inferences": {
+          "build": "repo_file:DESCRIPTION",
+          "example": null,
+          "input_type": null,
+          "output": "doc/MPSproto_tutorial.Rmd:L132",
+          "platform": null,
+          "regions": null,
+          "run_command": "doc/MPSproto_tutorial.Rmd:L181",
+          "single_sample_bams": null
+        },
+        "input_type": {
+          "assembly": {
+            "against_hg38": null,
+            "declared": null,
+            "evidence_source": null,
+            "hg19_evidence_source": null,
+            "hg19_hits": 0,
+            "hg38_evidence_source": null,
+            "hg38_hits": 0,
+            "incompatible_with_hg38": false
+          },
+          "best": null,
+          "candidates": [],
+          "evidence_source": null,
+          "how": "counted",
+          "platform": "illumina",
+          "platform_evidence_source": null,
+          "platform_how": "counted",
+          "signals": {
+            "bam": 0,
+            "ce": 0,
+            "fastq": 0,
+            "hg19": 0,
+            "hg38": 0,
+            "illumina": 0,
+            "ont": 0,
+            "snp": 0,
+            "ystr": 0
+          },
+          "statements": {
+            "against": [],
+            "determined": false,
+            "inputs": [],
+            "platform": [],
+            "recommendation": null
+          },
+          "statements_file": null,
+          "supported_platforms": [],
+          "unsupported": null,
+          "warnings": []
+        },
+        "known_issues": [],
+        "limitations": [
+          "install_profile_unsupported",
+          "no_reference_dataset"
+        ],
+        "output": {
+          "evidence_source": "doc/MPSproto_tutorial.Rmd:L132",
+          "format": "csv",
+          "signals": {
+            "csv": 8,
+            "json": 0,
+            "tsv": 0,
+            "vcf": 0
+          }
+        },
+        "packaging": {
+          "executables": [],
+          "packages": [
+            "MPSproto"
+          ]
+        },
+        "readme": {
+          "gaps": [
+            {
+              "item": "input",
+              "text": "The README does not say what kind of data the tool takes (FASTQ or BAM; Illumina or nanopore; reference build)."
+            },
+            {
+              "item": "example_data",
+              "text": "The repository ships no example input a stranger could run on. A trial can still run on STRhub's reference data for the detected input type."
+            }
+          ],
+          "name": "README.md",
+          "sufficient_to_attempt": true
+        },
+        "readme_name": "README.md",
+        "readme_text": "## About\n\nMPSproto is a tool which contains a quantitative model for MPS-STR data to deal with complex stutters.\n\n## Installation\n\nInstallation for Windows (http://www.euroformix.com/MPSproto): \ninstall.packages('http://www.euroformix.com/sites/default/files/MPSproto_0.9.7.zip',repos=NULL,type='win.binary')\n\nAlternative installation from Github (https://github.com/oyvble/MPSproto): \\\ninstall_github(\"oyvble/MPSproto\")\n\n## Get started using GUI\nOpen R and run\n``` r\nlibrary(MPSproto) #load package\npkg = path.package(\"MPSproto\") #get package install folder\nproj = paste0(pkg,\"/examples/proj.Rdata\") #obtain project file\ngui(proj)\n```\n\n## Other information\n\nMathematical details of the model and a tutorial for how to use the tool can be found in the doc folder.\n\nThe tool was first time mentioned in the discussion of the paper Agudo et al (2022): \"A comprehensive characterization of STR-MPS stutter artefacts\". \n- Folder MPSproto_stutterCharPaper in the MPSproto installation directory contains scripts for the calibration and examples of interpretation\n\nThe allele format for MPS data must be the \"Forward_Strand_Bracketed_form\" from LUSstr (https://github.com/bioforensics/lusSTR) or LUSstrR (https://github.com/oyvble/LUSstrR).\n\nAn explanation about the nomenclature of the different stutter types used in the program:\n- BW1= \u2018n-1\u2019 for longest motif-repeat\n- FW1= \u2018n+1\u2019 for longest motif-repeat\n- DBW1= \u2018n-2\u2019 for longest motif-repeat (double back stutter)\n- TBW1= \u2018n-3\u2019 for longest motif-repeat (tripple back stutter)\n- etc.. \n\nFor more complex sequences:\n- BW2= \u2018n-1\u2019 for second longest motif-repeat\n- FWBW= \u2018n+1\u2019 for longest motif-repeat and \u2018n-1\u2019 for second longest motif-repeat\n- BWFW= \u2018n-1\u2019 for longest motif-repeat og \u2018n+1\u2019 for second longest motif-repeat\n\nThe software also support traditional CE data, with stutters BW1, FW1, DBW1 as supported stutter types.\n\n",
+        "ref": "16080a8c7a71493d89670ba39f2a33779c62dccf",
+        "regions": {
+          "ambiguous": false,
+          "candidates": [],
+          "end_line": null,
+          "evidence_source": null,
+          "file": null,
+          "format": null,
+          "line": null,
+          "text": null
+        },
+        "registry": {
+          "bioconda": {},
+          "documented": []
+        },
+        "repo": "https://github.com/oyvble/MPSproto",
+        "schema": "strhub-verified/recipe-proposal/1",
+        "single_sample_bams": {
+          "allowed": false,
+          "evidence_source": null,
+          "file": null,
+          "line": null,
+          "paired_flags": [],
+          "text": null
+        },
+        "source_documents": [
+          {
+            "file": "README.md",
+            "origin": "readme",
+            "text": "## About\n\nMPSproto is a tool which contains a quantitative model for MPS-STR data to deal with complex stutters.\n\n## Installation\n\nInstallation for Windows (http://www.euroformix.com/MPSproto): \ninstall.packages('http://www.euroformix.com/sites/default/files/MPSproto_0.9.7.zip',repos=NULL,type='win.binary')\n\nAlternative installation from Github (https://github.com/oyvble/MPSproto): \\\ninstall_github(\"oyvble/MPSproto\")\n\n## Get started using GUI\nOpen R and run\n``` r\nlibrary(MPSproto) #load package\npkg = path.package(\"MPSproto\") #get package install folder\nproj = paste0(pkg,\"/examples/proj.Rdata\") #obtain project file\ngui(proj)\n```\n\n## Other information\n\nMathematical details of the model and a tutorial for how to use the tool can be found in the doc folder.\n\nThe tool was first time mentioned in the discussion of the paper Agudo et al (2022): \"A comprehensive characterization of STR-MPS stutter artefacts\". \n- Folder MPSproto_stutterCharPaper in the MPSproto installation directory contains scripts for the calibration and examples of interpretation\n\nThe allele format for MPS data must be the \"Forward_Strand_Bracketed_form\" from LUSstr (https://github.com/bioforensics/lusSTR) or LUSstrR (https://github.com/oyvble/LUSstrR).\n\nAn explanation about the nomenclature of the different stutter types used in the program:\n- BW1= \u2018n-1\u2019 for longest motif-repeat\n- FW1= \u2018n+1\u2019 for longest motif-repeat\n- DBW1= \u2018n-2\u2019 for longest motif-repeat (double back stutter)\n- TBW1= \u2018n-3\u2019 for longest motif-repeat (tripple back stutter)\n- etc.. \n\nFor more complex sequences:\n- BW2= \u2018n-1\u2019 for second longest motif-repeat\n- FWBW= \u2018n+1\u2019 for longest motif-repeat and \u2018n-1\u2019 for second longest motif-repeat\n- BWFW= \u2018n-1\u2019 for longest motif-repeat og \u2018n+1\u2019 for second longest motif-repeat\n\nThe software also support traditional CE data, with stutters BW1, FW1, DBW1 as supported stutter types.\n\n"
+          },
+          {
+            "file": "doc/MPSproto_tutorial.Rmd",
+            "origin": "repo",
+            "text": "---\ntitle: \"MPSproto tutorial\"\n#date: \"01 08 2022\"\noutput:\n  html_document: default\n  pdf_document: default\n---\n\n```{r setup, include=FALSE}\nknitr::opts_chunk$set(echo = TRUE, warning = FALSE)\n```\n\n\n## About MPSproto\nMPSproto is a R-package for interpreting MPS-STR mixtures. It requires a calibrated model in order to do so.\n\nThe calibrated model ingredients must be: \\\n1) Analytical threshold parameters \\\n2) Marker efficiency parameters \\\n3) Noise parameters \\\n4) Stutter parameters (optional)\n\nThese parameters must be defined per marker and stored in a list structure (calibrated objected): \\\n*calibrated[[marker]]=list(markerEff,nNoiseParam,noiseSizeParam,AT,...)* \\\nwhere *...* is stutter type names (optional).\n\n\n## Calibration\nThe data used for calibration in this tutorial are based on positive control only (reference 2800M).\nSingle source profiles must be provided where the genotype of the contributor is indicated.\n\n### Step 1: Preparing data for calibration\n```{r}\nlibrary(MPSproto) #load package\npkg = path.package(\"MPSproto\") #get package install folder\npath = paste0(pkg,\"/examples\") #path of data to use\n\n#Load data for calibration;\ncalibrationDataFile = paste0(path,\"/tutorialDataCalibration.RDS\") #already stored in package\ndat = readRDS(calibrationDataFile)  #load object\n\n#note the header names must be strictly specified as follows:\ncolnames(dat) \n#Alternatively table data (text format) can be loaded using tableReader()\n\n# Insert missing alleles with dose>0 (true alleles)\ndat = insertMissingTrueAlleles(dat) \n\n#Specify Analytical threshold used (when exporting data)\nAT=11  \n\n#AT must be defined per marker:\nlocNames = unique(dat[,3])  #obtain locus names (Must be upper case)\nif(length(AT)==1) AT = setNames( rep(AT,length(locNames)),locNames)\n\n```\n\n### Step 2: Calibrating marker efficiency\n```{r}\nmarkerEfficiency = inferMarkerEfficiency(dat,AT,verbose = FALSE) #fitting model MLE model\nAmhat = markerEfficiency$MLE$theta2[locNames] #estimated params\n\n```\n\n### Step 3: Preparing stutter data (pre-step)\n```{r}\n#dat2 = getFilteredData(dat) #deprecated since already built into the getStutterData function\nstutterData = getStutterData(dat, minStuttOccurence=5, verbose=FALSE) #obtaining stutter candidates (traversing different stutter types)\nstuttDat = stutterData$stutterdata #obtain stutter data\n```\n\n### Step 4: Infer stutter model and store coefficients\n```{r}\n#A beta regression model is used to fit the stutter proportions\nstuttMod = inferStutterModel(stuttDat)#,print2pdf=\"StutterModel\")\nstuttModTab = stuttMod$betaTable #obtain coefficient table\n\n#Storing model coefficients in a list\nstuttModList = list() #obtain list of coefficients\nfor(i in seq_len(nrow(stuttModTab))) {\n  row = unlist(stuttModTab[i,])\n  loc = row[1] #obtain locus name\n  type = row[2] #obtain stutter type\n  est =  as.numeric( na.omit(row[3:5]))    #obtain estimats\n  if( !loc%in%names(stuttModList)) stuttModList[[loc]] = list()\n  stuttModList[[loc]][[type]] = est\n}\n\n```\n\n\n### Step 5: Calibrate noise model (done after stutter calibration)\n```{r}\nnoiseMod = inferNoiseModel(sampleNames=unique(dat$SampleName), locNames=locNames, noisedata=stutterData$noisedata, AT=AT)#,print2pdf=\"NoiseModel\")\n```\n\n### Step 6: Storing calibration object\n```{r}\ncalibration = list()\nfor(loc in locNames) {\n  markerEff= Amhat[loc] #setNames(c(,AmSD[loc],AmSD[loc]),c(\"est\",\"SD\",\"SD2\"))\n  noiseMods = lapply(noiseMod,function(x) x[loc])\n  stuttMods = stuttModList[[loc]] \n  \n  calibration[[loc]] = list(markerEff=markerEff)  \n  calibration[[loc]] = append(calibration[[loc]],noiseMods)\n  \n  #put stutter model last (requirement!!)\n  calibration[[loc]] = append(calibration[[loc]],stuttMods)\n}\n\n#Store object for later use (mixture interpretation)\nsaveRDS(calibration,\"tutorialDataCalibrated.RDS\")\n```\n\n### A model calibration wrapper function\n```{r, eval=FALSE}\n#It is possible to run the following wrapper function to perform model calibration (still under development):\ncalibrateModel(dat,AT=11,minStuttOccurence=5,verbose=FALSE)\n```\n\n\n## Mixture interpretation\n\n### Step 1: Data import (calibrated model and frequencies)\n```{r}\n#The calibrated model is imported\ncalibratedModelFile = paste0(path,\"/tutorialDataCalibrated.RDS\") #file name for the calibrated model\ncalibration = readRDS(calibratedModelFile) #obtain the calibrated object\n\n#We import the allele frequency\nfreqFile = paste0(path,\"/ForenSeq_NIST1036cauc_FWbrack.csv\") #frequency file to use\npopFreq =  importMPSfreqs(freqFile)[[1]]\n\n#Note: Ensure that the alleles are all in forward direction for all markers (not UAS)\n```\n\n### Step 2: Generating a fictive mixture dataset\n```{r}\n#SETTINGS FOR GENERATED SAMPLE\nNOC = 2 #Number of contributors\nfst0 = 0.01\n\nset.seed(1) #make reproducible\ngen = genMPSevidence(calibration,NOC,popFreq,mu=1000,omega=0.1)\nevidData = gen$samples #this is evidence data\nrefData = gen$refData #this is reference data\n\n#We can Store Sample to text file:\n#write.csv2(sample_listToTable(evidData),file=\"MPS_evid2p.csv\",row.names = FALSE)\n#write.csv2(sample_listToTable(refData),file=\"MPS_evid2p_refs.csv\",row.names = FALSE)\n\n```\n\n\n### Step 3: Import and visualize profiles\n```{r}\n#Samples can also be obtained from a text file:\nevidData = importMPSsample(paste0(path,\"/MPS_evid2p.csv\") ) #LOAD EVIDENCE DATA\nrefData = importMPSsample(paste0(path,\"/MPS_evid2p_refs.csv\") ) #LOAD REFERENCE DATA\nplotMPS(evidData,refData) #Show in graphical interface\n```\n\n### Step 4: Specify hypotheses for interpretation\nHypothesis set: minor as POI \\\nHp: ref1 + 1 unknown \\\nHd: 2 unknowns\n\n```{r}\nhypHp = list(NOC=NOC,cond=c(1,0),fst=fst0) #(also include fst here)\nhypHd = list(NOC=NOC,cond=c(0,0),fst=fst0,knownRef=1) #(also include fst here)\n\n#If the major was evaluated as POI instead then\n#hypHp = list(NOC=NOC,cond=c(0,1),fst=fst0) #(also include fst here)\n#hypHd = list(NOC=NOC,cond=c(0,0),fst=fst0,knownRef=2) #(also include fst here)\n\n```\n\n### Step 5: Model fit of Hp and Hd \n```{r}\nmleHp = inferEvidence(evidData,popFreq,refData,hypHp , calibration, verbose=FALSE)\nmleHd = inferEvidence(evidData,popFreq,refData,hypHd , calibration, verbose=FALSE)\n```\n\n### Step 6: Obtain calculated LR\n```{r}\npar = getPar(mleHp,mleHd) #get estimated parameters\nLR = getLR(mleHp,mleHd) #get calculated LR (unlogged)\nlog10LR = getlog10LR(mleHp,mleHd) #log10 scale\nupperLR = getUpperLR(mleHd) #get upper LR-limit 1/RMP(theta)\n```\n\n### Step 7: Perform model validation\n```{r,fig.show='hide',eval=FALSE}\nvalidhp = validMLE(mleHp,\"Hp\")\nvalidhd = validMLE(mleHd,\"Hd\")\n```\n\n### Step 8: Provide deconvolution\n```{r}\nDCtableHp = deconvolve(mleHp)$table2\nDCtableHd = deconvolve(mleHd)$table2\n```\n\n### Step 9: Show model fit (expectation vs observations)\n```{r}\nplotTopMPS(mleHp)\nplotTopMPS(mleHd)\n```\n\n\n"
+          },
+          {
+            "file": "doc/MPSproto_tutorial_advanced.Rmd",
+            "origin": "repo",
+            "text": "---\ntitle: \"MPSproto tutorial (advanced)\"\n#date: \"01 08 2022\"\noutput:\n  html_document: default\n  pdf_document: default\n---\n\n```{r setup, include=FALSE}\nknitr::opts_chunk$set(echo = TRUE, warning = FALSE)\n```\n\n## About MPSproto mixture interpretation\nMPSproto is a R-package for interpreting MPS-STR mixtures. It requires a calibrated model in order to do so.\nThe user can choose between two models for the reads: Gamma or NegativeBinomial.\nThe differences are demonstrated in this tutorial.\n\n### Step 1: Preparing data\n```{r,fig.show='hide'}\nlibrary(MPSproto) #load package\npkg = path.package(\"MPSproto\") #get package install folder\npath = paste0(pkg,\"/examples\") #path of data to use\n\n#Obtain calibrated model\ncalibratedModelFile = paste0(path,\"/tutorialDataCalibrated.RDS\") #file name for the calibrated model\ncalibration = readRDS(calibratedModelFile) #obtain the calibrated object\n\n#We import the allele frequency\nfreqFile = paste0(path,\"/ForenSeq_NIST1036cauc_FWbrack.csv\") #frequency file to use\npopFreq =  importMPSfreqs(freqFile)[[1]]\n\n#import evidence and reference profiles\nevidData = importMPSsample(paste0(path,\"/MPS_evid2p.csv\") ) #LOAD EVIDENCE DATA\nrefData = importMPSsample(paste0(path,\"/MPS_evid2p_refs.csv\") ) #LOAD REFERENCE DATA\nplotMPS(evidData,refData) #Show in graphical interface\n\n#Note: Ensure that the alleles are all in forward direction for all markers (not UAS)\n```\n\n### Step 2: Specify hypotheses for interpretation\nHypothesis set: minor as POI \\\nHp: ref1 + 1 unknown \\\nHd: 2 unknowns\n\n```{r}\nNOC = 2 #Number of contributors\nfst0 = 0.01 #coancestry coefficient\nhypHp = list(NOC=NOC,cond=c(1,0),fst=fst0) #(also include fst here)\nhypHd = list(NOC=NOC,cond=c(0,0),fst=fst0,knownRef=1) #(also include fst here)\n\n#If the major was evaluated as POI instead then\n#hypHp = list(NOC=NOC,cond=c(0,1),fst=fst0) #(also include fst here)\n\n```\n\n### Step 3: Model fit based on gamma\n```{r,fig.show='hide'}\nmleHp = inferEvidence(evidData,popFreq,refData,hypHp , calibration, verbose=FALSE,model=\"GA\")\nmleHd = inferEvidence(evidData,popFreq,refData,hypHd , calibration, verbose=FALSE,model=\"GA\")\n\n#Obtain calculated LR\npar = getPar(mleHp,mleHd) #get estimated parameters\nLR = getLR(mleHp,mleHd) #get calculated LR (unlogged)\nlog10LR = getlog10LR(mleHp,mleHd) #log10 scale\nlog10LR\npar\n\n#Perform model validation\nvalidhp = validMLE(mleHp,\"Hp\",verbose=FALSE)\nvalidhd = validMLE(mleHd,\"Hd\",verbose=FALSE)\n\n#Provide deconvolution\nDCtableHp = deconvolve(mleHp)$table2\nDCtableHd = deconvolve(mleHd)$table2\n\n#Show model fit (expectation vs observations)\nplotTopMPS(mleHp)\nplotTopMPS(mleHd)\n```\n\n\n\n\n### Step 4: Model fit based on negative binomial\n```{r,fig.show='hide'}\nmleHp = inferEvidence(evidData,popFreq,refData,hypHp , calibration, verbose=FALSE,model=\"NB\")\nmleHd = inferEvidence(evidData,popFreq,refData,hypHd , calibration, verbose=FALSE,model=\"NB\")\n\n#Obtain calculated LR\npar = getPar(mleHp,mleHd) #get estimated parameters\nLR = getLR(mleHp,mleHd) #get calculated LR (unlogged)\nlog10LR = getlog10LR(mleHp,mleHd) #log10 scale\nlog10LR\npar\n\n#Perform model validation\nvalidhp = validMLE(mleHp,\"Hp\",verbose=FALSE)\nvalidhd = validMLE(mleHd,\"Hd\",verbose=FALSE)\n\n#Provide deconvolution\nDCtableHp = deconvolve(mleHp)$table2\nDCtableHd = deconvolve(mleHd)$table2\n\n#Show model fit (expectation vs observations)\nplotTopMPS(mleHp)\nplotTopMPS(mleHd)\n```\n\n\n"
+          }
+        ],
+        "tool_names": [
+          "MPSproto",
+          "mpsproto"
+        ],
+        "tree_paths": [
+          "DESCRIPTION",
+          "LICENSE",
+          "NAMESPACE",
+          "NEWS.md",
+          "R/calcLogLikC_prediction.R",
+          "R/calcLogLikR_prediction.R",
+          "R/calibrateModel.R",
+          "R/convertBracket2seq.R",
+          "R/convertMotifReps2seq.R",
+          "R/createDiagnosticPlots.R",
+          "R/deconvolve.R",
+          "R/diagnoseMCMC.R",
+          "R/doMCMC.R",
+          "R/dpareto.R",
+          "R/fitSUMmodel.R",
+          "R/genMPSevidence.R",
+          "R/getMPSkit.R",
+          "R/getMarkerEffStat.R",
+          "R/getMotifReps.R",
+          "R/getMotifRepsSequences.R",
+          "R/getResults.R",
+          "R/getStutterData.R",
+          "R/getStutterExpectations.R",
+          "R/getStutterIndex.R",
+          "R/getStutterTypeRule.R",
+          "R/getStutteredSequence.R",
+          "R/getUpperLR.R",
+          "R/gui.R",
+          "R/importMPSfreqs.R",
+          "R/importMPSsample.R",
+          "R/inferEvidence.R",
+          "R/inferEvidence2.R",
+          "R/inferMarkerEfficiency.R",
+          "R/inferNoiseModel.R",
+          "R/inferStutterModel.R",
+          "R/insertMissingTrueAlleles.R",
+          "R/logLiki.R",
+          "R/optimizeLik.R",
+          "R/plotMPS.R",
+          "R/plotTopMPS.R",
+          "R/prefit_prediction.R",
+          "R/prepareC_prediction.R",
+          "R/prepareData_prediction.R",
+          "R/sample_listToTable.R",
+          "R/tableReader.R",
+          "R/validMLE.R",
+          "README.md",
+          "doc/MPSproto_MathematicalDetails.docx",
+          "doc/MPSproto_tutorial.Rmd",
+          "doc/MPSproto_tutorial.html",
+          "doc/MPSproto_tutorial_advanced.Rmd",
+          "doc/MPSproto_tutorial_advanced.html",
+          "doc/tutorialDataCalibrated.RDS",
+          "inst/MPSproto_stutterCharPaper/README.txt",
+          "inst/MPSproto_stutterCharPaper/calibrate.R",
+          "inst/MPSproto_stutterCharPaper/data/ForenSeq_Norway_FWbrack.csv",
+          "inst/MPSproto_stutterCharPaper/data/calibrated_MPSproto_stutterCharPaper.RDS",
+          "inst/MPSproto_stutterCharPaper/data/calibrated_StutterCoef.csv",
+          "inst/MPSproto_stutterCharPaper/data/data_excludedStutters.csv",
+          "inst/MPSproto_stutterCharPaper/data/data_noise.csv",
+          "inst/MPSproto_stutterCharPaper/data/data_sumPerMarker.csv",
+          "inst/MPSproto_stutterCharPaper/interpret.R",
+          "inst/examples/ForenSeq_NIST1036cauc_FWbrack.csv",
+          "inst/examples/MPS_evid2p.csv",
+          "inst/examples/MPS_evid2p_CE.csv",
+          "inst/examples/MPS_evid2p_missing.csv",
+          "inst/examples/MPS_evid2p_missing2.csv",
+          "inst/examples/MPS_evid2p_refs.csv",
+          "inst/examples/MPS_evid2p_refsMissing.csv",
+          "inst/examples/proj.Rdata",
+          "inst/examples/tutorialDataCalibrated.RDS",
+          "inst/examples/tutorialDataCalibration.RDS",
+          "inst/examples/tutorialData_preparedCobj.RDS",
+          "inst/extdata/BLMM_CE_table.txt",
+          "inst/extdata/kit.txt",
+          "inst/extdata/kit_mps.txt",
+          "man/calcLogLikC_prediction.Rd",
+          "man/calcLogLikR_prediction.Rd",
+          "man/calibrateModel.Rd",
+          "man/convertBracket2seq.Rd",
+          "man/convertMotifReps2seq.Rd",
+          "man/createDiagnosticPlots.Rd",
+          "man/deconvolve.Rd",
+          "man/diagnoseMCMC.Rd",
+          "man/doMCMC.Rd",
+          "man/dpareto.Rd",
+          "man/fitSUMmodel.Rd",
+          "man/genMPSevidence.Rd",
+          "man/getMPSkit.Rd",
+          "man/getMarkerEffStat.Rd",
+          "man/getMotifReps.Rd",
+          "man/getMotifRepsSequences.Rd",
+          "man/getStutterData.Rd",
+          "man/getStutterExpectations.Rd",
+          "man/getStutterIndex.Rd",
+          "man/getStutterTypeRule.Rd",
+          "man/getStutteredSequence.Rd",
+          "man/getUpperLR.Rd",
+          "man/gui.Rd",
+          "man/importMPSfreqs.Rd",
+          "man/importMPSsample.Rd",
+          "man/inferEvidence.Rd",
+          "man/inferEvidence2.Rd",
+          "man/inferMarkerEfficiency.Rd",
+          "man/inferNoiseModel.Rd",
+          "man/inferStutterModel.Rd",
+          "man/insertMissingTrueAlleles.Rd",
+          "man/logLiki.Rd",
+          "man/optimizeLik.Rd",
+          "man/plotMPS.Rd",
+          "man/plotTopMPS.Rd",
+          "man/prefit_prediction.Rd",
+          "man/prepareC_prediction.Rd",
+          "man/prepareData_prediction.Rd",
+          "man/sample_listToTable.Rd",
+          "man/tableReader.Rd",
+          "man/validMLE.Rd",
+          "src/Makevars",
+          "src/Makevars.win",
+          "src/loglikPrediction_allcomb.cpp",
+          "src/loglikPrediction_allcomb2.cpp",
+          "src/loglikPrediction_cumprob.cpp",
+          "tests/testthat.R",
+          "tests/testthat/test_getStutterIndex.R",
+          "tests/testthat/test_interpretations_nodeg.R",
+          "tests/testthat/test_interpretations_nodeg_missing.R",
+          "tests/testthat/test_interpretations_withdeg.R",
+          "tests/testthat/test_loglikPrediction_allcomb.R"
+        ],
+        "tree_truncated": false,
+        "upstream_files": {}
+      },
+      "limitations": [
+        "install_profile_unsupported",
+        "no_reference_dataset"
+      ],
+      "caveat_items": [
+        "Environment: no proven installation profile; STRhub did not manufacture installation steps.",
+        "Run command: the one documented in doc/MPSproto_tutorial.Rmd (line 181), rewritten to STRhub's mounts; the capture wrapper is planned only if the procedure review passes."
+      ]
+    }
+  },
+  "provenance": {
+    "from_upstream": {
+      "install": {
+        "method": "r",
+        "evidence_source": "repo_file:DESCRIPTION"
+      },
+      "command": {
+        "value": "mleHp = inferEvidence(evidData,popFreq,refData,hypHp , calibration, verbose=FALSE)",
+        "evidence_source": "doc/MPSproto_tutorial.Rmd:L181"
+      },
+      "input_kind": null,
+      "supported_platforms": [],
+      "assembly": {
+        "declared": null,
+        "evidence_source": null
+      },
+      "regions_schema": null,
+      "output_format": {
+        "glob": "**/*.csv",
+        "evidence_source": "doc/MPSproto_tutorial.Rmd:L132"
+      }
+    },
+    "derived": {
+      "command_rewrites": [],
+      "regions_layout_binding": null,
+      "single_sample_adaptation": null
+    },
+    "harness_choices": {
+      "dataset": null,
+      "platform": {
+        "selected": "illumina",
+        "basis": "counted_unproven",
+        "supported_platforms": []
+      },
+      "assembly": null,
+      "regions_layout": null,
+      "base_environment": null
+    }
+  },
+  "procedure_validation": {
+    "schema": "strhub-procedure-evidence/1",
+    "valid": true,
+    "reason": "Procedure evidence matches the effective manifest and recomputed decision."
+  },
+  "verdict": {
+    "code": "undetermined",
+    "title": "Could not be determined",
+    "basis": "recipe",
+    "reason": "STRhub holds no reference sample of the kind this procedure reads, and the repository ships no example to run, so nothing was executed.",
+    "readme_gaps": [
+      {
+        "item": "input",
+        "text": "The README does not say what kind of data the tool takes (FASTQ or BAM; Illumina or nanopore; reference build)."
+      }
+    ],
+    "status_code": "UNVERIFIED_INSUFFICIENT_DOCS",
+    "blockers": [
+      {
+        "code": "no_reference_dataset",
+        "what": "STRhub has no reference sample of the kind this tool reads, and the repository ships no example to run, so nothing was executed.",
+        "ask_owner": {
+          "title": "Ship a small example dataset",
+          "body": "STRhub Verified could not run the tool: it holds no public reference sample of the input type the README describes, and the repository ships no example data. A small example (a few reads and the expected output) would let a new user, and STRhub, run it end-to-end."
+        }
+      },
+      {
+        "code": "build_failed",
+        "what": "The environment did not build from the install steps found in the repository.",
+        "ask_owner": {
+          "title": "Build fails from a clean checkout",
+          "body": "STRhub Verified tried to build the tool from a clean checkout at the pinned commit, following the repository's own install steps, and the build failed. The build log is linked from the run."
+        }
+      }
+    ]
+  },
+  "recommendations": [
+    {
+      "code": "example_data",
+      "text": "The repository ships no example input. A small example the documented command can read, with the output it should produce, would let any user reproduce the run without outside data."
+    }
+  ],
+  "step1": {
+    "code": "ours",
+    "headline": "STRhub could not attempt the documented run.",
+    "body": "STRhub holds no reference sample of the kind this procedure reads, and the repository ships no example to run, so nothing was executed. The limitation is ours. Nothing here is a finding about the tool.",
+    "missing": [],
+    "missing_text": [],
+    "guide": "docs/GUIA-PASO-1.md"
+  },
+  "certificate": {
+    "schema": "strhub-verified/certificate/1",
+    "label": "Could not be determined",
+    "reached": "Available",
+    "stages": [
+      {
+        "key": "available",
+        "label": "Source available",
+        "status": "PASS"
+      },
+      {
+        "key": "installs",
+        "label": "Installation",
+        "status": "NOT ATTEMPTED"
+      },
+      {
+        "key": "runs",
+        "label": "End-to-end execution",
+        "status": "NOT ATTEMPTED"
+      },
+      {
+        "key": "output",
+        "label": "Output generated",
+        "status": "NOT ATTEMPTED"
+      }
+    ],
+    "summary": {
+      "purpose": "Evaluate whether the tool installs, runs end-to-end, and produces structurally valid output.",
+      "result": "Could not be determined",
+      "reached": "Available, 1/5 gates passed",
+      "why": "STRhub holds no reference sample of the kind this procedure reads, and the repository ships no example to run, so nothing was executed.",
+      "scope": "Installation, execution, and output structure evaluation.",
+      "not_evaluated": [
+        "Genotype accuracy",
+        "Concordance",
+        "Forensic validity",
+        "Regulatory compliance"
+      ]
+    },
+    "conclusion": [
+      {
+        "title": "Procedure not established",
+        "body": "The recorded gate observations do not establish whether the documented procedure succeeded or failed."
+      },
+      {
+        "title": "Observations retained",
+        "body": "The supplied run and output observations remain in the report; they do not replace procedure evidence."
+      },
+      {
+        "title": "Verdict: Could not be determined",
+        "body": "STRhub holds no reference sample of the kind this procedure reads, and the repository ships no example to run, so nothing was executed."
+      },
+      {
+        "title": "Reproducibility not established",
+        "body": "These observations are insufficient to establish a reproducible documented execution finding."
+      }
+    ],
+    "out_of_scope": [
+      "Genotype correctness or accuracy",
+      "Concordance against known truth sets",
+      "Sensitivity, specificity, or stutter performance",
+      "Allele calling accuracy or forensic casework suitability",
+      "Regulatory compliance or ISO accreditation",
+      "Multi-laboratory or multi-dataset reproducibility"
+    ],
+    "limitations": [
+      "Single reference dataset per input type",
+      "Single containerized environment (Docker / ubuntu-22.04)",
+      "No truth-set comparison or ground-truth genotypes",
+      "No accuracy or concordance assessment",
+      "No forensic or clinical validation of results",
+      "No sequencing data were processed because execution did not complete"
+    ],
+    "scope": {
+      "statement": "Independent automated evaluation of reproducible execution. It checks whether the tool installs, runs end-to-end, and produces structurally valid output in a standardized environment.",
+      "not": "This is not an analytical validation. Genotype accuracy, concordance, forensic suitability, and regulatory compliance are out of scope.",
+      "disclaimer": "Each result is a dated snapshot, verified on the tool's public repository at a pinned commit. STRhub does not store tool source code."
+    }
+  }
+}
