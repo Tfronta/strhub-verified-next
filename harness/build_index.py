@@ -52,7 +52,7 @@ def _load(reports: pathlib.Path) -> list[dict]:
 
 
 def _stats(r: dict) -> dict | None:
-    outs = r.get("content_detail", {}).get("outputs", [])
+    outs = (r.get("content_detail") or {}).get("outputs", [])
     if outs and isinstance(outs[0], dict):
         return outs[0].get("stats")
     return None
