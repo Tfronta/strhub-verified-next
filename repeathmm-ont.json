@@ -1,0 +1,1045 @@
+{
+  "schema": "strhub-verified/1",
+  "mode": "publish",
+  "tool": {
+    "name": "RepeatHMM",
+    "version": "v2.0.3",
+    "contact": "https://github.com/WGLab/RepeatHMM/issues"
+  },
+  "submission": {
+    "by": "third_party"
+  },
+  "source": {
+    "repo": "https://github.com/WGLab/RepeatHMM",
+    "ref": "fa6c108fa0cc8ab344577147e52a8fcc3adde990",
+    "ref_resolved": "fa6c108fa0cc8ab344577147e52a8fcc3adde990",
+    "committed": "2020-12-03T17:30:50Z"
+  },
+  "environment": {
+    "dockerfile": "Dockerfile",
+    "os": [
+      "ubuntu-22.04"
+    ],
+    "source": "generated"
+  },
+  "generated": "2026-11-22T19:14:51+00:00",
+  "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/45059573616",
+  "run": {
+    "cmd": "python repeatHMM.py BAMinput --Onebamfile XXX.bam --repeatName HTT;",
+    "cwd": ".",
+    "effective_cmd": "cd '.' && touch /tmp/.strhub_mark && ( python repeatHMM.py BAMinput --Onebamfile XXX.bam --repeatName HTT; ); rc=$?; find . -xdev -type f -newer /tmp/.strhub_mark -size +0 ! -path './.git/*' ! -path './proc/*' ! -path './sys/*' ! -path './dev/*' ! -path './data/*' ! -path '*/__pycache__/*' ! -name '*.pyc' ! -name '*.pyo' 2>/dev/null | head -500 | while IFS= read -r f; do mkdir -p \"/data/out/$(dirname \"$f\")\" && cp \"$f\" \"/data/out/$f\"; done; exit $rc",
+    "step_outcome": "skipped"
+  },
+  "instrument": "documented",
+  "recipe": {
+    "origin": "proposed"
+  },
+  "gates": {
+    "available": true,
+    "installs": false,
+    "runs": false,
+    "io": false,
+    "content": false
+  },
+  "input_contract": {
+    "type": "ont-bam-hg38"
+  },
+  "level": "available",
+  "io_detail": {},
+  "content_detail": {},
+  "example_detail": null,
+  "datasets": [
+    {
+      "leg": "external",
+      "label": "External data",
+      "available": false,
+      "type": "ont-bam-hg38",
+      "dataset": null,
+      "io": false,
+      "content": false,
+      "passed": false
+    },
+    {
+      "leg": "example",
+      "label": "Tool's own example",
+      "available": false,
+      "io": false,
+      "content": null,
+      "passed": false,
+      "matches_expected": null,
+      "produced_count": null
+    }
+  ],
+  "scope": "Assessment of documented execution in the stated environment and output format. Concerns reproducible execution only; no claim of accuracy, casework fitness, or regulatory validation.",
+  "upstream": {
+    "checked": "2026-11-22T19:14:52+00:00",
+    "repo_exists": true,
+    "ref_exists": true,
+    "default_branch": "master",
+    "status": "ahead",
+    "behind_by": 8
+  },
+  "evidence": [
+    {
+      "claim": "install_method",
+      "kind": "tree",
+      "path": "environment.yml",
+      "text": "conda",
+      "url": "https://github.com/WGLab/RepeatHMM/blob/fa6c108fa0cc8ab344577147e52a8fcc3adde990/environment.yml"
+    },
+    {
+      "claim": "run_command",
+      "kind": "doc",
+      "path": "docs/Usage.md",
+      "line": 226,
+      "text": "python repeatHMM.py BAMinput --Onebamfile XXX.bam --repeatName HTT;",
+      "url": "https://github.com/WGLab/RepeatHMM/blob/fa6c108fa0cc8ab344577147e52a8fcc3adde990/docs/Usage.md#L226"
+    },
+    {
+      "claim": "documented_input",
+      "kind": "readme",
+      "path": "README.md",
+      "line": 23,
+      "text": "RepeatHMM takes long reads from a subject as input, and can also take a BAM file as input to find more than 10 predefined trinucleotide repeats or a gene given by users, after all reads were well alig",
+      "url": "https://github.com/WGLab/RepeatHMM/blob/fa6c108fa0cc8ab344577147e52a8fcc3adde990/README.md#L23"
+    }
+  ],
+  "repo_test_data": {
+    "known": true,
+    "present": false,
+    "count": 0,
+    "examples": []
+  },
+  "caveats": {
+    "source": "detect_recipe",
+    "items": [
+      "Environment: no proven installation profile; STRhub did not manufacture installation steps.",
+      "Input: the README documents BAM (line 23); this plan selects STRhub's ont-bam-hg38 reference data.",
+      "Evaluator limitation: a read-file argument is outside the closed input substitution table.",
+      "Run command: the one documented in docs/Usage.md (line 226), rewritten to STRhub's mounts; the capture wrapper is planned only if the procedure review passes."
+    ]
+  },
+  "install_detail": {
+    "passed": false,
+    "diagnostics": [],
+    "faults": []
+  },
+  "procedure_review": {
+    "may_say_runs": false,
+    "status_code": "UNVERIFIED_INSUFFICIENT_DOCS",
+    "basis": "recipe",
+    "attribution": "strhub",
+    "blocker": "install_not_copyable",
+    "reason": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub.",
+    "amendments": [
+      {
+        "code": "command_profile_unsupported",
+        "what": "A read-file argument is outside the closed input substitution table."
+      },
+      {
+        "code": "input_not_substituted",
+        "what": "This evaluator cannot establish that the cited command reads the declared reference input; no config or input list was rewritten to make it do so."
+      },
+      {
+        "code": "install_not_copyable",
+        "what": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub."
+      },
+      {
+        "code": "input_not_substituted",
+        "what": "The command still names the repository's own file paths, not STRhub's sample. Running it would not be the reference-sample test."
+      }
+    ],
+    "inferences": {
+      "install": {
+        "evidence_source": "repo_file:environment.yml",
+        "verified": false
+      },
+      "run_command": {
+        "evidence_source": "docs/Usage.md:L226",
+        "verified": true,
+        "kind": "doc",
+        "path": "docs/Usage.md",
+        "document_sha256": "fbc9fb7d7414b551514564a7a3035b325fcc3997dac02c93cb2c392c2a71f8e2"
+      },
+      "input_type": {
+        "verified": true,
+        "kind": "doc",
+        "path": "README.md",
+        "line": 23,
+        "end_line": 23,
+        "document_sha256": "52c3eb54d768ea13b9e1d33c94970101f0b6e70d109e192254b18abc80a83605",
+        "evidence_source": "README.md:L23",
+        "upstream_input_kind": "bam",
+        "selected_dataset": "ont-bam-hg38"
+      },
+      "platform": {
+        "verified": true,
+        "kind": "doc",
+        "path": "README.md",
+        "line": 1,
+        "end_line": 1,
+        "document_sha256": "52c3eb54d768ea13b9e1d33c94970101f0b6e70d109e192254b18abc80a83605",
+        "evidence_source": "README.md:L1",
+        "selected": "ont",
+        "selection_basis": "upstream_single_platform",
+        "supported_platforms": [
+          "ont"
+        ]
+      },
+      "output": {
+        "verified": true,
+        "kind": "doc",
+        "path": "docs/Usage.md",
+        "line": 128,
+        "end_line": 128,
+        "document_sha256": "fbc9fb7d7414b551514564a7a3035b325fcc3997dac02c93cb2c392c2a71f8e2",
+        "evidence_source": "docs/Usage.md:L128"
+      }
+    },
+    "unbacked_inferences": [
+      "install"
+    ],
+    "provenance": {
+      "from_upstream": {
+        "install": {
+          "method": "conda",
+          "evidence_source": "repo_file:environment.yml"
+        },
+        "command": {
+          "value": "python repeatHMM.py BAMinput --Onebamfile XXX.bam --repeatName HTT;",
+          "evidence_source": "docs/Usage.md:L226"
+        },
+        "input_kind": {
+          "value": "bam",
+          "evidence_source": "README.md:L23"
+        },
+        "supported_platforms": [
+          {
+            "platform": "ont",
+            "evidence_source": "README.md:L1"
+          }
+        ],
+        "assembly": {
+          "declared": "both",
+          "evidence_source": "docs/Usage.md:L62"
+        },
+        "regions_schema": null,
+        "output_format": {
+          "glob": "**/*.t[sx][vt]",
+          "evidence_source": "docs/Usage.md:L128"
+        }
+      },
+      "derived": {
+        "command_rewrites": [],
+        "regions_layout_binding": null,
+        "single_sample_adaptation": null
+      },
+      "harness_choices": {
+        "dataset": {
+          "selected": "ont-bam-hg38",
+          "reason": "STRhub selected 'ont-bam-hg38' as compatible with upstream input 'bam' and platform 'ont'"
+        },
+        "platform": {
+          "selected": "ont",
+          "basis": "upstream_single_platform",
+          "supported_platforms": [
+            "ont"
+          ]
+        },
+        "assembly": {
+          "selected": "hg38",
+          "basis": "upstream_stated",
+          "note": null
+        },
+        "regions_layout": null,
+        "base_environment": null
+      }
+    },
+    "install_method": "conda",
+    "citable_install": false,
+    "input_type": "ont-bam-hg38",
+    "output_glob": "**/*.t[sx][vt]",
+    "profile": "strhub-upstream-procedure/1",
+    "install_ready": false,
+    "example_ready": false,
+    "installation": {
+      "profile": "strhub-upstream-procedure/1",
+      "ready": false,
+      "method": "conda",
+      "reason": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub.",
+      "gap": "commit"
+    },
+    "command_review": {
+      "profile": "strhub-upstream-procedure/1",
+      "cited": "python repeatHMM.py BAMinput --Onebamfile XXX.bam --repeatName HTT;",
+      "command": "python repeatHMM.py BAMinput --Onebamfile XXX.bam --repeatName HTT;",
+      "substitutions": [],
+      "read_bindings": [],
+      "limitations": [
+        "a read-file argument is outside the closed input substitution table"
+      ],
+      "expected": "python repeatHMM.py BAMinput --Onebamfile XXX.bam --repeatName HTT;",
+      "executed": "python repeatHMM.py BAMinput --Onebamfile XXX.bam --repeatName HTT;",
+      "cited_sha256": "697db51801a493787fe091a1711cf239c71908ec0693eab3f9ae3bcac14aacdc",
+      "executed_sha256": "697db51801a493787fe091a1711cf239c71908ec0693eab3f9ae3bcac14aacdc",
+      "citations": [
+        {
+          "repo": "https://github.com/WGLab/RepeatHMM",
+          "ref": "fa6c108fa0cc8ab344577147e52a8fcc3adde990",
+          "path": "docs/Usage.md",
+          "line": 226,
+          "verified": true,
+          "document_sha256": "fbc9fb7d7414b551514564a7a3035b325fcc3997dac02c93cb2c392c2a71f8e2",
+          "command_sha256": "697db51801a493787fe091a1711cf239c71908ec0693eab3f9ae3bcac14aacdc"
+        }
+      ]
+    },
+    "manifest_sha256": "6522b5d571a289c89e6c76049fa1032bc256fc33246d666a330893197c7abf31",
+    "evidence_sha256": "95ff769c7d9353f72a7716cc0c5a89b54deb633cb7774642d1baccf2414d46a6",
+    "evidence": {
+      "schema": "strhub-procedure-evidence/1",
+      "manifest": {
+        "caveats": {
+          "items": [
+            "Environment: no proven installation profile; STRhub did not manufacture installation steps.",
+            "Input: the README documents BAM (line 23); this plan selects STRhub's ont-bam-hg38 reference data.",
+            "Evaluator limitation: a read-file argument is outside the closed input substitution table.",
+            "Run command: the one documented in docs/Usage.md (line 226), rewritten to STRhub's mounts; the capture wrapper is planned only if the procedure review passes."
+          ],
+          "source": "detect_recipe"
+        },
+        "environment": {
+          "dockerfile": "Dockerfile",
+          "os": [
+            "ubuntu-22.04"
+          ],
+          "source": "generated"
+        },
+        "inputs": {
+          "type": "ont-bam-hg38"
+        },
+        "outputs": [
+          {
+            "format": "tsv",
+            "min_records": 1,
+            "path": "**/*.t[sx][vt]"
+          }
+        ],
+        "recipe": {
+          "origin": "proposed"
+        },
+        "report": {
+          "slug": "repeathmm-ont"
+        },
+        "run": {
+          "cmd": "cd '.' && touch /tmp/.strhub_mark && ( python repeatHMM.py BAMinput --Onebamfile XXX.bam --repeatName HTT; ); rc=$?; find . -xdev -type f -newer /tmp/.strhub_mark -size +0 ! -path './.git/*' ! -path './proc/*' ! -path './sys/*' ! -path './dev/*' ! -path './data/*' ! -path '*/__pycache__/*' ! -name '*.pyc' ! -name '*.pyo' 2>/dev/null | head -500 | while IFS= read -r f; do mkdir -p \"/data/out/$(dirname \"$f\")\" && cp \"$f\" \"/data/out/$f\"; done; exit $rc",
+          "timeout_minutes": 20
+        },
+        "source": {
+          "ref": "fa6c108fa0cc8ab344577147e52a8fcc3adde990",
+          "repo": "https://github.com/WGLab/RepeatHMM"
+        },
+        "submission": {
+          "by": "third_party"
+        },
+        "tool": {
+          "contact": "https://github.com/WGLab/RepeatHMM/issues",
+          "name": "RepeatHMM",
+          "version": "v2.0.3"
+        }
+      },
+      "proposal": {
+        "build": {
+          "also_published": null,
+          "asset": null,
+          "candidates": [
+            {
+              "file": "environment.yml",
+              "method": "conda"
+            },
+            {
+              "file": "setup.py",
+              "method": "pip"
+            }
+          ],
+          "digest": null,
+          "dir": null,
+          "evidence_source": "repo_file:environment.yml",
+          "file": "environment.yml",
+          "image": null,
+          "method": "conda",
+          "package": null,
+          "readme_install_lines": [],
+          "readme_line": null,
+          "spec_list": false,
+          "ssh_urls_in": [],
+          "tag": null,
+          "then": [],
+          "url": null
+        },
+        "commands": [
+          {
+            "cmd": "python repeatHMM.py BAMinput --Onebamfile XXX.bam --repeatName HTT;",
+            "entry_point": true,
+            "evidence_source": "docs/Usage.md:L226",
+            "file": "docs/Usage.md",
+            "has_input_flag": true,
+            "has_output_flag": false,
+            "help_only": false,
+            "invokes": "repeatHMM.py",
+            "line": 226,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 1,
+            "subcommand": null,
+            "synopsis": false
+          },
+          {
+            "cmd": "python RepeatHMM/bin/repeatHMM.py FASTQinput --repeatName atxn3 --GapCorrection 1 --FlankLength 30 --UserDefinedUniqID sca3_pcr25_raw_test --fastq SRR5363632.fastq --outFolder logfq --Patternfile RepeatHMM/bin/reference_sts/hg38/hg38.predefined.pa --hgfile hg38/hg38.fa --hg hg38",
+            "entry_point": true,
+            "evidence_source": "docs/Usage.md:L123",
+            "file": "docs/Usage.md",
+            "has_input_flag": true,
+            "has_output_flag": true,
+            "help_only": false,
+            "invokes": "repeatHMM.py",
+            "line": 123,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 1,
+            "subcommand": null,
+            "synopsis": false
+          },
+          {
+            "cmd": "python RepeatHMM/bin/repeatHMM.py FASTQinput --fastq XXX.fq --repeatName HTT;",
+            "entry_point": true,
+            "evidence_source": "docs/Usage.md:L120",
+            "file": "docs/Usage.md",
+            "has_input_flag": true,
+            "has_output_flag": false,
+            "help_only": false,
+            "invokes": "repeatHMM.py",
+            "line": 120,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 1,
+            "subcommand": null,
+            "synopsis": false
+          },
+          {
+            "cmd": "python RepeatHMM/bin/repeatHMM.py FASTQinput --fastq XXX.fq --repeatName HTT --GapCorrection 1 --FlankLength 30 ;",
+            "entry_point": true,
+            "evidence_source": "docs/Usage.md:L121",
+            "file": "docs/Usage.md",
+            "has_input_flag": true,
+            "has_output_flag": false,
+            "help_only": false,
+            "invokes": "repeatHMM.py",
+            "line": 121,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 1,
+            "subcommand": null,
+            "synopsis": false
+          },
+          {
+            "cmd": "python RepeatHMM/bin/repeatHMM.py FASTQinput --fastq XXX.fq --repeatName HTT --GapCorrection 1 --FlankLength 30 --UserDefinedUniqID PCR1;",
+            "entry_point": true,
+            "evidence_source": "docs/Usage.md:L122",
+            "file": "docs/Usage.md",
+            "has_input_flag": true,
+            "has_output_flag": false,
+            "help_only": false,
+            "invokes": "repeatHMM.py",
+            "line": 122,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 1,
+            "subcommand": null,
+            "synopsis": false
+          },
+          {
+            "cmd": "python repeatHMM.py BAMinput --Sepbamfile XXX%s.bam --repeatName HTT --GapCorrection 1 FlankLength 30;",
+            "entry_point": true,
+            "evidence_source": "docs/Usage.md:L227",
+            "file": "docs/Usage.md",
+            "has_input_flag": true,
+            "has_output_flag": false,
+            "help_only": false,
+            "invokes": "repeatHMM.py",
+            "line": 227,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 1,
+            "subcommand": null,
+            "synopsis": false
+          },
+          {
+            "cmd": "python repeatHMM.py BAMinput --Onebamfile freeze4-all-merge.sort.bam --repeatName HTT;",
+            "entry_point": true,
+            "evidence_source": "docs/Usage.md:L228",
+            "file": "docs/Usage.md",
+            "has_input_flag": true,
+            "has_output_flag": false,
+            "help_only": false,
+            "invokes": "repeatHMM.py",
+            "line": 228,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 1,
+            "subcommand": null,
+            "synopsis": false
+          },
+          {
+            "cmd": "python RepeatHMM/bin/repeatHMM.py Scan --SplitAndReAlign 1 --MinSup 3 --UserDefinedUniqID chr22scan --SeqTech \"Nanopore\" \"--Patternfile\" chr22.trf.bed --cluster 1 --envset repeathmmenv --Onebamfile nanopore.minimap2.sorted.bam --hgfile GRCh38/GRCh38.fa --thread 50",
+            "entry_point": true,
+            "evidence_source": "docs/Usage.md:L352",
+            "file": "docs/Usage.md",
+            "has_input_flag": true,
+            "has_output_flag": false,
+            "help_only": false,
+            "invokes": "repeatHMM.py",
+            "line": 352,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 1,
+            "subcommand": null,
+            "synopsis": false
+          },
+          {
+            "cmd": "python repeatHMM.py Scan: for Scaning whole genome",
+            "entry_point": true,
+            "evidence_source": "docs/Usage.md:L22",
+            "file": "docs/Usage.md",
+            "has_input_flag": false,
+            "has_output_flag": false,
+            "help_only": false,
+            "invokes": "repeatHMM.py",
+            "line": 22,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 1,
+            "subcommand": null,
+            "synopsis": false
+          },
+          {
+            "cmd": "repeatHMM.py [-h] {BAMinput,FASTQinput,Scan} ...",
+            "entry_point": true,
+            "evidence_source": "docs/Usage.md:L6",
+            "file": "docs/Usage.md",
+            "has_input_flag": true,
+            "has_output_flag": false,
+            "help_only": true,
+            "invokes": "repeatHMM.py",
+            "line": 6,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "repo",
+            "piped": false,
+            "rst": false,
+            "source_rank": 1,
+            "subcommand": null,
+            "synopsis": true
+          }
+        ],
+        "dockerfile": null,
+        "docs_read": [
+          {
+            "origin": "repo",
+            "path": "docs/Usage.md"
+          },
+          {
+            "origin": "repo",
+            "path": "README.md"
+          },
+          {
+            "origin": "repo",
+            "path": "docs/Install.md"
+          },
+          {
+            "origin": "repo",
+            "path": "docs/Help on results interpretation.md"
+          }
+        ],
+        "docs_text": "# The options for repeatHMM.py\n\nThere are three options below for repeatHMM.py: `BAMinput`, `FASTQinput` and `Scan`. Please note that users do not need to provide all parameters below. Most of them have default values.\n\n```\nusage: repeatHMM.py [-h] {BAMinput,FASTQinput,Scan} ...\n\nDetermine microsatellite repeat of interests or for all microsatellites.\n\npositional arguments:\n  {BAMinput,FASTQinput,Scan}\n    BAMinput            Detect trinucleotide repeats from a BAM file\n    FASTQinput          Detect trinucleotide repeats from a FASTQ file\n    Scan                For scanning whole data\n\noptional arguments:\n  -h, --help            show this help message and exit\n\nFor example,\n        python repeatHMM.py BAMinput: with a BAM file as input\n        python repeatHMM.py FASTQinput: with a FASTQ file as input\n        python repeatHMM.py Scan: for Scaning whole genome\n```\n\n## 1. Repeat count estimation for a gene\n\nRepeatHMM is able to take a FASTQ file as input to estimate expansion count for a gene. \n\n### Command and Parameters:\nThe command and the parameters are given below:\n```\nusage: repeatHMM.py FASTQinput [-h] [--hg HG] [--hgfile HGFILE]\n                               [--GapCorrection GAPCORRECTION]\n                               [--FlankLength FLANKLENGTH]\n                               [--MatchInfo MATCHINFO] [--outlog OUTLOG]\n                               [--Tolerate TOLERATE] [--MinSup MINSUP]\n                               [--MaxRep MAXREP] [--CompRep COMPREP]\n                               [--repeatName REPEATNAME]\n                               [--UserDefinedUniqID USERDEFINEDUNIQID]\n                               [--Patternfile PATTERNFILE]\n                               [--UserDefinedRepeat USERDEFINEDREPEAT]\n                               [--SplitAndReAlign {0,1,2}]\n                               [--TRFOptions TRFOPTIONS]\n                               [--minTailSize MINTAILSIZE]\n                               [--minRepBWTSize MINREPBWTSIZE]\n                               [--RepeatTime REPEATTIME]\n                               [--BWAMEMOptions BWAMEMOPTIONS]\n                               [--hmm_insert_rate HMM_INSERT_RATE]\n                               [--hmm_del_rate HMM_DEL_RATE]\n                               [--hmm_sub_rate HMM_SUB_RATE]\n                               [--SeqTech {Pacbio,Nanopore,Illumina,None}]\n                               [--transitionm TRANSITIONM]\n                               [--emissionm EMISSIONM] [--fastq FASTQ]\n\nDetect trinucleotide repeats from a FASTQ file\n\noptional arguments:\n  -h, --help            show this help message and exit\n  --fastq FASTQ         The file name for fasta sequences\n\nCommon options for alignment:\n  --hg HG               The reference genome is used. Currently, some repeat information in hg38 and hg19 are pre-defined. The default folder is ./mhgversion/\n  --hgfile HGFILE       The file name of reference genome. It could be empty and the default file name is 'hg'.fa\n  --GapCorrection GAPCORRECTION\n                        Is unsymmetrical alignment used for error correction of detected repeat region in reads. 1: yes(Default), 0: no\n  --FlankLength FLANKLENGTH\n                        Is flanking sequence used for repeat region detection. non-0: yes(Default: 30), 0: no\n  --MatchInfo MATCHINFO\n                        The match strategy for gap correction.\n\nCommon options:\n  --outlog OUTLOG       The level for output of running information\n  --Tolerate TOLERATE   Tolerate mismatch, e.g., CTG:TTG:0:2 or CTG:CTT:-2:0.\n  --MinSup MINSUP       The minimum reads associated with peaks.\n  --MaxRep MAXREP       The maximum repeat size. The smallest MaxRep should not be less than 14.\n  --CompRep COMPREP     Whether the repeat pattern is simple ('0') or complex (nonzeo-'0': AlTlT50/C50lClT/C). For complex patterns, all patterns are required to have the same length, each position is seperated by `l` and the nucleotides at the same position is seperated by '/' where a nucleotide can by followed by a number specify relative frequency (cannot be float).\n\nCommon options for gene information:\n  --repeatName REPEATNAME\n                        A gene name which you want to analyze(Default: None), such as HTT for huntington's disease. 'all': all pre-defined genes will be analyzed;\n  --UserDefinedUniqID USERDEFINEDUNIQID\n                        The name for storing results. Default: Pcr1. Must be different when simultaneously running RepeatHMM many times with the same setting for a same file\n  --Patternfile PATTERNFILE\n                        The file storing all predefined microsatellites (e.g., './reference_sts/hg38/hg38.trf.bed'). '.bed' for bed files and '.pa' for pa file. More than one files can be provided seperated by ';'.\n  --UserDefinedRepeat USERDEFINEDREPEAT\n                        The repeat information defined by users. If this option is given, the default repeat information will be revised. Default: ///////\n\nCommon options for re-alignment after splitting long reads using repeat regions:\n  --SplitAndReAlign {0,1,2}\n                        Split long reads using repeat region in long reads and re-align the non-repeat regions using BWA MEM. Default=0: not use SplitAndReAlign; 1: use SplitAndReAlign only; 2: combine 0 and 1\n  --TRFOptions TRFOPTIONS\n                        The options used for detecting repeat region in a read using Tandem Repeat Finder. The options are merging using _. Default='2_7_4_80_10_100_500' or '2_7_4_80_10_100'. The last parameter will be twice of the length of repeat if not given.\n  --minTailSize MINTAILSIZE\n                        After the split using repeat regions, discard the leftmost/rightmost non-repeat sub-sequences if they have less than --minTailSize bps. Must not be less than 10. Default=70\n  --minRepBWTSize MINREPBWTSIZE\n                        After the split using repeat regions, merge any two non-repeat sub-sequences if they distance is less than --minRepBWTSize bps. Must not be less than 10. Default=70\n  --RepeatTime REPEATTIME\n                        The minimum repeat time for a microsatellite detected by Tandem Repeat Finder. Must not be less than 2. Default=5\n  --BWAMEMOptions BWAMEMOPTIONS\n                        The options used for BWA MEM to align sub-reads after splitting. The options are merging using _. Default='k8_W8_r7'. For example: 'k8_W8_r7'\n\nCommon options for setting HMM matrices:\n  --hmm_insert_rate HMM_INSERT_RATE\n                        Insert error rate in long reads. Default: 0.12\n  --hmm_del_rate HMM_DEL_RATE\n                        Deletion error rate in long reads. Default: 0.02\n  --hmm_sub_rate HMM_SUB_RATE\n                        Substitution error rate in long reads. Default: 0.02\n  --SeqTech {Pacbio,Nanopore,Illumina,None}\n                        The sequencing techniques, Pacbio or Nanopore or Illumina, used to generate reads data. Default: None. Setting this option will override the setting for --hmm_insert_rate, --hmm_del_rate and --hmm_sub_rate\n  --transitionm TRANSITIONM\n                        User-specified transition matrix for HMM. The number of rows and columns must be the same as the 3*L+1 where L is the size of repeat unit. Probabilities in a row is separated by ',' and their sum must be 1. Probabilities of different rows are separated by ';'. Please pay more attention when providing this parameter. For CG repeat, the example of this matrix is '0.96,0.02,0,0,0,0.02,0;0,0.001,0.869,0.11,0,0,0.02;0.02,0.849,0.001,0,0.11,0.02,0;0,0.001,0.869,0.11,0,0,0.02;0.02,0.849,0.001,0,0.11,0.02,0;0.02,0.849,0.001,0,0.11,0.02,0;0.02,0.001,0.849,0.11,0,0,0.02'. Setting this option will override the setting of --hmm_insert_rate, --hmm_del_rate, --hmm_sub_rate and --SeqTech for transition matrix.\n  --emissionm EMISSIONM\n                        User-specified emission matrix for HMM. The number of rows must be the same as the 3*L+1 where L is the size of repeat unit and the number of columns must be 5. Probabilities in a row is separated by ',' and their sum must be 1. Probabilities of different rows are separated by ';'. Please pay more attention when providing this parameter. For CG repeat, the example of this matrix is '0.2,0.2,0.2,0.2,0.2;0.005,0.985,0.005,0.005,0;0.005,0.005,0.985,0.005,0;0.25,0.25,0.25,0.25,0;0.25,0.25,0.25,0.25,0;0.005,0.005,0.985,0.005,0;0.005,0.985,0.005,0.005,0'. Setting this option will override the setting of --hmm_insert_rate, --hmm_del_rate, --hmm_sub_rate and --SeqTech for emission matrix.\n```\n\n### Example\n```\nFor example,\n     python RepeatHMM/bin/repeatHMM.py FASTQinput --fastq XXX.fq --repeatName HTT;\n     python RepeatHMM/bin/repeatHMM.py FASTQinput --fastq XXX.fq --repeatName HTT --GapCorrection 1 --FlankLength 30 ;\n     python RepeatHMM/bin/repeatHMM.py FASTQinput --fastq XXX.fq --repeatName HTT --GapCorrection 1 --FlankLength 30 --UserDefinedUniqID PCR1;\n     python RepeatHMM/bin/repeatHMM.py FASTQinput --repeatName atxn3 --GapCorrection 1 --FlankLength 30 --UserDefinedUniqID sca3_pcr25_raw_test --fastq SRR5363632.fastq --outFolder logfq --Patternfile RepeatHMM/bin/reference_sts/hg38/hg38.predefined.pa --hgfile hg38/hg38.fa --hg hg38 \n```\nwhere `hg38/hg38.fa` is the hg38 human reference genome. To run the example above, users need to install `fastq-dump` and then use `fastq-dump SRR5363632` to download fastq file to `SRR5363632.fastq`. \n\n### Where to find the result:\nFinal results was stored in logfq/RepFQ_*.log\n\n\n## 2. With a BAM file\n### Command and Parameters:\n```\nusage: repeatHMM.py BAMinput [-h] [--hg HG] [--hgfile HGFILE]\n                             [--GapCorrection GAPCORRECTION]\n                             [--FlankLength FLANKLENGTH]\n                             [--MatchInfo MATCHINFO] [--outlog OUTLOG]\n                             [--Tolerate TOLERATE] [--MinSup MINSUP]\n                             [--MaxRep MAXREP] [--CompRep COMPREP]\n                             [--repeatName REPEATNAME]\n                             [--UserDefinedUniqID USERDEFINEDUNIQID]\n                             [--Patternfile PATTERNFILE]\n                             [--UserDefinedRepeat USERDEFINEDREPEAT]\n                             [--SplitAndReAlign {0,1,2}]\n                             [--TRFOptions TRFOPTIONS]\n                             [--minTailSize MINTAILSIZE]\n                             [--minRepBWTSize MINREPBWTSIZE]\n                             [--RepeatTime REPEATTIME]\n                             [--BWAMEMOptions BWAMEMOPTIONS]\n                             [--hmm_insert_rate HMM_INSERT_RATE]\n                             [--hmm_del_rate HMM_DEL_RATE]\n                             [--hmm_sub_rate HMM_SUB_RATE]\n                             [--SeqTech {Pacbio,Nanopore,Illumina,None}]\n                             [--transitionm TRANSITIONM]\n                             [--emissionm EMISSIONM]\n                             [--Onebamfile ONEBAMFILE | --SepbamfileTemp SEPBAMFILETEMP]\n\nDetect trinucleotide repeats from a BAM file\n\noptional arguments:\n  -h, --help            show this help message and exit\n  --Onebamfile ONEBAMFILE\n                        A BAM file storing all alignments\n  --SepbamfileTemp SEPBAMFILETEMP\n                        A separated BAM file template storing all alignments; separated by chromosome ids. For example, '--SepbamfileTemp'=mybam_Chr%s_sorted.bam where '%s' is chromosome id (1....22,x,y)\n\nCommon options for alignment:\n  --hg HG               The reference genome is used. Currently, some repeat information in hg38 and hg19 are pre-defined. The default folder is ./mhgversion/\n  --hgfile HGFILE       The file name of reference genome. It could be empty and the default file name is 'hg'.fa\n  --GapCorrection GAPCORRECTION\n                        Is unsymmetrical alignment used for error correction of detected repeat region in reads. 1: yes(Default), 0: no\n  --FlankLength FLANKLENGTH\n                        Is flanking sequence used for repeat region detection. non-0: yes(Default: 30), 0: no\n  --MatchInfo MATCHINFO\n                        The match strategy for gap correction.\n\nCommon options:\n  --outlog OUTLOG       The level for output of running information\n  --Tolerate TOLERATE   Tolerate mismatch, e.g., CTG:TTG:0:2 or CTG:CTT:-2:0.\n  --MinSup MINSUP       The minimum reads associated with peaks.\n  --MaxRep MAXREP       The maximum repeat size. The smallest MaxRep should not be less than 14.\n  --CompRep COMPREP     Whether the repeat pattern is simple ('0') or complex (nonzeo-'0': AlTlT50/C50lClT/C). For complex patterns, all patterns are required to have the same length, each position is seperated by `l` and the nucleotides at the same position is seperated by '/' where a nucleotide can by followed by a number specify relative frequency (cannot be float).\n\nCommon options for gene information:\n  --repeatName REPEATNAME\n                        A gene name which you want to analyze(Default: None), such as HTT for huntington's disease. 'all': all pre-defined genes will be analyzed;\n  --UserDefinedUniqID USERDEFINEDUNIQID\n                        The name for storing results. Default: Pcr1. Must be different when simultaneously running RepeatHMM many times with the same setting for a same file\n  --Patternfile PATTERNFILE\n                        The file storing all predefined microsatellites (e.g., './reference_sts/hg38/hg38.trf.bed'). '.bed' for bed files and '.pa' for pa file. More than one files can be provided seperated by ';'.\n  --UserDefinedRepeat USERDEFINEDREPEAT\n                        The repeat information defined by users. If this option is given, the default repeat information will be revised. Default: ///////\n\nCommon options for re-alignment after splitting long reads using repeat regions:\n  --SplitAndReAlign {0,1,2}\n                        Split long reads using repeat region in long reads and re-align the non-repeat regions using BWA MEM. Default=0: not use SplitAndReAlign; 1: use SplitAndReAlign only; 2: combine 0 and 1\n  --TRFOptions TRFOPTIONS\n                        The options used for detecting repeat region in a read using Tandem Repeat Finder. The options are merging using _. Default='2_7_4_80_10_100_500' or '2_7_4_80_10_100'. The last parameter will be twice of the length of repeat if not given.\n  --minTailSize MINTAILSIZE\n                        After the split using repeat regions, discard the leftmost/rightmost non-repeat sub-sequences if they have less than --minTailSize bps. Must not be less than 10. Default=70\n  --minRepBWTSize MINREPBWTSIZE\n                        After the split using repeat regions, merge any two non-repeat sub-sequences if they distance is less than --minRepBWTSize bps. Must not be less than 10. Default=70\n  --RepeatTime REPEATTIME\n                        The minimum repeat time for a microsatellite detected by Tandem Repeat Finder. Must not be less than 2. Default=5\n  --BWAMEMOptions BWAMEMOPTIONS\n                        The options used for BWA MEM to align sub-reads after splitting. The options are merging using _. Default='k8_W8_r7'. For example: 'k8_W8_r7'\n\nCommon options for setting HMM matrices:\n  --hmm_insert_rate HMM_INSERT_RATE\n                        Insert error rate in long reads. Default: 0.12\n  --hmm_del_rate HMM_DEL_RATE\n                        Deletion error rate in long reads. Default: 0.02\n  --hmm_sub_rate HMM_SUB_RATE\n                        Substitution error rate in long reads. Default: 0.02\n  --SeqTech {Pacbio,Nanopore,Illumina,None}\n                        The sequencing techniques, Pacbio or Nanopore or Illumina, used to generate reads data. Default: None. Setting this option will override the setting for --hmm_insert_rate, --hmm_del_rate and --hmm_sub_rate\n  --transitionm TRANSITIONM\n                        User-specified transition matrix for HMM. The number of rows and columns must be the same as the 3*L+1 where L is the size of repeat unit. Probabilities in a row is separated by ',' and their sum must be 1. Probabilities of different rows are separated by ';'. Please pay more attention when providing this parameter. For CG repeat, the example of this matrix is '0.96,0.02,0,0,0,0.02,0;0,0.001,0.869,0.11,0,0,0.02;0.02,0.849,0.001,0,0.11,0.02,0;0,0.001,0.869,0.11,0,0,0.02;0.02,0.849,0.001,0,0.11,0.02,0;0.02,0.849,0.001,0,0.11,0.02,0;0.02,0.001,0.849,0.11,0,0,0.02'. Setting this option will override the setting of --hmm_insert_rate, --hmm_del_rate, --hmm_sub_rate and --SeqTech for transition matrix.\n  --emissionm EMISSIONM\n                        User-specified emission matrix for HMM. The number of rows must be the same as the 3*L+1 where L is the size of repeat unit and the number of columns must be 5. Probabilities in a row is separated by ',' and their sum must be 1. Probabilities of different rows are separated by ';'. Please pay more attention when providing this parameter. For CG repeat, the example of this matrix is '0.2,0.2,0.2,0.2,0.2;0.005,0.985,0.005,0.005,0;0.005,0.005,0.985,0.005,0;0.25,0.25,0.25,0.25,0;0.25,0.25,0.25,0.25,0;0.005,0.005,0.985,0.005,0;0.005,0.985,0.005,0.005,0'. Setting this option will override the setting of --hmm_insert_rate, --hmm_del_rate, --hmm_sub_rate and --SeqTech for emission matrix.\n```\n\n### Example\n```\nFor example,\n     python repeatHMM.py BAMinput --Onebamfile XXX.bam --repeatName HTT;\n     python repeatHMM.py BAMinput --Sepbamfile XXX%s.bam --repeatName HTT --GapCorrection 1 FlankLength 30;\n     python repeatHMM.py BAMinput --Onebamfile freeze4-all-merge.sort.bam --repeatName HTT;\n```\nPlease note that BAM file should be produced with the same version of 'hg' if '--hg' or '--hgfile' is specified.\n\n### Where to find the result:\n Final results was stored in logbam/RepBAM_*.log\n\n\n## 3. RepeatHMM-Scan\nRepeatHMM-scan is a new module which takes the advantage of RepeatHMM to automatically scan a genome for all potential repeat regions. Together with the RepeatHMM-DB released in the assets of RepeatHMM, a genome-scale anaysis of short repeat expansions is available. \n\n### Command and Parameters:\n\n```\nusage: repeatHMM.py Scan [-h] [--hg HG] [--hgfile HGFILE]\n                         [--GapCorrection GAPCORRECTION]\n                         [--FlankLength FLANKLENGTH] [--MatchInfo MATCHINFO]\n                         [--outlog OUTLOG] [--Tolerate TOLERATE]\n                         [--MinSup MINSUP] [--MaxRep MAXREP]\n                         [--CompRep COMPREP] [--outFolder OUTFOLDER]\n                         [--repeatName REPEATNAME]\n                         [--UserDefinedUniqID USERDEFINEDUNIQID]\n                         [--Patternfile PATTERNFILE]\n                         [--UserDefinedRepeat USERDEFINEDREPEAT]\n                         [--SplitAndReAlign {0,1,2}] [--TRFOptions TRFOPTIONS]\n                         [--minTailSize MINTAILSIZE]\n                         [--minRepBWTSize MINREPBWTSIZE]\n                         [--RepeatTime REPEATTIME]\n                         [--BWAMEMOptions BWAMEMOPTIONS]\n                         [--hmm_insert_rate HMM_INSERT_RATE]\n                         [--hmm_del_rate HMM_DEL_RATE]\n                         [--hmm_sub_rate HMM_SUB_RATE]\n                         [--SeqTech {Pacbio,Nanopore,Illumina,None}]\n                         [--transitionm TRANSITIONM] [--emissionm EMISSIONM]\n                         [--region REGION] [--thread THREAD] [--conted CONTED]\n                         [--cluster CLUSTER] [--clusterOption CLUSTEROPTION]\n                         [--max_len MAX_LEN] [--StopFail STOPFAIL]\n                         [--avergnum AVERGNUM] [--envset ENVSET]\n                         [--repeathmmPath REPEATHMMPATH]\n                         [--Onebamfile ONEBAMFILE | --SepbamfileTemp SEPBAMFILETEMP]\n\nScan for a whole genome or a whole region given\n\noptional arguments:\n  -h, --help            show this help message and exit\n  --region REGION       The region where microsatellites are located. 'All' means all microsatellites (<10 nucleotides in repeat units), 'chrZ:X:Y' indicates a chromosome region where all microsatellites would be automatically searche. 'None': will only detect microsatellites predined in 'repeatName'\n  --thread THREAD       How many additional threads are used. Default: 1\n  --conted CONTED       Whether continue the running last time. Default: 0\n  --cluster CLUSTER     Whether cluster computing would be used. Default: 0\n  --clusterOption CLUSTEROPTION\n                        Options for job submission to cluter. Default: 'qsub -V -cwd -pe smp 1 -l h_vmem=8G -q all.q,bigmem -e %s -o %s -N %s'\n  --max_len MAX_LEN     The maximum length of repeat regions which will be detected. Default: 0\n  --StopFail STOPFAIL   Whether stop when a job failed. Default: 0(not stop)\n  --avergnum AVERGNUM   The number of repeat regions for each jobs. Default:100.\n  --envset ENVSET       Whether virtual environment is created for running RepeatHMM. Default: None. Can set 'repeathmmenv'\n  --repeathmmPath REPEATHMMPATH\n                        The path to repeatHMM.py. Default: 'RepeatHMM/bin/'\n  --Onebamfile ONEBAMFILE\n                        A BAM file storing all alignments\n  --SepbamfileTemp SEPBAMFILETEMP\n                        A separated BAM file template storing all alignments; separated by chromosome ids. For example, '--SepbamfileTemp'=mybam_Chr%s_sorted.bam where '%s' is chromosome id (1....22,x,y)\n\nCommon options for alignment:\n  --hg HG               The reference genome is used. Currently, some repeat information in hg38 and hg19 are pre-defined. The default folder is ./mhgversion/\n  --hgfile HGFILE       The file name of reference genome. It could be empty and the default file name is 'hg'.fa\n  --GapCorrection GAPCORRECTION\n                        Is unsymmetrical alignment used for error correction of detected repeat region in reads. 1: yes(Default), 0: no\n  --FlankLength FLANKLENGTH\n                        Is flanking sequence used for repeat region detection. non-0: yes(Default: 30), 0: no\n  --MatchInfo MATCHINFO\n                        The match strategy for gap correction.\n\nCommon options:\n  --outlog OUTLOG       The level for output of running information: 0:DEBUG; 1:INFO; 2:WARNING; 3:ERROR; 4:FATAL\n  --Tolerate TOLERATE   Tolerate mismatch, e.g., CTG:TTG:0:2 or CTG:CTT:-2:0.\n  --MinSup MINSUP       The minimum reads associated with peaks.\n  --MaxRep MAXREP       The maximum repeat size. The smallest MaxRep should not be less than 14.\n  --CompRep COMPREP     Whether the repeat pattern is simple ('0') or complex (nonzeo-'0': AlTlT50/C50lClT/C). For complex patterns, all patterns are required to have the same length, each position is seperated by `l` and the nucleotides at the same position is seperated by '/' where a nucleotide can by followed by a number specify relative frequency (cannot be float).\n  --outFolder OUTFOLDER\n                        The default folder for temporary output. Default: align/\n\nCommon options for gene information:\n  --repeatName REPEATNAME\n                        A gene name which you want to analyze(Default: None), such as HTT for huntington's disease. 'all': all pre-defined genes will be analyzed;\n  --UserDefinedUniqID USERDEFINEDUNIQID\n                        The name for storing results. Default: Pcr1. Must be different when simultaneously running RepeatHMM many times with the same setting for a same file\n  --Patternfile PATTERNFILE\n                        The file storing all predefined microsatellites (e.g., './reference_sts/hg38/hg38.trf.bed'). '.bed' for bed files and '.pa' for pa file. More than one files can be provided seperated by ';'.\n  --UserDefinedRepeat USERDEFINEDREPEAT\n                        The repeat information defined by users. If this option is given, the default repeat information will be revised. Default: ///////\n\nCommon options for re-alignment after splitting long reads using repeat regions:\n  --SplitAndReAlign {0,1,2}\n                        Split long reads using repeat region in long reads and re-align the non-repeat regions using BWA MEM. Default=0: not use SplitAndReAlign; 1: use SplitAndReAlign only; 2: combine 0 and 1\n  --TRFOptions TRFOPTIONS\n                        The options used for detecting repeat region in a read using Tandem Repeat Finder. The options are merging using _. Default='2_7_4_80_10_100_500' or '2_7_4_80_10_100'. The last parameter will be twice of the length of repeat if not given.\n  --minTailSize MINTAILSIZE\n                        After the split using repeat regions, discard the leftmost/rightmost non-repeat sub-sequences if they have less than --minTailSize bps. Must not be less than 10. Default=70\n  --minRepBWTSize MINREPBWTSIZE\n                        After the split using repeat regions, merge any two non-repeat sub-sequences if they distance is less than --minRepBWTSize bps. Must not be less than 10. Default=70\n  --RepeatTime REPEATTIME\n                        The minimum repeat time for a microsatellite detected by Tandem Repeat Finder. Must not be less than 2. Default=5\n  --BWAMEMOptions BWAMEMOPTIONS\n                        The options used for BWA MEM to align sub-reads after splitting. The options are merging using _. Default='k8_W8_r7'. For example: 'k8_W8_r7'\n\nCommon options for setting HMM matrices:\n  --hmm_insert_rate HMM_INSERT_RATE\n                        Insert error rate in long reads. Default: 0.12\n  --hmm_del_rate HMM_DEL_RATE\n                        Deletion error rate in long reads. Default: 0.02\n  --hmm_sub_rate HMM_SUB_RATE\n                        Substitution error rate in long reads. Default: 0.02\n  --SeqTech {Pacbio,Nanopore,Illumina,None}\n                        The sequencing techniques, Pacbio or Nanopore or Illumina, used to generate reads data. Default: None. Setting this option will override the setting for --hmm_insert_rate, --hmm_del_rate and --hmm_sub_rate\n  --transitionm TRANSITIONM\n                        User-specified transition matrix for HMM. The number of rows and columns must be the same as the 3*L+1 where L is the size of repeat unit. Probabilities in a row is separated by ',' and their sum must be 1. Probabilities of different rows are separated by ';'. Please pay more attention when providing this parameter. For CG repeat, the example of this matrix is '0.96,0.02,0,0,0,0.02,0;0,0.001,0.869,0.11,0,0,0.02;0.02,0.849,0.001,0,0.11,0.02,0;0,0.001,0.869,0.11,0,0,0.02;0.02,0.849,0.001,0,0.11,0.02,0;0.02,0.849,0.001,0,0.11,0.02,0;0.02,0.001,0.849,0.11,0,0,0.02'. Setting this option will override the setting of --hmm_insert_rate, --hmm_del_rate, --hmm_sub_rate and --SeqTech for transition matrix.\n  --emissionm EMISSIONM\n                        User-specified emission matrix for HMM. The number of rows must be the same as the 3*L+1 where L is the size of repeat unit and the number of columns must be 5. Probabilities in a row is separated by ',' and their sum must be 1. Probabilities of different rows are separated by ';'. Please pay more attention when providing this parameter. For CG repeat, the example of this matrix is '0.2,0.2,0.2,0.2,0.2;0.005,0.985,0.005,0.005,0;0.005,0.005,0.985,0.005,0;0.25,0.25,0.25,0.25,0;0.25,0.25,0.25,0.25,0;0.005,0.005,0.985,0.005,0;0.005,0.985,0.005,0.005,0'. Setting this option will override the setting of --hmm_insert_rate, --hmm_del_rate, --hmm_sub_rate and --SeqTech for emission matrix.\n\n```\n\n### Example\n```\nFor example,\npython RepeatHMM/bin/repeatHMM.py Scan --SplitAndReAlign 1 --MinSup 3 --UserDefinedUniqID chr22scan --SeqTech \"Nanopore\" \"--Patternfile\" chr22.trf.bed --cluster 1 --envset repeathmmenv --Onebamfile nanopore.minimap2.sorted.bam --hgfile GRCh38/GRCh38.fa --thread 50\n```\nwhere users need to revise 4 parameters below for their own genome: `repeathmmenv` is your repeathmm environment, `GRCh38/GRCh38.fa` is your reference genome, `nanopore.minimap2.sorted.bam` is a bam file of a nanopore data with minimap2 alignment, and `chr22.trf.bed` is potential repeat list for chr22.  `chr22.trf.bed` could be any list if it follows the format used by UCSC genome browser. For example, users can download whole-genome repeat list using `wget https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.trf.bed.gz`, and then after ungzip, `grep \"chr22\" hg38.trf.bed > chr22.trf.bed` to have `chr22.trf.bed` in this example.\n\n\n\n\n# RepeatHMM: estimation of repeat counts on microsatellites from long-read sequencing data\n\nRepeatHMM is a novel computational tool to detect any microsatellites (including trinucleotide repeats in trinucleotide repeat disorders (TRD)) from given long reads for a subject of interests. It is able to accurately estimate estimate expansion counts according to the evaluation performance on both simulation data and real data. It is user friendly and easy to install and use.\n\n## Features\n\n* Accurate and efficient estimation of repeat counts from long-read sequencing data\n\n* Analysis of all types of simple repeats\n\n* Prefined models are included for more than 10 well known trinucleotide repeats: AFF2, AR, ATN1, ATXN1, ATXN2, ATXN3, ATXN7, ATXN8OS, CACNA1A, DMPK, FMR1, FXN, HTT, PPP2R2B, TBP\n\n* Easy to install and use\n\n## Methodology of RepeatHMM\n\nRepeatHMM takes a set of reads as input, uses a split-and-align strategy to improve alignments, performs error correction, and leverages a hidden Markov model (HMM) and a peak calling algorithm based on Gaussian mixture model to infer repeat counts. RepeatHMM allows users to specify error parameters of the sequencing experiments, thus automatically producing transition and emission matrices for HMM and allowing the analysis of both PacBio and Oxford Nanopore data. \n\nRepeatHMM was evaluated on both random simulation and PCR-based simulation for long reads containing CAG repeats, and also on real datasets of ATXN3 for SCA3 of ATXN10  for SCA10. The results demonstrated that our tool was able to accurately estimate expansion counts from long reads.\n\n## Inputs of RepeatHMM\n\nRepeatHMM takes long reads from a subject as input, and can also take a BAM file as input to find more than 10 ",
+        "evidence": [
+          {
+            "claim": "install_method",
+            "kind": "tree",
+            "path": "environment.yml",
+            "text": "conda",
+            "url": "https://github.com/WGLab/RepeatHMM/blob/fa6c108fa0cc8ab344577147e52a8fcc3adde990/environment.yml"
+          },
+          {
+            "claim": "run_command",
+            "kind": "doc",
+            "line": 226,
+            "path": "docs/Usage.md",
+            "text": "python repeatHMM.py BAMinput --Onebamfile XXX.bam --repeatName HTT;",
+            "url": "https://github.com/WGLab/RepeatHMM/blob/fa6c108fa0cc8ab344577147e52a8fcc3adde990/docs/Usage.md#L226"
+          },
+          {
+            "claim": "documented_input",
+            "kind": "readme",
+            "line": 23,
+            "path": "README.md",
+            "text": "RepeatHMM takes long reads from a subject as input, and can also take a BAM file as input to find more than 10 predefined trinucleotide repeats or a gene given by users, after all reads were well alig",
+            "url": "https://github.com/WGLab/RepeatHMM/blob/fa6c108fa0cc8ab344577147e52a8fcc3adde990/README.md#L23"
+          }
+        ],
+        "example": null,
+        "example_data": [],
+        "inferences": {
+          "build": "repo_file:environment.yml",
+          "example": null,
+          "input_type": "README.md:L23",
+          "output": "docs/Usage.md:L128",
+          "platform": "README.md:L1",
+          "regions": null,
+          "run_command": "docs/Usage.md:L226",
+          "single_sample_bams": null
+        },
+        "input_type": {
+          "assembly": {
+            "against_hg38": null,
+            "declared": "both",
+            "evidence_source": "docs/Usage.md:L62",
+            "hg19_evidence_source": "docs/Usage.md:L62",
+            "hg19_hits": 3,
+            "hg38_evidence_source": "docs/Usage.md:L62",
+            "hg38_hits": 24,
+            "incompatible_with_hg38": false
+          },
+          "best": "ont-bam-hg38",
+          "candidates": [
+            "ont-bam-hg38"
+          ],
+          "evidence_source": "README.md:L23",
+          "how": "read",
+          "platform": "ont",
+          "platform_evidence_source": "README.md:L1",
+          "platform_how": "stated",
+          "signals": {
+            "bam": 1,
+            "ce": 0,
+            "fastq": 0,
+            "hg19": 3,
+            "hg38": 24,
+            "illumina": 0,
+            "ont": 8,
+            "snp": 0,
+            "ystr": 0
+          },
+          "statements": {
+            "against": [],
+            "determined": true,
+            "inputs": [
+              {
+                "kind": "bam",
+                "line": 23,
+                "text": "RepeatHMM takes long reads from a subject as input, and can also take a BAM file as input to find more than 10 predefined trinucleotide repeats or a gene given by users, after all reads were well alig"
+              }
+            ],
+            "platform": [
+              {
+                "historical": false,
+                "line": 1,
+                "platform": "ont",
+                "text": "# RepeatHMM: estimation of repeat counts on microsatellites from long-read sequencing data"
+              }
+            ],
+            "recommendation": null
+          },
+          "statements_file": null,
+          "supported_platforms": [
+            {
+              "evidence_source": "README.md:L1",
+              "historical": false,
+              "line": 1,
+              "platform": "ont",
+              "text": "# RepeatHMM: estimation of repeat counts on microsatellites from long-read sequencing data"
+            }
+          ],
+          "unsupported": null,
+          "warnings": []
+        },
+        "known_issues": [],
+        "limitations": [
+          "install_profile_unsupported"
+        ],
+        "output": {
+          "evidence_source": "docs/Usage.md:L128",
+          "format": "tsv",
+          "signals": {
+            "csv": 0,
+            "json": 0,
+            "tsv": 0,
+            "vcf": 0
+          }
+        },
+        "packaging": {
+          "executables": [
+            "repeatHMM.py"
+          ],
+          "packages": [
+            "RepeatHMM"
+          ]
+        },
+        "readme": {
+          "gaps": [
+            {
+              "item": "example_data",
+              "text": "The repository ships no example input a stranger could run on. A trial can still run on STRhub's reference data for the detected input type."
+            }
+          ],
+          "name": "README.md",
+          "sufficient_to_attempt": true
+        },
+        "readme_name": "README.md",
+        "readme_text": "# RepeatHMM: estimation of repeat counts on microsatellites from long-read sequencing data\n\nRepeatHMM is a novel computational tool to detect any microsatellites (including trinucleotide repeats in trinucleotide repeat disorders (TRD)) from given long reads for a subject of interests. It is able to accurately estimate estimate expansion counts according to the evaluation performance on both simulation data and real data. It is user friendly and easy to install and use.\n\n## Features\n\n* Accurate and efficient estimation of repeat counts from long-read sequencing data\n\n* Analysis of all types of simple repeats\n\n* Prefined models are included for more than 10 well known trinucleotide repeats: AFF2, AR, ATN1, ATXN1, ATXN2, ATXN3, ATXN7, ATXN8OS, CACNA1A, DMPK, FMR1, FXN, HTT, PPP2R2B, TBP\n\n* Easy to install and use\n\n## Methodology of RepeatHMM\n\nRepeatHMM takes a set of reads as input, uses a split-and-align strategy to improve alignments, performs error correction, and leverages a hidden Markov model (HMM) and a peak calling algorithm based on Gaussian mixture model to infer repeat counts. RepeatHMM allows users to specify error parameters of the sequencing experiments, thus automatically producing transition and emission matrices for HMM and allowing the analysis of both PacBio and Oxford Nanopore data. \n\nRepeatHMM was evaluated on both random simulation and PCR-based simulation for long reads containing CAG repeats, and also on real datasets of ATXN3 for SCA3 of ATXN10  for SCA10. The results demonstrated that our tool was able to accurately estimate expansion counts from long reads.\n\n## Inputs of RepeatHMM\n\nRepeatHMM takes long reads from a subject as input, and can also take a BAM file as input to find more than 10 predefined trinucleotide repeats or a gene given by users, after all reads were well aligned to a reference genome. \n\n## Usage\n\nPlease refer to [Usage](https://github.com/WGLab/RepeatHMM/blob/master/docs/Usage.md) for how to use RepeatHMM.\n\n## Revision History\n\nFor release history, please visit [here](https://github.com/WGLab/RepeatHMM/releases). For details, please go [here](https://github.com/WGLab/RepeatHMM/blob/master/README.md).\n\n## Contact\n\nIf you have any questions/issues/bugs, please post them on [GitHub](https://github.com/WGLab/RepeatHMM/issues). They would also be helpful to other users. \n\n## Reference\n**Please cite the publication below if you use our tool:**\n\nQian Liu, Peng Zhang, Depeng Wang, Weihong Gu and Kai Wang. Interrogating the \"unsequenceable\" genomic trinucleotide repeat disorders by long-read sequencing. Genome Med. 9(1):65, 2017. doi: 10.1186/s13073-017-0456-7.\n",
+        "ref": "fa6c108fa0cc8ab344577147e52a8fcc3adde990",
+        "regions": {
+          "ambiguous": false,
+          "candidates": [],
+          "end_line": null,
+          "evidence_source": null,
+          "file": null,
+          "format": null,
+          "line": null,
+          "text": null
+        },
+        "registry": {
+          "bioconda": {},
+          "documented": []
+        },
+        "repo": "https://github.com/WGLab/RepeatHMM",
+        "schema": "strhub-verified/recipe-proposal/1",
+        "single_sample_bams": {
+          "allowed": false,
+          "evidence_source": null,
+          "file": null,
+          "line": null,
+          "paired_flags": [],
+          "text": null
+        },
+        "source_documents": [
+          {
+            "file": "README.md",
+            "origin": "readme",
+            "text": "# RepeatHMM: estimation of repeat counts on microsatellites from long-read sequencing data\n\nRepeatHMM is a novel computational tool to detect any microsatellites (including trinucleotide repeats in trinucleotide repeat disorders (TRD)) from given long reads for a subject of interests. It is able to accurately estimate estimate expansion counts according to the evaluation performance on both simulation data and real data. It is user friendly and easy to install and use.\n\n## Features\n\n* Accurate and efficient estimation of repeat counts from long-read sequencing data\n\n* Analysis of all types of simple repeats\n\n* Prefined models are included for more than 10 well known trinucleotide repeats: AFF2, AR, ATN1, ATXN1, ATXN2, ATXN3, ATXN7, ATXN8OS, CACNA1A, DMPK, FMR1, FXN, HTT, PPP2R2B, TBP\n\n* Easy to install and use\n\n## Methodology of RepeatHMM\n\nRepeatHMM takes a set of reads as input, uses a split-and-align strategy to improve alignments, performs error correction, and leverages a hidden Markov model (HMM) and a peak calling algorithm based on Gaussian mixture model to infer repeat counts. RepeatHMM allows users to specify error parameters of the sequencing experiments, thus automatically producing transition and emission matrices for HMM and allowing the analysis of both PacBio and Oxford Nanopore data. \n\nRepeatHMM was evaluated on both random simulation and PCR-based simulation for long reads containing CAG repeats, and also on real datasets of ATXN3 for SCA3 of ATXN10  for SCA10. The results demonstrated that our tool was able to accurately estimate expansion counts from long reads.\n\n## Inputs of RepeatHMM\n\nRepeatHMM takes long reads from a subject as input, and can also take a BAM file as input to find more than 10 predefined trinucleotide repeats or a gene given by users, after all reads were well aligned to a reference genome. \n\n## Usage\n\nPlease refer to [Usage](https://github.com/WGLab/RepeatHMM/blob/master/docs/Usage.md) for how to use RepeatHMM.\n\n## Revision History\n\nFor release history, please visit [here](https://github.com/WGLab/RepeatHMM/releases). For details, please go [here](https://github.com/WGLab/RepeatHMM/blob/master/README.md).\n\n## Contact\n\nIf you have any questions/issues/bugs, please post them on [GitHub](https://github.com/WGLab/RepeatHMM/issues). They would also be helpful to other users. \n\n## Reference\n**Please cite the publication below if you use our tool:**\n\nQian Liu, Peng Zhang, Depeng Wang, Weihong Gu and Kai Wang. Interrogating the \"unsequenceable\" genomic trinucleotide repeat disorders by long-read sequencing. Genome Med. 9(1):65, 2017. doi: 10.1186/s13073-017-0456-7.\n"
+          },
+          {
+            "file": "docs/Usage.md",
+            "origin": "repo",
+            "text": "# The options for repeatHMM.py\n\nThere are three options below for repeatHMM.py: `BAMinput`, `FASTQinput` and `Scan`. Please note that users do not need to provide all parameters below. Most of them have default values.\n\n```\nusage: repeatHMM.py [-h] {BAMinput,FASTQinput,Scan} ...\n\nDetermine microsatellite repeat of interests or for all microsatellites.\n\npositional arguments:\n  {BAMinput,FASTQinput,Scan}\n    BAMinput            Detect trinucleotide repeats from a BAM file\n    FASTQinput          Detect trinucleotide repeats from a FASTQ file\n    Scan                For scanning whole data\n\noptional arguments:\n  -h, --help            show this help message and exit\n\nFor example,\n        python repeatHMM.py BAMinput: with a BAM file as input\n        python repeatHMM.py FASTQinput: with a FASTQ file as input\n        python repeatHMM.py Scan: for Scaning whole genome\n```\n\n## 1. Repeat count estimation for a gene\n\nRepeatHMM is able to take a FASTQ file as input to estimate expansion count for a gene. \n\n### Command and Parameters:\nThe command and the parameters are given below:\n```\nusage: repeatHMM.py FASTQinput [-h] [--hg HG] [--hgfile HGFILE]\n                               [--GapCorrection GAPCORRECTION]\n                               [--FlankLength FLANKLENGTH]\n                               [--MatchInfo MATCHINFO] [--outlog OUTLOG]\n                               [--Tolerate TOLERATE] [--MinSup MINSUP]\n                               [--MaxRep MAXREP] [--CompRep COMPREP]\n                               [--repeatName REPEATNAME]\n                               [--UserDefinedUniqID USERDEFINEDUNIQID]\n                               [--Patternfile PATTERNFILE]\n                               [--UserDefinedRepeat USERDEFINEDREPEAT]\n                               [--SplitAndReAlign {0,1,2}]\n                               [--TRFOptions TRFOPTIONS]\n                               [--minTailSize MINTAILSIZE]\n                               [--minRepBWTSize MINREPBWTSIZE]\n                               [--RepeatTime REPEATTIME]\n                               [--BWAMEMOptions BWAMEMOPTIONS]\n                               [--hmm_insert_rate HMM_INSERT_RATE]\n                               [--hmm_del_rate HMM_DEL_RATE]\n                               [--hmm_sub_rate HMM_SUB_RATE]\n                               [--SeqTech {Pacbio,Nanopore,Illumina,None}]\n                               [--transitionm TRANSITIONM]\n                               [--emissionm EMISSIONM] [--fastq FASTQ]\n\nDetect trinucleotide repeats from a FASTQ file\n\noptional arguments:\n  -h, --help            show this help message and exit\n  --fastq FASTQ         The file name for fasta sequences\n\nCommon options for alignment:\n  --hg HG               The reference genome is used. Currently, some repeat information in hg38 and hg19 are pre-defined. The default folder is ./mhgversion/\n  --hgfile HGFILE       The file name of reference genome. It could be empty and the default file name is 'hg'.fa\n  --GapCorrection GAPCORRECTION\n                        Is unsymmetrical alignment used for error correction of detected repeat region in reads. 1: yes(Default), 0: no\n  --FlankLength FLANKLENGTH\n                        Is flanking sequence used for repeat region detection. non-0: yes(Default: 30), 0: no\n  --MatchInfo MATCHINFO\n                        The match strategy for gap correction.\n\nCommon options:\n  --outlog OUTLOG       The level for output of running information\n  --Tolerate TOLERATE   Tolerate mismatch, e.g., CTG:TTG:0:2 or CTG:CTT:-2:0.\n  --MinSup MINSUP       The minimum reads associated with peaks.\n  --MaxRep MAXREP       The maximum repeat size. The smallest MaxRep should not be less than 14.\n  --CompRep COMPREP     Whether the repeat pattern is simple ('0') or complex (nonzeo-'0': AlTlT50/C50lClT/C). For complex patterns, all patterns are required to have the same length, each position is seperated by `l` and the nucleotides at the same position is seperated by '/' where a nucleotide can by followed by a number specify relative frequency (cannot be float).\n\nCommon options for gene information:\n  --repeatName REPEATNAME\n                        A gene name which you want to analyze(Default: None), such as HTT for huntington's disease. 'all': all pre-defined genes will be analyzed;\n  --UserDefinedUniqID USERDEFINEDUNIQID\n                        The name for storing results. Default: Pcr1. Must be different when simultaneously running RepeatHMM many times with the same setting for a same file\n  --Patternfile PATTERNFILE\n                        The file storing all predefined microsatellites (e.g., './reference_sts/hg38/hg38.trf.bed'). '.bed' for bed files and '.pa' for pa file. More than one files can be provided seperated by ';'.\n  --UserDefinedRepeat USERDEFINEDREPEAT\n                        The repeat information defined by users. If this option is given, the default repeat information will be revised. Default: ///////\n\nCommon options for re-alignment after splitting long reads using repeat regions:\n  --SplitAndReAlign {0,1,2}\n                        Split long reads using repeat region in long reads and re-align the non-repeat regions using BWA MEM. Default=0: not use SplitAndReAlign; 1: use SplitAndReAlign only; 2: combine 0 and 1\n  --TRFOptions TRFOPTIONS\n                        The options used for detecting repeat region in a read using Tandem Repeat Finder. The options are merging using _. Default='2_7_4_80_10_100_500' or '2_7_4_80_10_100'. The last parameter will be twice of the length of repeat if not given.\n  --minTailSize MINTAILSIZE\n                        After the split using repeat regions, discard the leftmost/rightmost non-repeat sub-sequences if they have less than --minTailSize bps. Must not be less than 10. Default=70\n  --minRepBWTSize MINREPBWTSIZE\n                        After the split using repeat regions, merge any two non-repeat sub-sequences if they distance is less than --minRepBWTSize bps. Must not be less than 10. Default=70\n  --RepeatTime REPEATTIME\n                        The minimum repeat time for a microsatellite detected by Tandem Repeat Finder. Must not be less than 2. Default=5\n  --BWAMEMOptions BWAMEMOPTIONS\n                        The options used for BWA MEM to align sub-reads after splitting. The options are merging using _. Default='k8_W8_r7'. For example: 'k8_W8_r7'\n\nCommon options for setting HMM matrices:\n  --hmm_insert_rate HMM_INSERT_RATE\n                        Insert error rate in long reads. Default: 0.12\n  --hmm_del_rate HMM_DEL_RATE\n                        Deletion error rate in long reads. Default: 0.02\n  --hmm_sub_rate HMM_SUB_RATE\n                        Substitution error rate in long reads. Default: 0.02\n  --SeqTech {Pacbio,Nanopore,Illumina,None}\n                        The sequencing techniques, Pacbio or Nanopore or Illumina, used to generate reads data. Default: None. Setting this option will override the setting for --hmm_insert_rate, --hmm_del_rate and --hmm_sub_rate\n  --transitionm TRANSITIONM\n                        User-specified transition matrix for HMM. The number of rows and columns must be the same as the 3*L+1 where L is the size of repeat unit. Probabilities in a row is separated by ',' and their sum must be 1. Probabilities of different rows are separated by ';'. Please pay more attention when providing this parameter. For CG repeat, the example of this matrix is '0.96,0.02,0,0,0,0.02,0;0,0.001,0.869,0.11,0,0,0.02;0.02,0.849,0.001,0,0.11,0.02,0;0,0.001,0.869,0.11,0,0,0.02;0.02,0.849,0.001,0,0.11,0.02,0;0.02,0.849,0.001,0,0.11,0.02,0;0.02,0.001,0.849,0.11,0,0,0.02'. Setting this option will override the setting of --hmm_insert_rate, --hmm_del_rate, --hmm_sub_rate and --SeqTech for transition matrix.\n  --emissionm EMISSIONM\n                        User-specified emission matrix for HMM. The number of rows must be the same as the 3*L+1 where L is the size of repeat unit and the number of columns must be 5. Probabilities in a row is separated by ',' and their sum must be 1. Probabilities of different rows are separated by ';'. Please pay more attention when providing this parameter. For CG repeat, the example of this matrix is '0.2,0.2,0.2,0.2,0.2;0.005,0.985,0.005,0.005,0;0.005,0.005,0.985,0.005,0;0.25,0.25,0.25,0.25,0;0.25,0.25,0.25,0.25,0;0.005,0.005,0.985,0.005,0;0.005,0.985,0.005,0.005,0'. Setting this option will override the setting of --hmm_insert_rate, --hmm_del_rate, --hmm_sub_rate and --SeqTech for emission matrix.\n```\n\n### Example\n```\nFor example,\n     python RepeatHMM/bin/repeatHMM.py FASTQinput --fastq XXX.fq --repeatName HTT;\n     python RepeatHMM/bin/repeatHMM.py FASTQinput --fastq XXX.fq --repeatName HTT --GapCorrection 1 --FlankLength 30 ;\n     python RepeatHMM/bin/repeatHMM.py FASTQinput --fastq XXX.fq --repeatName HTT --GapCorrection 1 --FlankLength 30 --UserDefinedUniqID PCR1;\n     python RepeatHMM/bin/repeatHMM.py FASTQinput --repeatName atxn3 --GapCorrection 1 --FlankLength 30 --UserDefinedUniqID sca3_pcr25_raw_test --fastq SRR5363632.fastq --outFolder logfq --Patternfile RepeatHMM/bin/reference_sts/hg38/hg38.predefined.pa --hgfile hg38/hg38.fa --hg hg38 \n```\nwhere `hg38/hg38.fa` is the hg38 human reference genome. To run the example above, users need to install `fastq-dump` and then use `fastq-dump SRR5363632` to download fastq file to `SRR5363632.fastq`. \n\n### Where to find the result:\nFinal results was stored in logfq/RepFQ_*.log\n\n\n## 2. With a BAM file\n### Command and Parameters:\n```\nusage: repeatHMM.py BAMinput [-h] [--hg HG] [--hgfile HGFILE]\n                             [--GapCorrection GAPCORRECTION]\n                             [--FlankLength FLANKLENGTH]\n                             [--MatchInfo MATCHINFO] [--outlog OUTLOG]\n                             [--Tolerate TOLERATE] [--MinSup MINSUP]\n                             [--MaxRep MAXREP] [--CompRep COMPREP]\n                             [--repeatName REPEATNAME]\n                             [--UserDefinedUniqID USERDEFINEDUNIQID]\n                             [--Patternfile PATTERNFILE]\n                             [--UserDefinedRepeat USERDEFINEDREPEAT]\n                             [--SplitAndReAlign {0,1,2}]\n                             [--TRFOptions TRFOPTIONS]\n                             [--minTailSize MINTAILSIZE]\n                             [--minRepBWTSize MINREPBWTSIZE]\n                             [--RepeatTime REPEATTIME]\n                             [--BWAMEMOptions BWAMEMOPTIONS]\n                             [--hmm_insert_rate HMM_INSERT_RATE]\n                             [--hmm_del_rate HMM_DEL_RATE]\n                             [--hmm_sub_rate HMM_SUB_RATE]\n                             [--SeqTech {Pacbio,Nanopore,Illumina,None}]\n                             [--transitionm TRANSITIONM]\n                             [--emissionm EMISSIONM]\n                             [--Onebamfile ONEBAMFILE | --SepbamfileTemp SEPBAMFILETEMP]\n\nDetect trinucleotide repeats from a BAM file\n\noptional arguments:\n  -h, --help            show this help message and exit\n  --Onebamfile ONEBAMFILE\n                        A BAM file storing all alignments\n  --SepbamfileTemp SEPBAMFILETEMP\n                        A separated BAM file template storing all alignments; separated by chromosome ids. For example, '--SepbamfileTemp'=mybam_Chr%s_sorted.bam where '%s' is chromosome id (1....22,x,y)\n\nCommon options for alignment:\n  --hg HG               The reference genome is used. Currently, some repeat information in hg38 and hg19 are pre-defined. The default folder is ./mhgversion/\n  --hgfile HGFILE       The file name of reference genome. It could be empty and the default file name is 'hg'.fa\n  --GapCorrection GAPCORRECTION\n                        Is unsymmetrical alignment used for error correction of detected repeat region in reads. 1: yes(Default), 0: no\n  --FlankLength FLANKLENGTH\n                        Is flanking sequence used for repeat region detection. non-0: yes(Default: 30), 0: no\n  --MatchInfo MATCHINFO\n                        The match strategy for gap correction.\n\nCommon options:\n  --outlog OUTLOG       The level for output of running information\n  --Tolerate TOLERATE   Tolerate mismatch, e.g., CTG:TTG:0:2 or CTG:CTT:-2:0.\n  --MinSup MINSUP       The minimum reads associated with peaks.\n  --MaxRep MAXREP       The maximum repeat size. The smallest MaxRep should not be less than 14.\n  --CompRep COMPREP     Whether the repeat pattern is simple ('0') or complex (nonzeo-'0': AlTlT50/C50lClT/C). For complex patterns, all patterns are required to have the same length, each position is seperated by `l` and the nucleotides at the same position is seperated by '/' where a nucleotide can by followed by a number specify relative frequency (cannot be float).\n\nCommon options for gene information:\n  --repeatName REPEATNAME\n                        A gene name which you want to analyze(Default: None), such as HTT for huntington's disease. 'all': all pre-defined genes will be analyzed;\n  --UserDefinedUniqID USERDEFINEDUNIQID\n                        The name for storing results. Default: Pcr1. Must be different when simultaneously running RepeatHMM many times with the same setting for a same file\n  --Patternfile PATTERNFILE\n                        The file storing all predefined microsatellites (e.g., './reference_sts/hg38/hg38.trf.bed'). '.bed' for bed files and '.pa' for pa file. More than one files can be provided seperated by ';'.\n  --UserDefinedRepeat USERDEFINEDREPEAT\n                        The repeat information defined by users. If this option is given, the default repeat information will be revised. Default: ///////\n\nCommon options for re-alignment after splitting long reads using repeat regions:\n  --SplitAndReAlign {0,1,2}\n                        Split long reads using repeat region in long reads and re-align the non-repeat regions using BWA MEM. Default=0: not use SplitAndReAlign; 1: use SplitAndReAlign only; 2: combine 0 and 1\n  --TRFOptions TRFOPTIONS\n                        The options used for detecting repeat region in a read using Tandem Repeat Finder. The options are merging using _. Default='2_7_4_80_10_100_500' or '2_7_4_80_10_100'. The last parameter will be twice of the length of repeat if not given.\n  --minTailSize MINTAILSIZE\n                        After the split using repeat regions, discard the leftmost/rightmost non-repeat sub-sequences if they have less than --minTailSize bps. Must not be less than 10. Default=70\n  --minRepBWTSize MINREPBWTSIZE\n                        After the split using repeat regions, merge any two non-repeat sub-sequences if they distance is less than --minRepBWTSize bps. Must not be less than 10. Default=70\n  --RepeatTime REPEATTIME\n                        The minimum repeat time for a microsatellite detected by Tandem Repeat Finder. Must not be less than 2. Default=5\n  --BWAMEMOptions BWAMEMOPTIONS\n                        The options used for BWA MEM to align sub-reads after splitting. The options are merging using _. Default='k8_W8_r7'. For example: 'k8_W8_r7'\n\nCommon options for setting HMM matrices:\n  --hmm_insert_rate HMM_INSERT_RATE\n                        Insert error rate in long reads. Default: 0.12\n  --hmm_del_rate HMM_DEL_RATE\n                        Deletion error rate in long reads. Default: 0.02\n  --hmm_sub_rate HMM_SUB_RATE\n                        Substitution error rate in long reads. Default: 0.02\n  --SeqTech {Pacbio,Nanopore,Illumina,None}\n                        The sequencing techniques, Pacbio or Nanopore or Illumina, used to generate reads data. Default: None. Setting this option will override the setting for --hmm_insert_rate, --hmm_del_rate and --hmm_sub_rate\n  --transitionm TRANSITIONM\n                        User-specified transition matrix for HMM. The number of rows and columns must be the same as the 3*L+1 where L is the size of repeat unit. Probabilities in a row is separated by ',' and their sum must be 1. Probabilities of different rows are separated by ';'. Please pay more attention when providing this parameter. For CG repeat, the example of this matrix is '0.96,0.02,0,0,0,0.02,0;0,0.001,0.869,0.11,0,0,0.02;0.02,0.849,0.001,0,0.11,0.02,0;0,0.001,0.869,0.11,0,0,0.02;0.02,0.849,0.001,0,0.11,0.02,0;0.02,0.849,0.001,0,0.11,0.02,0;0.02,0.001,0.849,0.11,0,0,0.02'. Setting this option will override the setting of --hmm_insert_rate, --hmm_del_rate, --hmm_sub_rate and --SeqTech for transition matrix.\n  --emissionm EMISSIONM\n                        User-specified emission matrix for HMM. The number of rows must be the same as the 3*L+1 where L is the size of repeat unit and the number of columns must be 5. Probabilities in a row is separated by ',' and their sum must be 1. Probabilities of different rows are separated by ';'. Please pay more attention when providing this parameter. For CG repeat, the example of this matrix is '0.2,0.2,0.2,0.2,0.2;0.005,0.985,0.005,0.005,0;0.005,0.005,0.985,0.005,0;0.25,0.25,0.25,0.25,0;0.25,0.25,0.25,0.25,0;0.005,0.005,0.985,0.005,0;0.005,0.985,0.005,0.005,0'. Setting this option will override the setting of --hmm_insert_rate, --hmm_del_rate, --hmm_sub_rate and --SeqTech for emission matrix.\n```\n\n### Example\n```\nFor example,\n     python repeatHMM.py BAMinput --Onebamfile XXX.bam --repeatName HTT;\n     python repeatHMM.py BAMinput --Sepbamfile XXX%s.bam --repeatName HTT --GapCorrection 1 FlankLength 30;\n     python repeatHMM.py BAMinput --Onebamfile freeze4-all-merge.sort.bam --repeatName HTT;\n```\nPlease note that BAM file should be produced with the same version of 'hg' if '--hg' or '--hgfile' is specified.\n\n### Where to find the result:\n Final results was stored in logbam/RepBAM_*.log\n\n\n## 3. RepeatHMM-Scan\nRepeatHMM-scan is a new module which takes the advantage of RepeatHMM to automatically scan a genome for all potential repeat regions. Together with the RepeatHMM-DB released in the assets of RepeatHMM, a genome-scale anaysis of short repeat expansions is available. \n\n### Command and Parameters:\n\n```\nusage: repeatHMM.py Scan [-h] [--hg HG] [--hgfile HGFILE]\n                         [--GapCorrection GAPCORRECTION]\n                         [--FlankLength FLANKLENGTH] [--MatchInfo MATCHINFO]\n                         [--outlog OUTLOG] [--Tolerate TOLERATE]\n                         [--MinSup MINSUP] [--MaxRep MAXREP]\n                         [--CompRep COMPREP] [--outFolder OUTFOLDER]\n                         [--repeatName REPEATNAME]\n                         [--UserDefinedUniqID USERDEFINEDUNIQID]\n                         [--Patternfile PATTERNFILE]\n                         [--UserDefinedRepeat USERDEFINEDREPEAT]\n                         [--SplitAndReAlign {0,1,2}] [--TRFOptions TRFOPTIONS]\n                         [--minTailSize MINTAILSIZE]\n                         [--minRepBWTSize MINREPBWTSIZE]\n                         [--RepeatTime REPEATTIME]\n                         [--BWAMEMOptions BWAMEMOPTIONS]\n                         [--hmm_insert_rate HMM_INSERT_RATE]\n                         [--hmm_del_rate HMM_DEL_RATE]\n                         [--hmm_sub_rate HMM_SUB_RATE]\n                         [--SeqTech {Pacbio,Nanopore,Illumina,None}]\n                         [--transitionm TRANSITIONM] [--emissionm EMISSIONM]\n                         [--region REGION] [--thread THREAD] [--conted CONTED]\n                         [--cluster CLUSTER] [--clusterOption CLUSTEROPTION]\n                         [--max_len MAX_LEN] [--StopFail STOPFAIL]\n                         [--avergnum AVERGNUM] [--envset ENVSET]\n                         [--repeathmmPath REPEATHMMPATH]\n                         [--Onebamfile ONEBAMFILE | --SepbamfileTemp SEPBAMFILETEMP]\n\nScan for a whole genome or a whole region given\n\noptional arguments:\n  -h, --help            show this help message and exit\n  --region REGION       The region where microsatellites are located. 'All' means all microsatellites (<10 nucleotides in repeat units), 'chrZ:X:Y' indicates a chromosome region where all microsatellites would be automatically searche. 'None': will only detect microsatellites predined in 'repeatName'\n  --thread THREAD       How many additional threads are used. Default: 1\n  --conted CONTED       Whether continue the running last time. Default: 0\n  --cluster CLUSTER     Whether cluster computing would be used. Default: 0\n  --clusterOption CLUSTEROPTION\n                        Options for job submission to cluter. Default: 'qsub -V -cwd -pe smp 1 -l h_vmem=8G -q all.q,bigmem -e %s -o %s -N %s'\n  --max_len MAX_LEN     The maximum length of repeat regions which will be detected. Default: 0\n  --StopFail STOPFAIL   Whether stop when a job failed. Default: 0(not stop)\n  --avergnum AVERGNUM   The number of repeat regions for each jobs. Default:100.\n  --envset ENVSET       Whether virtual environment is created for running RepeatHMM. Default: None. Can set 'repeathmmenv'\n  --repeathmmPath REPEATHMMPATH\n                        The path to repeatHMM.py. Default: 'RepeatHMM/bin/'\n  --Onebamfile ONEBAMFILE\n                        A BAM file storing all alignments\n  --SepbamfileTemp SEPBAMFILETEMP\n                        A separated BAM file template storing all alignments; separated by chromosome ids. For example, '--SepbamfileTemp'=mybam_Chr%s_sorted.bam where '%s' is chromosome id (1....22,x,y)\n\nCommon options for alignment:\n  --hg HG               The reference genome is used. Currently, some repeat information in hg38 and hg19 are pre-defined. The default folder is ./mhgversion/\n  --hgfile HGFILE       The file name of reference genome. It could be empty and the default file name is 'hg'.fa\n  --GapCorrection GAPCORRECTION\n                        Is unsymmetrical alignment used for error correction of detected repeat region in reads. 1: yes(Default), 0: no\n  --FlankLength FLANKLENGTH\n                        Is flanking sequence used for repeat region detection. non-0: yes(Default: 30), 0: no\n  --MatchInfo MATCHINFO\n                        The match strategy for gap correction.\n\nCommon options:\n  --outlog OUTLOG       The level for output of running information: 0:DEBUG; 1:INFO; 2:WARNING; 3:ERROR; 4:FATAL\n  --Tolerate TOLERATE   Tolerate mismatch, e.g., CTG:TTG:0:2 or CTG:CTT:-2:0.\n  --MinSup MINSUP       The minimum reads associated with peaks.\n  --MaxRep MAXREP       The maximum repeat size. The smallest MaxRep should not be less than 14.\n  --CompRep COMPREP     Whether the repeat pattern is simple ('0') or complex (nonzeo-'0': AlTlT50/C50lClT/C). For complex patterns, all patterns are required to have the same length, each position is seperated by `l` and the nucleotides at the same position is seperated by '/' where a nucleotide can by followed by a number specify relative frequency (cannot be float).\n  --outFolder OUTFOLDER\n                        The default folder for temporary output. Default: align/\n\nCommon options for gene information:\n  --repeatName REPEATNAME\n                        A gene name which you want to analyze(Default: None), such as HTT for huntington's disease. 'all': all pre-defined genes will be analyzed;\n  --UserDefinedUniqID USERDEFINEDUNIQID\n                        The name for storing results. Default: Pcr1. Must be different when simultaneously running RepeatHMM many times with the same setting for a same file\n  --Patternfile PATTERNFILE\n                        The file storing all predefined microsatellites (e.g., './reference_sts/hg38/hg38.trf.bed'). '.bed' for bed files and '.pa' for pa file. More than one files can be provided seperated by ';'.\n  --UserDefinedRepeat USERDEFINEDREPEAT\n                        The repeat information defined by users. If this option is given, the default repeat information will be revised. Default: ///////\n\nCommon options for re-alignment after splitting long reads using repeat regions:\n  --SplitAndReAlign {0,1,2}\n                        Split long reads using repeat region in long reads and re-align the non-repeat regions using BWA MEM. Default=0: not use SplitAndReAlign; 1: use SplitAndReAlign only; 2: combine 0 and 1\n  --TRFOptions TRFOPTIONS\n                        The options used for detecting repeat region in a read using Tandem Repeat Finder. The options are merging using _. Default='2_7_4_80_10_100_500' or '2_7_4_80_10_100'. The last parameter will be twice of the length of repeat if not given.\n  --minTailSize MINTAILSIZE\n                        After the split using repeat regions, discard the leftmost/rightmost non-repeat sub-sequences if they have less than --minTailSize bps. Must not be less than 10. Default=70\n  --minRepBWTSize MINREPBWTSIZE\n                        After the split using repeat regions, merge any two non-repeat sub-sequences if they distance is less than --minRepBWTSize bps. Must not be less than 10. Default=70\n  --RepeatTime REPEATTIME\n                        The minimum repeat time for a microsatellite detected by Tandem Repeat Finder. Must not be less than 2. Default=5\n  --BWAMEMOptions BWAMEMOPTIONS\n                        The options used for BWA MEM to align sub-reads after splitting. The options are merging using _. Default='k8_W8_r7'. For example: 'k8_W8_r7'\n\nCommon options for setting HMM matrices:\n  --hmm_insert_rate HMM_INSERT_RATE\n                        Insert error rate in long reads. Default: 0.12\n  --hmm_del_rate HMM_DEL_RATE\n                        Deletion error rate in long reads. Default: 0.02\n  --hmm_sub_rate HMM_SUB_RATE\n                        Substitution error rate in long reads. Default: 0.02\n  --SeqTech {Pacbio,Nanopore,Illumina,None}\n                        The sequencing techniques, Pacbio or Nanopore or Illumina, used to generate reads data. Default: None. Setting this option will override the setting for --hmm_insert_rate, --hmm_del_rate and --hmm_sub_rate\n  --transitionm TRANSITIONM\n                        User-specified transition matrix for HMM. The number of rows and columns must be the same as the 3*L+1 where L is the size of repeat unit. Probabilities in a row is separated by ',' and their sum must be 1. Probabilities of different rows are separated by ';'. Please pay more attention when providing this parameter. For CG repeat, the example of this matrix is '0.96,0.02,0,0,0,0.02,0;0,0.001,0.869,0.11,0,0,0.02;0.02,0.849,0.001,0,0.11,0.02,0;0,0.001,0.869,0.11,0,0,0.02;0.02,0.849,0.001,0,0.11,0.02,0;0.02,0.849,0.001,0,0.11,0.02,0;0.02,0.001,0.849,0.11,0,0,0.02'. Setting this option will override the setting of --hmm_insert_rate, --hmm_del_rate, --hmm_sub_rate and --SeqTech for transition matrix.\n  --emissionm EMISSIONM\n                        User-specified emission matrix for HMM. The number of rows must be the same as the 3*L+1 where L is the size of repeat unit and the number of columns must be 5. Probabilities in a row is separated by ',' and their sum must be 1. Probabilities of different rows are separated by ';'. Please pay more attention when providing this parameter. For CG repeat, the example of this matrix is '0.2,0.2,0.2,0.2,0.2;0.005,0.985,0.005,0.005,0;0.005,0.005,0.985,0.005,0;0.25,0.25,0.25,0.25,0;0.25,0.25,0.25,0.25,0;0.005,0.005,0.985,0.005,0;0.005,0.985,0.005,0.005,0'. Setting this option will override the setting of --hmm_insert_rate, --hmm_del_rate, --hmm_sub_rate and --SeqTech for emission matrix.\n\n```\n\n### Example\n```\nFor example,\npython RepeatHMM/bin/repeatHMM.py Scan --SplitAndReAlign 1 --MinSup 3 --UserDefinedUniqID chr22scan --SeqTech \"Nanopore\" \"--Patternfile\" chr22.trf.bed --cluster 1 --envset repeathmmenv --Onebamfile nanopore.minimap2.sorted.bam --hgfile GRCh38/GRCh38.fa --thread 50\n```\nwhere users need to revise 4 parameters below for their own genome: `repeathmmenv` is your repeathmm environment, `GRCh38/GRCh38.fa` is your reference genome, `nanopore.minimap2.sorted.bam` is a bam file of a nanopore data with minimap2 alignment, and `chr22.trf.bed` is potential repeat list for chr22.  `chr22.trf.bed` could be any list if it follows the format used by UCSC genome browser. For example, users can download whole-genome repeat list using `wget https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.trf.bed.gz`, and then after ungzip, `grep \"chr22\" hg38.trf.bed > chr22.trf.bed` to have `chr22.trf.bed` in this example.\n\n\n\n"
+          },
+          {
+            "file": "README.md",
+            "origin": "repo",
+            "text": "# RepeatHMM: estimation of repeat counts on microsatellites from long-read sequencing data\n\nRepeatHMM is a novel computational tool to detect any microsatellites (including trinucleotide repeats in trinucleotide repeat disorders (TRD)) from given long reads for a subject of interests. It is able to accurately estimate estimate expansion counts according to the evaluation performance on both simulation data and real data. It is user friendly and easy to install and use.\n\n## Features\n\n* Accurate and efficient estimation of repeat counts from long-read sequencing data\n\n* Analysis of all types of simple repeats\n\n* Prefined models are included for more than 10 well known trinucleotide repeats: AFF2, AR, ATN1, ATXN1, ATXN2, ATXN3, ATXN7, ATXN8OS, CACNA1A, DMPK, FMR1, FXN, HTT, PPP2R2B, TBP\n\n* Easy to install and use\n\n## Methodology of RepeatHMM\n\nRepeatHMM takes a set of reads as input, uses a split-and-align strategy to improve alignments, performs error correction, and leverages a hidden Markov model (HMM) and a peak calling algorithm based on Gaussian mixture model to infer repeat counts. RepeatHMM allows users to specify error parameters of the sequencing experiments, thus automatically producing transition and emission matrices for HMM and allowing the analysis of both PacBio and Oxford Nanopore data. \n\nRepeatHMM was evaluated on both random simulation and PCR-based simulation for long reads containing CAG repeats, and also on real datasets of ATXN3 for SCA3 of ATXN10  for SCA10. The results demonstrated that our tool was able to accurately estimate expansion counts from long reads.\n\n## Inputs of RepeatHMM\n\nRepeatHMM takes long reads from a subject as input, and can also take a BAM file as input to find more than 10 predefined trinucleotide repeats or a gene given by users, after all reads were well aligned to a reference genome. \n\n## Usage\n\nPlease refer to [Usage](https://github.com/WGLab/RepeatHMM/blob/master/docs/Usage.md) for how to use RepeatHMM.\n\n## Revision History\n\nFor release history, please visit [here](https://github.com/WGLab/RepeatHMM/releases). For details, please go [here](https://github.com/WGLab/RepeatHMM/blob/master/README.md).\n\n## Contact\n\nIf you have any questions/issues/bugs, please post them on [GitHub](https://github.com/WGLab/RepeatHMM/issues). They would also be helpful to other users. \n\n## Reference\n**Please cite the publication below if you use our tool:**\n\nQian Liu, Peng Zhang, Depeng Wang, Weihong Gu and Kai Wang. Interrogating the \"unsequenceable\" genomic trinucleotide repeat disorders by long-read sequencing. Genome Med. 9(1):65, 2017. doi: 10.1186/s13073-017-0456-7.\n"
+          },
+          {
+            "file": "docs/Install.md",
+            "origin": "repo",
+            "text": "\n## Quick preparation of running RepeatHMM using conda\n1. Download RepeatHMM\n\n`git clone https://github.com/WGLab/RepeatHMM`\n\n2. Create conda environment.\n```\ncd RepeatHMM\nconda env create -f environment.yml\nsource activate repeathmmenv\ncd bin/scripts/UnsymmetricPairAlignment\nmake\ncd ../../../\n```\nThen, you can use run RepeatHMM by `python bin/repeatHMM.py`\n\nIf you have any error, please post them on [GitHub](https://github.com/WGLab/RepeatHMM/issues). They would also be helpful to other users.\n\nYou can also prepare the environment using the guideline below.\n\n## Prerequisites:\n\t* Python 2.7\n\t* GCC 4.4.7\n\t* python packages:\n\t\t+ peakutils 1.0.3\n\t\t+ hmmlearn 0.2.1\n\t\t+ sklearn (sklearn.mixture.GaussianMixture)\n\t\t+ biopython (strongly recommend 1.66 if possible)\n\t  installation using pip:\n\t   pip install peakutils==1.0.3 hmmlearn==0.2.1 sklearn biopython==1.66\n\t* SWIG (see https://anaconda.org/anaconda/swig)\n\t* make\n\t* BWA MEM (see https://anaconda.org/bioconda/bwa)\n\t* Tandem Repeat Finder (see https://bioconda.github.io/recipes/trf/README.html)\n\t* samtools (see https://anaconda.org/bioconda/samtools)\n\n## Step 1:\n\t* git clone https://github.com/WGLab/RepeatHMM\n\n## Step 2:\n\t* go to bin/RepeatHMM_scripts/UnsymmetricPairAlignment\n\t* type \"make\" and then enter\n\n## Usage:\n For how to use them, please refer to [Usage](https://github.com/WGLab/RepeatHMM/blob/master/docs/Usage.md)\n\n"
+          },
+          {
+            "file": "docs/Help on results interpretation.md",
+            "origin": "repo",
+            "text": "# Some help document to run `repeatHMM.py`\n\n## Where to find the result and how to interpret it\n\n`repeatHMM.py FASTQinput` will store the result in `logfq/RepFQ_*.log`, while `repeatHMM.py BAMinput` stores result in `logbam/RepBAM_*.log`. \n\nUsually, you will have some line in the result file like https://github.com/WGLab/RepeatHMM/issues/2:\n```\np2bamhmm ['atxn3', 14.0, [27, 27], 'allocr:11:1, 14:1, 15:1, 16:1, 18:1, 19:4, 20:195, 21:6, 22:3, 23:2, 24:7, 25:76, 26:626, 27:519, 28:51, 29:7, 30:3, 31:3, 32:1, 34:1, 35:2, 36:1, 37:2, 39:2, 40:3, 41:2, 42:3, 43:7, 44:1, 45:4, 46:6, 47:3, 48:6, 49:2, 50:4, 51:3, 52:4, 53:1, 54:2, 57:1, 62:1, 63:1, 64:1, 67:2, 69:1, 70:2, 71:2, 72:2,', 1580, 205]\np2sp ['atxn3', 14.0, [27, 69], 'allocr:20:1, 22:1, 23:2, 24:7, 25:76, 26:625, 27:520, 28:51, 29:6, 30:3, 31:3, 32:1, 35:2, 36:1, 37:2, 39:2, 40:3, 41:2, 42:3, 43:5, 45:4, 46:6, 47:4, 48:5, 49:3, 50:6, 51:4, 52:6, 53:2, 54:6, 55:4, 56:1, 57:2, 58:4, 59:4, 60:4, 61:3, 62:2, 63:3, 64:2, 65:2, 66:5, 67:11, 68:24, 69:35, 70:43, 71:35, 72:27, 73:7, 74:4, 75:5, 78:1, 83:1,', 1591, 2]\n```\np2sp's results are recommended which usually are better than p2bamhmm's results (which could be used for testing and would be removed in future).  [XX, YY] is the estimated allele size, followed by a distribution of all estimated repeat sizes.\n\n## `INFO: Warning!!!! could not find optimized model`\nSometimes, you might find the warning above in the result file. Do not be panic! This is because Gaussian Mixture model is used in RepeatHMM to infer repeat count. Thus, enough reads are needed to support the estimation. When there are no enough supporting reads and each estimated repeat count is only supported by very few reads. Gaussian Mixture model thus cannot find a better model to fit the data and give the warning. Thus, the suitable coverage is necessary to avoid the warning and provide better estimation. \n\nUsually, high coverage would be a better choice to reliably detect much longer repeats (hundreds of repeats); otherwise, each estimation repeat count only has very few supporting reads, and RepeatHMM might filter the estimation at the final step, and just outputs something like [0, 0], indicating that there is not enough evidence to support the estimation.\n\n\n## Other explanation of logging files\n\nSome information below is for the DEBUG purpose, and they would not be in the output file with default settings.  \n\n### INFO: ref_repeat 14 CTG +14\n\nThe information of the CTG repeat in the reference genome, and \"+14\" is the information provided by users or in pre-defined repeats.\n\n### INFO: no_repeat_id_list 40\n\nThe number of reads whose repeats could not be detected by TRF (Tandem Repeat Finder).\n\n### INFO: short_repeat_id_list 0\n\nThe number of reads whose repeats could be detected by TRF but the repeat regions are too short.\n\n### INFO: repeat_id_list 14\n\nThe number of reads whose repeats could be detected by TRF.\n\n### INFO: expRegionInLongRead= 10 4\n\nThe number of reads with longer repeat regions detected, followed by the number of reads without longer repeat regions or incorrectly aligned or partial alignment with the region of interest.\n\n### INFO: nonRepeatinLongRead= 7 10\n\nThe number of reads with possibly short repeat regions detected, followed by the number of reads with incorrect alignment or partial alignment with the region of interest.\n\n### INFO: tol_info=['', 0, 0]\n\nThe tolerant repeat patterns. For example, CTT could be considered to well match with CTG in the error correction process (not  in the HMM process), although the last alignment are T vs G. Here, not tolerant repeat patterns were specified. \n\n### INFO:  allocr:20:1, 22:1, 23:2, 24:7, 25:76, 26:625, 27:520, 28:51, 29:6, 30:3, 31:3, 32:1, 35:2, 36:1, 37:2, 39:2, 40:3, 41:2, 42:3, 43:5, 45:4, 46:6, 47:4, 48:5, 49:3, 50:6, 51:4, 52:6, 53:2, 54:6, 55:4, 56:1, 57:2, 58:4, 59:4, 60:4, 61:3, 62:2, 63:3, 64:2, 65:2, 66:5, 67:11, 68:24, 69:35, 70:43, 71:35, 72:27, 73:7, 74:4, 75:5, 78:1, 83:1\n\nThe dictionary of the estimation repeat count. In 'X:Y', 'X' is the estimation repeat count, and 'Y' is the number of supporting reads. \n\n\n\n\n"
+          }
+        ],
+        "tool_names": [
+          "RepeatHMM",
+          "__init__.py",
+          "getAlignment",
+          "getAlignment.py",
+          "getTransition_start_emission_prob_x",
+          "getTransition_start_emission_prob_x.py",
+          "myBAMhandler",
+          "myBAMhandler.py",
+          "myCommonFun",
+          "myCommonFun.py",
+          "myFASTQhandler",
+          "myFASTQhandler.py",
+          "myGaussianMixtureModel",
+          "myGaussianMixtureModel.py",
+          "myHMM",
+          "myHMM.py",
+          "myPredefinedPatternReader",
+          "myPredefinedPatternReader.py",
+          "myRepeatReAlignment",
+          "myRepeatReAlignment.py",
+          "myScanWholeGenome",
+          "myScanWholeGenome.py",
+          "mySetting",
+          "mySetting.py",
+          "myheader",
+          "myheader.py",
+          "printHMMmatrix",
+          "printHMMmatrix.py",
+          "repeatHMM",
+          "repeatHMM.py",
+          "repeathmm"
+        ],
+        "tree_paths": [
+          "INSTALL",
+          "LICENSE",
+          "README.md",
+          "bin/RepeatHMM_scripts/UnsymmetricPairAlignment/Makefile",
+          "bin/RepeatHMM_scripts/UnsymmetricPairAlignment/UnsymmetricPairAlignment.c",
+          "bin/RepeatHMM_scripts/UnsymmetricPairAlignment/UnsymmetricPairAlignment.i",
+          "bin/RepeatHMM_scripts/UnsymmetricPairAlignment/__init__.py",
+          "bin/RepeatHMM_scripts/UnsymmetricPairAlignment/setup.py",
+          "bin/RepeatHMM_scripts/__init__.py",
+          "bin/RepeatHMM_scripts/getAlignment.py",
+          "bin/RepeatHMM_scripts/getTransition_start_emission_prob_x.py",
+          "bin/RepeatHMM_scripts/myBAMhandler.py",
+          "bin/RepeatHMM_scripts/myCommonFun.py",
+          "bin/RepeatHMM_scripts/myFASTQhandler.py",
+          "bin/RepeatHMM_scripts/myGaussianMixtureModel.py",
+          "bin/RepeatHMM_scripts/myHMM.py",
+          "bin/RepeatHMM_scripts/myPredefinedPatternReader.py",
+          "bin/RepeatHMM_scripts/myRepeatReAlignment.py",
+          "bin/RepeatHMM_scripts/myScanWholeGenome.py",
+          "bin/RepeatHMM_scripts/mySetting.py",
+          "bin/RepeatHMM_scripts/myheader.py",
+          "bin/RepeatHMM_scripts/printHMMmatrix.py",
+          "bin/__init__.py",
+          "bin/reference_sts/hg19/hg19.predefined.pa",
+          "bin/reference_sts/hg38/hg38.predefined.pa",
+          "bin/repeatHMM.py",
+          "docs/Help on results interpretation.md",
+          "docs/Install.md",
+          "docs/Usage.md",
+          "environment.yml",
+          "setup.py"
+        ],
+        "tree_truncated": false,
+        "upstream_files": {}
+      },
+      "limitations": [
+        "install_profile_unsupported"
+      ],
+      "caveat_items": [
+        "Environment: no proven installation profile; STRhub did not manufacture installation steps.",
+        "Input: the README documents BAM (line 23); this plan selects STRhub's ont-bam-hg38 reference data.",
+        "Evaluator limitation: a read-file argument is outside the closed input substitution table.",
+        "Run command: the one documented in docs/Usage.md (line 226), rewritten to STRhub's mounts; the capture wrapper is planned only if the procedure review passes."
+      ]
+    }
+  },
+  "provenance": {
+    "from_upstream": {
+      "install": {
+        "method": "conda",
+        "evidence_source": "repo_file:environment.yml"
+      },
+      "command": {
+        "value": "python repeatHMM.py BAMinput --Onebamfile XXX.bam --repeatName HTT;",
+        "evidence_source": "docs/Usage.md:L226"
+      },
+      "input_kind": {
+        "value": "bam",
+        "evidence_source": "README.md:L23"
+      },
+      "supported_platforms": [
+        {
+          "platform": "ont",
+          "evidence_source": "README.md:L1"
+        }
+      ],
+      "assembly": {
+        "declared": "both",
+        "evidence_source": "docs/Usage.md:L62"
+      },
+      "regions_schema": null,
+      "output_format": {
+        "glob": "**/*.t[sx][vt]",
+        "evidence_source": "docs/Usage.md:L128"
+      }
+    },
+    "derived": {
+      "command_rewrites": [],
+      "regions_layout_binding": null,
+      "single_sample_adaptation": null
+    },
+    "harness_choices": {
+      "dataset": {
+        "selected": "ont-bam-hg38",
+        "reason": "STRhub selected 'ont-bam-hg38' as compatible with upstream input 'bam' and platform 'ont'"
+      },
+      "platform": {
+        "selected": "ont",
+        "basis": "upstream_single_platform",
+        "supported_platforms": [
+          "ont"
+        ]
+      },
+      "assembly": {
+        "selected": "hg38",
+        "basis": "upstream_stated",
+        "note": null
+      },
+      "regions_layout": null,
+      "base_environment": null
+    }
+  },
+  "procedure_validation": {
+    "schema": "strhub-procedure-evidence/1",
+    "valid": true,
+    "reason": "Procedure evidence matches the effective manifest and recomputed decision."
+  },
+  "verdict": {
+    "code": "undetermined",
+    "title": "Could not be determined",
+    "basis": "recipe",
+    "reason": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub.",
+    "readme_gaps": [],
+    "status_code": "UNVERIFIED_INSUFFICIENT_DOCS",
+    "blockers": [
+      {
+        "code": "install_not_copyable",
+        "what": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub.",
+        "ask_owner": {
+          "title": "Write the installation as commands that can be copied and run",
+          "body": "STRhub Verified reads the installation from the repository's documentation and runs it exactly as written, adding nothing. At this commit it could not follow it. Writing the installation as plain commands in one code block (apt, conda, pip, make or cmake, with the files they name in the repository) lets a new user, a reviewer and STRhub install the tool by copying it. The forms it can follow are listed in the guide: https://github.com/Tfronta/strhub-verified-next/blob/main/docs/GUIA-PASO-1.md What stopped it: No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub."
+        }
+      }
+    ]
+  },
+  "recommendations": [
+    {
+      "code": "example_data",
+      "text": "The repository ships no example input. A small example the documented command can read, with the output it should produce, would let any user reproduce the run without outside data."
+    }
+  ],
+  "step1": {
+    "code": "cannot_tell",
+    "headline": "As documented, a third party cannot tell how to run it.",
+    "body": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub. Nothing was executed. That does not mean the tool does not work: what the guide asks for is missing from the README at this commit. Add it and try the link again on the new commit.",
+    "missing": [
+      "install"
+    ],
+    "missing_text": [
+      "Installation, copyable"
+    ],
+    "guide": "docs/GUIA-PASO-1.md"
+  },
+  "certificate": {
+    "schema": "strhub-verified/certificate/1",
+    "label": "Could not be determined",
+    "reached": "Available",
+    "stages": [
+      {
+        "key": "available",
+        "label": "Source available",
+        "status": "PASS"
+      },
+      {
+        "key": "installs",
+        "label": "Installation",
+        "status": "NOT ATTEMPTED"
+      },
+      {
+        "key": "runs",
+        "label": "End-to-end execution",
+        "status": "NOT ATTEMPTED"
+      },
+      {
+        "key": "output",
+        "label": "Output generated",
+        "status": "NOT ATTEMPTED"
+      }
+    ],
+    "summary": {
+      "purpose": "Evaluate whether the tool installs, runs end-to-end, and produces structurally valid output.",
+      "result": "Could not be determined",
+      "reached": "Available, 1/5 gates passed",
+      "why": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub.",
+      "scope": "Installation, execution, and output structure evaluation.",
+      "not_evaluated": [
+        "Genotype accuracy",
+        "Concordance",
+        "Forensic validity",
+        "Regulatory compliance"
+      ]
+    },
+    "conclusion": [
+      {
+        "title": "Procedure not established",
+        "body": "The recorded gate observations do not establish whether the documented procedure succeeded or failed."
+      },
+      {
+        "title": "Observations retained",
+        "body": "The supplied run and output observations remain in the report; they do not replace procedure evidence."
+      },
+      {
+        "title": "Verdict: Could not be determined",
+        "body": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub."
+      },
+      {
+        "title": "Reproducibility not established",
+        "body": "These observations are insufficient to establish a reproducible documented execution finding."
+      }
+    ],
+    "out_of_scope": [
+      "Genotype correctness or accuracy",
+      "Concordance against known truth sets",
+      "Sensitivity, specificity, or stutter performance",
+      "Allele calling accuracy or forensic casework suitability",
+      "Regulatory compliance or ISO accreditation",
+      "Multi-laboratory or multi-dataset reproducibility"
+    ],
+    "limitations": [
+      "Single reference dataset per input type",
+      "Single containerized environment (Docker / ubuntu-22.04)",
+      "No truth-set comparison or ground-truth genotypes",
+      "No accuracy or concordance assessment",
+      "No forensic or clinical validation of results",
+      "No sequencing data were processed because execution did not complete"
+    ],
+    "scope": {
+      "statement": "Independent automated evaluation of reproducible execution. It checks whether the tool installs, runs end-to-end, and produces structurally valid output in a standardized environment.",
+      "not": "This is not an analytical validation. Genotype accuracy, concordance, forensic suitability, and regulatory compliance are out of scope.",
+      "disclaimer": "Each result is a dated snapshot, verified on the tool's public repository at a pinned commit. STRhub does not store tool source code."
+    }
+  }
+}

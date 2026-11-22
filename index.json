@@ -1,7 +1,7 @@
 {
   "schema": "strhub-verified/index/3",
-  "generated": "2026-11-22T19:15:12+00:00",
-  "count": 20,
+  "generated": "2026-11-22T19:15:19+00:00",
+  "count": 21,
   "tools": [
     {
       "slug": "expansionhunter",
@@ -392,6 +392,50 @@
           "report": "mpsproto/16080a8c7a71493d89670ba39f2a33779c62dccf/mpsproto.json",
           "page": "mpsproto/16080a8c7a71493d89670ba39f2a33779c62dccf/mpsproto.html",
           "pdf": "mpsproto/16080a8c7a71493d89670ba39f2a33779c62dccf/mpsproto.pdf"
+        }
+      ]
+    },
+    {
+      "slug": "repeathmm-ont",
+      "name": "RepeatHMM",
+      "version": "v2.0.3",
+      "variant": null,
+      "sha": "fa6c108fa0cc8ab344577147e52a8fcc3adde990",
+      "committed": "2020-12-03T17:30:50Z",
+      "instrument": "documented",
+      "level": "available",
+      "label": "Could not be determined",
+      "verdict": "undetermined",
+      "errors_reported": false,
+      "generated": "2026-11-22T19:14:51+00:00",
+      "source_repo": "https://github.com/WGLab/RepeatHMM",
+      "source_ref": "fa6c108fa0cc8ab344577147e52a8fcc3adde990",
+      "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/45059573616",
+      "distinct_str_loci": null,
+      "distinct_snp_markers": null,
+      "total_reads": null,
+      "external_state": "na",
+      "dataset_types": [
+        "ont-bam-hg38"
+      ],
+      "report": "repeathmm-ont.json",
+      "page": "repeathmm-ont.html",
+      "versions": [
+        {
+          "sha": "fa6c108fa0cc8ab344577147e52a8fcc3adde990",
+          "instrument": "documented",
+          "version": "v2.0.3",
+          "variant": null,
+          "committed": "2020-12-03T17:30:50Z",
+          "generated": "2026-11-22T19:14:51+00:00",
+          "level": "available",
+          "label": "Could not be determined",
+          "verdict": "undetermined",
+          "errors_reported": false,
+          "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/45059573616",
+          "report": "repeathmm-ont/fa6c108fa0cc8ab344577147e52a8fcc3adde990/repeathmm-ont.json",
+          "page": "repeathmm-ont/fa6c108fa0cc8ab344577147e52a8fcc3adde990/repeathmm-ont.html",
+          "pdf": "repeathmm-ont/fa6c108fa0cc8ab344577147e52a8fcc3adde990/repeathmm-ont.pdf"
         }
       ]
     },
