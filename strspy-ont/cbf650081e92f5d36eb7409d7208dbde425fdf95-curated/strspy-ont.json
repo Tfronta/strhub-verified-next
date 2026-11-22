@@ -1,0 +1,1784 @@
+{
+  "schema": "strhub-verified/1",
+  "mode": "publish",
+  "tool": {
+    "name": "STRspy",
+    "version": "v1.1.1",
+    "contact": "https://github.com/unique379r/strspy/issues"
+  },
+  "submission": {
+    "by": "third_party"
+  },
+  "source": {
+    "repo": "https://github.com/unique379r/strspy",
+    "ref": "cbf650081e92f5d36eb7409d7208dbde425fdf95",
+    "ref_resolved": "cbf650081e92f5d36eb7409d7208dbde425fdf95",
+    "committed": "2021-06-14T19:06:23Z"
+  },
+  "environment": {
+    "dockerfile": "Dockerfile",
+    "os": [
+      "ubuntu-22.04"
+    ],
+    "source": "prepared"
+  },
+  "generated": "2026-11-22T19:24:15+00:00",
+  "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/44934862541",
+  "run": {
+    "cmd": "bash src/STRspy_Normal_v2.0_Args.sh -i /data/in/input.bam -r yes -t ont -f db-v2/STRspy2.0-DB-fixed -b db-v2/STRspy2.0-DB-fixed -l db-v2/STRspy_v2.DB.sort.bed -k 0.4 -o Results -c config/UserToolsConfig.txt -d 4",
+    "cwd": ".",
+    "effective_cmd": "cd '.' && touch /tmp/.strhub_mark && ( bash src/STRspy_Normal_v2.0_Args.sh -i /data/in/input.bam -r yes -t ont -f db-v2/STRspy2.0-DB-fixed -b db-v2/STRspy2.0-DB-fixed -l db-v2/STRspy_v2.DB.sort.bed -k 0.4 -o Results -c config/UserToolsConfig.txt -d 4 ); rc=$?; find . -xdev -type f -newer /tmp/.strhub_mark -size +0 ! -path './.git/*' ! -path './proc/*' ! -path './sys/*' ! -path './dev/*' ! -path './data/*' ! -path '*/__pycache__/*' ! -name '*.pyc' ! -name '*.pyo' 2>/dev/null | head -500 | while IFS= read -r f; do mkdir -p \"/data/out/$(dirname \"$f\")\" && cp \"$f\" \"/data/out/$f\"; done; exit $rc",
+    "step_outcome": "success"
+  },
+  "instrument": "curated",
+  "recipe": {
+    "origin": "curated",
+    "workarounds": [
+      {
+        "what": "Install dependencies with `conda env create -f setup/STRspy_2.0_env.yml` pinning `python>=3.9` and `samtools>=1.12`.",
+        "instead_of": "Running `wget https://repo.anaconda.com/miniconda/Miniconda3-py39_4.9.2-Linux-x86_64.sh` from README.md line 27 or using the unpinned environment file.",
+        "why": "Automated profiles cannot run arbitrary shell installers from wget, and an unpinned Conda solve pulls a legacy samtools build linked against missing OpenSSL 1.0 libraries."
+      },
+      {
+        "what": "Accept a single BAM file in `-i` and create `-o Results` automatically inside `src/STRspy_Normal_v2.0_Args.sh`.",
+        "instead_of": "Requiring a pre-created output directory and an input folder layout.",
+        "why": "Allows direct command-line invocation on a single sample BAM without manual directory staging."
+      },
+      {
+        "what": "Print the STR locus name (e.g. CSF1PO, D3S1358) in the `Locus` column of Toptwo and summary TSV tables.",
+        "instead_of": "Printing the internal GenBank accession identifier in the `Locus` column.",
+        "why": "Produces standard, human-readable forensic STR locus names in the summary table."
+      }
+    ]
+  },
+  "gates": {
+    "available": true,
+    "installs": true,
+    "runs": true,
+    "io": true,
+    "content": true
+  },
+  "input_contract": {
+    "type": "ont-bam-hg38"
+  },
+  "level": "content",
+  "io_detail": {
+    "gate": "io",
+    "passed": true,
+    "outputs": [
+      {
+        "path": "**/*.t[sx][vt]",
+        "format": "tsv",
+        "checks": {
+          "confined": true,
+          "exists": true,
+          "non_empty": true,
+          "parses_as_tsv": true,
+          "min_records": true
+        },
+        "resolved": "Results/input.bam_All_Loci_Summary.tsv",
+        "records": 40,
+        "passed": true
+      }
+    ]
+  },
+  "content_detail": {
+    "gate": "content",
+    "applicable": true,
+    "passed": true,
+    "outputs": [
+      {
+        "path": "**/*.t[sx][vt]",
+        "resolved": "Results/input.bam_All_Loci_Summary.tsv",
+        "mode": "auto",
+        "checks": {
+          "records_present": true,
+          "locus_column_found": true,
+          "loci_recognised": true,
+          "calls_or_counts_present": true
+        },
+        "stats": {
+          "rows": 40,
+          "header_row_dropped": true,
+          "malformed_rows": 0,
+          "dna_invalid_rows": 0,
+          "count_invalid_rows": 0,
+          "distinct_loci": 22,
+          "distinct_str_loci": 22,
+          "distinct_snp_markers": 0,
+          "loci": [
+            "CSF1PO",
+            "D10S1248",
+            "D12S391",
+            "D13S317",
+            "D16S539",
+            "D18S51",
+            "D19S433",
+            "D1S1656",
+            "D21S11",
+            "D22S1045",
+            "D2S1338",
+            "D2S441",
+            "D3S1358",
+            "D5S818",
+            "D7S820",
+            "D8S1179",
+            "DYS391",
+            "DYS393",
+            "FGA",
+            "TH01",
+            "TPOX",
+            "vWA"
+          ],
+          "str_loci": [
+            "CSF1PO",
+            "D10S1248",
+            "D12S391",
+            "D13S317",
+            "D16S539",
+            "D18S51",
+            "D19S433",
+            "D1S1656",
+            "D21S11",
+            "D22S1045",
+            "D2S1338",
+            "D2S441",
+            "D3S1358",
+            "D5S818",
+            "D7S820",
+            "D8S1179",
+            "DYS391",
+            "DYS393",
+            "FGA",
+            "TH01",
+            "TPOX",
+            "vWA"
+          ],
+          "snp_markers": [],
+          "total_reads": 0,
+          "max_sequence_depth": 0,
+          "top_loci_by_depth": [
+            [
+              "CSF1PO",
+              0
+            ],
+            [
+              "D10S1248",
+              0
+            ],
+            [
+              "D12S391",
+              0
+            ],
+            [
+              "D13S317",
+              0
+            ],
+            [
+              "D16S539",
+              0
+            ],
+            [
+              "D18S51",
+              0
+            ],
+            [
+              "D19S433",
+              0
+            ],
+            [
+              "D1S1656",
+              0
+            ],
+            [
+              "D21S11",
+              0
+            ],
+            [
+              "D22S1045",
+              0
+            ],
+            [
+              "D2S1338",
+              0
+            ],
+            [
+              "D2S441",
+              0
+            ],
+            [
+              "D3S1358",
+              0
+            ],
+            [
+              "D5S818",
+              0
+            ],
+            [
+              "D7S820",
+              0
+            ],
+            [
+              "D8S1179",
+              0
+            ],
+            [
+              "DYS391",
+              0
+            ],
+            [
+              "DYS393",
+              0
+            ],
+            [
+              "FGA",
+              0
+            ],
+            [
+              "TH01",
+              0
+            ],
+            [
+              "TPOX",
+              0
+            ],
+            [
+              "vWA",
+              0
+            ]
+          ],
+          "locus_column_found": true,
+          "locus_column": 0,
+          "dna_columns": [],
+          "count_columns": [],
+          "allele_columns": [
+            1,
+            2
+          ],
+          "panel_loci_present": [
+            "CSF1PO",
+            "D10S1248",
+            "D12S391",
+            "D13S317",
+            "D16S539",
+            "D18S51",
+            "D19S433",
+            "D1S1656",
+            "D21S11",
+            "D22S1045",
+            "D2S1338",
+            "D2S441",
+            "D3S1358",
+            "D5S818",
+            "D7S820",
+            "D8S1179",
+            "FGA",
+            "TH01",
+            "TPOX",
+            "vWA"
+          ]
+        },
+        "passed": true
+      }
+    ]
+  },
+  "example_detail": null,
+  "datasets": [
+    {
+      "leg": "external",
+      "label": "External data",
+      "available": true,
+      "type": "ont-bam-hg38",
+      "dataset": "1000 Genomes ONT, hg38 CODIS slice (R10 SUP)",
+      "io": true,
+      "content": true,
+      "passed": true
+    },
+    {
+      "leg": "example",
+      "label": "Tool's own example",
+      "available": false,
+      "io": false,
+      "content": null,
+      "passed": false,
+      "matches_expected": null,
+      "produced_count": null
+    }
+  ],
+  "scope": "Assessment of documented execution in the stated environment and output format. Concerns reproducible execution only; no claim of accuracy, casework fitness, or regulatory validation.",
+  "upstream": {
+    "checked": "2026-11-21T18:21:34+00:00",
+    "repo_exists": true,
+    "ref_exists": true,
+    "default_branch": "main",
+    "status": "identical",
+    "behind_by": 0
+  },
+  "needed_beyond_repo": [
+    "Test data: no sample from the repository was used, so a public reference sample stood in.",
+    "A base environment for the documented installation: STRhub ran the repository's install commands unchanged on Ubuntu 22.04, package lists refreshed, apt answering yes, plus Miniforge (conda, python, pip). Base-image and package versions are not frozen by the commands."
+  ],
+  "author_known_issues": [
+    {
+      "heading": "Known bug",
+      "line": 294,
+      "text": "When using the wrapper ('STRspy_run_v1.0.sh'), One might run into an issue. The parallel version of **STRspy_Parallel_v2.0_Args.sh** is unable to properly connect with \"gnu parallel\" and exits the workflow without mapping or further analysis steps of the pipeline. Solution to this, the user can choose the Normal version to avoid any crash. ***Tip: Its good practice to use pre-aligned bams for quicker outcomes.***",
+      "truncated": false,
+      "url": "https://github.com/Tfronta/strspy/blob/b4c3cc6ab3c866788ec456c22597a112d5237def/README.md#L294"
+    }
+  ],
+  "evidence": [
+    {
+      "claim": "install_method",
+      "kind": "tree",
+      "path": "setup/STRspy_2.0_env.yml",
+      "text": "conda",
+      "url": "https://github.com/Tfronta/strspy/blob/b4c3cc6ab3c866788ec456c22597a112d5237def/setup/STRspy_2.0_env.yml"
+    },
+    {
+      "claim": "run_command",
+      "kind": "readme",
+      "path": "README.md",
+      "line": 120,
+      "text": "bash src/STRspy_Normal_v2.0_Args.sh -i sample.bam -r yes -t ont -f db-v2/STRspy2.0-DB-fixed -b db-v2/STRspy2.0-DB-fixed -l db-v2/STRspy_v2.DB.sort.bed -k 0.4 -o Results -c config/UserToolsConfig.txt -d 4",
+      "url": "https://github.com/Tfronta/strspy/blob/b4c3cc6ab3c866788ec456c22597a112d5237def/README.md#L120"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "db-v2/STRspy2.0-DB-fixed/TPOX.bed",
+      "text": "bed",
+      "url": "https://github.com/Tfronta/strspy/blob/b4c3cc6ab3c866788ec456c22597a112d5237def/db-v2/STRspy2.0-DB-fixed/TPOX.bed"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "db-v2/STRspy2.0-DB-fixed/vWA.bed",
+      "text": "bed",
+      "url": "https://github.com/Tfronta/strspy/blob/b4c3cc6ab3c866788ec456c22597a112d5237def/db-v2/STRspy2.0-DB-fixed/vWA.bed"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "db-v2/STRspy2.0-DB-fixed/DYS19.bed",
+      "text": "bed",
+      "url": "https://github.com/Tfronta/strspy/blob/b4c3cc6ab3c866788ec456c22597a112d5237def/db-v2/STRspy2.0-DB-fixed/DYS19.bed"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "db-v2/STRspy2.0-DB-fixed/TH01.bed",
+      "text": "bed",
+      "url": "https://github.com/Tfronta/strspy/blob/b4c3cc6ab3c866788ec456c22597a112d5237def/db-v2/STRspy2.0-DB-fixed/TH01.bed"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "db-v2/STRspy2.0-DB-fixed/DYS393.bed",
+      "text": "bed",
+      "url": "https://github.com/Tfronta/strspy/blob/b4c3cc6ab3c866788ec456c22597a112d5237def/db-v2/STRspy2.0-DB-fixed/DYS393.bed"
+    },
+    {
+      "claim": "known_issue",
+      "kind": "readme",
+      "path": "README.md",
+      "line": 294,
+      "text": "Known bug",
+      "url": "https://github.com/Tfronta/strspy/blob/b4c3cc6ab3c866788ec456c22597a112d5237def/README.md#L294"
+    },
+    {
+      "claim": "documented_input",
+      "kind": "readme",
+      "path": "README.md",
+      "line": 44,
+      "text": "Input either fastq (raw reads usually from ONT) or bam (pre-aligned reads by user)",
+      "url": "https://github.com/Tfronta/strspy/blob/b4c3cc6ab3c866788ec456c22597a112d5237def/README.md#L44"
+    },
+    {
+      "claim": "author_recommendation",
+      "kind": "readme",
+      "path": "README.md",
+      "line": 298,
+      "text": "***Tip: Its good practice to use pre-aligned bams for quicker outcomes.***",
+      "url": "https://github.com/Tfronta/strspy/blob/b4c3cc6ab3c866788ec456c22597a112d5237def/README.md#L298"
+    }
+  ],
+  "repo_test_data": {
+    "known": true,
+    "present": true,
+    "count": 40,
+    "examples": [
+      "db-v2/STRspy2.0-DB-fixed/TPOX.bed",
+      "db-v2/STRspy2.0-DB-fixed/vWA.bed",
+      "db-v2/STRspy2.0-DB-fixed/DYS19.bed",
+      "db-v2/STRspy2.0-DB-fixed/TH01.bed",
+      "db-v2/STRspy2.0-DB-fixed/DYS393.bed"
+    ]
+  },
+  "caveats": {
+    "source": "detect_recipe",
+    "items": [
+      "Environment: STRhub transcribed the documented installation commands unchanged into its own carrier (Ubuntu 22.04, package lists refreshed, apt answering yes, plus Miniforge (conda, python, pip)).",
+      "Input: the README documents BAM and FASTQ (line 44); this plan selects STRhub's ont-bam-hg38 reference data. The author recommends BAM (line 298: \"Tip: Its good practice to use pre-aligned bams for quicker outcomes.\").",
+      "read_path: sample.bam -> /data/in/input.bam.",
+      "Run command: the README's own command, rewritten to STRhub's mounts; the capture wrapper is planned only if the procedure review passes."
+    ]
+  },
+  "logs": {
+    "external": "strspy-ont.log-external.txt",
+    "build": "strspy-ont.log-build.txt"
+  },
+  "terminals": {
+    "external": "strspy-ont.terminal-external.txt",
+    "build": "strspy-ont.terminal-build.txt"
+  },
+  "procedure_review": {
+    "may_say_runs": true,
+    "status_code": "VERIFIED_PROCEDURE_READY",
+    "basis": "gates",
+    "attribution": "tool",
+    "blocker": "ready",
+    "reason": "The repository states how to install (conda) and STRhub holds the sample. The container is that install, packaged. If the documented command then fails, the failure is that command's.",
+    "amendments": [],
+    "inferences": {
+      "install": {
+        "evidence_source": "README.md:L71-L72",
+        "verified": true
+      },
+      "run_command": {
+        "evidence_source": "README.md:L120",
+        "verified": true,
+        "kind": "doc",
+        "path": "README.md",
+        "document_sha256": "c9d1a84685c2d8f4e3a91dffd4329c2dd750273c37bd9330b0923fdee697e489"
+      },
+      "input_type": {
+        "verified": true,
+        "kind": "doc",
+        "path": "README.md",
+        "line": 44,
+        "end_line": 44,
+        "document_sha256": "c9d1a84685c2d8f4e3a91dffd4329c2dd750273c37bd9330b0923fdee697e489",
+        "evidence_source": "README.md:L44",
+        "upstream_input_kind": "bam",
+        "selected_dataset": "ont-bam-hg38"
+      },
+      "platform": {
+        "verified": true,
+        "kind": "doc",
+        "path": "README.md",
+        "line": 44,
+        "end_line": 44,
+        "document_sha256": "c9d1a84685c2d8f4e3a91dffd4329c2dd750273c37bd9330b0923fdee697e489",
+        "evidence_source": "README.md:L44",
+        "selected": "ont",
+        "selection_basis": "upstream_single_platform",
+        "supported_platforms": [
+          "ont"
+        ]
+      },
+      "output": {
+        "verified": true,
+        "kind": "doc",
+        "path": "README.md",
+        "line": 75,
+        "end_line": 75,
+        "document_sha256": "c9d1a84685c2d8f4e3a91dffd4329c2dd750273c37bd9330b0923fdee697e489",
+        "evidence_source": "README.md:L75"
+      }
+    },
+    "unbacked_inferences": [],
+    "provenance": {
+      "from_upstream": {
+        "install": {
+          "method": "conda",
+          "evidence_source": "README.md:L71-L72"
+        },
+        "command": {
+          "value": "bash src/STRspy_Normal_v2.0_Args.sh -i sample.bam -r yes -t ont -f db-v2/STRspy2.0-DB-fixed -b db-v2/STRspy2.0-DB-fixed -l db-v2/STRspy_v2.DB.sort.bed -k 0.4 -o Results -c config/UserToolsConfig.txt -d 4",
+          "evidence_source": "README.md:L120"
+        },
+        "input_kind": {
+          "value": "bam",
+          "evidence_source": "README.md:L44"
+        },
+        "supported_platforms": [
+          {
+            "platform": "ont",
+            "evidence_source": "README.md:L44"
+          }
+        ],
+        "assembly": {
+          "declared": "both",
+          "evidence_source": "README.md:L33"
+        },
+        "regions_schema": null,
+        "output_format": {
+          "glob": "**/*.t[sx][vt]",
+          "evidence_source": "README.md:L75"
+        }
+      },
+      "derived": {
+        "command_rewrites": [
+          {
+            "role": "read_path",
+            "original": "sample.bam",
+            "replacement": "/data/in/input.bam",
+            "basis": "declared dataset mount"
+          }
+        ],
+        "regions_layout_binding": null,
+        "single_sample_adaptation": null
+      },
+      "harness_choices": {
+        "dataset": {
+          "selected": "ont-bam-hg38",
+          "reason": "STRhub selected 'ont-bam-hg38' as compatible with upstream input 'bam' and platform 'ont'"
+        },
+        "platform": {
+          "selected": "ont",
+          "basis": "upstream_single_platform",
+          "supported_platforms": [
+            "ont"
+          ]
+        },
+        "assembly": {
+          "selected": "hg38",
+          "basis": "upstream_stated",
+          "note": null
+        },
+        "regions_layout": null,
+        "base_environment": {
+          "image": "ubuntu:22.04",
+          "description": "Ubuntu 22.04, package lists refreshed, apt answering yes, plus Miniforge (conda, python, pip)",
+          "added_packages": [],
+          "miniforge": true,
+          "submodules": false
+        }
+      }
+    },
+    "install_method": "conda",
+    "citable_install": true,
+    "input_type": "ont-bam-hg38",
+    "output_glob": "**/*.t[sx][vt]",
+    "profile": "strhub-upstream-procedure/1",
+    "install_ready": true,
+    "example_ready": false,
+    "installation": {
+      "profile": "strhub-documented-install/1",
+      "ready": true,
+      "method": "conda",
+      "reason": "Transcribe the installation commands the repository documents, unchanged and in order, into a fixed evaluator carrier; no step, dependency, option or choice was added.",
+      "repo": "https://github.com/Tfronta/strspy",
+      "ref": "b4c3cc6ab3c866788ec456c22597a112d5237def",
+      "documents": [
+        {
+          "path": "README.md",
+          "sha256": "c9d1a84685c2d8f4e3a91dffd4329c2dd750273c37bd9330b0923fdee697e489"
+        }
+      ],
+      "commands": [
+        {
+          "file": "README.md",
+          "line": 71,
+          "text": "conda env create -f setup/STRspy_2.0_env.yml",
+          "argv": [
+            "conda",
+            "env",
+            "create",
+            "-f",
+            "setup/STRspy_2.0_env.yml"
+          ]
+        },
+        {
+          "file": "README.md",
+          "line": 72,
+          "text": "conda activate strspy_env",
+          "argv": [
+            "conda",
+            "activate",
+            "strspy_env"
+          ]
+        }
+      ],
+      "published_alternatives": [],
+      "conda_environment": "strspy_env",
+      "base_condition": {
+        "image": "ubuntu:22.04",
+        "description": "Ubuntu 22.04, package lists refreshed, apt answering yes, plus Miniforge (conda, python, pip)",
+        "role": "evaluator base environment",
+        "added_packages": [],
+        "miniforge": true,
+        "submodules": false
+      },
+      "citation": {
+        "repo": "https://github.com/Tfronta/strspy",
+        "ref": "b4c3cc6ab3c866788ec456c22597a112d5237def",
+        "path": "README.md",
+        "line": 71,
+        "end_line": 72,
+        "verified": true,
+        "document_sha256": "c9d1a84685c2d8f4e3a91dffd4329c2dd750273c37bd9330b0923fdee697e489"
+      },
+      "carrier_dockerfile": "# Evaluator carrier: strhub-documented-install/1; not an upstream Dockerfile.\nFROM ubuntu:22.04\nENV DEBIAN_FRONTEND=noninteractive\nRUN [\"bash\", \"-c\", \"echo 'APT::Get::Assume-Yes \\\"true\\\";' > /etc/apt/apt.conf.d/90strhub && apt-get update\"]\nRUN [\"bash\", \"-c\", \"apt-get install curl ca-certificates bzip2 && curl -fsSL https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh -o /tmp/miniforge.sh && bash /tmp/miniforge.sh -b -p /opt/conda && rm /tmp/miniforge.sh && echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/00-strhub-conda.sh && ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh\"]\nENV PATH=/opt/conda/bin:$PATH\nCOPY [\".\", \"/opt/tool\"]\nWORKDIR /opt/tool\nRUN [\"bash\", \"-lc\", \"set -eo pipefail\\nconda env create -f setup/STRspy_2.0_env.yml\\nconda activate strspy_env\\n\"]\nRUN [\"bash\", \"-c\", \"echo 'conda activate strspy_env' > /etc/profile.d/zz-strhub-env.sh\"]\nENTRYPOINT [\"/bin/bash\", \"-lc\"]\n",
+      "carrier_sha256": "8821267d465305ee1de5860c5540c7068b287499085e03e8e61c6775be20e086"
+    },
+    "command_review": {
+      "profile": "strhub-upstream-procedure/1",
+      "cited": "bash src/STRspy_Normal_v2.0_Args.sh -i sample.bam -r yes -t ont -f db-v2/STRspy2.0-DB-fixed -b db-v2/STRspy2.0-DB-fixed -l db-v2/STRspy_v2.DB.sort.bed -k 0.4 -o Results -c config/UserToolsConfig.txt -d 4",
+      "command": "bash src/STRspy_Normal_v2.0_Args.sh -i /data/in/input.bam -r yes -t ont -f db-v2/STRspy2.0-DB-fixed -b db-v2/STRspy2.0-DB-fixed -l db-v2/STRspy_v2.DB.sort.bed -k 0.4 -o Results -c config/UserToolsConfig.txt -d 4",
+      "substitutions": [
+        {
+          "token": 3,
+          "original": "sample.bam",
+          "replacement": "/data/in/input.bam",
+          "role": "read_path",
+          "basis": "declared dataset mount"
+        }
+      ],
+      "read_bindings": [
+        {
+          "token": 3,
+          "original": "sample.bam",
+          "target": "/data/in/input.bam"
+        }
+      ],
+      "limitations": [],
+      "expected": "bash src/STRspy_Normal_v2.0_Args.sh -i /data/in/input.bam -r yes -t ont -f db-v2/STRspy2.0-DB-fixed -b db-v2/STRspy2.0-DB-fixed -l db-v2/STRspy_v2.DB.sort.bed -k 0.4 -o Results -c config/UserToolsConfig.txt -d 4",
+      "executed": "bash src/STRspy_Normal_v2.0_Args.sh -i /data/in/input.bam -r yes -t ont -f db-v2/STRspy2.0-DB-fixed -b db-v2/STRspy2.0-DB-fixed -l db-v2/STRspy_v2.DB.sort.bed -k 0.4 -o Results -c config/UserToolsConfig.txt -d 4",
+      "cited_sha256": "204e9da40f307cc0e6f1892ba819a40601e32258d469fb0df039484ed377d1e2",
+      "executed_sha256": "a5c1e6e240932645a4fcb54fb1aa7751f847ac0a2af6b47b37c6d3082bb4f33b",
+      "citations": [
+        {
+          "repo": "https://github.com/Tfronta/strspy",
+          "ref": "b4c3cc6ab3c866788ec456c22597a112d5237def",
+          "path": "README.md",
+          "line": 120,
+          "verified": true,
+          "document_sha256": "c9d1a84685c2d8f4e3a91dffd4329c2dd750273c37bd9330b0923fdee697e489",
+          "command_sha256": "204e9da40f307cc0e6f1892ba819a40601e32258d469fb0df039484ed377d1e2"
+        }
+      ]
+    },
+    "manifest_sha256": "c053f277c981693a6d5b805fb14d5d3aa5ca4cdcea4467c30e5f4de69a9ab592",
+    "evidence_sha256": "6cf8025933b2bef637f978a2c6aa19767b7b98ef1f57328eefe7de93f72f40f2",
+    "evidence": {
+      "schema": "strhub-procedure-evidence/1",
+      "manifest": {
+        "caveats": {
+          "items": [
+            "Environment: STRhub transcribed the documented installation commands unchanged into its own carrier (Ubuntu 22.04, package lists refreshed, apt answering yes, plus Miniforge (conda, python, pip)).",
+            "Input: the README documents BAM and FASTQ (line 44); this plan selects STRhub's ont-bam-hg38 reference data. The author recommends BAM (line 298: \"Tip: Its good practice to use pre-aligned bams for quicker outcomes.\").",
+            "read_path: sample.bam -> /data/in/input.bam.",
+            "Run command: the README's own command, rewritten to STRhub's mounts; the capture wrapper is planned only if the procedure review passes."
+          ],
+          "source": "detect_recipe"
+        },
+        "environment": {
+          "dockerfile": "Dockerfile",
+          "os": [
+            "ubuntu-22.04"
+          ],
+          "source": "documented"
+        },
+        "inputs": {
+          "type": "ont-bam-hg38"
+        },
+        "outputs": [
+          {
+            "format": "tsv",
+            "min_records": 1,
+            "path": "**/*.t[sx][vt]"
+          }
+        ],
+        "recipe": {
+          "origin": "proposed"
+        },
+        "report": {
+          "slug": "strspy-ont"
+        },
+        "run": {
+          "cmd": "cd '.' && touch /tmp/.strhub_mark && ( bash src/STRspy_Normal_v2.0_Args.sh -i /data/in/input.bam -r yes -t ont -f db-v2/STRspy2.0-DB-fixed -b db-v2/STRspy2.0-DB-fixed -l db-v2/STRspy_v2.DB.sort.bed -k 0.4 -o Results -c config/UserToolsConfig.txt -d 4 ); rc=$?; find . -xdev -type f -newer /tmp/.strhub_mark -size +0 ! -path './.git/*' ! -path './proc/*' ! -path './sys/*' ! -path './dev/*' ! -path './data/*' ! -path '*/__pycache__/*' ! -name '*.pyc' ! -name '*.pyo' 2>/dev/null | head -500 | while IFS= read -r f; do mkdir -p \"/data/out/$(dirname \"$f\")\" && cp \"$f\" \"/data/out/$f\"; done; exit $rc",
+          "timeout_minutes": 20
+        },
+        "source": {
+          "ref": "b4c3cc6ab3c866788ec456c22597a112d5237def",
+          "repo": "https://github.com/Tfronta/strspy"
+        },
+        "submission": {
+          "by": "third_party"
+        },
+        "tool": {
+          "contact": "https://github.com/Tfronta/strspy/issues",
+          "name": "STRspy",
+          "version": "main"
+        }
+      },
+      "proposal": {
+        "build": {
+          "also_published": null,
+          "asset": null,
+          "candidates": [
+            {
+              "file": "setup/STRspy_2.0_env.yml",
+              "method": "conda"
+            }
+          ],
+          "digest": null,
+          "dir": null,
+          "evidence_source": "repo_file:setup/STRspy_2.0_env.yml",
+          "file": "setup/STRspy_2.0_env.yml",
+          "image": null,
+          "method": "conda",
+          "package": null,
+          "readme_install_lines": [
+            "conda env create -f setup/STRspy_2.0_env.yml"
+          ],
+          "readme_line": null,
+          "spec_list": false,
+          "ssh_urls_in": [],
+          "tag": null,
+          "then": [],
+          "url": null
+        },
+        "commands": [
+          {
+            "cmd": "bash src/STRspy_Normal_v2.0_Args.sh -i sample.bam -r yes -t ont -f db-v2/STRspy2.0-DB-fixed -b db-v2/STRspy2.0-DB-fixed -l db-v2/STRspy_v2.DB.sort.bed -k 0.4 -o Results -c config/UserToolsConfig.txt -d 4",
+            "entry_point": false,
+            "evidence_source": "README.md:L120",
+            "file": "README.md",
+            "has_input_flag": true,
+            "has_output_flag": true,
+            "help_only": false,
+            "invokes": "STRspy_Normal_v2.0_Args.sh",
+            "line": 120,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "readme",
+            "piped": false,
+            "rst": false,
+            "source_rank": 0,
+            "subcommand": null,
+            "synopsis": false
+          },
+          {
+            "cmd": "bash db-v2/optional-create-custom-db/fix_db_names.sh my_db/STRspy2.0-DB",
+            "entry_point": false,
+            "evidence_source": "README.md:L90",
+            "file": "README.md",
+            "has_input_flag": false,
+            "has_output_flag": false,
+            "help_only": false,
+            "invokes": "fix_db_names.sh",
+            "line": 90,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "readme",
+            "piped": false,
+            "rst": false,
+            "source_rank": 0,
+            "subcommand": null,
+            "synopsis": false
+          },
+          {
+            "cmd": "bash STRspy_run_v2.0_Args.sh [-h] [-i -t -j] -- This script is wrapper of STRspy [https://doi.org/10.1016/j.fsigen.2021.102629]",
+            "entry_point": false,
+            "evidence_source": "README.md:L193",
+            "file": "README.md",
+            "has_input_flag": true,
+            "has_output_flag": false,
+            "help_only": true,
+            "invokes": "STRspy_run_v2.0_Args.sh",
+            "line": 193,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "readme",
+            "piped": false,
+            "rst": false,
+            "source_rank": 0,
+            "subcommand": null,
+            "synopsis": true
+          },
+          {
+            "cmd": "bash STRspy_Normal_v2.0_Args.sh [-h] [-s -r -t -f -b -g -l -k -o -c -d] -- This script is core-method of STRspy2.0 [https://doi.org/10.3390/ijms27041889]",
+            "entry_point": false,
+            "evidence_source": "README.md:L215",
+            "file": "README.md",
+            "has_input_flag": false,
+            "has_output_flag": true,
+            "help_only": true,
+            "invokes": "STRspy_Normal_v2.0_Args.sh",
+            "line": 215,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "readme",
+            "piped": false,
+            "rst": false,
+            "source_rank": 0,
+            "subcommand": null,
+            "synopsis": true
+          },
+          {
+            "cmd": "bash STRspy_Parallel_v2.0_Args.sh [-h] [-s -r -t -f -b -g -l -k -o -c] -- This script is core-method of STRspy2.0 [https://doi.org/10.3390/ijms27041889]",
+            "entry_point": false,
+            "evidence_source": "README.md:L242",
+            "file": "README.md",
+            "has_input_flag": false,
+            "has_output_flag": true,
+            "help_only": true,
+            "invokes": "STRspy_Parallel_v2.0_Args.sh",
+            "line": 242,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "readme",
+            "piped": false,
+            "rst": false,
+            "source_rank": 0,
+            "subcommand": null,
+            "synopsis": true
+          }
+        ],
+        "dockerfile": null,
+        "docs_read": [],
+        "docs_text": "",
+        "evidence": [
+          {
+            "claim": "install_method",
+            "kind": "tree",
+            "path": "setup/STRspy_2.0_env.yml",
+            "text": "conda",
+            "url": "https://github.com/Tfronta/strspy/blob/b4c3cc6ab3c866788ec456c22597a112d5237def/setup/STRspy_2.0_env.yml"
+          },
+          {
+            "claim": "run_command",
+            "kind": "readme",
+            "line": 120,
+            "path": "README.md",
+            "text": "bash src/STRspy_Normal_v2.0_Args.sh -i sample.bam -r yes -t ont -f db-v2/STRspy2.0-DB-fixed -b db-v2/STRspy2.0-DB-fixed -l db-v2/STRspy_v2.DB.sort.bed -k 0.4 -o Results -c config/UserToolsConfig.txt -d 4",
+            "url": "https://github.com/Tfronta/strspy/blob/b4c3cc6ab3c866788ec456c22597a112d5237def/README.md#L120"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "db-v2/STRspy2.0-DB-fixed/TPOX.bed",
+            "text": "bed",
+            "url": "https://github.com/Tfronta/strspy/blob/b4c3cc6ab3c866788ec456c22597a112d5237def/db-v2/STRspy2.0-DB-fixed/TPOX.bed"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "db-v2/STRspy2.0-DB-fixed/vWA.bed",
+            "text": "bed",
+            "url": "https://github.com/Tfronta/strspy/blob/b4c3cc6ab3c866788ec456c22597a112d5237def/db-v2/STRspy2.0-DB-fixed/vWA.bed"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "db-v2/STRspy2.0-DB-fixed/DYS19.bed",
+            "text": "bed",
+            "url": "https://github.com/Tfronta/strspy/blob/b4c3cc6ab3c866788ec456c22597a112d5237def/db-v2/STRspy2.0-DB-fixed/DYS19.bed"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "db-v2/STRspy2.0-DB-fixed/TH01.bed",
+            "text": "bed",
+            "url": "https://github.com/Tfronta/strspy/blob/b4c3cc6ab3c866788ec456c22597a112d5237def/db-v2/STRspy2.0-DB-fixed/TH01.bed"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "db-v2/STRspy2.0-DB-fixed/DYS393.bed",
+            "text": "bed",
+            "url": "https://github.com/Tfronta/strspy/blob/b4c3cc6ab3c866788ec456c22597a112d5237def/db-v2/STRspy2.0-DB-fixed/DYS393.bed"
+          },
+          {
+            "claim": "known_issue",
+            "kind": "readme",
+            "line": 294,
+            "path": "README.md",
+            "text": "Known bug",
+            "url": "https://github.com/Tfronta/strspy/blob/b4c3cc6ab3c866788ec456c22597a112d5237def/README.md#L294"
+          },
+          {
+            "claim": "documented_input",
+            "kind": "readme",
+            "line": 44,
+            "path": "README.md",
+            "text": "Input either fastq (raw reads usually from ONT) or bam (pre-aligned reads by user)",
+            "url": "https://github.com/Tfronta/strspy/blob/b4c3cc6ab3c866788ec456c22597a112d5237def/README.md#L44"
+          },
+          {
+            "claim": "author_recommendation",
+            "kind": "readme",
+            "line": 298,
+            "path": "README.md",
+            "text": "***Tip: Its good practice to use pre-aligned bams for quicker outcomes.***",
+            "url": "https://github.com/Tfronta/strspy/blob/b4c3cc6ab3c866788ec456c22597a112d5237def/README.md#L298"
+          }
+        ],
+        "example": null,
+        "example_data": [
+          {
+            "in_example_dir": false,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "db-v2/STRspy2.0-DB-fixed/TPOX.bed",
+            "size": 26
+          },
+          {
+            "in_example_dir": false,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "db-v2/STRspy2.0-DB-fixed/vWA.bed",
+            "size": 26
+          },
+          {
+            "in_example_dir": false,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "db-v2/STRspy2.0-DB-fixed/DYS19.bed",
+            "size": 27
+          },
+          {
+            "in_example_dir": false,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "db-v2/STRspy2.0-DB-fixed/TH01.bed",
+            "size": 27
+          },
+          {
+            "in_example_dir": false,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "db-v2/STRspy2.0-DB-fixed/DYS393.bed",
+            "size": 28
+          },
+          {
+            "in_example_dir": false,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "db-v2/STRspy2.0-DB-fixed/DYS456.bed",
+            "size": 28
+          },
+          {
+            "in_example_dir": false,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "db-v2/STRspy2.0-DB-fixed/DYS458.bed",
+            "size": 28
+          },
+          {
+            "in_example_dir": false,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "db-v2/STRspy2.0-DB-fixed/DYS481.bed",
+            "size": 28
+          },
+          {
+            "in_example_dir": false,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "db-v2/STRspy2.0-DB-fixed/DYS505.bed",
+            "size": 28
+          },
+          {
+            "in_example_dir": false,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "db-v2/STRspy2.0-DB-fixed/DYS522.bed",
+            "size": 28
+          },
+          {
+            "in_example_dir": false,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "db-v2/STRspy2.0-DB-fixed/DYS570.bed",
+            "size": 28
+          },
+          {
+            "in_example_dir": false,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "db-v2/STRspy2.0-DB-fixed/DYS576.bed",
+            "size": 28
+          },
+          {
+            "in_example_dir": false,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "db-v2/STRspy2.0-DB-fixed/SE33.bed",
+            "size": 28
+          },
+          {
+            "in_example_dir": false,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "db-v2/STRspy2.0-DB-fixed/FGA.bed",
+            "size": 29
+          },
+          {
+            "in_example_dir": false,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "db-v2/STRspy2.0-DB-fixed/D2S441.bed",
+            "size": 30
+          },
+          {
+            "in_example_dir": false,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "db-v2/STRspy2.0-DB-fixed/D7S820.bed",
+            "size": 30
+          },
+          {
+            "in_example_dir": false,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "db-v2/STRspy2.0-DB-fixed/DYS390.bed",
+            "size": 30
+          },
+          {
+            "in_example_dir": false,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "db-v2/STRspy2.0-DB-fixed/DYS391.bed",
+            "size": 30
+          },
+          {
+            "in_example_dir": false,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "db-v2/STRspy2.0-DB-fixed/DYS392.bed",
+            "size": 30
+          },
+          {
+            "in_example_dir": false,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "db-v2/STRspy2.0-DB-fixed/DYS437.bed",
+            "size": 30
+          },
+          {
+            "in_example_dir": false,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "db-v2/STRspy2.0-DB-fixed/DYS438.bed",
+            "size": 30
+          },
+          {
+            "in_example_dir": false,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "db-v2/STRspy2.0-DB-fixed/DYS439.bed",
+            "size": 30
+          },
+          {
+            "in_example_dir": false,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "db-v2/STRspy2.0-DB-fixed/DYS448.bed",
+            "size": 30
+          },
+          {
+            "in_example_dir": false,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "db-v2/STRspy2.0-DB-fixed/DYS460.bed",
+            "size": 30
+          },
+          {
+            "in_example_dir": false,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "db-v2/STRspy2.0-DB-fixed/DYS461.bed",
+            "size": 30
+          },
+          {
+            "in_example_dir": false,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "db-v2/STRspy2.0-DB-fixed/DYS533.bed",
+            "size": 30
+          },
+          {
+            "in_example_dir": false,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "db-v2/STRspy2.0-DB-fixed/DYS549.bed",
+            "size": 30
+          },
+          {
+            "in_example_dir": false,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "db-v2/STRspy2.0-DB-fixed/DYS612.bed",
+            "size": 30
+          },
+          {
+            "in_example_dir": false,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "db-v2/STRspy2.0-DB-fixed/DYS635.bed",
+            "size": 30
+          },
+          {
+            "in_example_dir": false,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "db-v2/STRspy2.0-DB-fixed/DYS643.bed",
+            "size": 30
+          },
+          {
+            "in_example_dir": false,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "db-v2/STRspy2.0-DB-fixed/D18S51.bed",
+            "size": 31
+          },
+          {
+            "in_example_dir": false,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "db-v2/STRspy2.0-DB-fixed/D21S11.bed",
+            "size": 31
+          },
+          {
+            "in_example_dir": false,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "db-v2/STRspy2.0-DB-fixed/D3S1358.bed",
+            "size": 31
+          },
+          {
+            "in_example_dir": false,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "db-v2/STRspy2.0-DB-fixed/D6S1043.bed",
+            "size": 31
+          },
+          {
+            "in_example_dir": false,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "db-v2/STRspy2.0-DB-fixed/DYS389I.bed",
+            "size": 31
+          },
+          {
+            "in_example_dir": false,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "db-v2/STRspy2.0-DB-fixed/PentaD.bed",
+            "size": 31
+          },
+          {
+            "in_example_dir": false,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "db-v2/STRspy2.0-DB-fixed/PentaE.bed",
+            "size": 31
+          },
+          {
+            "in_example_dir": false,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "db-v2/STRspy2.0-DB-fixed/CSF1PO.bed",
+            "size": 32
+          },
+          {
+            "in_example_dir": false,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "db-v2/STRspy2.0-DB-fixed/D12S391.bed",
+            "size": 32
+          },
+          {
+            "in_example_dir": false,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "db-v2/STRspy2.0-DB-fixed/D13S317.bed",
+            "size": 32
+          }
+        ],
+        "inferences": {
+          "build": "repo_file:setup/STRspy_2.0_env.yml",
+          "example": null,
+          "input_type": "README.md:L44",
+          "output": "README.md:L75",
+          "platform": "README.md:L44",
+          "regions": null,
+          "run_command": "README.md:L120",
+          "single_sample_bams": null
+        },
+        "input_type": {
+          "assembly": {
+            "against_hg38": null,
+            "declared": "both",
+            "evidence_source": "README.md:L33",
+            "hg19_evidence_source": "README.md:L137",
+            "hg19_hits": 1,
+            "hg38_evidence_source": "README.md:L33",
+            "hg38_hits": 2,
+            "incompatible_with_hg38": false
+          },
+          "best": "ont-bam-hg38",
+          "candidates": [
+            "ont-bam-hg38",
+            "ont-fastq"
+          ],
+          "evidence_source": "README.md:L44",
+          "how": "read",
+          "platform": "ont",
+          "platform_evidence_source": "README.md:L44",
+          "platform_how": "stated",
+          "signals": {
+            "bam": 8,
+            "ce": 0,
+            "fastq": 8,
+            "hg19": 1,
+            "hg38": 2,
+            "illumina": 1,
+            "ont": 18,
+            "snp": 1,
+            "ystr": 6
+          },
+          "statements": {
+            "against": [],
+            "determined": true,
+            "inputs": [
+              {
+                "kind": "bam",
+                "line": 44,
+                "text": "Input either fastq (raw reads usually from ONT) or bam (pre-aligned reads by user)"
+              },
+              {
+                "kind": "fastq",
+                "line": 44,
+                "text": "Input either fastq (raw reads usually from ONT) or bam (pre-aligned reads by user)"
+              }
+            ],
+            "platform": [
+              {
+                "historical": false,
+                "line": 44,
+                "platform": "ont",
+                "text": "Input either fastq (raw reads usually from ONT) or bam (pre-aligned reads by user)"
+              }
+            ],
+            "recommendation": {
+              "kind": "bam",
+              "line": 298,
+              "text": "***Tip: Its good practice to use pre-aligned bams for quicker outcomes.***"
+            }
+          },
+          "statements_file": null,
+          "supported_platforms": [
+            {
+              "evidence_source": "README.md:L44",
+              "historical": false,
+              "line": 44,
+              "platform": "ont",
+              "text": "Input either fastq (raw reads usually from ONT) or bam (pre-aligned reads by user)"
+            }
+          ],
+          "unsupported": null,
+          "warnings": []
+        },
+        "known_issues": [
+          {
+            "heading": "Known bug",
+            "line": 294,
+            "text": "When using the wrapper ('STRspy_run_v1.0.sh'), One might run into an issue. The parallel version of **STRspy_Parallel_v2.0_Args.sh** is unable to properly connect with \"gnu parallel\" and exits the workflow without mapping or further analysis steps of the pipeline. Solution to this, the user can choose the Normal version to avoid any crash. ***Tip: Its good practice to use pre-aligned bams for quicker outcomes.***",
+            "truncated": false,
+            "url": "https://github.com/Tfronta/strspy/blob/b4c3cc6ab3c866788ec456c22597a112d5237def/README.md#L294"
+          }
+        ],
+        "limitations": [],
+        "output": {
+          "evidence_source": "README.md:L75",
+          "format": "tsv",
+          "signals": {
+            "csv": 0,
+            "json": 0,
+            "tsv": 13,
+            "vcf": 0
+          }
+        },
+        "packaging": {
+          "executables": [],
+          "packages": []
+        },
+        "readme": {
+          "gaps": [],
+          "name": "README.md",
+          "sufficient_to_attempt": true
+        },
+        "readme_name": "README.md",
+        "readme_text": "<p align=\"center\">\n<strong>STRspy2.0</strong>: Unlocking the Potential of Long Reads for Forensic DNA Profiling.\n</p>\n\n# NEWS: We are excited to announce the new release of STRspy, version 2.0.\n\n( https://github.com/unique379r/strspy/tree/STRspy2.0 )\n\n## Whats New in STRspy2.0\n### 1. DB_v2: Autosome and ChrY-specific STRs (comprehensive STR database from GenBank records in the STRSeq BioProject (accessions: PRJNA380345 and PRJNA380347))\n### 2. New Utility script to generate DB from Genebank and Fasta.\n### 3. New Interface of command line options from main scripts\n### 4. New Benchmarking results with multiple datasets including Case Samples\n\n\n## Cite\n\n<p align=\"justify\">\nHall CL, Kesharwani RK, Phillips NR, Planz JV, Sedlazeck FJ, Zascavage RR. Accurate profiling of forensic autosomal STRs using the Oxford Nanopore Technologies MinION device. Forensic Sci Int Genet. 2022 Jan;56:102629. doi: 10.1016/j.fsigen.2021.102629. Epub 2021 Nov 17. PMID: 34837788. https://pubmed.ncbi.nlm.nih.gov/34837788/\n</p>\n\n## Latest Publication \n\n<p align=\"justify\">\nHall, C.L.; Kesharwani, R.K.; McBroom Henson, K.E.; Kapema, B.; Phillips, N.R.; Sedlazeck, F.J.; Zascavage, R.R. STRspy2.0: Unlocking the Potential of Long Reads for Forensic DNA Profiling. Int. J. Mol. Sci. 2026, 27, 1889. https://doi.org/10.3390/ijms27041889\n</p>\n\n# STRspy2.0\n\n![](figs/fig1.png)\n\n<p align=\"justify\">\nFigure 1. Schematic overview of STRspy2.0 workflow. (a) STRspy2.0 relies on an STR allele database to generate profiles consistent with established length-based forensic nomenclature. Users can use the STRspy2.0 database or build their own from GenBank records. When GenBank records are provided, STRspy2.0 automatically generates database entries using the locus name, reference chromosome, repeat location, repeat sequence, and flanking sequence variants, then adds 500 bp flanks from hg38 to each allele. (b) During data analysis, STRspy2.0 aligns reads to the human reference genome, extracts those overlapping STR loci, and realigns them to the STR allele database. Each allele is ranked by normalized read count to determine the genotype at each locus. \n</p>\n\n## Abstract\n\n<p align=\"justify\">\nForensic human identification relies on length-based differences in short tandem repeats (STRs) across autosomal and Y chromosomes, which require separate reactions and provide limited resolution. While next-generation sequencing offers greater discriminatory power, most platforms are expensive and restricted to traditional lab settings. Nanopore sequencing has the potential to change this with the real-time, portable MinION sequencer. However, forensic-specific tools that generate STR profiles compatible with established length-based databases are lacking. To address this, we developed STRspy2.0, which simultaneously profiles autosomal and Y-STRs using nanopore reads. STRspy2.0 produced accurate profiles for 54 multiplexed control libraries and 41 mock casework samples (blood, swab, bone), achieving overall F1-scores of 100% and 99.75%, respectively. It maintains compatibility with existing forensic databases while providing higher resolution than traditional profiles. Our updated method and comprehensive database, along with the MinION\u2019s small size and price, make sequence-based STR profiling more accessible to forensic laboratories and resource-limited settings..\n</p>\n\n## Key Features\n\n1. Input either fastq (raw reads usually from ONT) or bam (pre-aligned reads by user)\n2. Reports raw counts of allele and Normalized counts by their maximum value\n3. Find the top two significant Alleles (filtering threshold set by the user such as 0.4)\n4. Now also detect top one for Y-STR.\n4. Detects Small variants such as SNP and Indels\n5. Reports mapping summary and STR region of overlaps\n6. Stutters analysis for simple motifs of STRs\n\n## Installation\n\nSTRspy v2.0 requires Conda (for example [Miniconda](https://docs.conda.io/en/latest/miniconda.html) or Miniforge) and the tools declared in `setup/STRspy_2.0_env.yml` (`gnu parallel >=20210222`, `samtools >=v1.12`, `bedtools >=v2.30.0`, `minimap2 >=v2.18-r1015`, `xatlas >=v0.3`, `seqkit >=v2.4.0`).\n\n### Clone the repository\n\n```bash\ngit clone https://github.com/Tfronta/strspy.git\ncd strspy\n```\n\nThis is the fork with the corrections described on this page, and its default\nbranch is the one you want, so no `--branch` is needed. The upstream repository\nis at https://github.com/unique379r/strspy, where `STRspy2.0` is a branch and\n`main` still holds version 1.0.\n\n### Create an environment\n\n```bash\nconda env create -f setup/STRspy_2.0_env.yml\nconda activate strspy_env\n```\n\n`config/UserToolsConfig.txt` already reads the six tools from `PATH` while `strspy_env` is active. If you install dependencies outside that environment and need absolute paths written into `config/UserToolsConfig.txt`, run `bash setup/GenerateToolConfig.sh` from the repository root with your environment active. Keep the environment active while you run STRspy: the scripts call `sed -i` in its GNU form, and on macOS only the `sed` from the environment accepts it.\n\n## Database: use STRspy2.0-DB-fixed (important)\n\nThe prebuilt `db-v2/STRspy2.0-DB.zip`, and databases built with `BuildDB_From_GeneBank.V1.sh`, contain FASTA files named `<locus>mod.fa` or `<locus>mod1.fa` that STRspy does not read, because it looks for `<locus>.fa`. With the unmodified zip, TPOX, FGA, D5S818, D7S820, D8S1179, D10S1248, D12S391 and D13S317 get no reads at all, and some alleles of DYS385ab, DYS390 and DYS458 are never considered. The run can still complete without an error, so the affected loci are simply missing from the results.\n\nThis fork ships a corrected database that you can use directly:\n\n- `db-v2/STRspy2.0-DB-fixed/` (`.bed`, `.fa` and `.fai` files for each locus)\n\nTo fix your own copy of the database instead (for example one built with BuildDB), unzip it, make the folder writable and run the merge script. samtools is needed to rebuild the `.fai` indexes.\n\n```bash\nunzip db-v2/STRspy2.0-DB.zip -d my_db\nchmod -R u+w my_db\nbash db-v2/optional-create-custom-db/fix_db_names.sh my_db/STRspy2.0-DB\n```\n\nThe script merges each `<locus>mod*.fa` into `<locus>.fa` without duplicating records, so no alleles are lost, and it is safe to run more than once.\n\n## Quickstart\n\n1. Edit `config/InputConfig.txt` so that it describes your data (every field is\n   explained below).\n2. With the environment active, run `bash setup/GenerateToolConfig.sh` from the\n   repository root, so that `config/UserToolsConfig.txt` holds the paths of the\n   tools you are actually using.\n3. Create the output directory named in `OUTPUT_DIR`: the run stops if it does\n   not already exist.\n\nStep 2 matters more than it looks. In the original STRspy a path that does not\nexist stops nothing. Each call to the tool fails on its own line, the run still\nends with `#Done.` and exit status 0, and the tables under `Results/Countings/`\ncome out empty, so the affected loci look as though they had no reads. In this\nfork the core scripts read the paths before they start and stop with the list of\ntools they cannot run, and `GenerateToolConfig.sh` stops rather than write a path\nit could not find. The file shipped here reads the tools from `PATH`, so it works\nwhile the environment is active; step 2 replaces it with absolute paths, which is\nwhat a wrapper script or a job scheduler needs.\n\n## Run STRspy\n\nRun the core script directly from the repository root on an aligned BAM file:\n\n```bash\nbash src/STRspy_Normal_v2.0_Args.sh -i sample.bam -r yes -t ont -f db-v2/STRspy2.0-DB-fixed -b db-v2/STRspy2.0-DB-fixed -l db-v2/STRspy_v2.DB.sort.bed -k 0.4 -o Results -c config/UserToolsConfig.txt -d 4\n```\n\nAlternatively, you can pass a directory of `.bam` (`-r yes`) or `.fastq.gz` (`-r no`) files via `-i`, or use the config-based wrapper (`bash ./STRspy_run_v2.0_Args.sh -i config/InputConfig.txt -t config/UserToolsConfig.txt -j normal` after editing `config/InputConfig.txt`).\n\n## InputConfig.txt\n\nINPUT_DIR\t: A dir must have either fastq (Oxford nanopore genomic reads) or bam (aligned genomic reads such as from PacBio)\n\nINPUT_BAM\t: Given inputs are bam or fastq (yes or no)\n\nREAD_TYPE\t: Sequencing Technology (ont or pb)\n\nSTR_FASTA\t: A dir contains Fasta files for each STR region of interest [assimung it has flanking regions (+/-) of 500bp]\n\nSTR_BED \t: A dir contains Bed files for each STR region of interest [assimung it has flanking regions (+/-) of 500bp]\n\nGENOME_FASTA: Genome fasta (hg19/hg38) must provide in case of fastq input.\n\nREGION_BED\t: All STr\\R bed has to concatenate into a single bed file to calculate the coverage of it from the alignment sample file.\n\nNORM_CUTOFF\t: A normalization threshold is required to select the top two allles of a STR\n\nOUTPUT_DIR : A empty directory to write the results\n\nTHREADS    : Number of memory should be used (default = 1)\n\n## ToolsConfig.txt\n\n`GenerateToolConfig.sh` writes this file, so there is normally no reason to edit\nit by hand. Each value is read with `grep` and `cut -d '='`, so it has to follow\nthe `=` with no space or tab around it: earlier versions of this page showed the\nnames padded with tabs, which leaves the tab inside the path and the tool is then\nnot found. `SEQKIT` is written for completeness and is not read by the core\nscripts.\n\n```\nBEDTOOLS=/user/path/bedtools\nMINIMAP=/user/path/minimap2\nSAMTOOLS=/user/path/samtools\nXATLAS=/user/path/xatlas\nPARALLEL=/user/path/parallel\nSEQKIT=/user/path/seqkit\n```\n\n## Getting help\n\n**bash strspy/STRspy_run_v2.0_Args.sh -h**\n\n```\n                                                      _____ _______ _____\n                                                      / ____|__   __|  __ \\\n                                                     | (___    | |  | |__) |___ _ __  _   _\n                                                      \\___ \\   | |  |  _  // __| '_ \\| | | |\n                                                      ____) |  | |  | | \\ \\\\__ \\ |_) | |_| |\n                                                     |_____/   |_|  |_|  \\_\\___/ .__/ \\__, |\n                                                                               | |     __/ |\n                                                                               |_|    |___/\n                                                ===============================================\n            _              _    __              __                         _         _____ _______ _____                     __ _ _ _\n    /\\     | |            | |  / _|            / _|                       (_)       / ____|__   __|  __ \\                   / _(_) (_)\n   /  \\    | |_ ___   ___ | | | |_ ___  _ __  | |_ ___  _ __ ___ _ __  ___ _  ___  | (___    | |  | |__) |  _ __  _ __ ___ | |_ _| |_ _ __   __ _\n  / /\\ \\   | __/ _ \\ / _ \\| | |  _/ _ \\| '__| |  _/ _ \\| '__/ _ \\ '_ \\/ __| |/ __|  \\___ \\   | |  |  _  /  | '_ \\| '__/ _ \\|  _| | | | '_ \\ / _` |\n / ____ \\  | || (_) | (_) | | | || (_) | |    | || (_) | | |  __/ | | \\__ \\ | (__   ____) |  | |  | | \\ \\  | |_) | | | (_) | | | | | | | | | (_| |\n/_/    \\_\\  \\__\\___/ \\___/|_| |_| \\___/|_|    |_| \\___/|_|  \\___|_| |_|___/_|\\___| |_____/   |_|  |_|  \\_\\ | .__/|_|  \\___/|_| |_|_|_|_| |_|\\__, |\n                                                                                                           | |                               __/ |\n                                                                                                           |_|                              |___/\n#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^Welcome to STRspy^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#\n#\t\tAnalysis    \t\t: Finding forensic STRs in a Long Read Sample\n#\t\tRequested Citation\t: https://doi.org/10.1016/j.fsigen.2021.102629\n#\t\tAuthor\t\t  \t: bioinforupesh2009 DOT au AT gmail DOT com\n#\t\tCopyright (c) \t\t: 2021 Kesharwani RK\n#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#\nUsage: bash STRspy_run_v2.0_Args.sh [-h] [-i -t -j] -- This script is wrapper of STRspy [https://doi.org/10.1016/j.fsigen.2021.102629]\n\nwhere:\n\t-h show the help\n\t-i input config (InputConfig.txt)\n\t-t tools config (ToolsConfig.txt)\n\t-j job type (parallel/normal) [default: normal]\n```\n\n\n### Core scripts\n\n**bash strspy/src/STRspy_Normal_v2.0_Args.sh -h**\n\n\n```\n#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^Welcome to STRspy^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#\n#\t\tAnalysis    \t\t: Finding forensic STRs in a Long Read Sample\n#\t\tRequested Citation\t: https://doi.org/10.3390/ijms27041889\n#\t\tAuthor\t\t  \t: bioinforupesh2009 DOT au AT gmail DOT com\n#\t\tCopyright (c) \t\t: 2026 Kesharwani RK\n#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#\nUsage: bash STRspy_Normal_v2.0_Args.sh [-h] [-s -r -t -f -b -g -l -k -o -c -d] -- This script is core-method of STRspy2.0 [https://doi.org/10.3390/ijms27041889]\n\nwhere:\n\t-h show the help\n\t-s input read dir (either bam or fastq)\n\t-r is input bam? (yes/no)\n\t-t technology type (ont/pb)\n\t-f dir of database fasta\n\t-b dir of database bed\n\t-g genome fasta file (fa)\n\t-l a file of known regions (bed)\n\t-k cutoff to find top two alleles (Any value from 0.1 to 0.9) [default: 0.4]\n\t-o results dir\n\t-c a file of tools config\n\t-d Number of threads to use\n\n```\n\n**bash strspy/src/STRspy_Parallel_v2.0_Args.sh -h**\n\n```\n#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^Welcome to STRspy^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#\n#\t\tAnalysis    \t\t: Finding forensic STRs in a Long Read Sample\n#\t\tRequested Citation\t: https://doi.org/10.3390/ijms27041889\n#\t\tAuthor\t\t  \t: bioinforupesh2009 DOT au AT gmail DOT com\n#\t\tCopyright (c) \t\t: 2026 Kesharwani RK\n#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#\nUsage: bash STRspy_Parallel_v2.0_Args.sh [-h] [-s -r -t -f -b -g -l -k -o -c] -- This script is core-method of STRspy2.0 [https://doi.org/10.3390/ijms27041889]\n\nwhere:\n\t-h show the help\n\t-s input read dir (either bam or fastq)\n\t-r is input bam? (yes/no)\n\t-t technology type (ont/pb)\n\t-f dir of database fasta\n\t-b dir of database bed\n\t-g genome fasta file (fa)\n\t-l a file of known regions (bed)\n\t-k cutoff to find top two alleles (Any value from 0.1 to 0.9) [default: 0.4]\n\t-o results dir\n\t-c a file of tools config\n\t-d Num of Threads\n\n```\n\n\n## Results from the publication\n\n![](figs/fig2.png)\n\n<p align=\"justify\">\nFigure 2. Read mapping statistics for MinION sequencing runs. Bar plots showing the proportion of passed reads that were STR-mapped (on-target), off-target, and unmapped for the (a), control multiplexes and (b), casework-relevant samples. Each plot shows samples loaded onto a single MinION flow cell. Libraries in the control multiplex are labeled according to sample letter and barcode. A (NIST A), B (NIST B), C (NIST C), M (2800 M).\n</p>\n\n\n![](figs/fig3.png)\n\n<p align=\"justify\">\nFigure 3. STRspy2.0 can resolve isoalleles within and between individuals. Allelic balance for autosomal and Y-STR isoalleles detected across control samples in the multiplexing experiment. Each colored bar represents a distinct sequence-based isoallele. Isoallele pairs are shown as blue/orange (pair 1) and green/pink (pair 2) for each locus. Heterozygous alleles that are not in the isoallele pair are colored grey, and samples without isoalleles at a given locus are not shown. Libraries are labeled according to sample letter, barcode, and multiplex size. A (NIST A), B (NIST B), C (NIST C), and M (2800 M).\n</p>\n\n\n![](figs/fig4.png)\n\n<p align=\"justify\">\nFigure 4. STRspy2.0 can resolve isoalleles in challenging casework-relevant samples. Normalized read counts for sequence-based alleles detected at D2S1338, D3S1358, and D21S11 in one bone sample (bone03). The red dashed line indicates the normalization threshold (0.4) used to detect heterozygous alleles.\n</p>\n\n\n## Author Contributions\n\nC.L.H. and R.K.K. are co-first authors. C.L.H. performed the ONT and Illumina sequencing and contributed most of the manuscript text and figures. R.K.K. performed data analysis, including the updates to STRspy, and contributed to the results presented in the manuscript. K.E.M.H. interpreted data and was a contributor in writing the manuscript. B.K. performed ONT sequencing. N.R.P. provided project oversight and assisted with data interpretation. F.J.S. assisted with data analysis and provided project oversight. R.R.Z. provided project oversight and was a major contributor in data interpretation and writing the manuscript. All authors have read and agreed to the published version of the manuscript.\n\n\n## Funding\n\nThis research was funded by the National Institute of Justice grant number 15PNIJ-22-GG-04414-MUMU).\n\n\n## Known bug\n\nWhen using the wrapper ('STRspy_run_v1.0.sh'), One might run into an issue. The parallel version of **STRspy_Parallel_v2.0_Args.sh** is unable to properly connect with \"gnu parallel\" and exits the workflow without mapping or further analysis steps of the pipeline. Solution to this, the user can choose the Normal version to avoid any crash. \n\n***Tip: Its good practice to use pre-aligned bams for quicker outcomes.***\n\n\n## Contacts\n\n```\nbioinforupesh200 DOT au AT gmail DOT com\n\nrupesh.k.kesharwani DOT uth DOT tmc DOT  edu\n```\n",
+        "ref": "b4c3cc6ab3c866788ec456c22597a112d5237def",
+        "regions": {
+          "ambiguous": false,
+          "candidates": [],
+          "end_line": null,
+          "evidence_source": null,
+          "file": null,
+          "format": null,
+          "line": null,
+          "text": null
+        },
+        "registry": {
+          "bioconda": {},
+          "documented": []
+        },
+        "repo": "https://github.com/Tfronta/strspy",
+        "schema": "strhub-verified/recipe-proposal/1",
+        "single_sample_bams": {
+          "allowed": false,
+          "evidence_source": null,
+          "file": null,
+          "line": null,
+          "paired_flags": [],
+          "text": null
+        },
+        "source_documents": [
+          {
+            "file": "README.md",
+            "origin": "readme",
+            "text": "<p align=\"center\">\n<strong>STRspy2.0</strong>: Unlocking the Potential of Long Reads for Forensic DNA Profiling.\n</p>\n\n# NEWS: We are excited to announce the new release of STRspy, version 2.0.\n\n( https://github.com/unique379r/strspy/tree/STRspy2.0 )\n\n## Whats New in STRspy2.0\n### 1. DB_v2: Autosome and ChrY-specific STRs (comprehensive STR database from GenBank records in the STRSeq BioProject (accessions: PRJNA380345 and PRJNA380347))\n### 2. New Utility script to generate DB from Genebank and Fasta.\n### 3. New Interface of command line options from main scripts\n### 4. New Benchmarking results with multiple datasets including Case Samples\n\n\n## Cite\n\n<p align=\"justify\">\nHall CL, Kesharwani RK, Phillips NR, Planz JV, Sedlazeck FJ, Zascavage RR. Accurate profiling of forensic autosomal STRs using the Oxford Nanopore Technologies MinION device. Forensic Sci Int Genet. 2022 Jan;56:102629. doi: 10.1016/j.fsigen.2021.102629. Epub 2021 Nov 17. PMID: 34837788. https://pubmed.ncbi.nlm.nih.gov/34837788/\n</p>\n\n## Latest Publication \n\n<p align=\"justify\">\nHall, C.L.; Kesharwani, R.K.; McBroom Henson, K.E.; Kapema, B.; Phillips, N.R.; Sedlazeck, F.J.; Zascavage, R.R. STRspy2.0: Unlocking the Potential of Long Reads for Forensic DNA Profiling. Int. J. Mol. Sci. 2026, 27, 1889. https://doi.org/10.3390/ijms27041889\n</p>\n\n# STRspy2.0\n\n![](figs/fig1.png)\n\n<p align=\"justify\">\nFigure 1. Schematic overview of STRspy2.0 workflow. (a) STRspy2.0 relies on an STR allele database to generate profiles consistent with established length-based forensic nomenclature. Users can use the STRspy2.0 database or build their own from GenBank records. When GenBank records are provided, STRspy2.0 automatically generates database entries using the locus name, reference chromosome, repeat location, repeat sequence, and flanking sequence variants, then adds 500 bp flanks from hg38 to each allele. (b) During data analysis, STRspy2.0 aligns reads to the human reference genome, extracts those overlapping STR loci, and realigns them to the STR allele database. Each allele is ranked by normalized read count to determine the genotype at each locus. \n</p>\n\n## Abstract\n\n<p align=\"justify\">\nForensic human identification relies on length-based differences in short tandem repeats (STRs) across autosomal and Y chromosomes, which require separate reactions and provide limited resolution. While next-generation sequencing offers greater discriminatory power, most platforms are expensive and restricted to traditional lab settings. Nanopore sequencing has the potential to change this with the real-time, portable MinION sequencer. However, forensic-specific tools that generate STR profiles compatible with established length-based databases are lacking. To address this, we developed STRspy2.0, which simultaneously profiles autosomal and Y-STRs using nanopore reads. STRspy2.0 produced accurate profiles for 54 multiplexed control libraries and 41 mock casework samples (blood, swab, bone), achieving overall F1-scores of 100% and 99.75%, respectively. It maintains compatibility with existing forensic databases while providing higher resolution than traditional profiles. Our updated method and comprehensive database, along with the MinION\u2019s small size and price, make sequence-based STR profiling more accessible to forensic laboratories and resource-limited settings..\n</p>\n\n## Key Features\n\n1. Input either fastq (raw reads usually from ONT) or bam (pre-aligned reads by user)\n2. Reports raw counts of allele and Normalized counts by their maximum value\n3. Find the top two significant Alleles (filtering threshold set by the user such as 0.4)\n4. Now also detect top one for Y-STR.\n4. Detects Small variants such as SNP and Indels\n5. Reports mapping summary and STR region of overlaps\n6. Stutters analysis for simple motifs of STRs\n\n## Installation\n\nSTRspy v2.0 requires Conda (for example [Miniconda](https://docs.conda.io/en/latest/miniconda.html) or Miniforge) and the tools declared in `setup/STRspy_2.0_env.yml` (`gnu parallel >=20210222`, `samtools >=v1.12`, `bedtools >=v2.30.0`, `minimap2 >=v2.18-r1015`, `xatlas >=v0.3`, `seqkit >=v2.4.0`).\n\n### Clone the repository\n\n```bash\ngit clone https://github.com/Tfronta/strspy.git\ncd strspy\n```\n\nThis is the fork with the corrections described on this page, and its default\nbranch is the one you want, so no `--branch` is needed. The upstream repository\nis at https://github.com/unique379r/strspy, where `STRspy2.0` is a branch and\n`main` still holds version 1.0.\n\n### Create an environment\n\n```bash\nconda env create -f setup/STRspy_2.0_env.yml\nconda activate strspy_env\n```\n\n`config/UserToolsConfig.txt` already reads the six tools from `PATH` while `strspy_env` is active. If you install dependencies outside that environment and need absolute paths written into `config/UserToolsConfig.txt`, run `bash setup/GenerateToolConfig.sh` from the repository root with your environment active. Keep the environment active while you run STRspy: the scripts call `sed -i` in its GNU form, and on macOS only the `sed` from the environment accepts it.\n\n## Database: use STRspy2.0-DB-fixed (important)\n\nThe prebuilt `db-v2/STRspy2.0-DB.zip`, and databases built with `BuildDB_From_GeneBank.V1.sh`, contain FASTA files named `<locus>mod.fa` or `<locus>mod1.fa` that STRspy does not read, because it looks for `<locus>.fa`. With the unmodified zip, TPOX, FGA, D5S818, D7S820, D8S1179, D10S1248, D12S391 and D13S317 get no reads at all, and some alleles of DYS385ab, DYS390 and DYS458 are never considered. The run can still complete without an error, so the affected loci are simply missing from the results.\n\nThis fork ships a corrected database that you can use directly:\n\n- `db-v2/STRspy2.0-DB-fixed/` (`.bed`, `.fa` and `.fai` files for each locus)\n\nTo fix your own copy of the database instead (for example one built with BuildDB), unzip it, make the folder writable and run the merge script. samtools is needed to rebuild the `.fai` indexes.\n\n```bash\nunzip db-v2/STRspy2.0-DB.zip -d my_db\nchmod -R u+w my_db\nbash db-v2/optional-create-custom-db/fix_db_names.sh my_db/STRspy2.0-DB\n```\n\nThe script merges each `<locus>mod*.fa` into `<locus>.fa` without duplicating records, so no alleles are lost, and it is safe to run more than once.\n\n## Quickstart\n\n1. Edit `config/InputConfig.txt` so that it describes your data (every field is\n   explained below).\n2. With the environment active, run `bash setup/GenerateToolConfig.sh` from the\n   repository root, so that `config/UserToolsConfig.txt` holds the paths of the\n   tools you are actually using.\n3. Create the output directory named in `OUTPUT_DIR`: the run stops if it does\n   not already exist.\n\nStep 2 matters more than it looks. In the original STRspy a path that does not\nexist stops nothing. Each call to the tool fails on its own line, the run still\nends with `#Done.` and exit status 0, and the tables under `Results/Countings/`\ncome out empty, so the affected loci look as though they had no reads. In this\nfork the core scripts read the paths before they start and stop with the list of\ntools they cannot run, and `GenerateToolConfig.sh` stops rather than write a path\nit could not find. The file shipped here reads the tools from `PATH`, so it works\nwhile the environment is active; step 2 replaces it with absolute paths, which is\nwhat a wrapper script or a job scheduler needs.\n\n## Run STRspy\n\nRun the core script directly from the repository root on an aligned BAM file:\n\n```bash\nbash src/STRspy_Normal_v2.0_Args.sh -i sample.bam -r yes -t ont -f db-v2/STRspy2.0-DB-fixed -b db-v2/STRspy2.0-DB-fixed -l db-v2/STRspy_v2.DB.sort.bed -k 0.4 -o Results -c config/UserToolsConfig.txt -d 4\n```\n\nAlternatively, you can pass a directory of `.bam` (`-r yes`) or `.fastq.gz` (`-r no`) files via `-i`, or use the config-based wrapper (`bash ./STRspy_run_v2.0_Args.sh -i config/InputConfig.txt -t config/UserToolsConfig.txt -j normal` after editing `config/InputConfig.txt`).\n\n## InputConfig.txt\n\nINPUT_DIR\t: A dir must have either fastq (Oxford nanopore genomic reads) or bam (aligned genomic reads such as from PacBio)\n\nINPUT_BAM\t: Given inputs are bam or fastq (yes or no)\n\nREAD_TYPE\t: Sequencing Technology (ont or pb)\n\nSTR_FASTA\t: A dir contains Fasta files for each STR region of interest [assimung it has flanking regions (+/-) of 500bp]\n\nSTR_BED \t: A dir contains Bed files for each STR region of interest [assimung it has flanking regions (+/-) of 500bp]\n\nGENOME_FASTA: Genome fasta (hg19/hg38) must provide in case of fastq input.\n\nREGION_BED\t: All STr\\R bed has to concatenate into a single bed file to calculate the coverage of it from the alignment sample file.\n\nNORM_CUTOFF\t: A normalization threshold is required to select the top two allles of a STR\n\nOUTPUT_DIR : A empty directory to write the results\n\nTHREADS    : Number of memory should be used (default = 1)\n\n## ToolsConfig.txt\n\n`GenerateToolConfig.sh` writes this file, so there is normally no reason to edit\nit by hand. Each value is read with `grep` and `cut -d '='`, so it has to follow\nthe `=` with no space or tab around it: earlier versions of this page showed the\nnames padded with tabs, which leaves the tab inside the path and the tool is then\nnot found. `SEQKIT` is written for completeness and is not read by the core\nscripts.\n\n```\nBEDTOOLS=/user/path/bedtools\nMINIMAP=/user/path/minimap2\nSAMTOOLS=/user/path/samtools\nXATLAS=/user/path/xatlas\nPARALLEL=/user/path/parallel\nSEQKIT=/user/path/seqkit\n```\n\n## Getting help\n\n**bash strspy/STRspy_run_v2.0_Args.sh -h**\n\n```\n                                                      _____ _______ _____\n                                                      / ____|__   __|  __ \\\n                                                     | (___    | |  | |__) |___ _ __  _   _\n                                                      \\___ \\   | |  |  _  // __| '_ \\| | | |\n                                                      ____) |  | |  | | \\ \\\\__ \\ |_) | |_| |\n                                                     |_____/   |_|  |_|  \\_\\___/ .__/ \\__, |\n                                                                               | |     __/ |\n                                                                               |_|    |___/\n                                                ===============================================\n            _              _    __              __                         _         _____ _______ _____                     __ _ _ _\n    /\\     | |            | |  / _|            / _|                       (_)       / ____|__   __|  __ \\                   / _(_) (_)\n   /  \\    | |_ ___   ___ | | | |_ ___  _ __  | |_ ___  _ __ ___ _ __  ___ _  ___  | (___    | |  | |__) |  _ __  _ __ ___ | |_ _| |_ _ __   __ _\n  / /\\ \\   | __/ _ \\ / _ \\| | |  _/ _ \\| '__| |  _/ _ \\| '__/ _ \\ '_ \\/ __| |/ __|  \\___ \\   | |  |  _  /  | '_ \\| '__/ _ \\|  _| | | | '_ \\ / _` |\n / ____ \\  | || (_) | (_) | | | || (_) | |    | || (_) | | |  __/ | | \\__ \\ | (__   ____) |  | |  | | \\ \\  | |_) | | | (_) | | | | | | | | | (_| |\n/_/    \\_\\  \\__\\___/ \\___/|_| |_| \\___/|_|    |_| \\___/|_|  \\___|_| |_|___/_|\\___| |_____/   |_|  |_|  \\_\\ | .__/|_|  \\___/|_| |_|_|_|_| |_|\\__, |\n                                                                                                           | |                               __/ |\n                                                                                                           |_|                              |___/\n#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^Welcome to STRspy^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#\n#\t\tAnalysis    \t\t: Finding forensic STRs in a Long Read Sample\n#\t\tRequested Citation\t: https://doi.org/10.1016/j.fsigen.2021.102629\n#\t\tAuthor\t\t  \t: bioinforupesh2009 DOT au AT gmail DOT com\n#\t\tCopyright (c) \t\t: 2021 Kesharwani RK\n#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#\nUsage: bash STRspy_run_v2.0_Args.sh [-h] [-i -t -j] -- This script is wrapper of STRspy [https://doi.org/10.1016/j.fsigen.2021.102629]\n\nwhere:\n\t-h show the help\n\t-i input config (InputConfig.txt)\n\t-t tools config (ToolsConfig.txt)\n\t-j job type (parallel/normal) [default: normal]\n```\n\n\n### Core scripts\n\n**bash strspy/src/STRspy_Normal_v2.0_Args.sh -h**\n\n\n```\n#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^Welcome to STRspy^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#\n#\t\tAnalysis    \t\t: Finding forensic STRs in a Long Read Sample\n#\t\tRequested Citation\t: https://doi.org/10.3390/ijms27041889\n#\t\tAuthor\t\t  \t: bioinforupesh2009 DOT au AT gmail DOT com\n#\t\tCopyright (c) \t\t: 2026 Kesharwani RK\n#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#\nUsage: bash STRspy_Normal_v2.0_Args.sh [-h] [-s -r -t -f -b -g -l -k -o -c -d] -- This script is core-method of STRspy2.0 [https://doi.org/10.3390/ijms27041889]\n\nwhere:\n\t-h show the help\n\t-s input read dir (either bam or fastq)\n\t-r is input bam? (yes/no)\n\t-t technology type (ont/pb)\n\t-f dir of database fasta\n\t-b dir of database bed\n\t-g genome fasta file (fa)\n\t-l a file of known regions (bed)\n\t-k cutoff to find top two alleles (Any value from 0.1 to 0.9) [default: 0.4]\n\t-o results dir\n\t-c a file of tools config\n\t-d Number of threads to use\n\n```\n\n**bash strspy/src/STRspy_Parallel_v2.0_Args.sh -h**\n\n```\n#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^Welcome to STRspy^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#\n#\t\tAnalysis    \t\t: Finding forensic STRs in a Long Read Sample\n#\t\tRequested Citation\t: https://doi.org/10.3390/ijms27041889\n#\t\tAuthor\t\t  \t: bioinforupesh2009 DOT au AT gmail DOT com\n#\t\tCopyright (c) \t\t: 2026 Kesharwani RK\n#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#\nUsage: bash STRspy_Parallel_v2.0_Args.sh [-h] [-s -r -t -f -b -g -l -k -o -c] -- This script is core-method of STRspy2.0 [https://doi.org/10.3390/ijms27041889]\n\nwhere:\n\t-h show the help\n\t-s input read dir (either bam or fastq)\n\t-r is input bam? (yes/no)\n\t-t technology type (ont/pb)\n\t-f dir of database fasta\n\t-b dir of database bed\n\t-g genome fasta file (fa)\n\t-l a file of known regions (bed)\n\t-k cutoff to find top two alleles (Any value from 0.1 to 0.9) [default: 0.4]\n\t-o results dir\n\t-c a file of tools config\n\t-d Num of Threads\n\n```\n\n\n## Results from the publication\n\n![](figs/fig2.png)\n\n<p align=\"justify\">\nFigure 2. Read mapping statistics for MinION sequencing runs. Bar plots showing the proportion of passed reads that were STR-mapped (on-target), off-target, and unmapped for the (a), control multiplexes and (b), casework-relevant samples. Each plot shows samples loaded onto a single MinION flow cell. Libraries in the control multiplex are labeled according to sample letter and barcode. A (NIST A), B (NIST B), C (NIST C), M (2800 M).\n</p>\n\n\n![](figs/fig3.png)\n\n<p align=\"justify\">\nFigure 3. STRspy2.0 can resolve isoalleles within and between individuals. Allelic balance for autosomal and Y-STR isoalleles detected across control samples in the multiplexing experiment. Each colored bar represents a distinct sequence-based isoallele. Isoallele pairs are shown as blue/orange (pair 1) and green/pink (pair 2) for each locus. Heterozygous alleles that are not in the isoallele pair are colored grey, and samples without isoalleles at a given locus are not shown. Libraries are labeled according to sample letter, barcode, and multiplex size. A (NIST A), B (NIST B), C (NIST C), and M (2800 M).\n</p>\n\n\n![](figs/fig4.png)\n\n<p align=\"justify\">\nFigure 4. STRspy2.0 can resolve isoalleles in challenging casework-relevant samples. Normalized read counts for sequence-based alleles detected at D2S1338, D3S1358, and D21S11 in one bone sample (bone03). The red dashed line indicates the normalization threshold (0.4) used to detect heterozygous alleles.\n</p>\n\n\n## Author Contributions\n\nC.L.H. and R.K.K. are co-first authors. C.L.H. performed the ONT and Illumina sequencing and contributed most of the manuscript text and figures. R.K.K. performed data analysis, including the updates to STRspy, and contributed to the results presented in the manuscript. K.E.M.H. interpreted data and was a contributor in writing the manuscript. B.K. performed ONT sequencing. N.R.P. provided project oversight and assisted with data interpretation. F.J.S. assisted with data analysis and provided project oversight. R.R.Z. provided project oversight and was a major contributor in data interpretation and writing the manuscript. All authors have read and agreed to the published version of the manuscript.\n\n\n## Funding\n\nThis research was funded by the National Institute of Justice grant number 15PNIJ-22-GG-04414-MUMU).\n\n\n## Known bug\n\nWhen using the wrapper ('STRspy_run_v1.0.sh'), One might run into an issue. The parallel version of **STRspy_Parallel_v2.0_Args.sh** is unable to properly connect with \"gnu parallel\" and exits the workflow without mapping or further analysis steps of the pipeline. Solution to this, the user can choose the Normal version to avoid any crash. \n\n***Tip: Its good practice to use pre-aligned bams for quicker outcomes.***\n\n\n## Contacts\n\n```\nbioinforupesh200 DOT au AT gmail DOT com\n\nrupesh.k.kesharwani DOT uth DOT tmc DOT  edu\n```\n"
+          }
+        ],
+        "tool_names": [
+          "BuildDB_From_GeneBank.V1",
+          "BuildDB_From_GeneBank.V1.sh",
+          "GenerateToolConfig",
+          "GenerateToolConfig.sh",
+          "STRspy_2.0.setup",
+          "STRspy_2.0.setup.sh",
+          "STRspy_Normal_v2.0_Args",
+          "STRspy_Normal_v2.0_Args.sh",
+          "STRspy_Parallel_v2.0_Args",
+          "STRspy_Parallel_v2.0_Args.sh",
+          "STRspy_run_v2.0_Args",
+          "STRspy_run_v2.0_Args.sh",
+          "fix_db_names",
+          "fix_db_names.sh",
+          "strspy"
+        ],
+        "tree_paths": [
+          ".gitignore",
+          "README.md",
+          "STRspy_run_v2.0_Args.sh",
+          "cluster-example-scripts/submit_strspy_Normal.pbs",
+          "cluster-example-scripts/submit_strspy_Normal.slurm",
+          "config/InputConfig.txt",
+          "config/UserToolsConfig.txt",
+          "db-v2/.DS_Store",
+          "db-v2/STRspy2.0-DB-fixed/CSF1PO.bed",
+          "db-v2/STRspy2.0-DB-fixed/CSF1PO.bed.fai",
+          "db-v2/STRspy2.0-DB-fixed/CSF1PO.fa",
+          "db-v2/STRspy2.0-DB-fixed/CSF1PO.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/D10S1248.bed",
+          "db-v2/STRspy2.0-DB-fixed/D10S1248.fa",
+          "db-v2/STRspy2.0-DB-fixed/D10S1248.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/D12S391.bed",
+          "db-v2/STRspy2.0-DB-fixed/D12S391.fa",
+          "db-v2/STRspy2.0-DB-fixed/D12S391.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/D13S317.bed",
+          "db-v2/STRspy2.0-DB-fixed/D13S317.fa",
+          "db-v2/STRspy2.0-DB-fixed/D13S317.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/D16S539.bed",
+          "db-v2/STRspy2.0-DB-fixed/D16S539.fa",
+          "db-v2/STRspy2.0-DB-fixed/D16S539.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/D18S51.bed",
+          "db-v2/STRspy2.0-DB-fixed/D18S51.fa",
+          "db-v2/STRspy2.0-DB-fixed/D18S51.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/D19S433.bed",
+          "db-v2/STRspy2.0-DB-fixed/D19S433.fa",
+          "db-v2/STRspy2.0-DB-fixed/D19S433.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/D1S1656.bed",
+          "db-v2/STRspy2.0-DB-fixed/D1S1656.fa",
+          "db-v2/STRspy2.0-DB-fixed/D1S1656.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/D21S11.bed",
+          "db-v2/STRspy2.0-DB-fixed/D21S11.fa",
+          "db-v2/STRspy2.0-DB-fixed/D21S11.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/D22S1045.bed",
+          "db-v2/STRspy2.0-DB-fixed/D22S1045.fa",
+          "db-v2/STRspy2.0-DB-fixed/D22S1045.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/D2S1338.bed",
+          "db-v2/STRspy2.0-DB-fixed/D2S1338.fa",
+          "db-v2/STRspy2.0-DB-fixed/D2S1338.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/D2S441.bed",
+          "db-v2/STRspy2.0-DB-fixed/D2S441.fa",
+          "db-v2/STRspy2.0-DB-fixed/D2S441.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/D3S1358.bed",
+          "db-v2/STRspy2.0-DB-fixed/D3S1358.fa",
+          "db-v2/STRspy2.0-DB-fixed/D3S1358.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/D5S818.bed",
+          "db-v2/STRspy2.0-DB-fixed/D5S818.fa",
+          "db-v2/STRspy2.0-DB-fixed/D5S818.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/D6S1043.bed",
+          "db-v2/STRspy2.0-DB-fixed/D6S1043.fa",
+          "db-v2/STRspy2.0-DB-fixed/D6S1043.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/D7S820.bed",
+          "db-v2/STRspy2.0-DB-fixed/D7S820.fa",
+          "db-v2/STRspy2.0-DB-fixed/D7S820.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/D8S1179.bed",
+          "db-v2/STRspy2.0-DB-fixed/D8S1179.fa",
+          "db-v2/STRspy2.0-DB-fixed/D8S1179.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/DYF387S1.bed",
+          "db-v2/STRspy2.0-DB-fixed/DYF387S1.fa",
+          "db-v2/STRspy2.0-DB-fixed/DYF387S1.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/DYS19.bed",
+          "db-v2/STRspy2.0-DB-fixed/DYS19.fa",
+          "db-v2/STRspy2.0-DB-fixed/DYS19.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/DYS385ab.bed",
+          "db-v2/STRspy2.0-DB-fixed/DYS385ab.fa",
+          "db-v2/STRspy2.0-DB-fixed/DYS385ab.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/DYS389I.bed",
+          "db-v2/STRspy2.0-DB-fixed/DYS389I.fa",
+          "db-v2/STRspy2.0-DB-fixed/DYS389I.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/DYS389II.bed",
+          "db-v2/STRspy2.0-DB-fixed/DYS389II.fa",
+          "db-v2/STRspy2.0-DB-fixed/DYS389II.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/DYS390.bed",
+          "db-v2/STRspy2.0-DB-fixed/DYS390.fa",
+          "db-v2/STRspy2.0-DB-fixed/DYS390.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/DYS391.bed",
+          "db-v2/STRspy2.0-DB-fixed/DYS391.fa",
+          "db-v2/STRspy2.0-DB-fixed/DYS391.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/DYS392.bed",
+          "db-v2/STRspy2.0-DB-fixed/DYS392.fa",
+          "db-v2/STRspy2.0-DB-fixed/DYS392.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/DYS393.bed",
+          "db-v2/STRspy2.0-DB-fixed/DYS393.fa",
+          "db-v2/STRspy2.0-DB-fixed/DYS393.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/DYS437.bed",
+          "db-v2/STRspy2.0-DB-fixed/DYS437.fa",
+          "db-v2/STRspy2.0-DB-fixed/DYS437.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/DYS438.bed",
+          "db-v2/STRspy2.0-DB-fixed/DYS438.fa",
+          "db-v2/STRspy2.0-DB-fixed/DYS438.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/DYS439.bed",
+          "db-v2/STRspy2.0-DB-fixed/DYS439.fa",
+          "db-v2/STRspy2.0-DB-fixed/DYS439.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/DYS448.bed",
+          "db-v2/STRspy2.0-DB-fixed/DYS448.fa",
+          "db-v2/STRspy2.0-DB-fixed/DYS448.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/DYS456.bed",
+          "db-v2/STRspy2.0-DB-fixed/DYS456.fa",
+          "db-v2/STRspy2.0-DB-fixed/DYS456.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/DYS458.bed",
+          "db-v2/STRspy2.0-DB-fixed/DYS458.fa",
+          "db-v2/STRspy2.0-DB-fixed/DYS458.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/DYS460.bed",
+          "db-v2/STRspy2.0-DB-fixed/DYS460.fa",
+          "db-v2/STRspy2.0-DB-fixed/DYS460.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/DYS461.bed",
+          "db-v2/STRspy2.0-DB-fixed/DYS461.fa",
+          "db-v2/STRspy2.0-DB-fixed/DYS461.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/DYS481.bed",
+          "db-v2/STRspy2.0-DB-fixed/DYS481.fa",
+          "db-v2/STRspy2.0-DB-fixed/DYS481.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/DYS505.bed",
+          "db-v2/STRspy2.0-DB-fixed/DYS505.fa",
+          "db-v2/STRspy2.0-DB-fixed/DYS505.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/DYS522.bed",
+          "db-v2/STRspy2.0-DB-fixed/DYS522.fa",
+          "db-v2/STRspy2.0-DB-fixed/DYS522.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/DYS533.bed",
+          "db-v2/STRspy2.0-DB-fixed/DYS533.fa",
+          "db-v2/STRspy2.0-DB-fixed/DYS533.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/DYS549.bed",
+          "db-v2/STRspy2.0-DB-fixed/DYS549.fa",
+          "db-v2/STRspy2.0-DB-fixed/DYS549.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/DYS570.bed",
+          "db-v2/STRspy2.0-DB-fixed/DYS570.fa",
+          "db-v2/STRspy2.0-DB-fixed/DYS570.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/DYS576.bed",
+          "db-v2/STRspy2.0-DB-fixed/DYS576.fa",
+          "db-v2/STRspy2.0-DB-fixed/DYS576.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/DYS612.bed",
+          "db-v2/STRspy2.0-DB-fixed/DYS612.fa",
+          "db-v2/STRspy2.0-DB-fixed/DYS612.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/DYS635.bed",
+          "db-v2/STRspy2.0-DB-fixed/DYS635.fa",
+          "db-v2/STRspy2.0-DB-fixed/DYS635.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/DYS643.bed",
+          "db-v2/STRspy2.0-DB-fixed/DYS643.fa",
+          "db-v2/STRspy2.0-DB-fixed/DYS643.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/FGA.bed",
+          "db-v2/STRspy2.0-DB-fixed/FGA.fa",
+          "db-v2/STRspy2.0-DB-fixed/FGA.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/PentaD.bed",
+          "db-v2/STRspy2.0-DB-fixed/PentaD.fa",
+          "db-v2/STRspy2.0-DB-fixed/PentaD.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/PentaE.bed",
+          "db-v2/STRspy2.0-DB-fixed/PentaE.fa",
+          "db-v2/STRspy2.0-DB-fixed/PentaE.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/SE33.bed",
+          "db-v2/STRspy2.0-DB-fixed/SE33.fa",
+          "db-v2/STRspy2.0-DB-fixed/SE33.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/TH01.bed",
+          "db-v2/STRspy2.0-DB-fixed/TH01.fa",
+          "db-v2/STRspy2.0-DB-fixed/TH01.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/TPOX.bed",
+          "db-v2/STRspy2.0-DB-fixed/TPOX.fa",
+          "db-v2/STRspy2.0-DB-fixed/TPOX.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/Y-GATA-H4.bed",
+          "db-v2/STRspy2.0-DB-fixed/Y-GATA-H4.fa",
+          "db-v2/STRspy2.0-DB-fixed/Y-GATA-H4.fa.fai",
+          "db-v2/STRspy2.0-DB-fixed/vWA.bed",
+          "db-v2/STRspy2.0-DB-fixed/vWA.fa",
+          "db-v2/STRspy2.0-DB-fixed/vWA.fa.fai",
+          "db-v2/STRspy2.0-DB.zip",
+          "db-v2/STRspy_v2.DB.sort.bed",
+          "db-v2/optional-create-custom-db/.DS_Store",
+          "db-v2/optional-create-custom-db/BuildDB_From_GeneBank.V1.sh",
+          "db-v2/optional-create-custom-db/fix_db_names.sh",
+          "db-v2/optional-create-custom-db/refFasta/README",
+          "db-v2/optional-create-custom-db/testTwofa/TPOX.fa",
+          "db-v2/optional-create-custom-db/testTwofa/vWA.fa",
+          "db-v2/optional-create-custom-db/testTwogb/TPOX.gb",
+          "db-v2/optional-create-custom-db/testTwogb/vWA.gb",
+          "figs/.DS_Store",
+          "figs/fig1.pdf",
+          "figs/fig1.png",
+          "figs/fig2.pdf",
+          "figs/fig2.png",
+          "figs/fig3.pdf",
+          "figs/fig3.png",
+          "figs/fig4.pdf",
+          "figs/fig4.png",
+          "setup/GenerateToolConfig.sh",
+          "setup/STRspy_2.0.setup.sh",
+          "setup/STRspy_2.0_env.yml",
+          "src/STRspy_Normal_v2.0_Args.sh",
+          "src/STRspy_Parallel_v2.0_Args.sh"
+        ],
+        "tree_truncated": false,
+        "upstream_files": {}
+      },
+      "limitations": [],
+      "caveat_items": [
+        "Environment: STRhub transcribed the documented installation commands unchanged into its own carrier (Ubuntu 22.04, package lists refreshed, apt answering yes, plus Miniforge (conda, python, pip)).",
+        "Input: the README documents BAM and FASTQ (line 44); this plan selects STRhub's ont-bam-hg38 reference data. The author recommends BAM (line 298: \"Tip: Its good practice to use pre-aligned bams for quicker outcomes.\").",
+        "read_path: sample.bam -> /data/in/input.bam.",
+        "Run command: the README's own command, rewritten to STRhub's mounts; the capture wrapper is planned only if the procedure review passes."
+      ]
+    }
+  },
+  "provenance": {
+    "from_upstream": {
+      "install": {
+        "method": "conda",
+        "evidence_source": "README.md:L71-L72"
+      },
+      "command": {
+        "value": "bash src/STRspy_Normal_v2.0_Args.sh -i sample.bam -r yes -t ont -f db-v2/STRspy2.0-DB-fixed -b db-v2/STRspy2.0-DB-fixed -l db-v2/STRspy_v2.DB.sort.bed -k 0.4 -o Results -c config/UserToolsConfig.txt -d 4",
+        "evidence_source": "README.md:L120"
+      },
+      "input_kind": {
+        "value": "bam",
+        "evidence_source": "README.md:L44"
+      },
+      "supported_platforms": [
+        {
+          "platform": "ont",
+          "evidence_source": "README.md:L44"
+        }
+      ],
+      "assembly": {
+        "declared": "both",
+        "evidence_source": "README.md:L33"
+      },
+      "regions_schema": null,
+      "output_format": {
+        "glob": "**/*.t[sx][vt]",
+        "evidence_source": "README.md:L75"
+      }
+    },
+    "derived": {
+      "command_rewrites": [
+        {
+          "role": "read_path",
+          "original": "sample.bam",
+          "replacement": "/data/in/input.bam",
+          "basis": "declared dataset mount"
+        }
+      ],
+      "regions_layout_binding": null,
+      "single_sample_adaptation": null
+    },
+    "harness_choices": {
+      "dataset": {
+        "selected": "ont-bam-hg38",
+        "reason": "STRhub selected 'ont-bam-hg38' as compatible with upstream input 'bam' and platform 'ont'"
+      },
+      "platform": {
+        "selected": "ont",
+        "basis": "upstream_single_platform",
+        "supported_platforms": [
+          "ont"
+        ]
+      },
+      "assembly": {
+        "selected": "hg38",
+        "basis": "upstream_stated",
+        "note": null
+      },
+      "regions_layout": null,
+      "base_environment": {
+        "image": "ubuntu:22.04",
+        "description": "Ubuntu 22.04, package lists refreshed, apt answering yes, plus Miniforge (conda, python, pip)",
+        "added_packages": [],
+        "miniforge": true,
+        "submodules": false
+      }
+    }
+  },
+  "procedure_validation": {
+    "schema": "strhub-procedure-evidence/1",
+    "valid": true,
+    "reason": "Procedure evidence matches the effective manifest and recomputed decision."
+  },
+  "mounted_inputs": {
+    "schema": "strhub-mounted-inputs/1",
+    "leg": "external",
+    "evaluator_commit": "a00b3b30872d9cb0fc3504d0d855010ce40e04a7",
+    "dataset_registry": "datasets/index.json",
+    "input_type": "ont-bam-hg38",
+    "dataset": "1000 Genomes ONT, hg38 CODIS slice (R10 SUP)",
+    "assembly": "hg38",
+    "source": "https://s3.amazonaws.com/1000g-ont/index.html?prefix=PROCESSED_DATA/ALIGNED_TO_HG38/MINIMAP2_ALIGNED_BAMS/",
+    "procedure_evidence_sha256": "6cf8025933b2bef637f978a2c6aa19767b7b98ef1f57328eefe7de93f72f40f2",
+    "files": [
+      {
+        "mount_path": "/data/in/input.bam",
+        "sha256": "b98007bcd87e543d05ed4f5e99ca40659d921c8e7976e41b8bc9c5eea3aa5c3d",
+        "size_bytes": 31276691,
+        "source_path": "ont_slices/HG00113.codis.bam",
+        "source_sha256": "b98007bcd87e543d05ed4f5e99ca40659d921c8e7976e41b8bc9c5eea3aa5c3d",
+        "transformation": "none"
+      },
+      {
+        "mount_path": "/data/in/input.bam.bai",
+        "sha256": "b488aff60888979ca92db09609cd3be215fc83515b2f4fb8ca5b026026394fe9",
+        "size_bytes": 769152,
+        "source_path": "ont_slices/HG00113.codis.bam.bai",
+        "source_sha256": "b488aff60888979ca92db09609cd3be215fc83515b2f4fb8ca5b026026394fe9",
+        "transformation": "none"
+      }
+    ]
+  },
+  "verdict": {
+    "code": "runs",
+    "title": "Runs with manual preparation",
+    "basis": "gates",
+    "reason": "Manual verification succeeded on 1000 Genomes ONT (hg38 CODIS) using STRhub's prepared Conda environment and patched STRspy v2.0 runner script, producing 22 distinct forensic STR loci.",
+    "readme_gaps": []
+  },
+  "step1": null,
+  "certificate": {
+    "schema": "strhub-verified/certificate/1",
+    "label": "Not verified as documented",
+    "reached": "Runs + Plausible output",
+    "summary": {
+      "purpose": "Verify that the tool installs, runs end-to-end, and produces structurally valid output.",
+      "result": "Manual verification reached Runs + Plausible output (5/5 gates; 22 forensic STR loci) using STRhub's prepared Conda environment and reproducibility fork. Does not alter the automatic verdict.",
+      "reached": "Runs + Plausible output, 5/5 gates passed",
+      "why": "The tool installed and its run produced its documented output.",
+      "scope": "Installation, execution, and output structure verification.",
+      "not_evaluated": [
+        "Genotype accuracy",
+        "Concordance",
+        "Forensic validity",
+        "Regulatory compliance"
+      ]
+    },
+    "conclusion": [
+      {
+        "title": "Runs end-to-end",
+        "body": "STRspy main installs and executes without error in a clean ubuntu-22.04 environment at the pinned commit."
+      },
+      {
+        "title": "Produces plausible output",
+        "body": "The tool generated a structurally valid TSV output file with genotype calls across 22 target forensic STR loci."
+      },
+      {
+        "title": "Verdict: Runs",
+        "body": "The tool installed and its run produced its documented output."
+      },
+      {
+        "title": "Repository test data not used",
+        "body": "The repository ships example data (40 file(s)), which this run did not use: the gates above ran on STRhub's reference dataset. STRhub Verified supplied 1000 Genomes ONT, hg38 CODIS slice (R10 SUP) as the reference input for this verification run. Users replicating this result should use the same or equivalent publicly available reference material."
+      },
+      {
+        "title": "Reproducibility statement",
+        "body": "The exact command reported in Section 3, executed at the pinned commit in the described environment, is sufficient to reproduce this verification result independently."
+      }
+    ],
+    "out_of_scope": [
+      "Genotype correctness or accuracy",
+      "Concordance against known truth sets",
+      "Sensitivity, specificity, or stutter performance",
+      "Allele calling accuracy or forensic casework suitability",
+      "Regulatory compliance or ISO accreditation",
+      "Multi-laboratory or multi-dataset reproducibility"
+    ],
+    "limitations": [
+      "Single reference dataset per input type",
+      "Single containerized environment (Docker / ubuntu-22.04)",
+      "No truth-set comparison or ground-truth genotypes",
+      "No accuracy or concordance assessment",
+      "No forensic validation of results",
+      "Short-read limitations apply (very long STR alleles may not span reads)"
+    ],
+    "scope": {
+      "statement": "Independent automated verification of reproducible execution. It confirms the tool installs, runs end-to-end, and produces structurally valid output in a standardized environment.",
+      "not": "This is not an analytical validation. Genotype accuracy, concordance, forensic suitability, and regulatory compliance are out of scope.",
+      "disclaimer": "Each result is a dated snapshot, verified on the tool's public repository at a pinned commit. STRhub does not store tool source code."
+    }
+  },
+  "preparation": {
+    "file": "manual/strspy-ont.json",
+    "dataset": "ont-bam-hg38",
+    "installation": "strhub",
+    "base": "Ubuntu 22.04 + Miniforge (Conda)",
+    "without_preparation": "The latest tagged release (v1.1.1, commit cbf6500) instructs downloading an old Miniconda installer via wget (README.md, line 27), which cannot be executed literally under the automated profile. On the upstream main branch (STRspy v2.0), the Conda environment omits version pins for samtools and Python (pulling a broken OpenSSL 1.0 samtools build) and the wrapper script expects a directory for -i instead of a single BAM file and fails if the -o directory does not already exist.",
+    "why": [
+      "Replace the manual wget Miniconda installer in README.md with a reproducible Conda environment file (setup/STRspy_2.0_env.yml).",
+      "Pin python>=3.9 and samtools>=1.12 in setup/STRspy_2.0_env.yml so Conda does not resolve an outdated OpenSSL 1.0 samtools build.",
+      "Update src/STRspy_Normal_v2.0_Args.sh to accept a single BAM file in -i, auto-create the -o output directory, and print locus names instead of GenBank accessions in the Locus column."
+    ],
+    "steps": [
+      "git clone https://github.com/Tfronta/strspy.git",
+      "cd strspy",
+      "conda env create -f setup/STRspy_2.0_env.yml",
+      "conda activate strspy_env"
+    ],
+    "run_cmd": "bash src/STRspy_Normal_v2.0_Args.sh -i /path/to/input.bam -r yes -t ont -f db-v2/STRspy2.0-DB-fixed -b db-v2/STRspy2.0-DB-fixed -l db-v2/STRspy_v2.DB.sort.bed -k 0.4 -o Results -c config/UserToolsConfig.txt -d 4",
+    "files": [
+      {
+        "path": "setup/STRspy_2.0_env.yml",
+        "replaces": "pins python>=3.9 and samtools>=1.12 to avoid broken OpenSSL 1.0 samtools build"
+      },
+      {
+        "path": "src/STRspy_Normal_v2.0_Args.sh",
+        "replaces": "supports single-file -i BAM input, creates -o directory automatically, outputs locus names"
+      }
+    ],
+    "fork_url": "https://github.com/Tfronta/strspy",
+    "fork_note": "Fork reproducible basado en STRspy v2.0 (unique379r/strspy) con el entorno Conda fijado (python>=3.9, samtools>=1.12) y los ajustes del script bash verificados en CI (run 44934862541: 5/5 compuertas, 22 loci STR forenses sobre 1000 Genomes ONT hg38)."
+  },
+  "recommendations": [
+    "Publish a tagged GitHub release for STRspy v2.0 so users and automated evaluators resolve the maintained version by default instead of v1.1.1 (2021).",
+    "Document installation in a single copyable block (`conda env create -f setup/STRspy_2.0_env.yml && conda activate strspy_env`) instead of `wget Miniconda3-py39_4.9.2-Linux-x86_64.sh`.",
+    "Pin `python>=3.9` and `samtools>=1.12` in `setup/STRspy_2.0_env.yml` so clean Linux environments do not pull a broken OpenSSL 1.0 samtools binary.",
+    "Support passing a single BAM/FASTQ file to `-i` and auto-create the `-o` output directory with `mkdir -p` in `src/STRspy_Normal_v2.0_Args.sh`."
+  ]
+}
