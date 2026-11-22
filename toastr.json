@@ -1,0 +1,638 @@
+{
+  "schema": "strhub-verified/1",
+  "mode": "publish",
+  "tool": {
+    "name": "toaSTR",
+    "version": "master",
+    "contact": "https://github.com/labconowl/toastr/issues"
+  },
+  "submission": {
+    "by": "third_party"
+  },
+  "source": {
+    "repo": "https://github.com/labconowl/toastr",
+    "ref": "669e2d6c00b9c79689c40472d58b651aca9d7f12",
+    "ref_resolved": "669e2d6c00b9c79689c40472d58b651aca9d7f12",
+    "committed": "2022-01-28T13:20:33Z"
+  },
+  "environment": {
+    "dockerfile": "Dockerfile",
+    "os": [
+      "ubuntu-22.04"
+    ],
+    "source": "generated"
+  },
+  "generated": "2026-11-22T19:14:24+00:00",
+  "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/45059535251",
+  "run": {
+    "cmd": "true  # no command found in the README; nothing to run",
+    "effective_cmd": "true  # no command found in the README; nothing to run",
+    "step_outcome": "skipped"
+  },
+  "instrument": "documented",
+  "recipe": {
+    "origin": "proposed"
+  },
+  "gates": {
+    "available": true,
+    "installs": false,
+    "runs": false,
+    "io": false,
+    "content": false
+  },
+  "input_contract": {},
+  "level": "available",
+  "io_detail": {},
+  "content_detail": {},
+  "example_detail": null,
+  "datasets": [
+    {
+      "leg": "external",
+      "label": "External data",
+      "available": false,
+      "type": null,
+      "dataset": null,
+      "io": false,
+      "content": false,
+      "passed": false
+    },
+    {
+      "leg": "example",
+      "label": "Tool's own example",
+      "available": false,
+      "io": false,
+      "content": null,
+      "passed": false,
+      "matches_expected": null,
+      "produced_count": null
+    }
+  ],
+  "scope": "Assessment of documented execution in the stated environment and output format. Concerns reproducible execution only; no claim of accuracy, casework fitness, or regulatory validation.",
+  "upstream": {
+    "checked": "2026-11-22T19:14:24+00:00",
+    "repo_exists": true,
+    "ref_exists": true,
+    "default_branch": "master",
+    "status": "identical",
+    "behind_by": 0
+  },
+  "evidence": [
+    {
+      "claim": "published_image",
+      "kind": "readme",
+      "path": "README.md",
+      "line": 13,
+      "text": "5. Open a command prompt (terminal), navigate to the `toastr` directory and run `docker-compose pull` (Linux: `sudo docker-compose pull`) to pull the toaSTR service images from [Docker Hub](https://hub.docker.com/r/labconowl/toastr).",
+      "url": "https://github.com/labconowl/toastr/blob/669e2d6c00b9c79689c40472d58b651aca9d7f12/README.md#L13"
+    }
+  ],
+  "repo_test_data": {
+    "known": true,
+    "present": false,
+    "count": 0,
+    "examples": []
+  },
+  "caveats": {
+    "source": "detect_recipe",
+    "items": [
+      "Environment: no proven installation profile; STRhub did not manufacture installation steps."
+    ]
+  },
+  "install_detail": {
+    "passed": false,
+    "diagnostics": [],
+    "faults": []
+  },
+  "procedure_review": {
+    "may_say_runs": false,
+    "status_code": "UNVERIFIED_INSUFFICIENT_DOCS",
+    "basis": "recipe",
+    "attribution": "strhub",
+    "blocker": "missing_input",
+    "reason": "STRhub holds no reference sample of the kind this procedure reads, and the repository ships no example to run, so nothing was executed.",
+    "amendments": [
+      {
+        "code": "command_evidence_missing",
+        "what": "No complete upstream command was established."
+      },
+      {
+        "code": "capture_wrapper_missing",
+        "what": "This profile requires the exact evaluator capture wrapper so output routing is established before execution."
+      },
+      {
+        "code": "command_evidence_missing",
+        "what": "The complete command and prerequisite must be established at the cited lines of this same pinned upstream commit; wiki text or a recipe label is not proof."
+      },
+      {
+        "code": "install_not_copyable",
+        "what": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub."
+      },
+      {
+        "code": "output_unnamed",
+        "what": "The documentation does not name an output file, so any file the wrapper copied would have been counted as the documented output."
+      },
+      {
+        "code": "published_image",
+        "what": "The install named here is a published image or package. That is a claim about the image, not about this commit, and it was not counted as the commit running."
+      }
+    ],
+    "inferences": {
+      "install": {
+        "evidence_source": "README.md:L13",
+        "verified": false
+      },
+      "run_command": {
+        "evidence_source": null,
+        "verified": false
+      },
+      "output": {
+        "evidence_source": null,
+        "verified": false
+      }
+    },
+    "unbacked_inferences": [
+      "install",
+      "output",
+      "run_command"
+    ],
+    "provenance": {
+      "from_upstream": {
+        "install": {
+          "method": "docker_image",
+          "evidence_source": "README.md:L13"
+        },
+        "command": null,
+        "input_kind": null,
+        "supported_platforms": [],
+        "assembly": {
+          "declared": null,
+          "evidence_source": null
+        },
+        "regions_schema": null,
+        "output_format": null
+      },
+      "derived": {
+        "command_rewrites": [],
+        "regions_layout_binding": null,
+        "single_sample_adaptation": null
+      },
+      "harness_choices": {
+        "dataset": null,
+        "platform": {
+          "selected": "illumina",
+          "basis": "counted_unproven",
+          "supported_platforms": []
+        },
+        "assembly": null,
+        "regions_layout": null,
+        "base_environment": null
+      }
+    },
+    "install_method": "docker_image",
+    "citable_install": false,
+    "input_type": null,
+    "output_glob": "**/*",
+    "profile": "strhub-upstream-procedure/1",
+    "install_ready": false,
+    "example_ready": false,
+    "installation": {
+      "profile": "strhub-upstream-procedure/1",
+      "ready": false,
+      "method": "docker_image",
+      "reason": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub.",
+      "gap": "commit"
+    },
+    "command_review": {
+      "profile": "strhub-upstream-procedure/1",
+      "cited": "",
+      "command": "",
+      "substitutions": [],
+      "read_bindings": [],
+      "limitations": [],
+      "expected": "",
+      "executed": "true  # no command found in the README; nothing to run",
+      "cited_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "executed_sha256": "a0c978938beb28f0f3787e7ae0e1b614d2d0a637f0fb037c95be7477acd398b6",
+      "citations": []
+    },
+    "manifest_sha256": "756889c1ea4b98fddb04f741198c15440cc1281691c360d5c9c380f045bdfa9f",
+    "evidence_sha256": "f05d903a2f0a12978c2a186d4bc6884a51795f38b36428bcca79dae1330c707c",
+    "evidence": {
+      "schema": "strhub-procedure-evidence/1",
+      "manifest": {
+        "caveats": {
+          "items": [
+            "Environment: no proven installation profile; STRhub did not manufacture installation steps."
+          ],
+          "source": "detect_recipe"
+        },
+        "environment": {
+          "dockerfile": "Dockerfile",
+          "os": [
+            "ubuntu-22.04"
+          ],
+          "source": "generated"
+        },
+        "inputs": {},
+        "outputs": [
+          {
+            "format": "text",
+            "min_records": 1,
+            "path": "**/*"
+          }
+        ],
+        "recipe": {
+          "origin": "proposed"
+        },
+        "report": {
+          "slug": "toastr"
+        },
+        "run": {
+          "cmd": "true  # no command found in the README; nothing to run",
+          "timeout_minutes": 20
+        },
+        "source": {
+          "ref": "669e2d6c00b9c79689c40472d58b651aca9d7f12",
+          "repo": "https://github.com/labconowl/toastr"
+        },
+        "submission": {
+          "by": "third_party"
+        },
+        "tool": {
+          "contact": "https://github.com/labconowl/toastr/issues",
+          "name": "toaSTR",
+          "version": "master"
+        }
+      },
+      "proposal": {
+        "build": {
+          "also_published": null,
+          "asset": null,
+          "candidates": [
+            {
+              "file": null,
+              "image": "labconowl/toastr",
+              "method": "docker_image",
+              "readme_line": 13
+            }
+          ],
+          "digest": null,
+          "dir": null,
+          "evidence_source": "README.md:L13",
+          "file": null,
+          "image": "labconowl/toastr",
+          "method": "docker_image",
+          "package": null,
+          "readme_install_lines": [],
+          "readme_line": 13,
+          "spec_list": false,
+          "ssh_urls_in": [],
+          "tag": null,
+          "then": [],
+          "url": null
+        },
+        "commands": [],
+        "dockerfile": null,
+        "docs_read": [],
+        "docs_text": "",
+        "evidence": [
+          {
+            "claim": "published_image",
+            "kind": "readme",
+            "line": 13,
+            "path": "README.md",
+            "text": "5. Open a command prompt (terminal), navigate to the `toastr` directory and run `docker-compose pull` (Linux: `sudo docker-compose pull`) to pull the toaSTR service images from [Docker Hub](https://hub.docker.com/r/labconowl/toastr).",
+            "url": "https://github.com/labconowl/toastr/blob/669e2d6c00b9c79689c40472d58b651aca9d7f12/README.md#L13"
+          }
+        ],
+        "example": null,
+        "example_data": [],
+        "inferences": {
+          "build": "README.md:L13",
+          "example": null,
+          "input_type": null,
+          "output": null,
+          "platform": null,
+          "regions": null,
+          "run_command": null,
+          "single_sample_bams": null
+        },
+        "input_type": {
+          "assembly": {
+            "against_hg38": null,
+            "declared": null,
+            "evidence_source": null,
+            "hg19_evidence_source": null,
+            "hg19_hits": 0,
+            "hg38_evidence_source": null,
+            "hg38_hits": 0,
+            "incompatible_with_hg38": false
+          },
+          "best": null,
+          "candidates": [],
+          "evidence_source": null,
+          "how": "counted",
+          "platform": "illumina",
+          "platform_evidence_source": null,
+          "platform_how": "counted",
+          "signals": {
+            "bam": 0,
+            "ce": 0,
+            "fastq": 0,
+            "hg19": 0,
+            "hg38": 0,
+            "illumina": 0,
+            "ont": 0,
+            "snp": 0,
+            "ystr": 0
+          },
+          "statements": {
+            "against": [],
+            "determined": false,
+            "inputs": [],
+            "platform": [],
+            "recommendation": null
+          },
+          "statements_file": null,
+          "supported_platforms": [],
+          "unsupported": null,
+          "warnings": []
+        },
+        "known_issues": [],
+        "limitations": [
+          "install_profile_unsupported",
+          "no_command",
+          "no_reference_dataset"
+        ],
+        "output": {
+          "evidence_source": null,
+          "format": null,
+          "signals": {
+            "csv": 0,
+            "json": 0,
+            "tsv": 0,
+            "vcf": 0
+          }
+        },
+        "packaging": {
+          "executables": [],
+          "packages": []
+        },
+        "readme": {
+          "gaps": [
+            {
+              "item": "command",
+              "text": "No command line invoking the tool was found in the README's code blocks."
+            },
+            {
+              "item": "input",
+              "text": "The README does not say what kind of data the tool takes (FASTQ or BAM; Illumina or nanopore; reference build)."
+            },
+            {
+              "item": "output",
+              "text": "The README does not describe the output file or its format."
+            },
+            {
+              "item": "example_data",
+              "text": "The repository ships no example input a stranger could run on. A trial can still run on STRhub's reference data for the detected input type."
+            }
+          ],
+          "name": "README.md",
+          "sufficient_to_attempt": false
+        },
+        "readme_name": "README.md",
+        "readme_text": "# toaSTR\ntoaSTR is a browser-based application for the analysis of short tandem repeats from massively parallel sequencing data. It runs on macOS, Windows, and Linux.\n\nOriginal publication: https://www.fsigenetics.com/article/S1872-4973(18)30063-2/fulltext\n\n## Installation\nThis dockerized, standalone distribution of toaSTR is a multi-container application that depends on multiple services, including a MySQL database and a job queue system which processes the analysis tasks. The application\u2019s services are configured in a Docker Compose file (`docker-compose.yml`) and automatically handled by the Docker platform. When toaSTR is started for the first time, it reads the `init.sql` file to initialize the toaSTR database.\n\n1. Install Docker (macOS, Windows or Linux): https://docs.docker.com/get-docker/\n2. Install Docker Compose (Linux users only): https://docs.docker.com/compose/install/\n3. Clone or download this repository\n4. Optionally configure the number of CPU cores used by toaSTR. Open the file `docker-compose.yml` in a text editor and search for the key `theschwartz` -> `environment` -> `PARALLEL_WORKERS`. Set the value to an appropriate number of CPU cores for your machine (default: 4).\n5. Open a command prompt (terminal), navigate to the `toastr` directory and run `docker-compose pull` (Linux: `sudo docker-compose pull`) to pull the toaSTR service images from [Docker Hub](https://hub.docker.com/r/labconowl/toastr).\n\n## Usage\n1. Start toaSTR: `docker-compose up -d` (Linux: `sudo docker-compose up -d`). On first start, please wait one minute to complete the database initialization before proceeding to the next step.\n2. Open `localhost:3000` in your browser and login with username `admin` and password `toastrdocker`. Please refer to the manual inside the app for usage instructions.\n3. Stop toaSTR: `docker-compose down` (Linux: `sudo docker-compose down`)\n\n## Update\nStop toaSTR and run `docker-compose pull` (Linux: `sudo docker-compose pull`) from time to time to pull the most recent update.\n\n## Reset\nIn case you want to reset the application, run `docker-compose down -v` (Linux: `sudo docker-compose down -v`). Warning: This deletes all app data and configuration.\n\n## Support\nSebastian Ganschow <sganschow@labcon-owl.de>\n",
+        "ref": "669e2d6c00b9c79689c40472d58b651aca9d7f12",
+        "regions": {
+          "ambiguous": false,
+          "candidates": [],
+          "end_line": null,
+          "evidence_source": null,
+          "file": null,
+          "format": null,
+          "line": null,
+          "text": null
+        },
+        "registry": {
+          "bioconda": {},
+          "documented": []
+        },
+        "repo": "https://github.com/labconowl/toastr",
+        "schema": "strhub-verified/recipe-proposal/1",
+        "single_sample_bams": {
+          "allowed": false,
+          "evidence_source": null,
+          "file": null,
+          "line": null,
+          "paired_flags": [],
+          "text": null
+        },
+        "source_documents": [
+          {
+            "file": "README.md",
+            "origin": "readme",
+            "text": "# toaSTR\ntoaSTR is a browser-based application for the analysis of short tandem repeats from massively parallel sequencing data. It runs on macOS, Windows, and Linux.\n\nOriginal publication: https://www.fsigenetics.com/article/S1872-4973(18)30063-2/fulltext\n\n## Installation\nThis dockerized, standalone distribution of toaSTR is a multi-container application that depends on multiple services, including a MySQL database and a job queue system which processes the analysis tasks. The application\u2019s services are configured in a Docker Compose file (`docker-compose.yml`) and automatically handled by the Docker platform. When toaSTR is started for the first time, it reads the `init.sql` file to initialize the toaSTR database.\n\n1. Install Docker (macOS, Windows or Linux): https://docs.docker.com/get-docker/\n2. Install Docker Compose (Linux users only): https://docs.docker.com/compose/install/\n3. Clone or download this repository\n4. Optionally configure the number of CPU cores used by toaSTR. Open the file `docker-compose.yml` in a text editor and search for the key `theschwartz` -> `environment` -> `PARALLEL_WORKERS`. Set the value to an appropriate number of CPU cores for your machine (default: 4).\n5. Open a command prompt (terminal), navigate to the `toastr` directory and run `docker-compose pull` (Linux: `sudo docker-compose pull`) to pull the toaSTR service images from [Docker Hub](https://hub.docker.com/r/labconowl/toastr).\n\n## Usage\n1. Start toaSTR: `docker-compose up -d` (Linux: `sudo docker-compose up -d`). On first start, please wait one minute to complete the database initialization before proceeding to the next step.\n2. Open `localhost:3000` in your browser and login with username `admin` and password `toastrdocker`. Please refer to the manual inside the app for usage instructions.\n3. Stop toaSTR: `docker-compose down` (Linux: `sudo docker-compose down`)\n\n## Update\nStop toaSTR and run `docker-compose pull` (Linux: `sudo docker-compose pull`) from time to time to pull the most recent update.\n\n## Reset\nIn case you want to reset the application, run `docker-compose down -v` (Linux: `sudo docker-compose down -v`). Warning: This deletes all app data and configuration.\n\n## Support\nSebastian Ganschow <sganschow@labcon-owl.de>\n"
+          }
+        ],
+        "tool_names": [
+          "LICENSE",
+          "toastr"
+        ],
+        "tree_paths": [
+          "LICENSE",
+          "README.md",
+          "docker-compose.yml",
+          "init.sql"
+        ],
+        "tree_truncated": false,
+        "upstream_files": {}
+      },
+      "limitations": [
+        "install_profile_unsupported",
+        "no_command",
+        "no_reference_dataset"
+      ],
+      "caveat_items": [
+        "Environment: no proven installation profile; STRhub did not manufacture installation steps."
+      ]
+    }
+  },
+  "provenance": {
+    "from_upstream": {
+      "install": {
+        "method": "docker_image",
+        "evidence_source": "README.md:L13"
+      },
+      "command": null,
+      "input_kind": null,
+      "supported_platforms": [],
+      "assembly": {
+        "declared": null,
+        "evidence_source": null
+      },
+      "regions_schema": null,
+      "output_format": null
+    },
+    "derived": {
+      "command_rewrites": [],
+      "regions_layout_binding": null,
+      "single_sample_adaptation": null
+    },
+    "harness_choices": {
+      "dataset": null,
+      "platform": {
+        "selected": "illumina",
+        "basis": "counted_unproven",
+        "supported_platforms": []
+      },
+      "assembly": null,
+      "regions_layout": null,
+      "base_environment": null
+    }
+  },
+  "procedure_validation": {
+    "schema": "strhub-procedure-evidence/1",
+    "valid": true,
+    "reason": "Procedure evidence matches the effective manifest and recomputed decision."
+  },
+  "verdict": {
+    "code": "undetermined",
+    "title": "Could not be determined",
+    "basis": "recipe",
+    "reason": "STRhub holds no reference sample of the kind this procedure reads, and the repository ships no example to run, so nothing was executed.",
+    "readme_gaps": [
+      {
+        "item": "command",
+        "text": "No command line invoking the tool was found in the README's code blocks."
+      },
+      {
+        "item": "input",
+        "text": "The README does not say what kind of data the tool takes (FASTQ or BAM; Illumina or nanopore; reference build)."
+      },
+      {
+        "item": "output",
+        "text": "The README does not describe the output file or its format."
+      }
+    ],
+    "status_code": "UNVERIFIED_INSUFFICIENT_DOCS",
+    "blockers": [
+      {
+        "code": "no_command",
+        "what": "No command line invoking the tool was found in the README.",
+        "ask_owner": {
+          "title": "Document the command that runs the tool",
+          "body": "STRhub Verified could not find, in the README, a command line that invokes the tool. A one-line example with an input file and the output it writes would let a new user run it and let STRhub verify it automatically."
+        }
+      },
+      {
+        "code": "no_reference_dataset",
+        "what": "STRhub has no reference sample of the kind this tool reads, and the repository ships no example to run, so nothing was executed.",
+        "ask_owner": {
+          "title": "Ship a small example dataset",
+          "body": "STRhub Verified could not run the tool: it holds no public reference sample of the input type the README describes, and the repository ships no example data. A small example (a few reads and the expected output) would let a new user, and STRhub, run it end-to-end."
+        }
+      },
+      {
+        "code": "build_failed",
+        "what": "The environment did not build from the install steps found in the repository.",
+        "ask_owner": {
+          "title": "Build fails from a clean checkout",
+          "body": "STRhub Verified tried to build the tool from a clean checkout at the pinned commit, following the repository's own install steps, and the build failed. The build log is linked from the run."
+        }
+      }
+    ]
+  },
+  "recommendations": [
+    {
+      "code": "example_data",
+      "text": "The repository ships no example input. A small example the documented command can read, with the output it should produce, would let any user reproduce the run without outside data."
+    }
+  ],
+  "step1": {
+    "code": "ours",
+    "headline": "STRhub could not attempt the documented run.",
+    "body": "STRhub holds no reference sample of the kind this procedure reads, and the repository ships no example to run, so nothing was executed. The limitation is ours. Nothing here is a finding about the tool.",
+    "missing": [],
+    "missing_text": [],
+    "guide": "docs/GUIA-PASO-1.md"
+  },
+  "certificate": {
+    "schema": "strhub-verified/certificate/1",
+    "label": "Could not be determined",
+    "reached": "Available",
+    "stages": [
+      {
+        "key": "available",
+        "label": "Source available",
+        "status": "PASS"
+      },
+      {
+        "key": "installs",
+        "label": "Installation",
+        "status": "NOT ATTEMPTED"
+      },
+      {
+        "key": "runs",
+        "label": "End-to-end execution",
+        "status": "NOT ATTEMPTED"
+      },
+      {
+        "key": "output",
+        "label": "Output generated",
+        "status": "NOT ATTEMPTED"
+      }
+    ],
+    "summary": {
+      "purpose": "Evaluate whether the tool installs, runs end-to-end, and produces structurally valid output.",
+      "result": "Could not be determined",
+      "reached": "Available, 1/5 gates passed",
+      "why": "STRhub holds no reference sample of the kind this procedure reads, and the repository ships no example to run, so nothing was executed.",
+      "scope": "Installation, execution, and output structure evaluation.",
+      "not_evaluated": [
+        "Genotype accuracy",
+        "Concordance",
+        "Forensic validity",
+        "Regulatory compliance"
+      ]
+    },
+    "conclusion": [
+      {
+        "title": "Procedure not established",
+        "body": "The recorded gate observations do not establish whether the documented procedure succeeded or failed."
+      },
+      {
+        "title": "Observations retained",
+        "body": "The supplied run and output observations remain in the report; they do not replace procedure evidence."
+      },
+      {
+        "title": "Verdict: Could not be determined",
+        "body": "STRhub holds no reference sample of the kind this procedure reads, and the repository ships no example to run, so nothing was executed."
+      },
+      {
+        "title": "Reproducibility not established",
+        "body": "These observations are insufficient to establish a reproducible documented execution finding."
+      }
+    ],
+    "out_of_scope": [
+      "Genotype correctness or accuracy",
+      "Concordance against known truth sets",
+      "Sensitivity, specificity, or stutter performance",
+      "Allele calling accuracy or forensic casework suitability",
+      "Regulatory compliance or ISO accreditation",
+      "Multi-laboratory or multi-dataset reproducibility"
+    ],
+    "limitations": [
+      "Single reference dataset per input type",
+      "Single containerized environment (Docker / ubuntu-22.04)",
+      "No truth-set comparison or ground-truth genotypes",
+      "No accuracy or concordance assessment",
+      "No forensic or clinical validation of results",
+      "No sequencing data were processed because execution did not complete"
+    ],
+    "scope": {
+      "statement": "Independent automated evaluation of reproducible execution. It checks whether the tool installs, runs end-to-end, and produces structurally valid output in a standardized environment.",
+      "not": "This is not an analytical validation. Genotype accuracy, concordance, forensic suitability, and regulatory compliance are out of scope.",
+      "disclaimer": "Each result is a dated snapshot, verified on the tool's public repository at a pinned commit. STRhub does not store tool source code."
+    }
+  }
+}

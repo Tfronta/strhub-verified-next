@@ -1,7 +1,7 @@
 {
   "schema": "strhub-verified/index/3",
-  "generated": "2026-11-22T19:14:40+00:00",
-  "count": 13,
+  "generated": "2026-11-22T19:14:43+00:00",
+  "count": 14,
   "tools": [
     {
       "slug": "expansionhunter",
@@ -434,6 +434,48 @@
           "report": "tandem-genotypes/706a6b6a134788afb689e35445c67b4c2ae40666/tandem-genotypes.json",
           "page": "tandem-genotypes/706a6b6a134788afb689e35445c67b4c2ae40666/tandem-genotypes.html",
           "pdf": "tandem-genotypes/706a6b6a134788afb689e35445c67b4c2ae40666/tandem-genotypes.pdf"
+        }
+      ]
+    },
+    {
+      "slug": "toastr",
+      "name": "toaSTR",
+      "version": "master",
+      "variant": null,
+      "sha": "669e2d6c00b9c79689c40472d58b651aca9d7f12",
+      "committed": "2022-01-28T13:20:33Z",
+      "instrument": "documented",
+      "level": "available",
+      "label": "Could not be determined",
+      "verdict": "undetermined",
+      "errors_reported": false,
+      "generated": "2026-11-22T19:14:24+00:00",
+      "source_repo": "https://github.com/labconowl/toastr",
+      "source_ref": "669e2d6c00b9c79689c40472d58b651aca9d7f12",
+      "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/45059535251",
+      "distinct_str_loci": null,
+      "distinct_snp_markers": null,
+      "total_reads": null,
+      "external_state": "na",
+      "dataset_types": [],
+      "report": "toastr.json",
+      "page": "toastr.html",
+      "versions": [
+        {
+          "sha": "669e2d6c00b9c79689c40472d58b651aca9d7f12",
+          "instrument": "documented",
+          "version": "master",
+          "variant": null,
+          "committed": "2022-01-28T13:20:33Z",
+          "generated": "2026-11-22T19:14:24+00:00",
+          "level": "available",
+          "label": "Could not be determined",
+          "verdict": "undetermined",
+          "errors_reported": false,
+          "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/45059535251",
+          "report": "toastr/669e2d6c00b9c79689c40472d58b651aca9d7f12/toastr.json",
+          "page": "toastr/669e2d6c00b9c79689c40472d58b651aca9d7f12/toastr.html",
+          "pdf": "toastr/669e2d6c00b9c79689c40472d58b651aca9d7f12/toastr.pdf"
         }
       ]
     },
