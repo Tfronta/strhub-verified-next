@@ -1,0 +1,1227 @@
+{
+  "schema": "strhub-verified/1",
+  "mode": "publish",
+  "tool": {
+    "name": "lobstr-code",
+    "version": "v4.0.6",
+    "contact": "https://github.com/mgymrek/lobstr-code/issues"
+  },
+  "submission": {
+    "by": "third_party"
+  },
+  "source": {
+    "repo": "https://github.com/mgymrek/lobstr-code",
+    "ref": "47da4cac554952f14a78bb4230d39efa1eaf8b0b",
+    "ref_resolved": "47da4cac554952f14a78bb4230d39efa1eaf8b0b",
+    "committed": "2016-07-01T18:57:21Z"
+  },
+  "environment": {
+    "dockerfile": "Dockerfile",
+    "os": [
+      "ubuntu-22.04"
+    ],
+    "source": "generated"
+  },
+  "generated": "2026-11-22T19:14:32+00:00",
+  "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/45059541165",
+  "run": {
+    "cmd": "true  # no command found in the README; nothing to run",
+    "effective_cmd": "true  # no command found in the README; nothing to run",
+    "step_outcome": "skipped"
+  },
+  "instrument": "documented",
+  "recipe": {
+    "origin": "proposed"
+  },
+  "gates": {
+    "available": true,
+    "installs": false,
+    "runs": false,
+    "io": false,
+    "content": false
+  },
+  "input_contract": {
+    "type": "illumina-bam-hg38"
+  },
+  "level": "available",
+  "io_detail": {},
+  "content_detail": {},
+  "example_detail": null,
+  "datasets": [
+    {
+      "leg": "external",
+      "label": "External data",
+      "available": false,
+      "type": "illumina-bam-hg38",
+      "dataset": null,
+      "io": false,
+      "content": false,
+      "passed": false
+    },
+    {
+      "leg": "example",
+      "label": "Tool's own example",
+      "available": false,
+      "io": false,
+      "content": null,
+      "passed": false,
+      "matches_expected": null,
+      "produced_count": null
+    }
+  ],
+  "scope": "Assessment of documented execution in the stated environment and output format. Concerns reproducible execution only; no claim of accuracy, casework fitness, or regulatory validation.",
+  "upstream": {
+    "checked": "2026-11-22T19:14:32+00:00",
+    "repo_exists": true,
+    "ref_exists": true,
+    "default_branch": "master",
+    "status": "ahead",
+    "behind_by": 1
+  },
+  "evidence": [
+    {
+      "claim": "install_method",
+      "kind": "tree",
+      "path": "configure.ac",
+      "text": "autotools",
+      "url": "https://github.com/mgymrek/lobstr-code/blob/47da4cac554952f14a78bb4230d39efa1eaf8b0b/configure.ac"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "tests/test.fa.gz",
+      "text": "fasta",
+      "url": "https://github.com/mgymrek/lobstr-code/blob/47da4cac554952f14a78bb4230d39efa1eaf8b0b/tests/test.fa.gz"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "tests/tmp_2.fa",
+      "text": "fasta",
+      "url": "https://github.com/mgymrek/lobstr-code/blob/47da4cac554952f14a78bb4230d39efa1eaf8b0b/tests/tmp_2.fa"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "tests/tmp_1.fa",
+      "text": "fasta",
+      "url": "https://github.com/mgymrek/lobstr-code/blob/47da4cac554952f14a78bb4230d39efa1eaf8b0b/tests/tmp_1.fa"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "tests/test.fq.gz",
+      "text": "fastq",
+      "url": "https://github.com/mgymrek/lobstr-code/blob/47da4cac554952f14a78bb4230d39efa1eaf8b0b/tests/test.fq.gz"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "tests/smallref/small_lobstr_ref_v2/lobSTR_mergedref.bed",
+      "text": "bed",
+      "url": "https://github.com/mgymrek/lobstr-code/blob/47da4cac554952f14a78bb4230d39efa1eaf8b0b/tests/smallref/small_lobstr_ref_v2/lobSTR_mergedref.bed"
+    }
+  ],
+  "repo_test_data": {
+    "known": true,
+    "present": true,
+    "count": 18,
+    "examples": [
+      "tests/test.fa.gz",
+      "tests/tmp_2.fa",
+      "tests/tmp_1.fa",
+      "tests/test.fq.gz",
+      "tests/smallref/small_lobstr_ref_v2/lobSTR_mergedref.bed"
+    ]
+  },
+  "caveats": {
+    "source": "detect_recipe",
+    "items": [
+      "Environment: no proven installation profile; STRhub did not manufacture installation steps.",
+      "Input: no sentence in the README says what the tool takes; illumina-bam-hg38 is only a guess from mentions; it is not authorization to execute."
+    ]
+  },
+  "install_detail": {
+    "passed": false,
+    "diagnostics": [],
+    "faults": []
+  },
+  "procedure_review": {
+    "may_say_runs": false,
+    "status_code": "UNVERIFIED_INSUFFICIENT_DOCS",
+    "basis": "recipe",
+    "attribution": "strhub",
+    "blocker": "install_not_copyable",
+    "reason": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub.",
+    "amendments": [
+      {
+        "code": "command_evidence_missing",
+        "what": "No complete upstream command was established."
+      },
+      {
+        "code": "capture_wrapper_missing",
+        "what": "This profile requires the exact evaluator capture wrapper so output routing is established before execution."
+      },
+      {
+        "code": "command_evidence_missing",
+        "what": "The complete command and prerequisite must be established at the cited lines of this same pinned upstream commit; wiki text or a recipe label is not proof."
+      },
+      {
+        "code": "input_not_substituted",
+        "what": "This evaluator cannot establish that the cited command reads the declared reference input; no config or input list was rewritten to make it do so."
+      },
+      {
+        "code": "input_platform_unproven",
+        "what": "Counting platform mentions does not establish which shared dataset this procedure reads."
+      },
+      {
+        "code": "install_not_copyable",
+        "what": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub."
+      },
+      {
+        "code": "input_guessed",
+        "what": "No sentence states what the tool reads, so the sample was chosen from mentions alone."
+      },
+      {
+        "code": "output_unnamed",
+        "what": "The documentation does not name an output file, so any file the wrapper copied would have been counted as the documented output."
+      }
+    ],
+    "inferences": {
+      "install": {
+        "evidence_source": "repo_file:configure.ac",
+        "verified": false
+      },
+      "run_command": {
+        "evidence_source": null,
+        "verified": false
+      },
+      "input_type": {
+        "evidence_source": null,
+        "verified": false
+      },
+      "output": {
+        "evidence_source": null,
+        "verified": false
+      }
+    },
+    "unbacked_inferences": [
+      "input_type",
+      "install",
+      "output",
+      "run_command"
+    ],
+    "provenance": {
+      "from_upstream": {
+        "install": {
+          "method": "autotools",
+          "evidence_source": "repo_file:configure.ac"
+        },
+        "command": null,
+        "input_kind": {
+          "value": "bam",
+          "evidence_source": null
+        },
+        "supported_platforms": [],
+        "assembly": {
+          "declared": null,
+          "evidence_source": null
+        },
+        "regions_schema": null,
+        "output_format": null
+      },
+      "derived": {
+        "command_rewrites": [],
+        "regions_layout_binding": null,
+        "single_sample_adaptation": null
+      },
+      "harness_choices": {
+        "dataset": {
+          "selected": "illumina-bam-hg38",
+          "reason": "STRhub selected 'illumina-bam-hg38' as compatible with upstream input 'bam' and platform 'illumina'"
+        },
+        "platform": {
+          "selected": "illumina",
+          "basis": "counted_unproven",
+          "supported_platforms": []
+        },
+        "assembly": {
+          "selected": "hg38",
+          "basis": "harness_choice_unstated",
+          "note": "Upstream did not specify an assembly; STRhub supplied an internally coherent hg38 BAM, FASTA and regions set"
+        },
+        "regions_layout": null,
+        "base_environment": null
+      }
+    },
+    "install_method": "autotools",
+    "citable_install": false,
+    "input_type": "illumina-bam-hg38",
+    "output_glob": "**/*",
+    "profile": "strhub-upstream-procedure/1",
+    "install_ready": false,
+    "example_ready": false,
+    "installation": {
+      "profile": "strhub-upstream-procedure/1",
+      "ready": false,
+      "method": "autotools",
+      "reason": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub.",
+      "gap": "commit"
+    },
+    "command_review": {
+      "profile": "strhub-upstream-procedure/1",
+      "cited": "",
+      "command": "",
+      "substitutions": [],
+      "read_bindings": [],
+      "limitations": [],
+      "expected": "",
+      "executed": "true  # no command found in the README; nothing to run",
+      "cited_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "executed_sha256": "a0c978938beb28f0f3787e7ae0e1b614d2d0a637f0fb037c95be7477acd398b6",
+      "citations": []
+    },
+    "manifest_sha256": "18b6e1a793232288a76c8bf0fd2396af26b8bc8556448c856c1d7f8d3de79ac7",
+    "evidence_sha256": "1d38d6fb36a4def20a1de0c24c34b91e4fa8d9627432ae27e7e38f0d077cc3f9",
+    "evidence": {
+      "schema": "strhub-procedure-evidence/1",
+      "manifest": {
+        "caveats": {
+          "items": [
+            "Environment: no proven installation profile; STRhub did not manufacture installation steps.",
+            "Input: no sentence in the README says what the tool takes; illumina-bam-hg38 is only a guess from mentions; it is not authorization to execute."
+          ],
+          "source": "detect_recipe"
+        },
+        "environment": {
+          "dockerfile": "Dockerfile",
+          "os": [
+            "ubuntu-22.04"
+          ],
+          "source": "generated"
+        },
+        "inputs": {
+          "type": "illumina-bam-hg38"
+        },
+        "outputs": [
+          {
+            "format": "text",
+            "min_records": 1,
+            "path": "**/*"
+          }
+        ],
+        "recipe": {
+          "origin": "proposed"
+        },
+        "report": {
+          "slug": "lobstr-code"
+        },
+        "run": {
+          "cmd": "true  # no command found in the README; nothing to run",
+          "timeout_minutes": 20
+        },
+        "source": {
+          "ref": "47da4cac554952f14a78bb4230d39efa1eaf8b0b",
+          "repo": "https://github.com/mgymrek/lobstr-code"
+        },
+        "submission": {
+          "by": "third_party"
+        },
+        "tool": {
+          "contact": "https://github.com/mgymrek/lobstr-code/issues",
+          "name": "lobstr-code",
+          "version": "v4.0.6"
+        }
+      },
+      "proposal": {
+        "build": {
+          "also_published": null,
+          "asset": null,
+          "candidates": [
+            {
+              "file": "configure.ac",
+              "method": "autotools"
+            }
+          ],
+          "digest": null,
+          "dir": null,
+          "evidence_source": "repo_file:configure.ac",
+          "file": "configure.ac",
+          "image": null,
+          "method": "autotools",
+          "package": null,
+          "readme_install_lines": [],
+          "readme_line": null,
+          "spec_list": false,
+          "ssh_urls_in": [],
+          "tag": null,
+          "then": [],
+          "url": null
+        },
+        "commands": [],
+        "dockerfile": null,
+        "docs_read": [],
+        "docs_text": "",
+        "evidence": [
+          {
+            "claim": "install_method",
+            "kind": "tree",
+            "path": "configure.ac",
+            "text": "autotools",
+            "url": "https://github.com/mgymrek/lobstr-code/blob/47da4cac554952f14a78bb4230d39efa1eaf8b0b/configure.ac"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "tests/test.fa.gz",
+            "text": "fasta",
+            "url": "https://github.com/mgymrek/lobstr-code/blob/47da4cac554952f14a78bb4230d39efa1eaf8b0b/tests/test.fa.gz"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "tests/tmp_2.fa",
+            "text": "fasta",
+            "url": "https://github.com/mgymrek/lobstr-code/blob/47da4cac554952f14a78bb4230d39efa1eaf8b0b/tests/tmp_2.fa"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "tests/tmp_1.fa",
+            "text": "fasta",
+            "url": "https://github.com/mgymrek/lobstr-code/blob/47da4cac554952f14a78bb4230d39efa1eaf8b0b/tests/tmp_1.fa"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "tests/test.fq.gz",
+            "text": "fastq",
+            "url": "https://github.com/mgymrek/lobstr-code/blob/47da4cac554952f14a78bb4230d39efa1eaf8b0b/tests/test.fq.gz"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "tests/smallref/small_lobstr_ref_v2/lobSTR_mergedref.bed",
+            "text": "bed",
+            "url": "https://github.com/mgymrek/lobstr-code/blob/47da4cac554952f14a78bb4230d39efa1eaf8b0b/tests/smallref/small_lobstr_ref_v2/lobSTR_mergedref.bed"
+          }
+        ],
+        "example": null,
+        "example_data": [
+          {
+            "in_example_dir": true,
+            "kind": "fasta",
+            "looks_like_output": false,
+            "path": "tests/test.fa.gz",
+            "size": 145
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fasta",
+            "looks_like_output": false,
+            "path": "tests/tmp_2.fa",
+            "size": 289
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fasta",
+            "looks_like_output": false,
+            "path": "tests/tmp_1.fa",
+            "size": 291
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fastq",
+            "looks_like_output": false,
+            "path": "tests/test.fq.gz",
+            "size": 441
+          },
+          {
+            "in_example_dir": true,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "tests/smallref/small_lobstr_ref_v2/lobSTR_mergedref.bed",
+            "size": 605
+          },
+          {
+            "in_example_dir": true,
+            "kind": "bam",
+            "looks_like_output": false,
+            "path": "tests/test.aligned.sorted.bam",
+            "size": 724
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fastq",
+            "looks_like_output": false,
+            "path": "tests/tiny.fq",
+            "size": 864
+          },
+          {
+            "in_example_dir": true,
+            "kind": "bam",
+            "looks_like_output": false,
+            "path": "tests/test.norg.bam",
+            "size": 1627
+          },
+          {
+            "in_example_dir": true,
+            "kind": "bam",
+            "looks_like_output": false,
+            "path": "tests/test.nosample.bam",
+            "size": 1658
+          },
+          {
+            "in_example_dir": true,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "tests/smallref/lobstr_test_ref.bed",
+            "size": 1904
+          },
+          {
+            "in_example_dir": true,
+            "kind": "bam",
+            "looks_like_output": false,
+            "path": "tests/test.noindex.bam",
+            "size": 11631
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fasta",
+            "looks_like_output": false,
+            "path": "tests/smallref/small_lobstr_ref_v2/lobSTR_ref.fasta",
+            "size": 19940
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fastq",
+            "looks_like_output": false,
+            "path": "tests/small.fq",
+            "size": 219786
+          },
+          {
+            "in_example_dir": true,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "tests/smallref_chrY/smallref_chrY_ref.bed",
+            "size": 529147
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fastq",
+            "looks_like_output": false,
+            "path": "tests/tmp_1.fq",
+            "size": 3191202
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fastq",
+            "looks_like_output": false,
+            "path": "tests/tmp_2.fq",
+            "size": 3191202
+          },
+          {
+            "in_example_dir": true,
+            "kind": "bam",
+            "looks_like_output": false,
+            "path": "tests/test_chrY.bam",
+            "size": 6430896
+          },
+          {
+            "in_example_dir": true,
+            "kind": "fasta",
+            "looks_like_output": false,
+            "path": "tests/smallref_chrY/small_lobstr_ref_v2_chrY/lobSTR_ref.fasta",
+            "size": 8533651
+          }
+        ],
+        "inferences": {
+          "build": "repo_file:configure.ac",
+          "example": null,
+          "input_type": null,
+          "output": null,
+          "platform": null,
+          "regions": null,
+          "run_command": null,
+          "single_sample_bams": null
+        },
+        "input_type": {
+          "assembly": {
+            "against_hg38": null,
+            "declared": null,
+            "evidence_source": null,
+            "hg19_evidence_source": null,
+            "hg19_hits": 0,
+            "hg38_evidence_source": null,
+            "hg38_hits": 0,
+            "incompatible_with_hg38": false
+          },
+          "best": "illumina-bam-hg38",
+          "candidates": [
+            "illumina-bam-hg38",
+            "illumina-str-fastq"
+          ],
+          "evidence_source": null,
+          "how": "counted",
+          "platform": "illumina",
+          "platform_evidence_source": null,
+          "platform_how": "counted",
+          "signals": {
+            "bam": 3,
+            "ce": 0,
+            "fastq": 3,
+            "hg19": 0,
+            "hg38": 0,
+            "illumina": 0,
+            "ont": 0,
+            "snp": 0,
+            "ystr": 0
+          },
+          "statements": {
+            "against": [],
+            "determined": false,
+            "inputs": [],
+            "platform": [],
+            "recommendation": null
+          },
+          "statements_file": null,
+          "supported_platforms": [],
+          "unsupported": null,
+          "warnings": []
+        },
+        "known_issues": [],
+        "limitations": [
+          "input_type_guessed",
+          "install_profile_unsupported",
+          "no_command"
+        ],
+        "output": {
+          "evidence_source": null,
+          "format": null,
+          "signals": {
+            "csv": 0,
+            "json": 0,
+            "tsv": 0,
+            "vcf": 0
+          }
+        },
+        "packaging": {
+          "executables": [],
+          "packages": []
+        },
+        "readme": {
+          "gaps": [
+            {
+              "item": "command",
+              "text": "No command line invoking the tool was found in the README's code blocks."
+            },
+            {
+              "item": "output",
+              "text": "The README does not describe the output file or its format."
+            }
+          ],
+          "name": "README",
+          "sufficient_to_attempt": false
+        },
+        "readme_name": "README",
+        "readme_text": "For full documentation, see the lobSTR website: http://lobstr.teamerlich.org/\n",
+        "ref": "47da4cac554952f14a78bb4230d39efa1eaf8b0b",
+        "regions": {
+          "ambiguous": false,
+          "candidates": [],
+          "end_line": null,
+          "evidence_source": null,
+          "file": null,
+          "format": null,
+          "line": null,
+          "text": null
+        },
+        "registry": {
+          "bioconda": {},
+          "documented": []
+        },
+        "repo": "https://github.com/mgymrek/lobstr-code",
+        "schema": "strhub-verified/recipe-proposal/1",
+        "single_sample_bams": {
+          "allowed": false,
+          "evidence_source": null,
+          "file": null,
+          "line": null,
+          "paired_flags": [],
+          "text": null
+        },
+        "source_documents": [
+          {
+            "file": "README",
+            "origin": "readme",
+            "text": "For full documentation, see the lobSTR website: http://lobstr.teamerlich.org/\n"
+          }
+        ],
+        "tool_names": [
+          "COPYING",
+          "GetSTRInfo",
+          "GetSTRInfo.py",
+          "allelotype_validation_suite",
+          "allelotype_validation_suite.sh",
+          "checks_utils",
+          "checks_utils.py",
+          "command_line_tests",
+          "command_line_tests.sh",
+          "gen-coverage-report",
+          "gen-coverage-report.sh",
+          "lobSTR_alignment_checks",
+          "lobSTR_alignment_checks.py",
+          "lobSTR_allelotype_checks",
+          "lobSTR_allelotype_checks.py",
+          "lobSTR_annotate_allele_freqs",
+          "lobSTR_annotate_allele_freqs.py",
+          "lobSTR_capillary_comparator",
+          "lobSTR_capillary_comparator.py",
+          "lobSTR_download_ref_hg19",
+          "lobSTR_download_ref_hg19.sh",
+          "lobSTR_filter_vcf",
+          "lobSTR_filter_vcf.py",
+          "lobSTR_test_run",
+          "lobSTR_test_run.sh",
+          "lobSTR_vcf_to_tab",
+          "lobSTR_vcf_to_tab.py",
+          "lobstr-code",
+          "lobstr_index",
+          "lobstr_index.py",
+          "make_bin_dist",
+          "make_bin_dist.sh",
+          "make_src_dist",
+          "make_src_dist.sh",
+          "rebuild-coverage",
+          "rebuild-coverage.sh",
+          "runtest",
+          "runtest.sh",
+          "set_new_tag_version",
+          "set_new_tag_version.sh",
+          "update_travis_mac",
+          "update_travis_mac.sh",
+          "vcf_extract",
+          "vcf_extract.py",
+          "visualize_stutter",
+          "visualize_stutter.py"
+        ],
+        "tree_paths": [
+          ".gitignore",
+          ".travis.yml",
+          "AUTHORS",
+          "COPYING",
+          "ChangeLog",
+          "HACKING.md",
+          "INSTALL",
+          "Makefile.am",
+          "NEWS",
+          "README",
+          "config/gen-coverage-report.sh",
+          "config/git-version-gen",
+          "config/rebuild-coverage.sh",
+          "configure.ac",
+          "experimental/visualize_stutter.py",
+          "lobSTR.rb",
+          "m4/Makefile.am",
+          "m4/acx_pthread.m4",
+          "m4/ax_blas.m4",
+          "m4/ax_boost_base.m4",
+          "m4/ax_check_zlib.m4",
+          "m4/ax_pthread.m4",
+          "make_bin_dist.sh",
+          "make_src_dist.sh",
+          "models/Makefile.am",
+          "models/illumina_v2.0.3.stepmodel",
+          "models/illumina_v2.0.3.stuttermodel",
+          "models/illumina_v2.0.3.stutterproblem",
+          "models/illumina_v3.pcrfree.stepmodel",
+          "models/illumina_v3.pcrfree.stuttermodel",
+          "reconf",
+          "scripts/GetSTRInfo.py",
+          "scripts/Makefile.am",
+          "scripts/allelotype_validation_suite.sh",
+          "scripts/checks_utils.py",
+          "scripts/lobSTR_alignment_checks.py",
+          "scripts/lobSTR_allelotype_checks.py",
+          "scripts/lobSTR_annotate_allele_freqs.py",
+          "scripts/lobSTR_capillary_comparator.py",
+          "scripts/lobSTR_download_ref_hg19.sh",
+          "scripts/lobSTR_filter_vcf.py",
+          "scripts/lobSTR_test_run.sh",
+          "scripts/lobSTR_vcf_to_tab.py",
+          "scripts/lobstr_index.py",
+          "scripts/vcf_extract.py",
+          "set_new_tag_version.sh",
+          "src/AlignedRead.h",
+          "src/Alignment.h",
+          "src/AlignmentFilters.cpp",
+          "src/AlignmentFilters.h",
+          "src/AlignmentUtils.cpp",
+          "src/AlignmentUtils.h",
+          "src/BWAReadAligner.cpp",
+          "src/BWAReadAligner.h",
+          "src/BamFileReader.cpp",
+          "src/BamFileReader.h",
+          "src/BamPairedFileReader.cpp",
+          "src/BamPairedFileReader.h",
+          "src/EntropyDetection.cpp",
+          "src/EntropyDetection.h",
+          "src/FastaFileReader.cpp",
+          "src/FastaFileReader.h",
+          "src/FastaPairedFileReader.cpp",
+          "src/FastaPairedFileReader.h",
+          "src/FastqFileReader.cpp",
+          "src/FastqFileReader.h",
+          "src/FastqPairedFileReader.cpp",
+          "src/FastqPairedFileReader.h",
+          "src/FilterCounter.cpp",
+          "src/FilterCounter.h",
+          "src/Genotyper.cpp",
+          "src/Genotyper.h",
+          "src/IFileReader.h",
+          "src/IFileWriter.h",
+          "src/IntervalTreeCore.h",
+          "src/MSReadRecord.h",
+          "src/Makefile.am",
+          "src/MultithreadData.cpp",
+          "src/MultithreadData.h",
+          "src/NWNoRefEndPenalty.cpp",
+          "src/NWNoRefEndPenalty.h",
+          "src/NoiseModel.cpp",
+          "src/NoiseModel.h",
+          "src/QSufSort.c",
+          "src/QSufSort.h",
+          "src/ReadContainer.cpp",
+          "src/ReadContainer.h",
+          "src/ReadPair.cpp",
+          "src/ReadPair.h",
+          "src/ReferenceSTR.cpp",
+          "src/ReferenceSTR.h",
+          "src/RemoveDuplicates.cpp",
+          "src/RemoveDuplicates.h",
+          "src/RunInfo.h",
+          "src/STRDetector.cpp",
+          "src/STRDetector.h",
+          "src/STRIntervalTree.cpp",
+          "src/STRIntervalTree.h",
+          "src/STRRecord.h",
+          "src/SamFileWriter.cpp",
+          "src/SamFileWriter.h",
+          "src/TextFileReader.cpp",
+          "src/TextFileReader.h",
+          "src/TextFileWriter.cpp",
+          "src/TextFileWriter.h",
+          "src/VCFWriter.cpp",
+          "src/VCFWriter.h",
+          "src/ZAlgorithm.cpp",
+          "src/ZAlgorithm.h",
+          "src/ZippedFastaFileReader.cpp",
+          "src/ZippedFastaFileReader.h",
+          "src/ZippedFastqFileReader.cpp",
+          "src/ZippedFastqFileReader.h",
+          "src/ZippedTextFileReader.cpp",
+          "src/ZippedTextFileReader.h",
+          "src/api/BGZF.h",
+          "src/api/BamAlgorithms.h",
+          "src/api/BamAlignment.cpp",
+          "src/api/BamAlignment.h",
+          "src/api/BamAux.h",
+          "src/api/BamAux.h~",
+          "src/api/BamConstants.h",
+          "src/api/BamIndex.h",
+          "src/api/BamMultiReader.cpp",
+          "src/api/BamMultiReader.h",
+          "src/api/BamReader.cpp",
+          "src/api/BamReader.h",
+          "src/api/BamWriter.cpp",
+          "src/api/BamWriter.h",
+          "src/api/BamWriter.h~",
+          "src/api/IBamIODevice.h",
+          "src/api/SamConstants.h",
+          "src/api/SamHeader.cpp",
+          "src/api/SamHeader.h",
+          "src/api/SamProgram.cpp",
+          "src/api/SamProgram.h",
+          "src/api/SamProgramChain.cpp",
+          "src/api/SamProgramChain.h",
+          "src/api/SamReadGroup.cpp",
+          "src/api/SamReadGroup.h",
+          "src/api/SamReadGroupDictionary.cpp",
+          "src/api/SamReadGroupDictionary.h",
+          "src/api/SamSequence.cpp",
+          "src/api/SamSequence.h",
+          "src/api/SamSequenceDictionary.cpp",
+          "src/api/SamSequenceDictionary.h",
+          "src/api/algorithms/Sort.h",
+          "src/api/api_global.h",
+          "src/api/api_global.h~",
+          "src/api/internal/BamDeviceFactory_p.cpp",
+          "src/api/internal/BamDeviceFactory_p.h",
+          "src/api/internal/BamException_p.cpp",
+          "src/api/internal/BamException_p.h",
+          "src/api/internal/BamFile_p.cpp",
+          "src/api/internal/BamFile_p.h",
+          "src/api/internal/BamFile_p.h~",
+          "src/api/internal/BamFtp_p.cpp",
+          "src/api/internal/BamFtp_p.h",
+          "src/api/internal/BamHeader_p.cpp",
+          "src/api/internal/BamHeader_p.h",
+          "src/api/internal/BamHttp_p.cpp",
+          "src/api/internal/BamHttp_p.h",
+          "src/api/internal/BamIndexFactory_p.cpp",
+          "src/api/internal/BamIndexFactory_p.h",
+          "src/api/internal/BamMultiMerger_p.h",
+          "src/api/internal/BamMultiReader_p.cpp",
+          "src/api/internal/BamMultiReader_p.h",
+          "src/api/internal/BamPipe_p.cpp",
+          "src/api/internal/BamPipe_p.h",
+          "src/api/internal/BamRandomAccessController_p.cpp",
+          "src/api/internal/BamRandomAccessController_p.h",
+          "src/api/internal/BamReader_p.cpp",
+          "src/api/internal/BamReader_p.h",
+          "src/api/internal/BamStandardIndex_p.cpp",
+          "src/api/internal/BamStandardIndex_p.h",
+          "src/api/internal/BamToolsIndex_p.cpp",
+          "src/api/internal/BamToolsIndex_p.h",
+          "src/api/internal/BamWriter_p.cpp",
+          "src/api/internal/BamWriter_p.h",
+          "src/api/internal/BgzfStream_p.cpp",
+          "src/api/internal/BgzfStream_p.cpp~",
+          "src/api/internal/BgzfStream_p.h",
+          "src/api/internal/BgzfStream_p.h~",
+          "src/api/internal/ILocalIODevice_p.cpp",
+          "src/api/internal/ILocalIODevice_p.h",
+          "src/api/internal/IRemoteIODevice_p.cpp",
+          "src/api/internal/IRemoteIODevice_p.h",
+          "src/api/internal/SamFormatParser_p.cpp",
+          "src/api/internal/SamFormatParser_p.h",
+          "src/api/internal/SamFormatPrinter_p.cpp",
+          "src/api/internal/SamFormatPrinter_p.h",
+          "src/api/internal/SamHeaderValidator_p.cpp",
+          "src/api/internal/SamHeaderValidator_p.h",
+          "src/api/internal/SamHeaderVersion_p.h",
+          "src/bamlite.c",
+          "src/bamlite.h",
+          "src/bntseq.c",
+          "src/bntseq.h",
+          "src/bwape.c",
+          "src/bwase.c",
+          "src/bwase.h",
+          "src/bwaseqio.c",
+          "src/bwt.c",
+          "src/bwt.h",
+          "src/bwt_gen.c",
+          "src/bwt_gen.h",
+          "src/bwt_lite.c",
+          "src/bwt_lite.h",
+          "src/bwtaln.c",
+          "src/bwtaln.h",
+          "src/bwtgap.c",
+          "src/bwtgap.h",
+          "src/bwtindex.c",
+          "src/bwtio.c",
+          "src/bwtmisc.c",
+          "src/bwtsw2.h",
+          "src/bwtsw2_aux.c",
+          "src/bwtsw2_chain.c",
+          "src/bwtsw2_core.c",
+          "src/bwtsw2_main.c",
+          "src/cigar.h",
+          "src/common.cpp",
+          "src/common.h",
+          "src/cs2nt.c",
+          "src/gzstream.cpp",
+          "src/gzstream.h",
+          "src/is.c",
+          "src/khash.h",
+          "src/kseq.h",
+          "src/ksort.h",
+          "src/kstring.c",
+          "src/kstring.h",
+          "src/kvec.h",
+          "src/logistic_regression.cpp",
+          "src/logistic_regression.h",
+          "src/main.c",
+          "src/main.cpp",
+          "src/main.h",
+          "src/main_allelotype.cpp",
+          "src/nw.cpp",
+          "src/nw.h",
+          "src/runtime_parameters.cpp",
+          "src/runtime_parameters.h",
+          "src/shared/bamtools_global.h",
+          "src/shared/bamtools_global.h~",
+          "src/simple_dp.c",
+          "src/stdaln.c",
+          "src/stdaln.h",
+          "src/tests/AlignmentFilters_test.cpp",
+          "src/tests/AlignmentFilters_test.h",
+          "src/tests/AlignmentUtils_test.cpp",
+          "src/tests/AlignmentUtils_test.h",
+          "src/tests/DNATools.cpp",
+          "src/tests/DNATools.h",
+          "src/tests/NWNoRefEndPenalty_test.cpp",
+          "src/tests/NWNoRefEndPenalty_test.h",
+          "src/tests/ReadContainer_test.cpp",
+          "src/tests/ReadContainer_test.h",
+          "src/tests/RemoveDuplicates_test.cpp",
+          "src/tests/RemoveDuplicates_test.h",
+          "src/tests/VCFWriter_test.cpp",
+          "src/tests/VCFWriter_test.h",
+          "src/tests/ZAlgorithm_test.cpp",
+          "src/tests/ZAlgorithm_test.h",
+          "src/tests/common_test.cpp",
+          "src/tests/common_test.h",
+          "src/tests/logistic_regression_test.cpp",
+          "src/tests/logistic_regression_test.h",
+          "src/tests/main_test.cpp",
+          "src/utils.c",
+          "src/utils.h",
+          "src/utils/CMakeLists.txt",
+          "src/utils/bamtools_fasta.cpp",
+          "src/utils/bamtools_fasta.h",
+          "src/utils/bamtools_filter_engine.h",
+          "src/utils/bamtools_filter_properties.h",
+          "src/utils/bamtools_filter_ruleparser.h",
+          "src/utils/bamtools_options.cpp",
+          "src/utils/bamtools_options.h",
+          "src/utils/bamtools_pileup_engine.cpp",
+          "src/utils/bamtools_pileup_engine.h",
+          "src/utils/bamtools_utilities.cpp",
+          "src/utils/bamtools_utilities.h",
+          "src/utils/bamtools_utilities.h~",
+          "src/utils/bamtools_variant.h",
+          "src/utils/utils_global.h",
+          "src/xsemaphore.h",
+          "tests/Makefile.am",
+          "tests/command_line_tests.sh",
+          "tests/runtest.sh",
+          "tests/small.fq",
+          "tests/smallref/lobstr_test_ref.bed",
+          "tests/smallref/readme.txt",
+          "tests/smallref/small_lobstr_ref_v2/lobSTR_chromsizes.tab",
+          "tests/smallref/small_lobstr_ref_v2/lobSTR_mergedref.bed",
+          "tests/smallref/small_lobstr_ref_v2/lobSTR_ref.fasta",
+          "tests/smallref/small_lobstr_ref_v2/lobSTR_ref.fasta.amb",
+          "tests/smallref/small_lobstr_ref_v2/lobSTR_ref.fasta.ann",
+          "tests/smallref/small_lobstr_ref_v2/lobSTR_ref.fasta.bwt",
+          "tests/smallref/small_lobstr_ref_v2/lobSTR_ref.fasta.pac",
+          "tests/smallref/small_lobstr_ref_v2/lobSTR_ref.fasta.rbwt",
+          "tests/smallref/small_lobstr_ref_v2/lobSTR_ref.fasta.rpac",
+          "tests/smallref/small_lobstr_ref_v2/lobSTR_ref.fasta.rsa",
+          "tests/smallref/small_lobstr_ref_v2/lobSTR_ref.fasta.sa",
+          "tests/smallref/small_lobstr_ref_v2/lobSTR_ref_map.tab",
+          "tests/smallref/smallref_strinfo.tab",
+          "tests/smallref_chrY/bad_strinfo_file.tab",
+          "tests/smallref_chrY/small_lobstr_ref_v2_chrY/lobSTR_ref.fasta",
+          "tests/smallref_chrY/small_lobstr_ref_v2_chrY/lobSTR_ref_map.tab",
+          "tests/smallref_chrY/smallref_chrY.strinfo.tab",
+          "tests/smallref_chrY/smallref_chrY_ref.bed",
+          "tests/test.aligned.sorted.bam",
+          "tests/test.aligned.sorted.bam.bai",
+          "tests/test.fa.gz",
+          "tests/test.fq.gz",
+          "tests/test.noindex.bam",
+          "tests/test.norg.bam",
+          "tests/test.norg.bam.bai",
+          "tests/test.nosample.bam",
+          "tests/test.nosample.bam.bai",
+          "tests/test_chrY.bam",
+          "tests/test_chrY.bam.bai",
+          "tests/tiny.fq",
+          "tests/tmp_1.fa",
+          "tests/tmp_1.fq",
+          "tests/tmp_2.fa",
+          "tests/tmp_2.fq",
+          "update_travis_mac.sh",
+          "wishlist.txt"
+        ],
+        "tree_truncated": false,
+        "upstream_files": {}
+      },
+      "limitations": [
+        "input_type_guessed",
+        "install_profile_unsupported",
+        "no_command"
+      ],
+      "caveat_items": [
+        "Environment: no proven installation profile; STRhub did not manufacture installation steps.",
+        "Input: no sentence in the README says what the tool takes; illumina-bam-hg38 is only a guess from mentions; it is not authorization to execute."
+      ]
+    }
+  },
+  "provenance": {
+    "from_upstream": {
+      "install": {
+        "method": "autotools",
+        "evidence_source": "repo_file:configure.ac"
+      },
+      "command": null,
+      "input_kind": {
+        "value": "bam",
+        "evidence_source": null
+      },
+      "supported_platforms": [],
+      "assembly": {
+        "declared": null,
+        "evidence_source": null
+      },
+      "regions_schema": null,
+      "output_format": null
+    },
+    "derived": {
+      "command_rewrites": [],
+      "regions_layout_binding": null,
+      "single_sample_adaptation": null
+    },
+    "harness_choices": {
+      "dataset": {
+        "selected": "illumina-bam-hg38",
+        "reason": "STRhub selected 'illumina-bam-hg38' as compatible with upstream input 'bam' and platform 'illumina'"
+      },
+      "platform": {
+        "selected": "illumina",
+        "basis": "counted_unproven",
+        "supported_platforms": []
+      },
+      "assembly": {
+        "selected": "hg38",
+        "basis": "harness_choice_unstated",
+        "note": "Upstream did not specify an assembly; STRhub supplied an internally coherent hg38 BAM, FASTA and regions set"
+      },
+      "regions_layout": null,
+      "base_environment": null
+    }
+  },
+  "procedure_validation": {
+    "schema": "strhub-procedure-evidence/1",
+    "valid": true,
+    "reason": "Procedure evidence matches the effective manifest and recomputed decision."
+  },
+  "verdict": {
+    "code": "undetermined",
+    "title": "Could not be determined",
+    "basis": "recipe",
+    "reason": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub.",
+    "readme_gaps": [
+      {
+        "item": "command",
+        "text": "No command line invoking the tool was found in the README's code blocks."
+      },
+      {
+        "item": "output",
+        "text": "The README does not describe the output file or its format."
+      }
+    ],
+    "status_code": "UNVERIFIED_INSUFFICIENT_DOCS",
+    "blockers": [
+      {
+        "code": "install_not_copyable",
+        "what": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub.",
+        "ask_owner": {
+          "title": "Write the installation as commands that can be copied and run",
+          "body": "STRhub Verified reads the installation from the repository's documentation and runs it exactly as written, adding nothing. At this commit it could not follow it. Writing the installation as plain commands in one code block (apt, conda, pip, make or cmake, with the files they name in the repository) lets a new user, a reviewer and STRhub install the tool by copying it. The forms it can follow are listed in the guide: https://github.com/Tfronta/strhub-verified-next/blob/main/docs/GUIA-PASO-1.md What stopped it: No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub."
+        }
+      },
+      {
+        "code": "no_command",
+        "what": "No command line invoking the tool was found in the README.",
+        "ask_owner": {
+          "title": "Document the command that runs the tool",
+          "body": "STRhub Verified could not find, in the README, a command line that invokes the tool. A one-line example with an input file and the output it writes would let a new user run it and let STRhub verify it automatically."
+        }
+      }
+    ]
+  },
+  "step1": {
+    "code": "cannot_tell",
+    "headline": "As documented, a third party cannot tell how to run it.",
+    "body": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub. Nothing was executed. That does not mean the tool does not work: what the guide asks for is missing from the README at this commit. Add it and try the link again on the new commit.",
+    "missing": [
+      "install"
+    ],
+    "missing_text": [
+      "Installation, copyable"
+    ],
+    "guide": "docs/GUIA-PASO-1.md"
+  },
+  "certificate": {
+    "schema": "strhub-verified/certificate/1",
+    "label": "Could not be determined",
+    "reached": "Available",
+    "stages": [
+      {
+        "key": "available",
+        "label": "Source available",
+        "status": "PASS"
+      },
+      {
+        "key": "installs",
+        "label": "Installation",
+        "status": "NOT ATTEMPTED"
+      },
+      {
+        "key": "runs",
+        "label": "End-to-end execution",
+        "status": "NOT ATTEMPTED"
+      },
+      {
+        "key": "output",
+        "label": "Output generated",
+        "status": "NOT ATTEMPTED"
+      }
+    ],
+    "summary": {
+      "purpose": "Evaluate whether the tool installs, runs end-to-end, and produces structurally valid output.",
+      "result": "Could not be determined",
+      "reached": "Available, 1/5 gates passed",
+      "why": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub.",
+      "scope": "Installation, execution, and output structure evaluation.",
+      "not_evaluated": [
+        "Genotype accuracy",
+        "Concordance",
+        "Forensic validity",
+        "Regulatory compliance"
+      ]
+    },
+    "conclusion": [
+      {
+        "title": "Procedure not established",
+        "body": "The recorded gate observations do not establish whether the documented procedure succeeded or failed."
+      },
+      {
+        "title": "Observations retained",
+        "body": "The supplied run and output observations remain in the report; they do not replace procedure evidence."
+      },
+      {
+        "title": "Verdict: Could not be determined",
+        "body": "No repository document shows an installation this profile can transcribe literally; no missing step, dependency or choice was supplied by STRhub."
+      },
+      {
+        "title": "Reproducibility not established",
+        "body": "These observations are insufficient to establish a reproducible documented execution finding."
+      }
+    ],
+    "out_of_scope": [
+      "Genotype correctness or accuracy",
+      "Concordance against known truth sets",
+      "Sensitivity, specificity, or stutter performance",
+      "Allele calling accuracy or forensic casework suitability",
+      "Regulatory compliance or ISO accreditation",
+      "Multi-laboratory or multi-dataset reproducibility"
+    ],
+    "limitations": [
+      "Single reference dataset per input type",
+      "Single containerized environment (Docker / ubuntu-22.04)",
+      "No truth-set comparison or ground-truth genotypes",
+      "No accuracy or concordance assessment",
+      "No forensic or clinical validation of results",
+      "No sequencing data were processed because execution did not complete"
+    ],
+    "scope": {
+      "statement": "Independent automated evaluation of reproducible execution. It checks whether the tool installs, runs end-to-end, and produces structurally valid output in a standardized environment.",
+      "not": "This is not an analytical validation. Genotype accuracy, concordance, forensic suitability, and regulatory compliance are out of scope.",
+      "disclaimer": "Each result is a dated snapshot, verified on the tool's public repository at a pinned commit. STRhub does not store tool source code."
+    }
+  }
+}
