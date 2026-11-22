@@ -1,7 +1,7 @@
 {
   "schema": "strhub-verified/index/3",
-  "generated": "2026-11-22T19:14:43+00:00",
-  "count": 14,
+  "generated": "2026-11-22T19:14:46+00:00",
+  "count": 15,
   "tools": [
     {
       "slug": "expansionhunter",
@@ -218,6 +218,50 @@
           "report": "lusstr-snp/2425112706d03929ee3cf82588ddd6a2f315083c/lusstr-snp.json",
           "page": "lusstr-snp/2425112706d03929ee3cf82588ddd6a2f315083c/lusstr-snp.html",
           "pdf": "lusstr-snp/2425112706d03929ee3cf82588ddd6a2f315083c/lusstr-snp.pdf"
+        }
+      ]
+    },
+    {
+      "slug": "mahi-mahi-ont-med",
+      "name": "mahi-mahi",
+      "version": "v1.0.0",
+      "variant": null,
+      "sha": "861ea09ab44e88424c45b04d8018f3948a8fefbb",
+      "committed": "2026-10-13T13:00:00Z",
+      "instrument": "documented",
+      "level": "content",
+      "label": "Runs as documented",
+      "verdict": "runs",
+      "errors_reported": false,
+      "generated": "2026-11-22T19:14:07+00:00",
+      "source_repo": "https://github.com/nanoporetech/mahi-mahi",
+      "source_ref": "861ea09ab44e88424c45b04d8018f3948a8fefbb",
+      "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/45059262501",
+      "distinct_str_loci": 74,
+      "distinct_snp_markers": 0,
+      "total_reads": 2533,
+      "external_state": "pass",
+      "dataset_types": [
+        "ont-bam-hg38-med"
+      ],
+      "report": "mahi-mahi-ont-med.json",
+      "page": "mahi-mahi-ont-med.html",
+      "versions": [
+        {
+          "sha": "861ea09ab44e88424c45b04d8018f3948a8fefbb",
+          "instrument": "documented",
+          "version": "v1.0.0",
+          "variant": null,
+          "committed": "2026-10-13T13:00:00Z",
+          "generated": "2026-11-22T19:14:07+00:00",
+          "level": "content",
+          "label": "Runs as documented",
+          "verdict": "runs",
+          "errors_reported": false,
+          "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/45059262501",
+          "report": "mahi-mahi-ont-med/861ea09ab44e88424c45b04d8018f3948a8fefbb/mahi-mahi-ont-med.json",
+          "page": "mahi-mahi-ont-med/861ea09ab44e88424c45b04d8018f3948a8fefbb/mahi-mahi-ont-med.html",
+          "pdf": "mahi-mahi-ont-med/861ea09ab44e88424c45b04d8018f3948a8fefbb/mahi-mahi-ont-med.pdf"
         }
       ]
     },
