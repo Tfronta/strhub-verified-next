@@ -1,0 +1,1030 @@
+{
+  "schema": "strhub-verified/1",
+  "mode": "publish",
+  "tool": {
+    "name": "NanoRepeat",
+    "version": "v1.8.3",
+    "contact": "https://github.com/WGLab/NanoRepeat/issues"
+  },
+  "submission": {
+    "by": "third_party"
+  },
+  "source": {
+    "repo": "https://github.com/WGLab/NanoRepeat",
+    "ref": "aa5ceb4eb92bc92acc718434b2fcb9f387009084",
+    "ref_resolved": "aa5ceb4eb92bc92acc718434b2fcb9f387009084",
+    "committed": "2026-01-13T06:15:20Z"
+  },
+  "environment": {
+    "dockerfile": "Dockerfile",
+    "os": [
+      "ubuntu-22.04"
+    ],
+    "source": "documented"
+  },
+  "generated": "2026-11-22T19:15:26+00:00",
+  "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/45059567503",
+  "run": {
+    "cmd": "nanoRepeat.py -i path/to/NanoRepeat_v1.3_example_data/HG002/hg002_Q20.20210805_3flowcells.hs37d5.example_regions.bam -t bam -d ont_q20 -r path/to/NanoRepeat_v1.3_example_data/HG002/GRCh37_chr1.fasta -b path/to/NanoRepeat_v1.3_example_data/HG002/HG002_GRCh37_example_regions.bed -c 4 --samtools path/to/samtools --minimap2 path/to/minimap2 -o ./nanorepeat_output/HG002",
+    "cwd": ".",
+    "effective_cmd": "cd '.' && touch /tmp/.strhub_mark && ( nanoRepeat.py -i path/to/NanoRepeat_v1.3_example_data/HG002/hg002_Q20.20210805_3flowcells.hs37d5.example_regions.bam -t bam -d ont_q20 -r path/to/NanoRepeat_v1.3_example_data/HG002/GRCh37_chr1.fasta -b path/to/NanoRepeat_v1.3_example_data/HG002/HG002_GRCh37_example_regions.bed -c 4 --samtools path/to/samtools --minimap2 path/to/minimap2 -o ./nanorepeat_output/HG002 ); rc=$?; find . -xdev -type f -newer /tmp/.strhub_mark -size +0 ! -path './.git/*' ! -path './proc/*' ! -path './sys/*' ! -path './dev/*' ! -path './data/*' ! -path '*/__pycache__/*' ! -name '*.pyc' ! -name '*.pyo' 2>/dev/null | head -500 | while IFS= read -r f; do mkdir -p \"/data/out/$(dirname \"$f\")\" && cp \"$f\" \"/data/out/$f\"; done; exit $rc",
+    "step_outcome": "skipped"
+  },
+  "instrument": "documented",
+  "recipe": {
+    "origin": "proposed"
+  },
+  "gates": {
+    "available": true,
+    "installs": false,
+    "runs": false,
+    "io": false,
+    "content": false
+  },
+  "input_contract": {
+    "type": "ont-bam-hg38"
+  },
+  "level": "available",
+  "io_detail": {},
+  "content_detail": {},
+  "example_detail": null,
+  "datasets": [
+    {
+      "leg": "external",
+      "label": "External data",
+      "available": false,
+      "type": "ont-bam-hg38",
+      "dataset": null,
+      "io": false,
+      "content": false,
+      "passed": false
+    },
+    {
+      "leg": "example",
+      "label": "Tool's own example",
+      "available": false,
+      "io": false,
+      "content": null,
+      "passed": false,
+      "matches_expected": null,
+      "produced_count": null
+    }
+  ],
+  "scope": "Assessment of documented execution in the stated environment and output format. Concerns reproducible execution only; no claim of accuracy, casework fitness, or regulatory validation.",
+  "upstream": {
+    "checked": "2026-11-22T19:15:26+00:00",
+    "repo_exists": true,
+    "ref_exists": true,
+    "default_branch": "master",
+    "status": "ahead",
+    "behind_by": 1
+  },
+  "needed_beyond_repo": [
+    "A base environment for the documented installation: STRhub ran the repository's install commands unchanged on Ubuntu 22.04, package lists refreshed, apt answering yes, plus Miniforge (conda, python, pip). Base-image and package versions are not frozen by the commands."
+  ],
+  "author_known_issues": [
+    {
+      "heading": "Limitation",
+      "line": 296,
+      "text": "NanoRepeat can accuratly quantify simple repeats but cannot handle mixed repeats of different motifs (i.e. a mixture of `GCCA` and `AAATT`), but imperfect repeats of approximately the same motif are OK.",
+      "truncated": false,
+      "url": "https://github.com/WGLab/NanoRepeat/blob/aa5ceb4eb92bc92acc718434b2fcb9f387009084/README.md#L296"
+    }
+  ],
+  "evidence": [
+    {
+      "claim": "install_method",
+      "kind": "tree",
+      "path": "pyproject.toml",
+      "text": "pip",
+      "url": "https://github.com/WGLab/NanoRepeat/blob/aa5ceb4eb92bc92acc718434b2fcb9f387009084/pyproject.toml"
+    },
+    {
+      "claim": "run_command",
+      "kind": "readme",
+      "path": "README.md",
+      "line": 69,
+      "text": "nanoRepeat.py \\",
+      "url": "https://github.com/WGLab/NanoRepeat/blob/aa5ceb4eb92bc92acc718434b2fcb9f387009084/README.md#L69"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "example_data/HTT_repeat_region.bed",
+      "text": "bed",
+      "url": "https://github.com/WGLab/NanoRepeat/blob/aa5ceb4eb92bc92acc718434b2fcb9f387009084/example_data/HTT_repeat_region.bed"
+    },
+    {
+      "claim": "known_issue",
+      "kind": "readme",
+      "path": "README.md",
+      "line": 296,
+      "text": "Limitation",
+      "url": "https://github.com/WGLab/NanoRepeat/blob/aa5ceb4eb92bc92acc718434b2fcb9f387009084/README.md#L296"
+    },
+    {
+      "claim": "documented_input",
+      "kind": "readme",
+      "path": "README.md",
+      "line": 81,
+      "text": "`-i` specifies the input file, which can be in `fasta`, `fastq` or `bam` format.",
+      "url": "https://github.com/WGLab/NanoRepeat/blob/aa5ceb4eb92bc92acc718434b2fcb9f387009084/README.md#L81"
+    }
+  ],
+  "repo_test_data": {
+    "known": true,
+    "present": true,
+    "count": 1,
+    "examples": [
+      "example_data/HTT_repeat_region.bed"
+    ]
+  },
+  "caveats": {
+    "source": "detect_recipe",
+    "items": [
+      "Environment: STRhub transcribed the documented installation commands unchanged into its own carrier (Ubuntu 22.04, package lists refreshed, apt answering yes, plus Miniforge (conda, python, pip)).",
+      "Input: the README documents BAM and FASTQ (line 81); this plan selects STRhub's ont-bam-hg38 reference data. Supported platforms documented: ont, pacbio; STRhub selected ont for this trial.",
+      "Evaluator limitation: the command names a different assembly from the registered hg38 dataset.",
+      "Run command: the README's own command, rewritten to STRhub's mounts; the capture wrapper is planned only if the procedure review passes.",
+      "File: the documented command reads path/to/NanoRepeat_v1.3_example_data/HG002/HG002_GRCh37_example_regions.bed (after -b), which is neither in the repository nor among STRhub's data."
+    ]
+  },
+  "logs": {
+    "build": "nanorepeat-ont.log-build.txt"
+  },
+  "terminals": {
+    "build": "nanorepeat-ont.terminal-build.txt"
+  },
+  "install_detail": {
+    "passed": false,
+    "diagnostics": [
+      {
+        "id": "pip_unresolvable",
+        "severity": "error",
+        "title": "pip cannot resolve a pinned dependency: pyminimap2>=2.30.0",
+        "count": 4,
+        "examples": [
+          "pyminimap2>=2.30.0"
+        ],
+        "suggestion": "pip could not resolve 'pyminimap2>=2.30.0' as pinned: that version is not on PyPI, or is incompatible with the base image's Python. The pin is the build's as cited."
+      }
+    ],
+    "faults": [
+      "author"
+    ]
+  },
+  "procedure_review": {
+    "may_say_runs": false,
+    "status_code": "UNVERIFIED_INSUFFICIENT_DOCS",
+    "basis": "recipe",
+    "attribution": "strhub",
+    "blocker": "missing_file",
+    "reason": "The documented command reads a file that neither the repository nor STRhub holds, so the command was not run.",
+    "amendments": [
+      {
+        "code": "command_profile_unsupported",
+        "what": "The command names a different assembly from the registered hg38 dataset."
+      },
+      {
+        "code": "input_not_substituted",
+        "what": "This evaluator cannot establish that the cited command reads the declared reference input; no config or input list was rewritten to make it do so."
+      },
+      {
+        "code": "input_not_substituted",
+        "what": "The command still names the repository's own file paths, not STRhub's sample. Running it would not be the reference-sample test."
+      }
+    ],
+    "inferences": {
+      "install": {
+        "evidence_source": "README.md:L28-L32",
+        "verified": true
+      },
+      "run_command": {
+        "evidence_source": "README.md:L69",
+        "verified": true,
+        "kind": "doc",
+        "path": "README.md",
+        "document_sha256": "e09599d4590f38afd7933ad749a43344ef2a7f9ce99a1ac32f98960517e3c325"
+      },
+      "input_type": {
+        "verified": true,
+        "kind": "doc",
+        "path": "README.md",
+        "line": 81,
+        "end_line": 81,
+        "document_sha256": "e09599d4590f38afd7933ad749a43344ef2a7f9ce99a1ac32f98960517e3c325",
+        "evidence_source": "README.md:L81",
+        "upstream_input_kind": "bam",
+        "selected_dataset": "ont-bam-hg38"
+      },
+      "platform": {
+        "verified": true,
+        "kind": "doc",
+        "path": "README.md",
+        "line": 1,
+        "end_line": 1,
+        "document_sha256": "e09599d4590f38afd7933ad749a43344ef2a7f9ce99a1ac32f98960517e3c325",
+        "evidence_source": "README.md:L1",
+        "selected": "ont",
+        "selection_basis": "harness_choice_from_supported",
+        "supported_platforms": [
+          "ont",
+          "pacbio"
+        ]
+      },
+      "output": {
+        "verified": true,
+        "kind": "doc",
+        "path": "README.md",
+        "line": 89,
+        "end_line": 89,
+        "document_sha256": "e09599d4590f38afd7933ad749a43344ef2a7f9ce99a1ac32f98960517e3c325",
+        "evidence_source": "README.md:L89"
+      }
+    },
+    "unbacked_inferences": [],
+    "provenance": {
+      "from_upstream": {
+        "install": {
+          "method": "pip",
+          "evidence_source": "README.md:L28-L32"
+        },
+        "command": {
+          "value": "nanoRepeat.py -i path/to/NanoRepeat_v1.3_example_data/HG002/hg002_Q20.20210805_3flowcells.hs37d5.example_regions.bam -t bam -d ont_q20 -r path/to/NanoRepeat_v1.3_example_data/HG002/GRCh37_chr1.fasta -b path/to/NanoRepeat_v1.3_example_data/HG002/HG002_GRCh37_example_regions.bed -c 4 --samtools path/to/samtools --minimap2 path/to/minimap2 -o ./nanorepeat_output/HG002",
+          "evidence_source": "README.md:L69"
+        },
+        "input_kind": {
+          "value": "bam",
+          "evidence_source": "README.md:L81"
+        },
+        "supported_platforms": [
+          {
+            "platform": "ont",
+            "evidence_source": "README.md:L1"
+          },
+          {
+            "platform": "pacbio",
+            "evidence_source": "README.md:L1"
+          }
+        ],
+        "assembly": {
+          "declared": "both",
+          "evidence_source": "README.md:L87"
+        },
+        "regions_schema": {
+          "format": "motif",
+          "evidence_source": "README.md:L89"
+        },
+        "output_format": {
+          "glob": "**/*.t[sx][vt]",
+          "evidence_source": "README.md:L89"
+        }
+      },
+      "derived": {
+        "command_rewrites": [],
+        "regions_layout_binding": null,
+        "single_sample_adaptation": null
+      },
+      "harness_choices": {
+        "dataset": {
+          "selected": "ont-bam-hg38",
+          "reason": "STRhub selected 'ont-bam-hg38' as compatible with upstream input 'bam' and platform 'ont'"
+        },
+        "platform": {
+          "selected": "ont",
+          "basis": "harness_choice_from_supported",
+          "supported_platforms": [
+            "ont",
+            "pacbio"
+          ]
+        },
+        "assembly": {
+          "selected": "hg38",
+          "basis": "upstream_stated",
+          "note": null
+        },
+        "regions_layout": null,
+        "base_environment": {
+          "image": "ubuntu:22.04",
+          "description": "Ubuntu 22.04, package lists refreshed, apt answering yes, plus Miniforge (conda, python, pip)",
+          "added_packages": [],
+          "miniforge": true,
+          "submodules": false
+        }
+      }
+    },
+    "install_method": "pip",
+    "citable_install": true,
+    "input_type": "ont-bam-hg38",
+    "output_glob": "**/*.t[sx][vt]",
+    "profile": "strhub-upstream-procedure/1",
+    "install_ready": true,
+    "example_ready": false,
+    "installation": {
+      "profile": "strhub-documented-install/1",
+      "ready": true,
+      "method": "pip",
+      "reason": "Transcribe the installation commands the repository documents, unchanged and in order, into a fixed evaluator carrier; no step, dependency, option or choice was added.",
+      "repo": "https://github.com/WGLab/NanoRepeat",
+      "ref": "aa5ceb4eb92bc92acc718434b2fcb9f387009084",
+      "documents": [
+        {
+          "path": "README.md",
+          "sha256": "e09599d4590f38afd7933ad749a43344ef2a7f9ce99a1ac32f98960517e3c325"
+        }
+      ],
+      "commands": [
+        {
+          "file": "README.md",
+          "line": 28,
+          "text": "conda create -n nanorepeat python=3.8",
+          "argv": [
+            "conda",
+            "create",
+            "-n",
+            "nanorepeat",
+            "python=3.8"
+          ]
+        },
+        {
+          "file": "README.md",
+          "line": 29,
+          "text": "conda activate nanorepeat",
+          "argv": [
+            "conda",
+            "activate",
+            "nanorepeat"
+          ]
+        },
+        {
+          "file": "README.md",
+          "line": 32,
+          "text": "pip install .",
+          "argv": [
+            "pip",
+            "install",
+            "."
+          ]
+        }
+      ],
+      "published_alternatives": [
+        {
+          "file": "README.md",
+          "line": 40,
+          "text": "pip install NanoRepeat"
+        }
+      ],
+      "conda_environment": "nanorepeat",
+      "base_condition": {
+        "image": "ubuntu:22.04",
+        "description": "Ubuntu 22.04, package lists refreshed, apt answering yes, plus Miniforge (conda, python, pip)",
+        "role": "evaluator base environment",
+        "added_packages": [],
+        "miniforge": true,
+        "submodules": false
+      },
+      "citation": {
+        "repo": "https://github.com/WGLab/NanoRepeat",
+        "ref": "aa5ceb4eb92bc92acc718434b2fcb9f387009084",
+        "path": "README.md",
+        "line": 28,
+        "end_line": 32,
+        "verified": true,
+        "document_sha256": "e09599d4590f38afd7933ad749a43344ef2a7f9ce99a1ac32f98960517e3c325"
+      },
+      "carrier_dockerfile": "# Evaluator carrier: strhub-documented-install/1; not an upstream Dockerfile.\nFROM ubuntu:22.04\nENV DEBIAN_FRONTEND=noninteractive\nRUN [\"bash\", \"-c\", \"echo 'APT::Get::Assume-Yes \\\"true\\\";' > /etc/apt/apt.conf.d/90strhub && apt-get update\"]\nRUN [\"bash\", \"-c\", \"apt-get install curl ca-certificates bzip2 && curl -fsSL https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh -o /tmp/miniforge.sh && bash /tmp/miniforge.sh -b -p /opt/conda && rm /tmp/miniforge.sh && echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/00-strhub-conda.sh && ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh\"]\nENV PATH=/opt/conda/bin:$PATH\nCOPY [\".\", \"/opt/tool\"]\nWORKDIR /opt/tool\nRUN [\"bash\", \"-lc\", \"set -eo pipefail\\nconda create -n nanorepeat python=3.8\\nconda activate nanorepeat\\npip install .\\n\"]\nRUN [\"bash\", \"-c\", \"echo 'conda activate nanorepeat' > /etc/profile.d/zz-strhub-env.sh\"]\nENTRYPOINT [\"/bin/bash\", \"-lc\"]\n",
+      "carrier_sha256": "17d0dccbe530ee81eb9f11df24fffb4b4777daf5a0314f7cdbacc869baeb8980"
+    },
+    "command_review": {
+      "profile": "strhub-upstream-procedure/1",
+      "cited": "nanoRepeat.py -i path/to/NanoRepeat_v1.3_example_data/HG002/hg002_Q20.20210805_3flowcells.hs37d5.example_regions.bam -t bam -d ont_q20 -r path/to/NanoRepeat_v1.3_example_data/HG002/GRCh37_chr1.fasta -b path/to/NanoRepeat_v1.3_example_data/HG002/HG002_GRCh37_example_regions.bed -c 4 --samtools path/to/samtools --minimap2 path/to/minimap2 -o ./nanorepeat_output/HG002",
+      "command": "nanoRepeat.py -i path/to/NanoRepeat_v1.3_example_data/HG002/hg002_Q20.20210805_3flowcells.hs37d5.example_regions.bam -t bam -d ont_q20 -r path/to/NanoRepeat_v1.3_example_data/HG002/GRCh37_chr1.fasta -b path/to/NanoRepeat_v1.3_example_data/HG002/HG002_GRCh37_example_regions.bed -c 4 --samtools path/to/samtools --minimap2 path/to/minimap2 -o ./nanorepeat_output/HG002",
+      "substitutions": [],
+      "read_bindings": [],
+      "limitations": [
+        "the command names a different assembly from the registered hg38 dataset"
+      ],
+      "expected": "nanoRepeat.py -i path/to/NanoRepeat_v1.3_example_data/HG002/hg002_Q20.20210805_3flowcells.hs37d5.example_regions.bam -t bam -d ont_q20 -r path/to/NanoRepeat_v1.3_example_data/HG002/GRCh37_chr1.fasta -b path/to/NanoRepeat_v1.3_example_data/HG002/HG002_GRCh37_example_regions.bed -c 4 --samtools path/to/samtools --minimap2 path/to/minimap2 -o ./nanorepeat_output/HG002",
+      "executed": "nanoRepeat.py -i path/to/NanoRepeat_v1.3_example_data/HG002/hg002_Q20.20210805_3flowcells.hs37d5.example_regions.bam -t bam -d ont_q20 -r path/to/NanoRepeat_v1.3_example_data/HG002/GRCh37_chr1.fasta -b path/to/NanoRepeat_v1.3_example_data/HG002/HG002_GRCh37_example_regions.bed -c 4 --samtools path/to/samtools --minimap2 path/to/minimap2 -o ./nanorepeat_output/HG002",
+      "cited_sha256": "356d7d1e0d53d530be27ad24bca0344242b77ed4f09d908b40b42328ea4c39c1",
+      "executed_sha256": "356d7d1e0d53d530be27ad24bca0344242b77ed4f09d908b40b42328ea4c39c1",
+      "citations": [
+        {
+          "repo": "https://github.com/WGLab/NanoRepeat",
+          "ref": "aa5ceb4eb92bc92acc718434b2fcb9f387009084",
+          "path": "README.md",
+          "line": 69,
+          "verified": true,
+          "document_sha256": "e09599d4590f38afd7933ad749a43344ef2a7f9ce99a1ac32f98960517e3c325",
+          "command_sha256": "356d7d1e0d53d530be27ad24bca0344242b77ed4f09d908b40b42328ea4c39c1"
+        }
+      ]
+    },
+    "manifest_sha256": "09ed8b10ae6132451afe5cfe3ce7bde026ef155b052e24fa52089ceb7d83b37f",
+    "evidence_sha256": "ebb4b38604655e440d32de55cebfc4dc6ce2add04de5e1fac47f7e8bb506552d",
+    "evidence": {
+      "schema": "strhub-procedure-evidence/1",
+      "manifest": {
+        "caveats": {
+          "items": [
+            "Environment: STRhub transcribed the documented installation commands unchanged into its own carrier (Ubuntu 22.04, package lists refreshed, apt answering yes, plus Miniforge (conda, python, pip)).",
+            "Input: the README documents BAM and FASTQ (line 81); this plan selects STRhub's ont-bam-hg38 reference data. Supported platforms documented: ont, pacbio; STRhub selected ont for this trial.",
+            "Evaluator limitation: the command names a different assembly from the registered hg38 dataset.",
+            "Run command: the README's own command, rewritten to STRhub's mounts; the capture wrapper is planned only if the procedure review passes.",
+            "File: the documented command reads path/to/NanoRepeat_v1.3_example_data/HG002/HG002_GRCh37_example_regions.bed (after -b), which is neither in the repository nor among STRhub's data."
+          ],
+          "source": "detect_recipe"
+        },
+        "environment": {
+          "dockerfile": "Dockerfile",
+          "os": [
+            "ubuntu-22.04"
+          ],
+          "source": "documented"
+        },
+        "inputs": {
+          "type": "ont-bam-hg38"
+        },
+        "outputs": [
+          {
+            "format": "tsv",
+            "min_records": 1,
+            "path": "**/*.t[sx][vt]"
+          }
+        ],
+        "recipe": {
+          "origin": "proposed"
+        },
+        "report": {
+          "slug": "nanorepeat-ont"
+        },
+        "run": {
+          "cmd": "cd '.' && touch /tmp/.strhub_mark && ( nanoRepeat.py -i path/to/NanoRepeat_v1.3_example_data/HG002/hg002_Q20.20210805_3flowcells.hs37d5.example_regions.bam -t bam -d ont_q20 -r path/to/NanoRepeat_v1.3_example_data/HG002/GRCh37_chr1.fasta -b path/to/NanoRepeat_v1.3_example_data/HG002/HG002_GRCh37_example_regions.bed -c 4 --samtools path/to/samtools --minimap2 path/to/minimap2 -o ./nanorepeat_output/HG002 ); rc=$?; find . -xdev -type f -newer /tmp/.strhub_mark -size +0 ! -path './.git/*' ! -path './proc/*' ! -path './sys/*' ! -path './dev/*' ! -path './data/*' ! -path '*/__pycache__/*' ! -name '*.pyc' ! -name '*.pyo' 2>/dev/null | head -500 | while IFS= read -r f; do mkdir -p \"/data/out/$(dirname \"$f\")\" && cp \"$f\" \"/data/out/$f\"; done; exit $rc",
+          "timeout_minutes": 20
+        },
+        "source": {
+          "ref": "aa5ceb4eb92bc92acc718434b2fcb9f387009084",
+          "repo": "https://github.com/WGLab/NanoRepeat"
+        },
+        "submission": {
+          "by": "third_party"
+        },
+        "tool": {
+          "contact": "https://github.com/WGLab/NanoRepeat/issues",
+          "name": "NanoRepeat",
+          "version": "v1.8.3"
+        }
+      },
+      "proposal": {
+        "build": {
+          "also_published": null,
+          "asset": null,
+          "candidates": [
+            {
+              "file": "pyproject.toml",
+              "method": "pip"
+            },
+            {
+              "file": "setup.py",
+              "method": "pip"
+            }
+          ],
+          "digest": null,
+          "dir": null,
+          "evidence_source": "repo_file:pyproject.toml",
+          "file": "pyproject.toml",
+          "image": null,
+          "method": "pip",
+          "package": null,
+          "readme_install_lines": [
+            "conda create -n nanorepeat python=3.8",
+            "pip install .",
+            "conda create -n nanorepeat python=3.8",
+            "pip install NanoRepeat"
+          ],
+          "readme_line": null,
+          "spec_list": false,
+          "ssh_urls_in": [],
+          "tag": null,
+          "then": [],
+          "url": null
+        },
+        "commands": [
+          {
+            "cmd": "nanoRepeat.py -i path/to/NanoRepeat_v1.3_example_data/HG002/hg002_Q20.20210805_3flowcells.hs37d5.example_regions.bam -t bam -d ont_q20 -r path/to/NanoRepeat_v1.3_example_data/HG002/GRCh37_chr1.fasta -b path/to/NanoRepeat_v1.3_example_data/HG002/HG002_GRCh37_example_regions.bed -c 4 --samtools path/to/samtools --minimap2 path/to/minimap2 -o ./nanorepeat_output/HG002",
+            "entry_point": true,
+            "evidence_source": "README.md:L69",
+            "file": "README.md",
+            "has_input_flag": true,
+            "has_output_flag": true,
+            "help_only": false,
+            "invokes": "nanoRepeat.py",
+            "line": 69,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "readme",
+            "piped": false,
+            "rst": false,
+            "source_rank": 0,
+            "subcommand": null,
+            "synopsis": false
+          },
+          {
+            "cmd": "nanoRepeat-joint.py -i ./NanoRepeat_v1.3_example_data/HTT_amplicon/HTT_amplicon.fastq.gz -r ./NanoRepeat_v1.3_example_data/HTT_amplicon/GRCh38_chr4.0_4Mb.fasta -1 chr4:3074876:3074933:CAG:200 -2 chr4:3074946:3074966:CCG:20 -o ./joint_quantification_output/HTT -c 4",
+            "entry_point": false,
+            "evidence_source": "README.md:L193",
+            "file": "README.md",
+            "has_input_flag": true,
+            "has_output_flag": true,
+            "help_only": false,
+            "invokes": "nanoRepeat-joint.py",
+            "line": 193,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "readme",
+            "piped": false,
+            "rst": false,
+            "source_rank": 0,
+            "subcommand": null,
+            "synopsis": false
+          }
+        ],
+        "dockerfile": null,
+        "docs_read": [],
+        "docs_text": "",
+        "evidence": [
+          {
+            "claim": "install_method",
+            "kind": "tree",
+            "path": "pyproject.toml",
+            "text": "pip",
+            "url": "https://github.com/WGLab/NanoRepeat/blob/aa5ceb4eb92bc92acc718434b2fcb9f387009084/pyproject.toml"
+          },
+          {
+            "claim": "run_command",
+            "kind": "readme",
+            "line": 69,
+            "path": "README.md",
+            "text": "nanoRepeat.py \\",
+            "url": "https://github.com/WGLab/NanoRepeat/blob/aa5ceb4eb92bc92acc718434b2fcb9f387009084/README.md#L69"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "example_data/HTT_repeat_region.bed",
+            "text": "bed",
+            "url": "https://github.com/WGLab/NanoRepeat/blob/aa5ceb4eb92bc92acc718434b2fcb9f387009084/example_data/HTT_repeat_region.bed"
+          },
+          {
+            "claim": "known_issue",
+            "kind": "readme",
+            "line": 296,
+            "path": "README.md",
+            "text": "Limitation",
+            "url": "https://github.com/WGLab/NanoRepeat/blob/aa5ceb4eb92bc92acc718434b2fcb9f387009084/README.md#L296"
+          },
+          {
+            "claim": "documented_input",
+            "kind": "readme",
+            "line": 81,
+            "path": "README.md",
+            "text": "`-i` specifies the input file, which can be in `fasta`, `fastq` or `bam` format.",
+            "url": "https://github.com/WGLab/NanoRepeat/blob/aa5ceb4eb92bc92acc718434b2fcb9f387009084/README.md#L81"
+          }
+        ],
+        "example": null,
+        "example_data": [
+          {
+            "in_example_dir": false,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "example_data/HTT_repeat_region.bed",
+            "size": 50
+          }
+        ],
+        "inferences": {
+          "build": "repo_file:pyproject.toml",
+          "example": null,
+          "input_type": "README.md:L81",
+          "output": "README.md:L89",
+          "platform": "README.md:L1",
+          "regions": "README.md:L89",
+          "run_command": "README.md:L69",
+          "single_sample_bams": null
+        },
+        "input_type": {
+          "assembly": {
+            "against_hg38": null,
+            "declared": "both",
+            "evidence_source": "README.md:L87",
+            "hg19_evidence_source": "README.md:L62",
+            "hg19_hits": 9,
+            "hg38_evidence_source": "README.md:L87",
+            "hg38_hits": 1,
+            "incompatible_with_hg38": false
+          },
+          "best": "ont-bam-hg38",
+          "candidates": [
+            "ont-bam-hg38",
+            "ont-fastq"
+          ],
+          "evidence_source": "README.md:L81",
+          "how": "read",
+          "platform": "ont",
+          "platform_evidence_source": "README.md:L1",
+          "platform_how": "multi_stated",
+          "signals": {
+            "bam": 9,
+            "ce": 0,
+            "fastq": 15,
+            "hg19": 9,
+            "hg38": 1,
+            "illumina": 0,
+            "ont": 26,
+            "snp": 3,
+            "ystr": 0
+          },
+          "statements": {
+            "against": [],
+            "determined": true,
+            "inputs": [
+              {
+                "kind": "bam",
+                "line": 81,
+                "text": "`-i` specifies the input file, which can be in `fasta`, `fastq` or `bam` format."
+              },
+              {
+                "kind": "fastq",
+                "line": 81,
+                "text": "`-i` specifies the input file, which can be in `fasta`, `fastq` or `bam` format."
+              }
+            ],
+            "platform": [
+              {
+                "historical": false,
+                "line": 1,
+                "platform": "ont",
+                "text": "# NanoRepeat: quantification of Short Tandem Repeats (STRs) from long-read sequencing data (including ONT and PacBio)"
+              },
+              {
+                "historical": false,
+                "line": 1,
+                "platform": "pacbio",
+                "text": "# NanoRepeat: quantification of Short Tandem Repeats (STRs) from long-read sequencing data (including ONT and PacBio)"
+              }
+            ],
+            "recommendation": null
+          },
+          "statements_file": null,
+          "supported_platforms": [
+            {
+              "evidence_source": "README.md:L1",
+              "historical": false,
+              "line": 1,
+              "platform": "ont",
+              "text": "# NanoRepeat: quantification of Short Tandem Repeats (STRs) from long-read sequencing data (including ONT and PacBio)"
+            },
+            {
+              "evidence_source": "README.md:L1",
+              "historical": false,
+              "line": 1,
+              "platform": "pacbio",
+              "text": "# NanoRepeat: quantification of Short Tandem Repeats (STRs) from long-read sequencing data (including ONT and PacBio)"
+            }
+          ],
+          "unsupported": null,
+          "warnings": []
+        },
+        "known_issues": [
+          {
+            "heading": "Limitation",
+            "line": 296,
+            "text": "NanoRepeat can accuratly quantify simple repeats but cannot handle mixed repeats of different motifs (i.e. a mixture of `GCCA` and `AAATT`), but imperfect repeats of approximately the same motif are OK.",
+            "truncated": false,
+            "url": "https://github.com/WGLab/NanoRepeat/blob/aa5ceb4eb92bc92acc718434b2fcb9f387009084/README.md#L296"
+          }
+        ],
+        "limitations": [
+          "documented_file_missing"
+        ],
+        "output": {
+          "evidence_source": "README.md:L89",
+          "format": "tsv",
+          "signals": {
+            "csv": 0,
+            "json": 0,
+            "tsv": 20,
+            "vcf": 1
+          }
+        },
+        "packaging": {
+          "executables": [
+            "nanoRepeat",
+            "nanoRepeat-joint",
+            "nanoRepeat.py",
+            "nanoRepeat_joint.py"
+          ],
+          "packages": [
+            "NanoRepeat"
+          ]
+        },
+        "readme": {
+          "gaps": [],
+          "name": "README.md",
+          "sufficient_to_attempt": true
+        },
+        "readme_name": "README.md",
+        "readme_text": "# NanoRepeat: quantification of Short Tandem Repeats (STRs) from long-read sequencing data (including ONT and PacBio)\n\n[![PyPI version](https://badge.fury.io/py/NanoRepeat.svg)](https://badge.fury.io/py/NanoRepeat)\n[![DOI](https://www.zenodo.org/badge/DOI/10.5281/zenodo.7024484.svg)](https://www.zenodo.org/record/7024484)\n\n## Table of Contents\n\n- [Installation](#installation)\n- [Usage](#usage)\n  - [Regular use cases](#regular-use-cases)\n  - [Joint quantification of two adjacent repeats](#joint_quantification)\n- [Citation](#citation)\n- [Limitation](#limitation)\n- [Contact Us](#contact-us)\n\n## Installation\n\n#### Prerequisites:\n\n1. [Python](https://www.python.org/downloads/) (version >= 3.8)\n2. [Minimap2](https://github.com/lh3/minimap2) (version >= 2.22)\n\nYou may alreadly have `minimap2` if you performed analysis of long-read sequencing data. You can use `which minimap2` to check the full path to the two executable files. Please note that `minimap2` should be v2.22 or later. \n\nOnce you installed the above tools, you can use the following commands to install NanoRepeat (we recommend creating an new conda environment to avoid dependency issues):\n\n```\nconda create -n nanorepeat python=3.8\nconda activate nanorepeat\ngit clone https://github.com/WGLab/NanoRepeat.git\ncd NanoRepeat\npip install .\n```\n\nIf you want to install a stable version from Python Package Index (PyPI): \n\n```\nconda create -n nanorepeat python=3.8\nconda activate nanorepeat\npip install NanoRepeat\n```\nNotice: If you want to install NanoRepeat from a PyPI mirror, please check if the version in the mirror is update to date. \n\n## Usage\n\n### Regular use cases\n\nNanoRepeat can quantify STRs from targeted sequencing or whole-genome sequencing data. We will demonstrate the usage of NanoRepeat using an example data set, which can be downloaded using the following commands. \n\n```\nwget https://github.com/WGLab/NanoRepeat/releases/download/v1.3/NanoRepeat_v1.3_example_data.tar.bz2\ntar xjf NanoRepeat_v1.3_example_data.tar.bz2\n```\n\nAfter unzipping the file, you will see a `NanoRepeat_v1.3_example_data` folder and there are two subfolders: `HG002` and `HTT_amplicon`. In this section, we will use the data under the `HG002` folder. \n\n```\n$ ls -1  ./NanoRepeat_v1.3_example_data/HG002/ \nGRCh37_chr1.fasta\nGRCh37_chr1.fasta.fai\nHG002_GRCh37_example_regions.bed\nhg002_Q20.20210805_3flowcells.hs37d5.example_regions.bam\nhg002_Q20.20210805_3flowcells.hs37d5.example_regions.bam.bai\n```\n\nYou can use the following command to run NanoRepeat: \n\n```\nnanoRepeat.py \\\n    -i path/to/NanoRepeat_v1.3_example_data/HG002/hg002_Q20.20210805_3flowcells.hs37d5.example_regions.bam \\\n    -t bam \\\n    -d ont_q20 \\\n    -r path/to/NanoRepeat_v1.3_example_data/HG002/GRCh37_chr1.fasta \\\n    -b path/to/NanoRepeat_v1.3_example_data/HG002/HG002_GRCh37_example_regions.bed \\\n    -c 4 \\\n    --samtools path/to/samtools \\\n    --minimap2 path/to/minimap2 \\\n    -o ./nanorepeat_output/HG002\n```\n\n`-i` specifies the input file, which can be in `fasta`, `fastq` or `bam` format. In this case our input file is `hg002_Q20.20210805_3flowcells.hs37d5.example_regions.bam`. It is a subset of an Oxford Nanopore whole-genome sequencing dataset of the [NIST/GIAB HG002 (GM24385/NA24385)](https://catalog.coriell.org/0/Sections/Search/Sample_Detail.aspx?Ref=NA24385&Product=DNA) genome. The sequencing data was from the [Oxford Nanopore Technologies Benchmark Datasets](https://registry.opendata.aws/ont-open-data/) and reads from 15 example STR regions in `chr1` were extracted. These regions were selected because they overlap with the [HG002 SV benchmark set](https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/data/AshkenazimTrio/analysis/NIST_SVs_Integration_v0.6/HG002_SVs_Tier1_v0.6.vcf.gz) and are heterozygous (i.e., two alleles have different repeat sizes). \n\n`-t` specifies the input file type. There are four valid values: bam, cram, fastq or fasta. In this case the input file is in a bam file. \n\n`-d` specifies the data type. There are five valid values: `ont_q20`, `ont_sup`, `ont`, `hifi`, and `clr`. `ont_q20` is for Oxford Nanopore sequencing with Q20+ chemistry (such as R10 flowcells). `ont_sup` is for Oxford Nanopore sequencing with R9 flowcells and basecalled in super accuracy mode. `ont` is for Oxford Nanopore sequencing with R9 flowcells and basecalled in fast mode or high accuracy mode. `hifi` is for PacBio HiFi/CCS reads. `clr` is for PacBio Continuous Long Reads (CLR) reads. Default value: `ont`.\n\n`-r` specifies the reference genome file in `FASTA` format. In this case, `GRCh37_chr1.fasta` is chr1 of the GRCh37/hg19 reference genome. We used GRCh37 instead of GRCh38 because the HG002 SV benchmark set is based on GRCh37. \n\n`-b` specifies the information of the tandem repeat regions that you are interested in. It is a tab-delimited text file in BED format. There are four required columns: `chromosome`, `start_position`, `end_position`, `repeat_unit_sequence`. In our case, `HG002_GRCh37_example_regions.bed` contains 15 STR regions in chr1 of GRCh37. The first 5 rows of the `HG002_GRCh37_example_regions.bed` are shown below. \n\n| 1 | 4599903  | 4599930   | TTTAG   |\n|---|----------|-----------|---------|\n| 1 | 7923034  | 7923187   | TATTG   |\n| 1 | 8321418  | 8321465   | TTCC    |\n| 1 | 14459872 |  14459935 |  AAAG   |\n| 1 | 20934886 |  20934920 |  GTTTT  |\n\n**IMPORTANT NOTICE**\n1) Please note that in BED format, all chromosome positions start from 0. `start_position` is self-inclusive but `end_position` is NOT self-inclusive. Tip: If you have 1-based positons, simply decrease the value of `start_position` by 1 and no changes for `end_position`\n\n2) NanoRepeat assumes that the seqeunce between `start_position` and `end_position` are all repeats of the motif specified in the fourth column. There should be neither non-repeat sequences nor other repeat motifs between `start_position` and `end_position`. If a region contains two consecutive repeats, you can specify them in two rows. \n\n`-c` specifies the number of CPU cores for alignment. \n\n`-o` specifies the output prefix. Please include the path to the output directory and prefix of output file names. In our case, the output prefix is `./nanorepeat_output/HG002`, which means the output directory is `./nanorepeat_output/` and the prefix of output file names is `HG002`.\n\n`--samtools` and `--minimap2` specifies the path to the two software tools. The two arguments are optional if `samtools` and `minimap2` and be found in your environment. \n\nIf you run NanoRepeat sucessfully, you will see 90 output files (six files per region). Output files of a single repeat region look like this: \n\n```\nHG002.1-7923034-7923187-TATTG.allele1.fastq\nHG002.1-7923034-7923187-TATTG.allele2.fastq\nHG002.1-7923034-7923187-TATTG.hist.png\nHG002.1-7923034-7923187-TATTG.phased_reads.txt\nHG002.1-7923034-7923187-TATTG.repeat_size.txt\nHG002.1-7923034-7923187-TATTG.summary.txt\n```\n\n`HG002.1-7923034-7923187-TATTG.allele1.fastq` and `HG002.1-7923034-7923187-TATTG.allele2.fastq` are reads of each allele. \n\n`HG002.1-7923034-7923187-TATTG.hist.png` is a histogram showing the repeat size distribution. Each allele has a different color.\n<p align=\"center\"><img src=\"images/HG002.1-7923034-7923187-TATTG.hist.png\" width=\"50%\"></p>\n\n\n`HG002.1-7923034-7923187-TATTG.phased_reads.txt` shows the phasing results. First 10 lines of the `HG002.1-7923034-7923187-TATTG.phased_reads.txt` are shown below. \n\n```\n$ head HG002.1-7923034-7923187-TATTG.phased_reads.txt\n##RepeatRegion=1-7923034-7923187-TATTG\n#Read_Name\tAllele_ID\tPhasing_Confidence\tRepeat_Size\n746edfa7-715f-4e97-913e-ef73ed97135f\t1\tHIGH\t14.0\nd6355053-0ed2-438e-8469-28cabeb2aedf\t1\tHIGH\t17.0\n513a749a-6ffc-47c4-a499-9f9222e93abf\t1\tHIGH\t17.0\nfc8dc377-8772-4dc0-922d-ad694deec8d7\t1\tHIGH\t17.0\ncd847c0e-9fbf-4abf-8f0a-ea938026ef41\t1\tHIGH\t17.0\nf53bc376-69b4-4118-87e1-59379c640408\t1\tHIGH\t17.0\n9b70cd2a-c1df-447a-a7aa-b5ab8046115e\t1\tHIGH\t17.0\n6a9b6f5b-d59d-4dde-9adb-8e6ac91cc6e4\t1\tHIGH\t17.0\n```\n\nThe columns of the `*.phased_reads.txt` file: \n\n| Column | Description                                  |\n|:------:|----------------------------------------------|\n|    1   | Read_Name                                    |\n|    2   | Allele_ID                                    |\n|    3   | Phasing_Confidence (two values: HIGH or LOW) |\n|    4   | Repeat_Size                                  |\n\n`HG002.1-7923034-7923187-TATTG.repeat_size.txt` is the estimated repeat sizes of ALL reads. This file is similar to the `*.phased_reads.txt` file but it also includes reads that may be removed in the phasing process (e.g. reads considered as noisy reads or outliers)\n\n```\n$ head HG002.1-7923034-7923187-TATTG.repeat_size.txt\n##Repeat_Region=1-7923034-7923187-TATTG\n#Read_Name\tRepeat_Size\n746edfa7-715f-4e97-913e-ef73ed97135f\t14.0\nd6355053-0ed2-438e-8469-28cabeb2aedf\t17.0\ndadaf0a0-8797-47ca-a21b-259928edca7e\t48.0\n513a749a-6ffc-47c4-a499-9f9222e93abf\t17.0\n07f65d31-4023-4d86-beba-76fb88f2cf45\t48.0\n4e66c3d0-6f15-4ff7-a8a8-d5c95d57e73d\t48.0\nfc8dc377-8772-4dc0-922d-ad694deec8d7\t17.0\ncd847c0e-9fbf-4abf-8f0a-ea938026ef41\t17.0\n```\n\n`HG002.1-7923034-7923187-TATTG.summary.txt` gives the quantification of the repeat size. It has the following information: 1) repeat region; 2) number of detected alleles; 3) repeat size of each allele; 4) number of reads of each allele; 5) number of removed reads.\n\n```\n$ cat HG002.1-7923034-7923187-TATTG.summary.txt\nRepeat_Region=1-7923034-7923187-TATTG\tMethod=GMM\tNum_Alleles=2\tNum_Removed_Reads=0\tAllele1_Num_Reads=33\tAllele1_Repeat_Size=17\tAllele2_Num_Reads=19\tAllele2_Repeat_Size=48\n```\n\n### <a name=\"joint_quantification\"> Joint quantification of two adjacent STRs (such as the `CAG` and `CCG` repeats in the HTT gene)\n\nSometimes two STRs are next to each other. For example, in exon-1 of the human HTT gene, there are two adjacent STRs: `CAG` and `CCG`. The sequence structure is: (CAG)<sub>m</sub>-CAA-CAG-CCG-CCA-(CCG)<sub>n</sub>. NanoRepeat can jointly quantify the two STRs and provide phased results. In our experience, looking at both repeats help generate better quantification results. \n\t\nWe will demonstrate the joint quantification using the same example dataset (described in the above section). If you have not downloaded the dataset, you can execute following commands. \n\n```\nwget https://github.com/WGLab/NanoRepeat/releases/download/v1.3/NanoRepeat_v1.3_example_data.tar.bz2\ntar xjf NanoRepeat_v1.3_example_data.tar.bz2\n```\n\nAfter unzipping the file, you will see a `NanoRepeat_v1.2_example_data` folder and there are two subfolders: `HG002` and `HTT_amplicon`. In this section, we will use the data under the `HTT_amplicon` folder. \n\t\nThe input fastq file is here: `./NanoRepeat_v1.2_example_data/HTT_amplicon/HTT_amplicon.fastq.gz`.\n\t\nThe reference fasta file is here: `./NanoRepeat_v1.2_example_data/HTT_amplicon/GRCh38_chr4.0_4Mb.fasta`.\n\nYou can use the following command to run `NanoRepeat-joint`:\n```\nnanoRepeat-joint.py  \\\n    -i ./NanoRepeat_v1.3_example_data/HTT_amplicon/HTT_amplicon.fastq.gz \\\n    -r ./NanoRepeat_v1.3_example_data/HTT_amplicon/GRCh38_chr4.0_4Mb.fasta \\\n    -1 chr4:3074876:3074933:CAG:200      \\\n    -2 chr4:3074946:3074966:CCG:20       \\\n    -o ./joint_quantification_output/HTT \\\n    -c 4\n```\n\n`-1` and `-2` specify the two repeat regions. The format of `-1`  and `-2` is `chrom:start_position:end_position:repeat_unit:max_size`. The start and end positions are 0-based (the first base on the chromosome is numbered 0). The start position is self-inclusive but the end position is non-inclusive, which is the same as the [BED format](https://genome.ucsc.edu/FAQ/FAQformat.html#format1). For example, a region of the first 100 bases of chr1 is denoted as `chr1:0:100`.  `max_size` is the max repeat length that we consider. Please set `max_size` to be a reasonal number. If `max_size` is too large (e.g. well beyond the max possible number), the speed of joint quantification might be slow.\n\n\nIf you run NanoRepeat sucessfully, you will see the following files in the `./joint_quantification_output` folder. \n\n```\nHTT.allele1.fastq\nHTT.allele2.fastq\nHTT.chr4-3074876-3074933-CAG.hist.png\nHTT.chr4-3074946-3074966-CCG.hist.png\nHTT.hist2d.png\nHTT.phased_reads.txt\nHTT.repeat_size.txt\nHTT.scatter.png\nHTT.summary.txt\n```\n\n`HTT.allele1.fastq` and `HTT.allele2.fastq` are the reads assigned to each allele. \n\n`HTT.chr4-3074876-3074933-CAG.hist.png` is a histogram showing the repeat size distribution of the first repeat (chr4-3074876-3074933-CAG).\n\n<p align=\"center\"><img src=\"images/HTT.chr4-3074876-3074933-CAG.hist.png\" width=\"50%\"></p>\n\n`HTT.chr4-3074946-3074966-CCG.hist.png` is a histogram showing the repeat size distribution of the second repeat (chr4-3074946-3074966-CCG). \n\n<p align=\"center\"><img src=\"images/HTT.chr4-3074946-3074966-CCG.hist.png\" width=\"50%\"></p>\n\n`HTT.hist2d.png` is a two-dimensional histogram showing the joint distribution of the two repeats. \n\n<p align=\"center\"><img src=\"images/HTT.hist2d.png\" width=\"50%\"></p>\n\n`HTT.scatter.png` is a scatter plot showing the joint distribution of the two repeats. The dotted lines indicates the 95% equi-probability surface of the Gaussian mixture models.\n\n<p align=\"center\"><img src=\"images/HTT.scatter.png\" width=\"50%\"></p>\n\n\n`HTT.phased_reads.txt` shows the phasing results. The first line is the path to the input FASTQ file. Lines 2-9 of the `HTT.phased_reads.txt` file are shown below (as a table). \n\n| #Read_Name | Allele_ID | Phasing_Confidence | chr4-3074876-3074933-CAG.Repeat_Size | chr4-3074946-3074966-CCG.Repeat_Size |\n|---|:---:|:---:|:---:|:---:|\n| ONT_read330 | 1 | HIGH | 13.5 | 8 |\n| ONT_read1284 | 1 | HIGH | 17 | 11.5 |\n| ONT_read579 | 1 | HIGH | 16 | 10 |\n| ONT_read838 | 1 | HIGH | 15.5 | 10 |\n| ONT_read520 | 1 | LOW | 25 | 13 |\n| ONT_read1066 | 1 | HIGH | 17.5 | 10 |\n| ONT_read1059 | 1 | HIGH | 16 | 10.5 |\n| ONT_read526 | 1 | HIGH | 17 | 10 |\n\nThe `*summary.txt` file gives the quantification of the repeat sizes. It has the following information: \n1) input file\n2) number of alleles\n3) number of reads for each allele\n4) quantification of repeat sizes of each allele\n\nThe content of `HTT.summary.txt` is shown below: \n\n| Input_FASTQ | path/to/HTT_amplicon.fastq.gz |\n|---|---|\n| Method | 2D-GMM |\n| Num_Alleles | 2 |\n| Num_Removed_Reads | 0 |\n| Allele1_Num_Reads | 733 |\n| Allele1_chr4-3074876-3074933-CAG.Repeat_Size | 17 |\n| Allele1_chr4-3074946-3074966-CCG.Repeat_Size | 10 |\n| Allele2_Num_Reads | 856 |\n| Allele2_chr4-3074876-3074933-CAG.Repeat_Size | 55 |\n| Allele2_chr4-3074946-3074966-CCG.Repeat_Size | 7 |\n\n\n## Citation\nIf you use NanoRepeat, please cite: \n\nFang L, Monteys AM, D\u00fcrr A, Keiser M, Cheng C, Harapanahalli A, et al. Haplotyping SNPs for allele-specific gene editing of the expanded huntingtin allele using long-read sequencing. Human Genetics and Genomics Advances. 2023;4(1):100146. DOI: https://doi.org/10.1016/j.xhgg.2022.100146.\n\n\nBibTeX format: \n\n```\n@article{FANG2023100146,\n\ttitle = {Haplotyping SNPs for allele-specific gene editing of the expanded huntingtin allele using long-read sequencing},\n\tjournal = {Human Genetics and Genomics Advances},\n\tvolume = {4},\n\tnumber = {1},\n\tpages = {100146},\n\tyear = {2023},\n\tissn = {2666-2477},\n\tdoi = {https://doi.org/10.1016/j.xhgg.2022.100146},\n\turl = {https://www.sciencedirect.com/science/article/pii/S266624772200063X},\n\tauthor = {Li Fang and Alex Mas Monteys and Alexandra D\u00fcrr and Megan Keiser and Congsheng Cheng and Akhil Harapanahalli and Pedro Gonzalez-Alegre and Beverly L. Davidson and Kai Wang},\n\tkeywords = {Huntington\u2019s disease, long-read sequencing, CRISPR, SNP, repeat detection}\n}\n\n```\n## Limitation\nNanoRepeat can accuratly quantify simple repeats but cannot handle mixed repeats of different motifs (i.e. a mixture of `GCCA` and `AAATT`), but imperfect repeats of approximately the same motif are OK. \n\n## Contact Us\n\nIf you need any help from us, you are welcome to raise an issue at the issue page. You can also contact Dr. Li Fang (fangli9@sysu.edu.cn) or Dr. Kai Wang (wangk@chop.edu).\n",
+        "ref": "aa5ceb4eb92bc92acc718434b2fcb9f387009084",
+        "regions": {
+          "ambiguous": false,
+          "candidates": [
+            {
+              "end_line": 89,
+              "evidence_source": "README.md:L89",
+              "file": "README.md",
+              "format": "motif",
+              "line": 89,
+              "text": "`-b` specifies the information of the tandem repeat regions that you are interested in. It is a tab-delimited text file in BED format. There are four required columns: `chromosome`, `start_position`, `end_position`, `repeat_unit_sequence`. In our case, `HG002_GRCh37_example_regions.bed` contains 15 "
+            }
+          ],
+          "end_line": 89,
+          "evidence_source": "README.md:L89",
+          "file": "README.md",
+          "format": "motif",
+          "line": 89,
+          "text": "`-b` specifies the information of the tandem repeat regions that you are interested in. It is a tab-delimited text file in BED format. There are four required columns: `chromosome`, `start_position`, `end_position`, `repeat_unit_sequence`. In our case, `HG002_GRCh37_example_regions.bed` contains 15 "
+        },
+        "registry": {
+          "bioconda": {},
+          "documented": []
+        },
+        "repo": "https://github.com/WGLab/NanoRepeat",
+        "schema": "strhub-verified/recipe-proposal/1",
+        "single_sample_bams": {
+          "allowed": false,
+          "evidence_source": null,
+          "file": null,
+          "line": null,
+          "paired_flags": [],
+          "text": null
+        },
+        "source_documents": [
+          {
+            "file": "README.md",
+            "origin": "readme",
+            "text": "# NanoRepeat: quantification of Short Tandem Repeats (STRs) from long-read sequencing data (including ONT and PacBio)\n\n[![PyPI version](https://badge.fury.io/py/NanoRepeat.svg)](https://badge.fury.io/py/NanoRepeat)\n[![DOI](https://www.zenodo.org/badge/DOI/10.5281/zenodo.7024484.svg)](https://www.zenodo.org/record/7024484)\n\n## Table of Contents\n\n- [Installation](#installation)\n- [Usage](#usage)\n  - [Regular use cases](#regular-use-cases)\n  - [Joint quantification of two adjacent repeats](#joint_quantification)\n- [Citation](#citation)\n- [Limitation](#limitation)\n- [Contact Us](#contact-us)\n\n## Installation\n\n#### Prerequisites:\n\n1. [Python](https://www.python.org/downloads/) (version >= 3.8)\n2. [Minimap2](https://github.com/lh3/minimap2) (version >= 2.22)\n\nYou may alreadly have `minimap2` if you performed analysis of long-read sequencing data. You can use `which minimap2` to check the full path to the two executable files. Please note that `minimap2` should be v2.22 or later. \n\nOnce you installed the above tools, you can use the following commands to install NanoRepeat (we recommend creating an new conda environment to avoid dependency issues):\n\n```\nconda create -n nanorepeat python=3.8\nconda activate nanorepeat\ngit clone https://github.com/WGLab/NanoRepeat.git\ncd NanoRepeat\npip install .\n```\n\nIf you want to install a stable version from Python Package Index (PyPI): \n\n```\nconda create -n nanorepeat python=3.8\nconda activate nanorepeat\npip install NanoRepeat\n```\nNotice: If you want to install NanoRepeat from a PyPI mirror, please check if the version in the mirror is update to date. \n\n## Usage\n\n### Regular use cases\n\nNanoRepeat can quantify STRs from targeted sequencing or whole-genome sequencing data. We will demonstrate the usage of NanoRepeat using an example data set, which can be downloaded using the following commands. \n\n```\nwget https://github.com/WGLab/NanoRepeat/releases/download/v1.3/NanoRepeat_v1.3_example_data.tar.bz2\ntar xjf NanoRepeat_v1.3_example_data.tar.bz2\n```\n\nAfter unzipping the file, you will see a `NanoRepeat_v1.3_example_data` folder and there are two subfolders: `HG002` and `HTT_amplicon`. In this section, we will use the data under the `HG002` folder. \n\n```\n$ ls -1  ./NanoRepeat_v1.3_example_data/HG002/ \nGRCh37_chr1.fasta\nGRCh37_chr1.fasta.fai\nHG002_GRCh37_example_regions.bed\nhg002_Q20.20210805_3flowcells.hs37d5.example_regions.bam\nhg002_Q20.20210805_3flowcells.hs37d5.example_regions.bam.bai\n```\n\nYou can use the following command to run NanoRepeat: \n\n```\nnanoRepeat.py \\\n    -i path/to/NanoRepeat_v1.3_example_data/HG002/hg002_Q20.20210805_3flowcells.hs37d5.example_regions.bam \\\n    -t bam \\\n    -d ont_q20 \\\n    -r path/to/NanoRepeat_v1.3_example_data/HG002/GRCh37_chr1.fasta \\\n    -b path/to/NanoRepeat_v1.3_example_data/HG002/HG002_GRCh37_example_regions.bed \\\n    -c 4 \\\n    --samtools path/to/samtools \\\n    --minimap2 path/to/minimap2 \\\n    -o ./nanorepeat_output/HG002\n```\n\n`-i` specifies the input file, which can be in `fasta`, `fastq` or `bam` format. In this case our input file is `hg002_Q20.20210805_3flowcells.hs37d5.example_regions.bam`. It is a subset of an Oxford Nanopore whole-genome sequencing dataset of the [NIST/GIAB HG002 (GM24385/NA24385)](https://catalog.coriell.org/0/Sections/Search/Sample_Detail.aspx?Ref=NA24385&Product=DNA) genome. The sequencing data was from the [Oxford Nanopore Technologies Benchmark Datasets](https://registry.opendata.aws/ont-open-data/) and reads from 15 example STR regions in `chr1` were extracted. These regions were selected because they overlap with the [HG002 SV benchmark set](https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/data/AshkenazimTrio/analysis/NIST_SVs_Integration_v0.6/HG002_SVs_Tier1_v0.6.vcf.gz) and are heterozygous (i.e., two alleles have different repeat sizes). \n\n`-t` specifies the input file type. There are four valid values: bam, cram, fastq or fasta. In this case the input file is in a bam file. \n\n`-d` specifies the data type. There are five valid values: `ont_q20`, `ont_sup`, `ont`, `hifi`, and `clr`. `ont_q20` is for Oxford Nanopore sequencing with Q20+ chemistry (such as R10 flowcells). `ont_sup` is for Oxford Nanopore sequencing with R9 flowcells and basecalled in super accuracy mode. `ont` is for Oxford Nanopore sequencing with R9 flowcells and basecalled in fast mode or high accuracy mode. `hifi` is for PacBio HiFi/CCS reads. `clr` is for PacBio Continuous Long Reads (CLR) reads. Default value: `ont`.\n\n`-r` specifies the reference genome file in `FASTA` format. In this case, `GRCh37_chr1.fasta` is chr1 of the GRCh37/hg19 reference genome. We used GRCh37 instead of GRCh38 because the HG002 SV benchmark set is based on GRCh37. \n\n`-b` specifies the information of the tandem repeat regions that you are interested in. It is a tab-delimited text file in BED format. There are four required columns: `chromosome`, `start_position`, `end_position`, `repeat_unit_sequence`. In our case, `HG002_GRCh37_example_regions.bed` contains 15 STR regions in chr1 of GRCh37. The first 5 rows of the `HG002_GRCh37_example_regions.bed` are shown below. \n\n| 1 | 4599903  | 4599930   | TTTAG   |\n|---|----------|-----------|---------|\n| 1 | 7923034  | 7923187   | TATTG   |\n| 1 | 8321418  | 8321465   | TTCC    |\n| 1 | 14459872 |  14459935 |  AAAG   |\n| 1 | 20934886 |  20934920 |  GTTTT  |\n\n**IMPORTANT NOTICE**\n1) Please note that in BED format, all chromosome positions start from 0. `start_position` is self-inclusive but `end_position` is NOT self-inclusive. Tip: If you have 1-based positons, simply decrease the value of `start_position` by 1 and no changes for `end_position`\n\n2) NanoRepeat assumes that the seqeunce between `start_position` and `end_position` are all repeats of the motif specified in the fourth column. There should be neither non-repeat sequences nor other repeat motifs between `start_position` and `end_position`. If a region contains two consecutive repeats, you can specify them in two rows. \n\n`-c` specifies the number of CPU cores for alignment. \n\n`-o` specifies the output prefix. Please include the path to the output directory and prefix of output file names. In our case, the output prefix is `./nanorepeat_output/HG002`, which means the output directory is `./nanorepeat_output/` and the prefix of output file names is `HG002`.\n\n`--samtools` and `--minimap2` specifies the path to the two software tools. The two arguments are optional if `samtools` and `minimap2` and be found in your environment. \n\nIf you run NanoRepeat sucessfully, you will see 90 output files (six files per region). Output files of a single repeat region look like this: \n\n```\nHG002.1-7923034-7923187-TATTG.allele1.fastq\nHG002.1-7923034-7923187-TATTG.allele2.fastq\nHG002.1-7923034-7923187-TATTG.hist.png\nHG002.1-7923034-7923187-TATTG.phased_reads.txt\nHG002.1-7923034-7923187-TATTG.repeat_size.txt\nHG002.1-7923034-7923187-TATTG.summary.txt\n```\n\n`HG002.1-7923034-7923187-TATTG.allele1.fastq` and `HG002.1-7923034-7923187-TATTG.allele2.fastq` are reads of each allele. \n\n`HG002.1-7923034-7923187-TATTG.hist.png` is a histogram showing the repeat size distribution. Each allele has a different color.\n<p align=\"center\"><img src=\"images/HG002.1-7923034-7923187-TATTG.hist.png\" width=\"50%\"></p>\n\n\n`HG002.1-7923034-7923187-TATTG.phased_reads.txt` shows the phasing results. First 10 lines of the `HG002.1-7923034-7923187-TATTG.phased_reads.txt` are shown below. \n\n```\n$ head HG002.1-7923034-7923187-TATTG.phased_reads.txt\n##RepeatRegion=1-7923034-7923187-TATTG\n#Read_Name\tAllele_ID\tPhasing_Confidence\tRepeat_Size\n746edfa7-715f-4e97-913e-ef73ed97135f\t1\tHIGH\t14.0\nd6355053-0ed2-438e-8469-28cabeb2aedf\t1\tHIGH\t17.0\n513a749a-6ffc-47c4-a499-9f9222e93abf\t1\tHIGH\t17.0\nfc8dc377-8772-4dc0-922d-ad694deec8d7\t1\tHIGH\t17.0\ncd847c0e-9fbf-4abf-8f0a-ea938026ef41\t1\tHIGH\t17.0\nf53bc376-69b4-4118-87e1-59379c640408\t1\tHIGH\t17.0\n9b70cd2a-c1df-447a-a7aa-b5ab8046115e\t1\tHIGH\t17.0\n6a9b6f5b-d59d-4dde-9adb-8e6ac91cc6e4\t1\tHIGH\t17.0\n```\n\nThe columns of the `*.phased_reads.txt` file: \n\n| Column | Description                                  |\n|:------:|----------------------------------------------|\n|    1   | Read_Name                                    |\n|    2   | Allele_ID                                    |\n|    3   | Phasing_Confidence (two values: HIGH or LOW) |\n|    4   | Repeat_Size                                  |\n\n`HG002.1-7923034-7923187-TATTG.repeat_size.txt` is the estimated repeat sizes of ALL reads. This file is similar to the `*.phased_reads.txt` file but it also includes reads that may be removed in the phasing process (e.g. reads considered as noisy reads or outliers)\n\n```\n$ head HG002.1-7923034-7923187-TATTG.repeat_size.txt\n##Repeat_Region=1-7923034-7923187-TATTG\n#Read_Name\tRepeat_Size\n746edfa7-715f-4e97-913e-ef73ed97135f\t14.0\nd6355053-0ed2-438e-8469-28cabeb2aedf\t17.0\ndadaf0a0-8797-47ca-a21b-259928edca7e\t48.0\n513a749a-6ffc-47c4-a499-9f9222e93abf\t17.0\n07f65d31-4023-4d86-beba-76fb88f2cf45\t48.0\n4e66c3d0-6f15-4ff7-a8a8-d5c95d57e73d\t48.0\nfc8dc377-8772-4dc0-922d-ad694deec8d7\t17.0\ncd847c0e-9fbf-4abf-8f0a-ea938026ef41\t17.0\n```\n\n`HG002.1-7923034-7923187-TATTG.summary.txt` gives the quantification of the repeat size. It has the following information: 1) repeat region; 2) number of detected alleles; 3) repeat size of each allele; 4) number of reads of each allele; 5) number of removed reads.\n\n```\n$ cat HG002.1-7923034-7923187-TATTG.summary.txt\nRepeat_Region=1-7923034-7923187-TATTG\tMethod=GMM\tNum_Alleles=2\tNum_Removed_Reads=0\tAllele1_Num_Reads=33\tAllele1_Repeat_Size=17\tAllele2_Num_Reads=19\tAllele2_Repeat_Size=48\n```\n\n### <a name=\"joint_quantification\"> Joint quantification of two adjacent STRs (such as the `CAG` and `CCG` repeats in the HTT gene)\n\nSometimes two STRs are next to each other. For example, in exon-1 of the human HTT gene, there are two adjacent STRs: `CAG` and `CCG`. The sequence structure is: (CAG)<sub>m</sub>-CAA-CAG-CCG-CCA-(CCG)<sub>n</sub>. NanoRepeat can jointly quantify the two STRs and provide phased results. In our experience, looking at both repeats help generate better quantification results. \n\t\nWe will demonstrate the joint quantification using the same example dataset (described in the above section). If you have not downloaded the dataset, you can execute following commands. \n\n```\nwget https://github.com/WGLab/NanoRepeat/releases/download/v1.3/NanoRepeat_v1.3_example_data.tar.bz2\ntar xjf NanoRepeat_v1.3_example_data.tar.bz2\n```\n\nAfter unzipping the file, you will see a `NanoRepeat_v1.2_example_data` folder and there are two subfolders: `HG002` and `HTT_amplicon`. In this section, we will use the data under the `HTT_amplicon` folder. \n\t\nThe input fastq file is here: `./NanoRepeat_v1.2_example_data/HTT_amplicon/HTT_amplicon.fastq.gz`.\n\t\nThe reference fasta file is here: `./NanoRepeat_v1.2_example_data/HTT_amplicon/GRCh38_chr4.0_4Mb.fasta`.\n\nYou can use the following command to run `NanoRepeat-joint`:\n```\nnanoRepeat-joint.py  \\\n    -i ./NanoRepeat_v1.3_example_data/HTT_amplicon/HTT_amplicon.fastq.gz \\\n    -r ./NanoRepeat_v1.3_example_data/HTT_amplicon/GRCh38_chr4.0_4Mb.fasta \\\n    -1 chr4:3074876:3074933:CAG:200      \\\n    -2 chr4:3074946:3074966:CCG:20       \\\n    -o ./joint_quantification_output/HTT \\\n    -c 4\n```\n\n`-1` and `-2` specify the two repeat regions. The format of `-1`  and `-2` is `chrom:start_position:end_position:repeat_unit:max_size`. The start and end positions are 0-based (the first base on the chromosome is numbered 0). The start position is self-inclusive but the end position is non-inclusive, which is the same as the [BED format](https://genome.ucsc.edu/FAQ/FAQformat.html#format1). For example, a region of the first 100 bases of chr1 is denoted as `chr1:0:100`.  `max_size` is the max repeat length that we consider. Please set `max_size` to be a reasonal number. If `max_size` is too large (e.g. well beyond the max possible number), the speed of joint quantification might be slow.\n\n\nIf you run NanoRepeat sucessfully, you will see the following files in the `./joint_quantification_output` folder. \n\n```\nHTT.allele1.fastq\nHTT.allele2.fastq\nHTT.chr4-3074876-3074933-CAG.hist.png\nHTT.chr4-3074946-3074966-CCG.hist.png\nHTT.hist2d.png\nHTT.phased_reads.txt\nHTT.repeat_size.txt\nHTT.scatter.png\nHTT.summary.txt\n```\n\n`HTT.allele1.fastq` and `HTT.allele2.fastq` are the reads assigned to each allele. \n\n`HTT.chr4-3074876-3074933-CAG.hist.png` is a histogram showing the repeat size distribution of the first repeat (chr4-3074876-3074933-CAG).\n\n<p align=\"center\"><img src=\"images/HTT.chr4-3074876-3074933-CAG.hist.png\" width=\"50%\"></p>\n\n`HTT.chr4-3074946-3074966-CCG.hist.png` is a histogram showing the repeat size distribution of the second repeat (chr4-3074946-3074966-CCG). \n\n<p align=\"center\"><img src=\"images/HTT.chr4-3074946-3074966-CCG.hist.png\" width=\"50%\"></p>\n\n`HTT.hist2d.png` is a two-dimensional histogram showing the joint distribution of the two repeats. \n\n<p align=\"center\"><img src=\"images/HTT.hist2d.png\" width=\"50%\"></p>\n\n`HTT.scatter.png` is a scatter plot showing the joint distribution of the two repeats. The dotted lines indicates the 95% equi-probability surface of the Gaussian mixture models.\n\n<p align=\"center\"><img src=\"images/HTT.scatter.png\" width=\"50%\"></p>\n\n\n`HTT.phased_reads.txt` shows the phasing results. The first line is the path to the input FASTQ file. Lines 2-9 of the `HTT.phased_reads.txt` file are shown below (as a table). \n\n| #Read_Name | Allele_ID | Phasing_Confidence | chr4-3074876-3074933-CAG.Repeat_Size | chr4-3074946-3074966-CCG.Repeat_Size |\n|---|:---:|:---:|:---:|:---:|\n| ONT_read330 | 1 | HIGH | 13.5 | 8 |\n| ONT_read1284 | 1 | HIGH | 17 | 11.5 |\n| ONT_read579 | 1 | HIGH | 16 | 10 |\n| ONT_read838 | 1 | HIGH | 15.5 | 10 |\n| ONT_read520 | 1 | LOW | 25 | 13 |\n| ONT_read1066 | 1 | HIGH | 17.5 | 10 |\n| ONT_read1059 | 1 | HIGH | 16 | 10.5 |\n| ONT_read526 | 1 | HIGH | 17 | 10 |\n\nThe `*summary.txt` file gives the quantification of the repeat sizes. It has the following information: \n1) input file\n2) number of alleles\n3) number of reads for each allele\n4) quantification of repeat sizes of each allele\n\nThe content of `HTT.summary.txt` is shown below: \n\n| Input_FASTQ | path/to/HTT_amplicon.fastq.gz |\n|---|---|\n| Method | 2D-GMM |\n| Num_Alleles | 2 |\n| Num_Removed_Reads | 0 |\n| Allele1_Num_Reads | 733 |\n| Allele1_chr4-3074876-3074933-CAG.Repeat_Size | 17 |\n| Allele1_chr4-3074946-3074966-CCG.Repeat_Size | 10 |\n| Allele2_Num_Reads | 856 |\n| Allele2_chr4-3074876-3074933-CAG.Repeat_Size | 55 |\n| Allele2_chr4-3074946-3074966-CCG.Repeat_Size | 7 |\n\n\n## Citation\nIf you use NanoRepeat, please cite: \n\nFang L, Monteys AM, D\u00fcrr A, Keiser M, Cheng C, Harapanahalli A, et al. Haplotyping SNPs for allele-specific gene editing of the expanded huntingtin allele using long-read sequencing. Human Genetics and Genomics Advances. 2023;4(1):100146. DOI: https://doi.org/10.1016/j.xhgg.2022.100146.\n\n\nBibTeX format: \n\n```\n@article{FANG2023100146,\n\ttitle = {Haplotyping SNPs for allele-specific gene editing of the expanded huntingtin allele using long-read sequencing},\n\tjournal = {Human Genetics and Genomics Advances},\n\tvolume = {4},\n\tnumber = {1},\n\tpages = {100146},\n\tyear = {2023},\n\tissn = {2666-2477},\n\tdoi = {https://doi.org/10.1016/j.xhgg.2022.100146},\n\turl = {https://www.sciencedirect.com/science/article/pii/S266624772200063X},\n\tauthor = {Li Fang and Alex Mas Monteys and Alexandra D\u00fcrr and Megan Keiser and Congsheng Cheng and Akhil Harapanahalli and Pedro Gonzalez-Alegre and Beverly L. Davidson and Kai Wang},\n\tkeywords = {Huntington\u2019s disease, long-read sequencing, CRISPR, SNP, repeat detection}\n}\n\n```\n## Limitation\nNanoRepeat can accuratly quantify simple repeats but cannot handle mixed repeats of different motifs (i.e. a mixture of `GCCA` and `AAATT`), but imperfect repeats of approximately the same motif are OK. \n\n## Contact Us\n\nIf you need any help from us, you are welcome to raise an issue at the issue page. You can also contact Dr. Li Fang (fangli9@sysu.edu.cn) or Dr. Kai Wang (wangk@chop.edu).\n"
+          }
+        ],
+        "tool_names": [
+          "NanoRepeat",
+          "nanoRepeat",
+          "nanoRepeat-joint",
+          "nanoRepeat.py",
+          "nanoRepeat_bam",
+          "nanoRepeat_bam.py",
+          "nanoRepeat_joint",
+          "nanoRepeat_joint.py",
+          "nanorepeat",
+          "paf",
+          "paf.py",
+          "repeat_region",
+          "repeat_region.py",
+          "split_alleles",
+          "split_alleles.py",
+          "tk.py"
+        ],
+        "tree_paths": [
+          ".gitignore",
+          "LICENSE",
+          "README.md",
+          "_config.yml",
+          "example_data/HTT_repeat_region.bed",
+          "images/HG002.1-7923034-7923187-TATTG.hist.png",
+          "images/HTT.chr4-3074876-3074933-CAG.hist.png",
+          "images/HTT.chr4-3074946-3074966-CCG.hist.png",
+          "images/HTT.hist2d.png",
+          "images/HTT.scatter.png",
+          "images/classify_reads.jpg",
+          "images/repeat_size_estimation.jpg",
+          "pyproject.toml",
+          "setup.py",
+          "src/NanoRepeat/__init__.py",
+          "src/NanoRepeat/nanoRepeat.py",
+          "src/NanoRepeat/nanoRepeat_bam.py",
+          "src/NanoRepeat/nanoRepeat_joint.py",
+          "src/NanoRepeat/paf.py",
+          "src/NanoRepeat/repeat_region.py",
+          "src/NanoRepeat/split_alleles.py",
+          "src/NanoRepeat/tk.py"
+        ],
+        "tree_truncated": false,
+        "upstream_files": {}
+      },
+      "limitations": [
+        "documented_file_missing"
+      ],
+      "caveat_items": [
+        "Environment: STRhub transcribed the documented installation commands unchanged into its own carrier (Ubuntu 22.04, package lists refreshed, apt answering yes, plus Miniforge (conda, python, pip)).",
+        "Input: the README documents BAM and FASTQ (line 81); this plan selects STRhub's ont-bam-hg38 reference data. Supported platforms documented: ont, pacbio; STRhub selected ont for this trial.",
+        "Evaluator limitation: the command names a different assembly from the registered hg38 dataset.",
+        "Run command: the README's own command, rewritten to STRhub's mounts; the capture wrapper is planned only if the procedure review passes.",
+        "File: the documented command reads path/to/NanoRepeat_v1.3_example_data/HG002/HG002_GRCh37_example_regions.bed (after -b), which is neither in the repository nor among STRhub's data."
+      ]
+    }
+  },
+  "provenance": {
+    "from_upstream": {
+      "install": {
+        "method": "pip",
+        "evidence_source": "README.md:L28-L32"
+      },
+      "command": {
+        "value": "nanoRepeat.py -i path/to/NanoRepeat_v1.3_example_data/HG002/hg002_Q20.20210805_3flowcells.hs37d5.example_regions.bam -t bam -d ont_q20 -r path/to/NanoRepeat_v1.3_example_data/HG002/GRCh37_chr1.fasta -b path/to/NanoRepeat_v1.3_example_data/HG002/HG002_GRCh37_example_regions.bed -c 4 --samtools path/to/samtools --minimap2 path/to/minimap2 -o ./nanorepeat_output/HG002",
+        "evidence_source": "README.md:L69"
+      },
+      "input_kind": {
+        "value": "bam",
+        "evidence_source": "README.md:L81"
+      },
+      "supported_platforms": [
+        {
+          "platform": "ont",
+          "evidence_source": "README.md:L1"
+        },
+        {
+          "platform": "pacbio",
+          "evidence_source": "README.md:L1"
+        }
+      ],
+      "assembly": {
+        "declared": "both",
+        "evidence_source": "README.md:L87"
+      },
+      "regions_schema": {
+        "format": "motif",
+        "evidence_source": "README.md:L89"
+      },
+      "output_format": {
+        "glob": "**/*.t[sx][vt]",
+        "evidence_source": "README.md:L89"
+      }
+    },
+    "derived": {
+      "command_rewrites": [],
+      "regions_layout_binding": null,
+      "single_sample_adaptation": null
+    },
+    "harness_choices": {
+      "dataset": {
+        "selected": "ont-bam-hg38",
+        "reason": "STRhub selected 'ont-bam-hg38' as compatible with upstream input 'bam' and platform 'ont'"
+      },
+      "platform": {
+        "selected": "ont",
+        "basis": "harness_choice_from_supported",
+        "supported_platforms": [
+          "ont",
+          "pacbio"
+        ]
+      },
+      "assembly": {
+        "selected": "hg38",
+        "basis": "upstream_stated",
+        "note": null
+      },
+      "regions_layout": null,
+      "base_environment": {
+        "image": "ubuntu:22.04",
+        "description": "Ubuntu 22.04, package lists refreshed, apt answering yes, plus Miniforge (conda, python, pip)",
+        "added_packages": [],
+        "miniforge": true,
+        "submodules": false
+      }
+    }
+  },
+  "procedure_validation": {
+    "schema": "strhub-procedure-evidence/1",
+    "valid": true,
+    "reason": "Procedure evidence matches the effective manifest and recomputed decision."
+  },
+  "verdict": {
+    "code": "undetermined",
+    "title": "Could not be determined",
+    "basis": "recipe",
+    "reason": "The documented command reads a file that neither the repository nor STRhub holds, so the command was not run.",
+    "readme_gaps": [],
+    "status_code": "UNVERIFIED_INSUFFICIENT_DOCS",
+    "blockers": [
+      {
+        "code": "documented_file_missing",
+        "what": "The documented command reads a file that is not in the repository at this commit and that STRhub does not hold, so the command cannot run as written.",
+        "ask_owner": {
+          "title": "Ship, or link from the README, the file the documented command reads",
+          "body": "STRhub Verified tried to run the command the documentation shows, in a clean environment at the pinned commit. The command reads a file that is not in the repository at that commit. Shipping it, or a documented step that fetches it, would let a new user run the command as written."
+        }
+      },
+      {
+        "code": "build_failed",
+        "what": "The environment did not build from the install steps found in the repository.",
+        "ask_owner": {
+          "title": "Build fails from a clean checkout",
+          "body": "STRhub Verified tried to build the tool from a clean checkout at the pinned commit, following the repository's own install steps, and the build failed. The build log is linked from the run."
+        }
+      }
+    ]
+  },
+  "step1": {
+    "code": "cannot_tell",
+    "headline": "As documented, a third party cannot tell how to run it.",
+    "body": "The documented command reads a file that neither the repository nor STRhub holds, so the command was not run. Nothing was executed. That does not mean the tool does not work: what the guide asks for is missing from the README at this commit. Add it and try the link again on the new commit.",
+    "missing": [
+      "input"
+    ],
+    "missing_text": [
+      "The declared input"
+    ],
+    "guide": "docs/GUIA-PASO-1.md"
+  },
+  "certificate": {
+    "schema": "strhub-verified/certificate/1",
+    "label": "Could not be determined",
+    "reached": "Available",
+    "stages": [
+      {
+        "key": "available",
+        "label": "Source available",
+        "status": "PASS"
+      },
+      {
+        "key": "installs",
+        "label": "Installation",
+        "status": "NOT ATTEMPTED"
+      },
+      {
+        "key": "runs",
+        "label": "End-to-end execution",
+        "status": "NOT ATTEMPTED"
+      },
+      {
+        "key": "output",
+        "label": "Output generated",
+        "status": "NOT ATTEMPTED"
+      }
+    ],
+    "summary": {
+      "purpose": "Evaluate whether the tool installs, runs end-to-end, and produces structurally valid output.",
+      "result": "Could not be determined",
+      "reached": "Available, 1/5 gates passed",
+      "why": "The documented command reads a file that neither the repository nor STRhub holds, so the command was not run.",
+      "scope": "Installation, execution, and output structure evaluation.",
+      "not_evaluated": [
+        "Genotype accuracy",
+        "Concordance",
+        "Forensic validity",
+        "Regulatory compliance"
+      ]
+    },
+    "conclusion": [
+      {
+        "title": "Procedure not established",
+        "body": "The recorded gate observations do not establish whether the documented procedure succeeded or failed."
+      },
+      {
+        "title": "Observations retained",
+        "body": "The supplied run and output observations remain in the report; they do not replace procedure evidence."
+      },
+      {
+        "title": "Verdict: Could not be determined",
+        "body": "The documented command reads a file that neither the repository nor STRhub holds, so the command was not run."
+      },
+      {
+        "title": "Reproducibility not established",
+        "body": "These observations are insufficient to establish a reproducible documented execution finding."
+      }
+    ],
+    "out_of_scope": [
+      "Genotype correctness or accuracy",
+      "Concordance against known truth sets",
+      "Sensitivity, specificity, or stutter performance",
+      "Allele calling accuracy or forensic casework suitability",
+      "Regulatory compliance or ISO accreditation",
+      "Multi-laboratory or multi-dataset reproducibility"
+    ],
+    "limitations": [
+      "Single reference dataset per input type",
+      "Single containerized environment (Docker / ubuntu-22.04)",
+      "No truth-set comparison or ground-truth genotypes",
+      "No accuracy or concordance assessment",
+      "No forensic or clinical validation of results",
+      "No sequencing data were processed because execution did not complete"
+    ],
+    "scope": {
+      "statement": "Independent automated evaluation of reproducible execution. It checks whether the tool installs, runs end-to-end, and produces structurally valid output in a standardized environment.",
+      "not": "This is not an analytical validation. Genotype accuracy, concordance, forensic suitability, and regulatory compliance are out of scope.",
+      "disclaimer": "Each result is a dated snapshot, verified on the tool's public repository at a pinned commit. STRhub does not store tool source code."
+    }
+  }
+}
