@@ -1,0 +1,1063 @@
+{
+  "schema": "strhub-verified/1",
+  "mode": "publish",
+  "tool": {
+    "name": "lusSTR",
+    "version": "0.11",
+    "contact": "https://github.com/bioforensics/lusSTR/issues"
+  },
+  "submission": {
+    "by": "third_party"
+  },
+  "source": {
+    "repo": "https://github.com/bioforensics/lusSTR",
+    "ref": "2425112706d03929ee3cf82588ddd6a2f315083c",
+    "ref_resolved": "2425112706d03929ee3cf82588ddd6a2f315083c",
+    "committed": "2025-06-05T16:18:38Z"
+  },
+  "environment": {
+    "dockerfile": "Dockerfile",
+    "os": [
+      "ubuntu-22.04"
+    ],
+    "source": "generated"
+  },
+  "generated": "2026-11-22T19:13:53+00:00",
+  "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/45059493742",
+  "run": {
+    "cmd": "lusstr strs all",
+    "cwd": ".",
+    "effective_cmd": "cd '.' && touch /tmp/.strhub_mark && ( lusstr strs all ); rc=$?; find . -xdev -type f -newer /tmp/.strhub_mark -size +0 ! -path './.git/*' ! -path './proc/*' ! -path './sys/*' ! -path './dev/*' ! -path './data/*' ! -path '*/__pycache__/*' ! -name '*.pyc' ! -name '*.pyo' 2>/dev/null | head -500 | while IFS= read -r f; do mkdir -p \"/data/out/$(dirname \"$f\")\" && cp \"$f\" \"/data/out/$f\"; done; exit $rc",
+    "step_outcome": "skipped"
+  },
+  "instrument": "documented",
+  "recipe": {
+    "origin": "proposed"
+  },
+  "gates": {
+    "available": true,
+    "installs": false,
+    "runs": false,
+    "io": false,
+    "content": false
+  },
+  "input_contract": {
+    "type": "illumina-snp-fastq"
+  },
+  "level": "available",
+  "io_detail": {},
+  "content_detail": {},
+  "example_detail": null,
+  "datasets": [
+    {
+      "leg": "external",
+      "label": "External data",
+      "available": false,
+      "type": "illumina-snp-fastq",
+      "dataset": null,
+      "io": false,
+      "content": false,
+      "passed": false
+    },
+    {
+      "leg": "example",
+      "label": "Tool's own example",
+      "available": false,
+      "io": false,
+      "content": null,
+      "passed": false,
+      "matches_expected": null,
+      "produced_count": null
+    }
+  ],
+  "scope": "Assessment of documented execution in the stated environment and output format. Concerns reproducible execution only; no claim of accuracy, casework fitness, or regulatory validation.",
+  "upstream": {
+    "checked": "2026-11-22T19:13:54+00:00",
+    "repo_exists": true,
+    "ref_exists": true,
+    "default_branch": "master",
+    "status": "ahead",
+    "behind_by": 4
+  },
+  "evidence": [
+    {
+      "claim": "install_method",
+      "kind": "tree",
+      "path": "setup.py",
+      "text": "pip",
+      "url": "https://github.com/bioforensics/lusSTR/blob/2425112706d03929ee3cf82588ddd6a2f315083c/setup.py"
+    },
+    {
+      "claim": "fallback_environment",
+      "kind": "readme",
+      "path": "README.md",
+      "line": 37,
+      "text": "conda install -c bioconda lusstr",
+      "url": "https://github.com/bioforensics/lusSTR/blob/2425112706d03929ee3cf82588ddd6a2f315083c/README.md#L37"
+    },
+    {
+      "claim": "run_command",
+      "kind": "readme",
+      "path": "README.md",
+      "line": 112,
+      "text": "lusstr strs all",
+      "url": "https://github.com/bioforensics/lusSTR/blob/2425112706d03929ee3cf82588ddd6a2f315083c/README.md#L112"
+    }
+  ],
+  "repo_test_data": {
+    "known": true,
+    "present": false,
+    "count": 0,
+    "examples": []
+  },
+  "caveats": {
+    "source": "detect_recipe",
+    "items": [
+      "Environment: no proven installation profile; STRhub did not manufacture installation steps.",
+      "Input: no sentence in the README says what the tool takes; illumina-snp-fastq is only a guess from mentions; it is not authorization to execute.",
+      "Run command: the README's own command, rewritten to STRhub's mounts; the capture wrapper is planned only if the procedure review passes."
+    ]
+  },
+  "install_detail": {
+    "passed": false,
+    "diagnostics": [],
+    "faults": []
+  },
+  "procedure_review": {
+    "may_say_runs": false,
+    "status_code": "UNVERIFIED_INSUFFICIENT_DOCS",
+    "basis": "recipe",
+    "attribution": "strhub",
+    "blocker": "missing_input",
+    "reason": "STRhub holds no reference sample of the kind this procedure reads, and the repository ships no example to run, so nothing was executed.",
+    "amendments": [
+      {
+        "code": "input_not_substituted",
+        "what": "This evaluator cannot establish that the cited command reads the declared reference input; no config or input list was rewritten to make it do so."
+      },
+      {
+        "code": "input_platform_unproven",
+        "what": "Counting platform mentions does not establish which shared dataset this procedure reads."
+      },
+      {
+        "code": "install_not_copyable",
+        "what": "An installation step is outside this profile (README.md, line 42: `git clone https://www.github.com/bioforensics/lusSTR.git`); STRhub does not interpret, complete or skip it."
+      },
+      {
+        "code": "input_guessed",
+        "what": "No sentence states what the tool reads, so the sample was chosen from mentions alone."
+      }
+    ],
+    "inferences": {
+      "install": {
+        "evidence_source": "repo_file:setup.py",
+        "verified": false
+      },
+      "run_command": {
+        "evidence_source": "README.md:L112",
+        "verified": true,
+        "kind": "doc",
+        "path": "README.md",
+        "document_sha256": "9881179990fc5b92f6c8e23d11340b3738555ee8d789bfe38deb5cddb74aea3f"
+      },
+      "input_type": {
+        "evidence_source": null,
+        "verified": false
+      },
+      "output": {
+        "verified": true,
+        "kind": "doc",
+        "path": "README.md",
+        "line": 28,
+        "end_line": 28,
+        "document_sha256": "9881179990fc5b92f6c8e23d11340b3738555ee8d789bfe38deb5cddb74aea3f",
+        "evidence_source": "README.md:L28"
+      }
+    },
+    "unbacked_inferences": [
+      "input_type",
+      "install"
+    ],
+    "provenance": {
+      "from_upstream": {
+        "install": {
+          "method": "pip",
+          "evidence_source": "repo_file:setup.py"
+        },
+        "command": {
+          "value": "lusstr strs all",
+          "evidence_source": "README.md:L112"
+        },
+        "input_kind": {
+          "value": "fastq",
+          "evidence_source": null
+        },
+        "supported_platforms": [],
+        "assembly": {
+          "declared": null,
+          "evidence_source": null
+        },
+        "regions_schema": null,
+        "output_format": {
+          "glob": "**/*.csv",
+          "evidence_source": "README.md:L28"
+        }
+      },
+      "derived": {
+        "command_rewrites": [],
+        "regions_layout_binding": null,
+        "single_sample_adaptation": null
+      },
+      "harness_choices": {
+        "dataset": {
+          "selected": "illumina-snp-fastq",
+          "reason": "STRhub selected 'illumina-snp-fastq' as compatible with upstream input 'fastq' and platform 'illumina'"
+        },
+        "platform": {
+          "selected": "illumina",
+          "basis": "counted_unproven",
+          "supported_platforms": []
+        },
+        "assembly": null,
+        "regions_layout": null,
+        "base_environment": null
+      }
+    },
+    "install_method": "pip",
+    "citable_install": false,
+    "input_type": "illumina-snp-fastq",
+    "output_glob": "**/*.csv",
+    "profile": "strhub-upstream-procedure/1",
+    "install_ready": false,
+    "example_ready": false,
+    "installation": {
+      "profile": "strhub-upstream-procedure/1",
+      "ready": false,
+      "method": "pip",
+      "reason": "An installation step is outside this profile (README.md, line 42: `git clone https://www.github.com/bioforensics/lusSTR.git`); STRhub does not interpret, complete or skip it.",
+      "gap": "commit"
+    },
+    "command_review": {
+      "profile": "strhub-upstream-procedure/1",
+      "cited": "lusstr strs all",
+      "command": "lusstr strs all",
+      "substitutions": [],
+      "read_bindings": [],
+      "limitations": [],
+      "expected": "lusstr strs all",
+      "executed": "lusstr strs all",
+      "cited_sha256": "e4aba2727771219f842e28d352e2757fbc76a894bbedeb992d5c5dc29f85cc9c",
+      "executed_sha256": "e4aba2727771219f842e28d352e2757fbc76a894bbedeb992d5c5dc29f85cc9c",
+      "citations": [
+        {
+          "repo": "https://github.com/bioforensics/lusSTR",
+          "ref": "2425112706d03929ee3cf82588ddd6a2f315083c",
+          "path": "README.md",
+          "line": 112,
+          "verified": true,
+          "document_sha256": "9881179990fc5b92f6c8e23d11340b3738555ee8d789bfe38deb5cddb74aea3f",
+          "command_sha256": "e4aba2727771219f842e28d352e2757fbc76a894bbedeb992d5c5dc29f85cc9c"
+        }
+      ]
+    },
+    "manifest_sha256": "9db620590db41d26b4401bf6c375958ff9bebd74fdcbc1db2047286e4560d903",
+    "evidence_sha256": "b6cfc70a5d4e261adbd0e74963087e95aa99ba9d937a226301ae22e208c1d768",
+    "evidence": {
+      "schema": "strhub-procedure-evidence/1",
+      "manifest": {
+        "caveats": {
+          "items": [
+            "Environment: no proven installation profile; STRhub did not manufacture installation steps.",
+            "Input: no sentence in the README says what the tool takes; illumina-snp-fastq is only a guess from mentions; it is not authorization to execute.",
+            "Run command: the README's own command, rewritten to STRhub's mounts; the capture wrapper is planned only if the procedure review passes."
+          ],
+          "source": "detect_recipe"
+        },
+        "environment": {
+          "dockerfile": "Dockerfile",
+          "os": [
+            "ubuntu-22.04"
+          ],
+          "source": "generated"
+        },
+        "inputs": {
+          "type": "illumina-snp-fastq"
+        },
+        "outputs": [
+          {
+            "format": "csv",
+            "min_records": 1,
+            "path": "**/*.csv"
+          }
+        ],
+        "recipe": {
+          "origin": "proposed"
+        },
+        "report": {
+          "slug": "lusstr-snp"
+        },
+        "run": {
+          "cmd": "cd '.' && touch /tmp/.strhub_mark && ( lusstr strs all ); rc=$?; find . -xdev -type f -newer /tmp/.strhub_mark -size +0 ! -path './.git/*' ! -path './proc/*' ! -path './sys/*' ! -path './dev/*' ! -path './data/*' ! -path '*/__pycache__/*' ! -name '*.pyc' ! -name '*.pyo' 2>/dev/null | head -500 | while IFS= read -r f; do mkdir -p \"/data/out/$(dirname \"$f\")\" && cp \"$f\" \"/data/out/$f\"; done; exit $rc",
+          "timeout_minutes": 20
+        },
+        "source": {
+          "ref": "2425112706d03929ee3cf82588ddd6a2f315083c",
+          "repo": "https://github.com/bioforensics/lusSTR"
+        },
+        "submission": {
+          "by": "third_party"
+        },
+        "tool": {
+          "contact": "https://github.com/bioforensics/lusSTR/issues",
+          "name": "lusSTR",
+          "version": "0.11"
+        }
+      },
+      "proposal": {
+        "build": {
+          "also_published": {
+            "file": null,
+            "method": "bioconda",
+            "package": "lusstr",
+            "readme_line": 37
+          },
+          "asset": null,
+          "candidates": [
+            {
+              "file": "setup.py",
+              "method": "pip"
+            },
+            {
+              "file": "Makefile",
+              "method": "make"
+            },
+            {
+              "file": null,
+              "method": "bioconda",
+              "package": "lusstr",
+              "readme_line": 37
+            }
+          ],
+          "digest": null,
+          "dir": null,
+          "evidence_source": "repo_file:setup.py",
+          "file": "setup.py",
+          "image": null,
+          "method": "pip",
+          "package": null,
+          "readme_install_lines": [
+            "conda install -c bioconda lusstr",
+            "conda create --name lusSTR -y python=3.10 pandas",
+            "make devenv"
+          ],
+          "readme_line": null,
+          "spec_list": false,
+          "ssh_urls_in": [],
+          "tag": null,
+          "then": [],
+          "url": null
+        },
+        "commands": [
+          {
+            "cmd": "lusstr strs all",
+            "entry_point": true,
+            "evidence_source": "README.md:L112",
+            "file": "README.md",
+            "has_input_flag": false,
+            "has_output_flag": false,
+            "help_only": false,
+            "invokes": "lusstr",
+            "line": 112,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "readme",
+            "piped": false,
+            "rst": false,
+            "source_rank": 0,
+            "subcommand": "strs",
+            "synopsis": false
+          },
+          {
+            "cmd": "lusstr strs all -w lusstr_files/",
+            "entry_point": true,
+            "evidence_source": "README.md:L119",
+            "file": "README.md",
+            "has_input_flag": false,
+            "has_output_flag": false,
+            "help_only": false,
+            "invokes": "lusstr",
+            "line": 119,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "readme",
+            "piped": false,
+            "rst": false,
+            "source_rank": 0,
+            "subcommand": "strs",
+            "synopsis": false
+          },
+          {
+            "cmd": "lusstr strs format -w lusstr_files/",
+            "entry_point": true,
+            "evidence_source": "README.md:L124",
+            "file": "README.md",
+            "has_input_flag": false,
+            "has_output_flag": false,
+            "help_only": false,
+            "invokes": "lusstr",
+            "line": 124,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "readme",
+            "piped": false,
+            "rst": false,
+            "source_rank": 0,
+            "subcommand": "strs",
+            "synopsis": false
+          },
+          {
+            "cmd": "lusstr strs convert -w lusstr_files/",
+            "entry_point": true,
+            "evidence_source": "README.md:L128",
+            "file": "README.md",
+            "has_input_flag": false,
+            "has_output_flag": false,
+            "help_only": false,
+            "invokes": "lusstr",
+            "line": 128,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "readme",
+            "piped": false,
+            "rst": false,
+            "source_rank": 0,
+            "subcommand": "strs",
+            "synopsis": false
+          },
+          {
+            "cmd": "lusstr snps all",
+            "entry_point": true,
+            "evidence_source": "README.md:L274",
+            "file": "README.md",
+            "has_input_flag": false,
+            "has_output_flag": false,
+            "help_only": false,
+            "invokes": "lusstr",
+            "line": 274,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "readme",
+            "piped": false,
+            "rst": false,
+            "source_rank": 0,
+            "subcommand": "snps",
+            "synopsis": false
+          },
+          {
+            "cmd": "lusstr snps all -w lusstr_files/",
+            "entry_point": true,
+            "evidence_source": "README.md:L281",
+            "file": "README.md",
+            "has_input_flag": false,
+            "has_output_flag": false,
+            "help_only": false,
+            "invokes": "lusstr",
+            "line": 281,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "readme",
+            "piped": false,
+            "rst": false,
+            "source_rank": 0,
+            "subcommand": "snps",
+            "synopsis": false
+          },
+          {
+            "cmd": "lusstr snps format -w lusstr_files/",
+            "entry_point": true,
+            "evidence_source": "README.md:L286",
+            "file": "README.md",
+            "has_input_flag": false,
+            "has_output_flag": false,
+            "help_only": false,
+            "invokes": "lusstr",
+            "line": 286,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "readme",
+            "piped": false,
+            "rst": false,
+            "source_rank": 0,
+            "subcommand": "snps",
+            "synopsis": false
+          },
+          {
+            "cmd": "lusstr gui",
+            "entry_point": true,
+            "evidence_source": "README.md:L53",
+            "file": "README.md",
+            "has_input_flag": false,
+            "has_output_flag": false,
+            "help_only": true,
+            "invokes": "lusstr",
+            "line": 53,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "readme",
+            "piped": false,
+            "rst": false,
+            "source_rank": 0,
+            "subcommand": "gui",
+            "synopsis": false
+          }
+        ],
+        "dockerfile": null,
+        "docs_read": [],
+        "docs_text": "",
+        "evidence": [
+          {
+            "claim": "install_method",
+            "kind": "tree",
+            "path": "setup.py",
+            "text": "pip",
+            "url": "https://github.com/bioforensics/lusSTR/blob/2425112706d03929ee3cf82588ddd6a2f315083c/setup.py"
+          },
+          {
+            "claim": "fallback_environment",
+            "kind": "readme",
+            "line": 37,
+            "path": "README.md",
+            "text": "conda install -c bioconda lusstr",
+            "url": "https://github.com/bioforensics/lusSTR/blob/2425112706d03929ee3cf82588ddd6a2f315083c/README.md#L37"
+          },
+          {
+            "claim": "run_command",
+            "kind": "readme",
+            "line": 112,
+            "path": "README.md",
+            "text": "lusstr strs all",
+            "url": "https://github.com/bioforensics/lusSTR/blob/2425112706d03929ee3cf82588ddd6a2f315083c/README.md#L112"
+          }
+        ],
+        "example": null,
+        "example_data": [],
+        "inferences": {
+          "build": "repo_file:setup.py",
+          "example": null,
+          "input_type": null,
+          "output": "README.md:L28",
+          "platform": null,
+          "regions": null,
+          "run_command": "README.md:L112",
+          "single_sample_bams": null
+        },
+        "input_type": {
+          "assembly": {
+            "against_hg38": null,
+            "declared": null,
+            "evidence_source": null,
+            "hg19_evidence_source": null,
+            "hg19_hits": 0,
+            "hg38_evidence_source": null,
+            "hg38_hits": 0,
+            "incompatible_with_hg38": false
+          },
+          "best": "illumina-snp-fastq",
+          "candidates": [
+            "illumina-snp-fastq"
+          ],
+          "evidence_source": null,
+          "how": "counted",
+          "platform": "illumina",
+          "platform_evidence_source": null,
+          "platform_how": "counted",
+          "signals": {
+            "bam": 0,
+            "ce": 0,
+            "fastq": 0,
+            "hg19": 0,
+            "hg38": 0,
+            "illumina": 15,
+            "ont": 0,
+            "snp": 36,
+            "ystr": 1
+          },
+          "statements": {
+            "against": [],
+            "determined": false,
+            "inputs": [],
+            "platform": [],
+            "recommendation": null
+          },
+          "statements_file": null,
+          "supported_platforms": [],
+          "unsupported": null,
+          "warnings": []
+        },
+        "known_issues": [],
+        "limitations": [
+          "input_type_guessed",
+          "install_profile_unsupported",
+          "no_reference_dataset"
+        ],
+        "output": {
+          "evidence_source": "README.md:L28",
+          "format": "csv",
+          "signals": {
+            "csv": 6,
+            "json": 2,
+            "tsv": 1,
+            "vcf": 0
+          }
+        },
+        "packaging": {
+          "executables": [
+            "lusstr"
+          ],
+          "packages": [
+            "lusSTR"
+          ]
+        },
+        "readme": {
+          "gaps": [
+            {
+              "item": "command_input",
+              "text": "The README's example commands do not show where the input file goes."
+            },
+            {
+              "item": "example_data",
+              "text": "The repository ships no example input a stranger could run on. A trial can still run on STRhub's reference data for the detected input type."
+            }
+          ],
+          "name": "README.md",
+          "sufficient_to_attempt": true
+        },
+        "readme_name": "README.md",
+        "readme_text": "# lusSTR\n\nlusSTR is a tool written in Python to convert NGS sequence data of forensic STR loci to different sequence representations (sequence bracketed form) and allele designations (CE allele, LUS/LUS+ alleles) for ease in downstream analyses. See the below section ```Converting STR sequences to other sequence representations and allele designations``` for more information. \n\nFurther, lusSTR can perform filtering and stutter identification using the CE allele, the LUS+ allele, or the bracketed sequence form for autosomal loci and create files for direct input into three probabilistic genotyping software packages, EuroForMix (CE and LUS+), MPSproto (NGS), and STRmix (CE and NGS). \n\nlusSTR also processes SNP data from the Verogen ForenSeq and Kintelligence panels and create evidence and/or reference files for use in EFM. See the below section ```SNP Data Processing``` for more information.\n____\n\n**lusSTR is available as a command line tool or as a GUI.**\n____\n\nThis Python package has been written for use with either:  \n* ForenSeq Signature Prep panel\n  * 27 autosomal STR loci\n  * 24 Y-chromosome STR loci\n  * 7 X-chromosome STR loci\n  * 94 identity SNPs\n  * 22 phenotype (hair/eye color) SNPs\n  * 54 ancestry SNPs\n  * 2 phenotype and ancestry SNPs\n* ForenSeq Kintelligence panel\n  * 10,230 SNPs for forensic genetic genealogy purposes\n* Promega PowerSeq panel\n  * 22 autosomal STR loci\n  * 22 Y-chromosome loci\n  \nThe package accomodates either the Sample Details Report/Phenotype Report/Sample Report from the ForenSeq Universal Analysis Software (UAS), STRait Razor v3 output, or GeneMarker v2.6 (```*_strresults_filtered.csv``` output file; PowerSeq sequences only). If STRait Razor or GeneMarker output is provided, sequences are filtered to the UAS sequence region for conversion.\n\n**It is important to note: the most recent lusSTR version (version 0.9) utilizes the most recent STRait Razor configuration files as of December 2023 (```ForenSeqv1.27.config``` and ```PowerSeqv2.31.config```). If using STRait Razor data as input, please ensure you are using these config file versions when running STRait Razor v3s.**\n\n\n## Installation\n\nFor best results, install from bioconda.\n```\nconda install -c bioconda lusstr\n```\nContributors/developers who want to create a dedicated environment on their machine can do so:\n```\nconda create --name lusSTR -y python=3.10 pandas\ngit clone https://www.github.com/bioforensics/lusSTR.git\ncd lusSTR\nmake devenv\n```\n\n## Usage\n\n## *GUI*\n\nOnce lusSTR has been installed, the GUI can be started with the command: \n```\nlusstr gui\n```\nAll lusSTR settings for either the STR pipeline or the SNP pipeline can be specified after selecting the desired pipeline tab.  \n\nThe GUI provides an option to view marker plots interactively and manually edit the sequence type after lusSTR is complete.  \nThere is also an option to upload previously run data to view. See the last STR section (```View and Edit lusSTR data```) for more information.  \n____\n\n## *Command line interface*\n\nlusSTR accomodates four different input formats:  \n(1) UAS Sample Details Report, UAS Sample Report, and UAS Phenotype Report (for SNP processing) in .xlsx format (a single file or directory containing multiple files)  \n(2) STRait Razor v3 output with one sample per file (a single file or directory containing multiple files)  \n(3) GeneMarker v2.6 output (```*_strresults_filtered.csv```; a single file or directory containing multiple files)   \n(4) Sample(s) sequences in CSV format; first four columns must be Locus, NumReads, Sequence, SampleID; Optional last two columns can be Project and Analysis IDs.  \n\n*These individual sample files or directory of files must be specified in the config file (see below).*\n\n\nlusSTR utilizes the ```lusstr``` command to invoke various Snakemake workflows. The ```lusstr strs``` command invokes the STR analysis workflow while the ```lusstr snps``` command invokes the SNP analysis workflow. Please see below for further information on processing SNP data.\n___\n### Creating the STR config file\n\nRunning ```lusstr config``` creates a config file containing the default settings for the lusSTR STR analysis pipeline. The settings can be changed with command line arguments (see below) or by manually editing the config file. The default settings, along with their descriptions, are as follows:\n\n### general settings\n**analysis_software**: ```uas``` (```uas/straitrazor/genemarker```); indicates the analysis software used prior to lusSTR  \n**sex**: ```False``` (True/False); include sex-chromosome STRs (invoke ```--sex``` flag)  \n**samp_input**: ```/path/to/input/directory/or/samples``` input directory or sample; if not provided, will be current working directory (indicate using ```--input path/to/dir``` )  \n**output**: ```lusstr_output``` output file/directory name (indicate using ```--out dir/sampleid e.g. --out test_030923```)  \n**custom**: ```False``` (True/False); use custom sequence ranges as defined in the STR markers json file (```str_markers.json```).\n\n### convert settings  \n**kit**: ```forenseq``` (forenseq/powerseq) (invoke the ```--powerseq``` flag if using PowerSeq data)  \n**nocombine**: ```False``` (True/False); do not combine identical sequences during the ```convert``` step, if using STRait Razor data. (invoke the ```--nocombine``` flag)  \n\n### filter settings  \n**output_type**: ```strmix``` (strmix/efm/mpsproto) (indicate using the ```--software``` flag)  \n**profile_type**: ```evidence``` (evidence/reference) (invoke ```--reference``` flag if creating a reference output file)  \n**data_type**: ```ngs``` (ce/ngs/lusplus) (indicate using the ```--str-type```)  \n**info**: ```True``` (True/False); create allele information file (invoke ```--noinfo``` flag to not create the allele information file)  \n**separate**: ```False``` (True/False); for EFM/MPSproto only, if True will create individual files for samples; if False, will create one file with all samples (invoke ```--separate``` flag to separate EFM/MPSproto output files)  \n**nofilters**: ```False``` (True/False); skip all filtering steps but still creates EFM/MPSproto/STRmix output files (invoke ```--nofilters``` flag)  \n**strand**: ```uas``` (uas/forward); indicates the strand orientation in which to report the sequence in the final output table for STRmix NGS only (indicate using ```--strand```)\n\nOne additional argument can be provided with ```lusstr config```:  \n```-w```/```-workdir``` sets the working directory (e.g. ```-w lusstr_files/```) and all created files are stored in that directory.\n\n**Once the config file is created with all the desired settings, the STR workflow can be run. The config file must be located in the working directory.**\n___\n## Running the lusSTR STR workflow\n\nThe lusSTR STR workflow consists of three steps:  \n(1) ```format```: formatting input  \n(2) ```convert```: converting sequences to other sequence representations and allele designations  \n(3) ```filter```: performing several filtering steps and creating appropriately formatted files for use in EuroForMix or STRmix.\n\nAny or all steps can be run. In order to run all three steps, the following command can be used:  \n```\nlusstr strs all\n```\n\nOne additional argument can be provided, a working directory.  \n**This working directory must contain the config file.**  \nIf not specified, the working directory is the current directory.\n```\nlusstr strs all -w lusstr_files/\n```\n\nIndividual steps can also be run\n```\nlusstr strs format -w lusstr_files/\n```\n\n```\nlusstr strs convert -w lusstr_files/\n```\n\n**In order to run the ```convert``` step, the appropriately formatted ```.csv``` file containing the sequences normally created in the ```format``` step must be present in the working directory. See the below ```Formatting input for STR loci sequences``` section for specific information about that file (required columns, etc.).** \n\n----\n\n## Additional information about each step  \n\n\n### Formatting input for STR loci sequences\n\nIf inputting data from either the UAS Sample Details Report, STRait Razor or GeneMarker output, the user must first invoke the ```format``` step to extract necessary information and format for the ```convert``` step.\n\nThe ```format``` command removes unnecessary rows/columns and outputs a table in CSV format containing the following columns:\n*  Locus\n*  Number of Reads observed with the specified sequence\n*  Sequence\n*  Sample ID\n*  Project ID (if provided)\n*  Analysis ID (if provided)\n\nIf including the sex chromosome loci as specified in the config file, the ```format``` command will output a second table for the sex loci with the same columns (```*_sexloci.csv```).\n\n---\n\n### Converting STR sequences to other sequence representations and allele designations\n\nThe ```convert``` step produces a tab-delineated table with the following columns:\n*  Sample ID\n*  Project ID (if provided)\n*  Analysis ID (if provided)\n*  Locus\n*  UAS Output sequence: can be forward or reverse strand\n*  Forward strand sequence: will be same as UAS Output sequence for those loci reported on forward strand\n*  UAS Output Bracketed notation: Bracketed sequence form for the reported UAS sequence output (will be same for those loci which report the forward strand)\n*  Forward Strand Bracketed notation: Bracketed notation for forward strand sequence\n*  CE allele: common length-based CE allele designation (also called the repeat unit, or RU, allele)\n*  LUS: Longest uninterrupted stretch\n*  LUS+: Notation combining multiple allele designations including CE, LUS, secondary motif (if applicable) and tertiary motif (if applicable)\n*  Reads: number of reads observed with the specified sequence\n\nIf including the sex chromosome loci as specified in the config file, a second table with the above columns for the sex chromosome loci will be outputted as well.\n\n\nIf STRait Razor or GeneMarker data is specified, several additional processes occur with the ```convert``` step:\n*  The full sequences are filtered to the UAS region before the translation step. The number of bases to remove is determined based on the specified kit.\n*  Once the sequences are filtered to the UAS region, any duplicated sequences are removed and their reads are summed in with the remaining sequence ```Reads``` column. NOTE: This step can be skipped with the ```nocombine``` setting in the config file.\n  \nFurther, a second table (labeled as ```*_flanks.txt```) containing information related to the flanking sequences surrounding the UAS sequence region is also produced with the following columns:\n*  Sample ID\n*  Project ID\n*  Analysis ID (same as Project ID)\n*  Locus\n*  Reads: number of reads observed for the specified sequence\n*  Length-based (CE) Allele\n*  Full Sequence\n*  5' Flanking Sequence Bracketed Notation\n*  UAS Region Sequence Bracketed Notation (same as column ```UAS Output Bracketed Notation``` in the main table)\n*  3' Flanking Sequence Bracketed Notation\n*  Potential Issues (such as: Possible indel or partial sequence)\n\nThe ```Potential Issues``` column in this report is to draw attention to potential problem sequences (due to perhaps an indel or partial sequence) and requires the attention of the user to further evaluate the sequence for its authenticity.  \n\nIndividual marker plots displaying reads vs. CE allele are created in PDF format. They are stored in the ```MarkerPlots/``` directory of the working directory:   \n* The first page of the PDF file contains the marker plots using a custom y-axis scale (i.e. the y-axis is scaled for each individual marker).  \n* The second page of the PDF file contains the marker plots using the same (i.e. the maximum) y-axis scale.  \n* A separate PDF file for the X- & Y-STRs are created, if specified.  \n \n---\n\n### Filtering Alleles/Sequences and Creation of Files for Use in ProbGen Software\n\nThe ```filter``` step provides the opportunity to filter sequences using thresholds such as:\n* Detection threshold (both static and dynamic)\n* Analytical threshold (both static and dynamic)\n* Same size threshold (dynamic)\n\nCustom static and dynamic thresholds for each locus are stored in the ```filters.json``` file. This file should be updated to utilize validated thresholds for individual labs.\n\nIn addition, stutter alleles can be identified using the ```info``` setting in the config file. This creates a separate file containing information about each allele, including an allele classification (```real allele```, ```stutter``` or ```BelowAT```). Stutter alleles are classified as either ```-1 stutter```, ```-2 stutter```, or ```+1 stutter```. For these stutter alleles, the stuttering allele is reported along with the percent stutter (# of reads for that allele/# of reads for stuttering allele). In instances where a stutter allele could be multiple different types of stutter, all potential designations will be reported as such: ```-1 stutter/-2 stutter```, ```-1 stutter/+1 stutter```, or ```-2 stutter/+1 stutter```. No percent stutter is calculated for these alleles. If a sequence is identified as noise, the percent noise is calculated (# of reads for that sequence/total locus reads).\n\nEach locus is checked for containing greater than 2 alleles (indicating a potential mixture) and for intralocus imbalance. If either are identified, a separate file (```Flagged_Loci.csv```) is created, containing the SampleID, Locus and either ```>2Alleles``` or ```IntraLocusImbalance```.\n\nWhen using STRmix data, the data type can be specified using the ```data-type``` setting as either ```ce```, ```ngs``` or ```lusplus``` (default is ```ngs```). If ```ngs``` or ```lusplus``` is specified, the same size filter is applied following the stutter filter. Further, the columns and column names in the output file differ based on the data type.\n\nFinally, output files are created for direct use in EuroForMix (EFM), MPSproto or STRmix. If EFM or MPSproto is specified, a single file is created containing all samples in the input file (however, separate output files for each sample can be created with the ```separate``` setting specified in the config file). If STRmix is specified, a directory containing files for each individual sample is created. The ```profile-type``` setting allows for the creation of either a ```reference``` or ```evidence``` profile. Both EuroForMix/MPSproto and STRmix require different formatting depending on the type of sample. \n\n---\n\n### View and Edit lusSTR data\n\nThe ```See Individual Marker Plots & Data``` button at the bottom of the lusSTR STR page can be run either directly after a lusSTR run (e.g. the settings have already been specified) or the user can upload previously-run lusSTR data by uploading the lusSTR output folder using the ```Select an Output Folder``` button. If using previously run data, the configuration settings within the ```config.yaml``` file in that folder will automatically be loaded and used. If other settings are desired, please re-run lusSTR using the new settings.  \n\nOnce the ```See Individual Marker Plots & Data``` button has been pressed, the sample of interest can be selected from the dropdown menu (if multiple samples are present). The first screen contains the marker plots for all autosomal STRs. Individual markers can be selected from the dropdown menu. Markers with potential issues are flagged with a caution symbol.  \n\nOn the individual marker pages, the ```allele_type``` column can be changed (no other column in the data table can be edited). A dropdown menu will appear to change the assigned allele type for a specific sequence. If a type is changed, the page will automatically refresh and the marker plot will be updated with the edited changes. The user may edit multiple markers and samples.  \n\nOnce all desired changes are made, selecting the \"Save Edits\" button will create the following files containing the changes:\n  1. New final lusSTR output files (either ```STRmix``` or ```EFM``` files as generated previously with lusSTR)  \n  2. New allele information file  \n  3. New PDFs of the marker plots  \nThe new files are automatically generated into a folder labeled as: ```edited_date_time``` (e.g. ```edited_10042024_16_29_50```)\n___\n\n\n ## SNP Data Processing\n\nlusSTR is able to process SNPs derived from the ForenSeq Signature Prep assay and the ForenSeq Kintelligence assay. SNPs from the ForenSeq Signature Prep assay could be analyzed using either the Verogen UAS or STRait Razor. SNPs from the ForenSeq Kintelligence assay must first be analyzed using the UAS.\n\n___\n### Creating the SNP config file\n\nRunning ```lusstr config --snps``` creates a config file containing the default settings for the lusSTR SNP workflow. The settings can be changed with command line arguments (see below) or by manually editing the config file. The default settings, along with their descriptions, are as follows:  \n\n\n### general settings  \n**analysis_software**: ```uas``` (```uas/straitrazor```); indicates the analysis software used prior to lusSTR\n**samp_input**: ```/path/to/input/directory/or/samples``` input directory or sample; if not provided, will be current working directory (indicate using ```--input path/to/dir```)  \n**output**: ```lusstr_output``` output file/directory name; (indicate using ```--out dir/sampleid e.g. --out test_030923```)   \n**kit**: ```sigprep``` (sigprep/kintelligence) (invoke using the ```--kintelligence``` flag if using Kintelligence data)  \n\n### format settings  \n**types**: ```all``` choices are \"all\", \"i\" (identity SNPs only), \"p\" (phenotype only), \"a\" (ancestry only) or any combination (indicate using the ```--snp-type e.g. --snp-type i, p```)  \n**nofilter**: ```False``` (True/False); if no filtering is desired at the format step; if False, will remove any allele designated as Not Typed (invoke using the ```--nofiltering```)  \n\n### convert settings  \n**strand**: ```forward``` (forward/uas); indicates which orientation to report the alleles for the SigPrep SNPs; uas indicates the orientation as reported by the UAS or the forward strand  \n**references**: ```None```; list IDs of the samples to be run as references in EFM; default is no reference samples  \n**separate**: ```False``` (True/False); if want to separate samples into individual files for use in EFM  \n**thresh**: ```0.03```; Analytical threshold value    \n\n\nOne additional argument can be provided with ```lusstr config --snps```:  \n```-w```/```-workdir``` sets the working directory (e.g. ```-w lusstr_files/```) and all created files are stored in that directory.\n\n**Once the config file is created with all the desired settings, the SNP workflow can be run. The config file must be located in the working directory.**\n___\n## Running the lusSTR SNP workflow\n\nThe lusSTR SNP workflow consists of two steps:  \n(1) ```format```: formatting input and calling alleles if using STRait Razor data  \n(2) ```convert```: applying analytical threshold and converting data to correct format for input into EuroForMix\n\nEither the first step, format, or both steps can be run. In order to run both steps, the following command can be used:  \n```\nlusstr snps all\n```\n\nOne additional argument can be provided, a working directory.  \n**This working directory must contain the config file.**  \nThe default working directory is the current directory.  \n```\nlusstr snps all -w lusstr_files/  \n```\n\nIndividual format step can also be run  \n```\nlusstr snps format -w lusstr_files/  \n```\n\n**In order to run the ```all``` step, the appropriately formatted ```.csv``` file containing the sequences normally created in the ```format``` step must be present in the working directory. See the below ```Usage``` section for specific information about that file (required columns, etc.).**  \n\n----\n\n## Additional information about each step  \n\n\n### Formatting input for SNP data  \n\nIf inputting data from either the UAS Sample Details Report/Phenotype Report/Sample Report or STRait Razor output, the user must first invoke the ```format``` step to extract necessary information and format for the",
+        "ref": "2425112706d03929ee3cf82588ddd6a2f315083c",
+        "regions": {
+          "ambiguous": false,
+          "candidates": [],
+          "end_line": null,
+          "evidence_source": null,
+          "file": null,
+          "format": null,
+          "line": null,
+          "text": null
+        },
+        "registry": {
+          "bioconda": {
+            "lusstr": {
+              "has_tag_version": true,
+              "latest": "0.11",
+              "versions": 11
+            }
+          },
+          "documented": [
+            "lusstr"
+          ]
+        },
+        "repo": "https://github.com/bioforensics/lusSTR",
+        "schema": "strhub-verified/recipe-proposal/1",
+        "single_sample_bams": {
+          "allowed": false,
+          "evidence_source": null,
+          "file": null,
+          "line": null,
+          "paired_flags": [],
+          "text": null
+        },
+        "source_documents": [
+          {
+            "file": "README.md",
+            "origin": "readme",
+            "text": "# lusSTR\n\nlusSTR is a tool written in Python to convert NGS sequence data of forensic STR loci to different sequence representations (sequence bracketed form) and allele designations (CE allele, LUS/LUS+ alleles) for ease in downstream analyses. See the below section ```Converting STR sequences to other sequence representations and allele designations``` for more information. \n\nFurther, lusSTR can perform filtering and stutter identification using the CE allele, the LUS+ allele, or the bracketed sequence form for autosomal loci and create files for direct input into three probabilistic genotyping software packages, EuroForMix (CE and LUS+), MPSproto (NGS), and STRmix (CE and NGS). \n\nlusSTR also processes SNP data from the Verogen ForenSeq and Kintelligence panels and create evidence and/or reference files for use in EFM. See the below section ```SNP Data Processing``` for more information.\n____\n\n**lusSTR is available as a command line tool or as a GUI.**\n____\n\nThis Python package has been written for use with either:  \n* ForenSeq Signature Prep panel\n  * 27 autosomal STR loci\n  * 24 Y-chromosome STR loci\n  * 7 X-chromosome STR loci\n  * 94 identity SNPs\n  * 22 phenotype (hair/eye color) SNPs\n  * 54 ancestry SNPs\n  * 2 phenotype and ancestry SNPs\n* ForenSeq Kintelligence panel\n  * 10,230 SNPs for forensic genetic genealogy purposes\n* Promega PowerSeq panel\n  * 22 autosomal STR loci\n  * 22 Y-chromosome loci\n  \nThe package accomodates either the Sample Details Report/Phenotype Report/Sample Report from the ForenSeq Universal Analysis Software (UAS), STRait Razor v3 output, or GeneMarker v2.6 (```*_strresults_filtered.csv``` output file; PowerSeq sequences only). If STRait Razor or GeneMarker output is provided, sequences are filtered to the UAS sequence region for conversion.\n\n**It is important to note: the most recent lusSTR version (version 0.9) utilizes the most recent STRait Razor configuration files as of December 2023 (```ForenSeqv1.27.config``` and ```PowerSeqv2.31.config```). If using STRait Razor data as input, please ensure you are using these config file versions when running STRait Razor v3s.**\n\n\n## Installation\n\nFor best results, install from bioconda.\n```\nconda install -c bioconda lusstr\n```\nContributors/developers who want to create a dedicated environment on their machine can do so:\n```\nconda create --name lusSTR -y python=3.10 pandas\ngit clone https://www.github.com/bioforensics/lusSTR.git\ncd lusSTR\nmake devenv\n```\n\n## Usage\n\n## *GUI*\n\nOnce lusSTR has been installed, the GUI can be started with the command: \n```\nlusstr gui\n```\nAll lusSTR settings for either the STR pipeline or the SNP pipeline can be specified after selecting the desired pipeline tab.  \n\nThe GUI provides an option to view marker plots interactively and manually edit the sequence type after lusSTR is complete.  \nThere is also an option to upload previously run data to view. See the last STR section (```View and Edit lusSTR data```) for more information.  \n____\n\n## *Command line interface*\n\nlusSTR accomodates four different input formats:  \n(1) UAS Sample Details Report, UAS Sample Report, and UAS Phenotype Report (for SNP processing) in .xlsx format (a single file or directory containing multiple files)  \n(2) STRait Razor v3 output with one sample per file (a single file or directory containing multiple files)  \n(3) GeneMarker v2.6 output (```*_strresults_filtered.csv```; a single file or directory containing multiple files)   \n(4) Sample(s) sequences in CSV format; first four columns must be Locus, NumReads, Sequence, SampleID; Optional last two columns can be Project and Analysis IDs.  \n\n*These individual sample files or directory of files must be specified in the config file (see below).*\n\n\nlusSTR utilizes the ```lusstr``` command to invoke various Snakemake workflows. The ```lusstr strs``` command invokes the STR analysis workflow while the ```lusstr snps``` command invokes the SNP analysis workflow. Please see below for further information on processing SNP data.\n___\n### Creating the STR config file\n\nRunning ```lusstr config``` creates a config file containing the default settings for the lusSTR STR analysis pipeline. The settings can be changed with command line arguments (see below) or by manually editing the config file. The default settings, along with their descriptions, are as follows:\n\n### general settings\n**analysis_software**: ```uas``` (```uas/straitrazor/genemarker```); indicates the analysis software used prior to lusSTR  \n**sex**: ```False``` (True/False); include sex-chromosome STRs (invoke ```--sex``` flag)  \n**samp_input**: ```/path/to/input/directory/or/samples``` input directory or sample; if not provided, will be current working directory (indicate using ```--input path/to/dir``` )  \n**output**: ```lusstr_output``` output file/directory name (indicate using ```--out dir/sampleid e.g. --out test_030923```)  \n**custom**: ```False``` (True/False); use custom sequence ranges as defined in the STR markers json file (```str_markers.json```).\n\n### convert settings  \n**kit**: ```forenseq``` (forenseq/powerseq) (invoke the ```--powerseq``` flag if using PowerSeq data)  \n**nocombine**: ```False``` (True/False); do not combine identical sequences during the ```convert``` step, if using STRait Razor data. (invoke the ```--nocombine``` flag)  \n\n### filter settings  \n**output_type**: ```strmix``` (strmix/efm/mpsproto) (indicate using the ```--software``` flag)  \n**profile_type**: ```evidence``` (evidence/reference) (invoke ```--reference``` flag if creating a reference output file)  \n**data_type**: ```ngs``` (ce/ngs/lusplus) (indicate using the ```--str-type```)  \n**info**: ```True``` (True/False); create allele information file (invoke ```--noinfo``` flag to not create the allele information file)  \n**separate**: ```False``` (True/False); for EFM/MPSproto only, if True will create individual files for samples; if False, will create one file with all samples (invoke ```--separate``` flag to separate EFM/MPSproto output files)  \n**nofilters**: ```False``` (True/False); skip all filtering steps but still creates EFM/MPSproto/STRmix output files (invoke ```--nofilters``` flag)  \n**strand**: ```uas``` (uas/forward); indicates the strand orientation in which to report the sequence in the final output table for STRmix NGS only (indicate using ```--strand```)\n\nOne additional argument can be provided with ```lusstr config```:  \n```-w```/```-workdir``` sets the working directory (e.g. ```-w lusstr_files/```) and all created files are stored in that directory.\n\n**Once the config file is created with all the desired settings, the STR workflow can be run. The config file must be located in the working directory.**\n___\n## Running the lusSTR STR workflow\n\nThe lusSTR STR workflow consists of three steps:  \n(1) ```format```: formatting input  \n(2) ```convert```: converting sequences to other sequence representations and allele designations  \n(3) ```filter```: performing several filtering steps and creating appropriately formatted files for use in EuroForMix or STRmix.\n\nAny or all steps can be run. In order to run all three steps, the following command can be used:  \n```\nlusstr strs all\n```\n\nOne additional argument can be provided, a working directory.  \n**This working directory must contain the config file.**  \nIf not specified, the working directory is the current directory.\n```\nlusstr strs all -w lusstr_files/\n```\n\nIndividual steps can also be run\n```\nlusstr strs format -w lusstr_files/\n```\n\n```\nlusstr strs convert -w lusstr_files/\n```\n\n**In order to run the ```convert``` step, the appropriately formatted ```.csv``` file containing the sequences normally created in the ```format``` step must be present in the working directory. See the below ```Formatting input for STR loci sequences``` section for specific information about that file (required columns, etc.).** \n\n----\n\n## Additional information about each step  \n\n\n### Formatting input for STR loci sequences\n\nIf inputting data from either the UAS Sample Details Report, STRait Razor or GeneMarker output, the user must first invoke the ```format``` step to extract necessary information and format for the ```convert``` step.\n\nThe ```format``` command removes unnecessary rows/columns and outputs a table in CSV format containing the following columns:\n*  Locus\n*  Number of Reads observed with the specified sequence\n*  Sequence\n*  Sample ID\n*  Project ID (if provided)\n*  Analysis ID (if provided)\n\nIf including the sex chromosome loci as specified in the config file, the ```format``` command will output a second table for the sex loci with the same columns (```*_sexloci.csv```).\n\n---\n\n### Converting STR sequences to other sequence representations and allele designations\n\nThe ```convert``` step produces a tab-delineated table with the following columns:\n*  Sample ID\n*  Project ID (if provided)\n*  Analysis ID (if provided)\n*  Locus\n*  UAS Output sequence: can be forward or reverse strand\n*  Forward strand sequence: will be same as UAS Output sequence for those loci reported on forward strand\n*  UAS Output Bracketed notation: Bracketed sequence form for the reported UAS sequence output (will be same for those loci which report the forward strand)\n*  Forward Strand Bracketed notation: Bracketed notation for forward strand sequence\n*  CE allele: common length-based CE allele designation (also called the repeat unit, or RU, allele)\n*  LUS: Longest uninterrupted stretch\n*  LUS+: Notation combining multiple allele designations including CE, LUS, secondary motif (if applicable) and tertiary motif (if applicable)\n*  Reads: number of reads observed with the specified sequence\n\nIf including the sex chromosome loci as specified in the config file, a second table with the above columns for the sex chromosome loci will be outputted as well.\n\n\nIf STRait Razor or GeneMarker data is specified, several additional processes occur with the ```convert``` step:\n*  The full sequences are filtered to the UAS region before the translation step. The number of bases to remove is determined based on the specified kit.\n*  Once the sequences are filtered to the UAS region, any duplicated sequences are removed and their reads are summed in with the remaining sequence ```Reads``` column. NOTE: This step can be skipped with the ```nocombine``` setting in the config file.\n  \nFurther, a second table (labeled as ```*_flanks.txt```) containing information related to the flanking sequences surrounding the UAS sequence region is also produced with the following columns:\n*  Sample ID\n*  Project ID\n*  Analysis ID (same as Project ID)\n*  Locus\n*  Reads: number of reads observed for the specified sequence\n*  Length-based (CE) Allele\n*  Full Sequence\n*  5' Flanking Sequence Bracketed Notation\n*  UAS Region Sequence Bracketed Notation (same as column ```UAS Output Bracketed Notation``` in the main table)\n*  3' Flanking Sequence Bracketed Notation\n*  Potential Issues (such as: Possible indel or partial sequence)\n\nThe ```Potential Issues``` column in this report is to draw attention to potential problem sequences (due to perhaps an indel or partial sequence) and requires the attention of the user to further evaluate the sequence for its authenticity.  \n\nIndividual marker plots displaying reads vs. CE allele are created in PDF format. They are stored in the ```MarkerPlots/``` directory of the working directory:   \n* The first page of the PDF file contains the marker plots using a custom y-axis scale (i.e. the y-axis is scaled for each individual marker).  \n* The second page of the PDF file contains the marker plots using the same (i.e. the maximum) y-axis scale.  \n* A separate PDF file for the X- & Y-STRs are created, if specified.  \n \n---\n\n### Filtering Alleles/Sequences and Creation of Files for Use in ProbGen Software\n\nThe ```filter``` step provides the opportunity to filter sequences using thresholds such as:\n* Detection threshold (both static and dynamic)\n* Analytical threshold (both static and dynamic)\n* Same size threshold (dynamic)\n\nCustom static and dynamic thresholds for each locus are stored in the ```filters.json``` file. This file should be updated to utilize validated thresholds for individual labs.\n\nIn addition, stutter alleles can be identified using the ```info``` setting in the config file. This creates a separate file containing information about each allele, including an allele classification (```real allele```, ```stutter``` or ```BelowAT```). Stutter alleles are classified as either ```-1 stutter```, ```-2 stutter```, or ```+1 stutter```. For these stutter alleles, the stuttering allele is reported along with the percent stutter (# of reads for that allele/# of reads for stuttering allele). In instances where a stutter allele could be multiple different types of stutter, all potential designations will be reported as such: ```-1 stutter/-2 stutter```, ```-1 stutter/+1 stutter```, or ```-2 stutter/+1 stutter```. No percent stutter is calculated for these alleles. If a sequence is identified as noise, the percent noise is calculated (# of reads for that sequence/total locus reads).\n\nEach locus is checked for containing greater than 2 alleles (indicating a potential mixture) and for intralocus imbalance. If either are identified, a separate file (```Flagged_Loci.csv```) is created, containing the SampleID, Locus and either ```>2Alleles``` or ```IntraLocusImbalance```.\n\nWhen using STRmix data, the data type can be specified using the ```data-type``` setting as either ```ce```, ```ngs``` or ```lusplus``` (default is ```ngs```). If ```ngs``` or ```lusplus``` is specified, the same size filter is applied following the stutter filter. Further, the columns and column names in the output file differ based on the data type.\n\nFinally, output files are created for direct use in EuroForMix (EFM), MPSproto or STRmix. If EFM or MPSproto is specified, a single file is created containing all samples in the input file (however, separate output files for each sample can be created with the ```separate``` setting specified in the config file). If STRmix is specified, a directory containing files for each individual sample is created. The ```profile-type``` setting allows for the creation of either a ```reference``` or ```evidence``` profile. Both EuroForMix/MPSproto and STRmix require different formatting depending on the type of sample. \n\n---\n\n### View and Edit lusSTR data\n\nThe ```See Individual Marker Plots & Data``` button at the bottom of the lusSTR STR page can be run either directly after a lusSTR run (e.g. the settings have already been specified) or the user can upload previously-run lusSTR data by uploading the lusSTR output folder using the ```Select an Output Folder``` button. If using previously run data, the configuration settings within the ```config.yaml``` file in that folder will automatically be loaded and used. If other settings are desired, please re-run lusSTR using the new settings.  \n\nOnce the ```See Individual Marker Plots & Data``` button has been pressed, the sample of interest can be selected from the dropdown menu (if multiple samples are present). The first screen contains the marker plots for all autosomal STRs. Individual markers can be selected from the dropdown menu. Markers with potential issues are flagged with a caution symbol.  \n\nOn the individual marker pages, the ```allele_type``` column can be changed (no other column in the data table can be edited). A dropdown menu will appear to change the assigned allele type for a specific sequence. If a type is changed, the page will automatically refresh and the marker plot will be updated with the edited changes. The user may edit multiple markers and samples.  \n\nOnce all desired changes are made, selecting the \"Save Edits\" button will create the following files containing the changes:\n  1. New final lusSTR output files (either ```STRmix``` or ```EFM``` files as generated previously with lusSTR)  \n  2. New allele information file  \n  3. New PDFs of the marker plots  \nThe new files are automatically generated into a folder labeled as: ```edited_date_time``` (e.g. ```edited_10042024_16_29_50```)\n___\n\n\n ## SNP Data Processing\n\nlusSTR is able to process SNPs derived from the ForenSeq Signature Prep assay and the ForenSeq Kintelligence assay. SNPs from the ForenSeq Signature Prep assay could be analyzed using either the Verogen UAS or STRait Razor. SNPs from the ForenSeq Kintelligence assay must first be analyzed using the UAS.\n\n___\n### Creating the SNP config file\n\nRunning ```lusstr config --snps``` creates a config file containing the default settings for the lusSTR SNP workflow. The settings can be changed with command line arguments (see below) or by manually editing the config file. The default settings, along with their descriptions, are as follows:  \n\n\n### general settings  \n**analysis_software**: ```uas``` (```uas/straitrazor```); indicates the analysis software used prior to lusSTR\n**samp_input**: ```/path/to/input/directory/or/samples``` input directory or sample; if not provided, will be current working directory (indicate using ```--input path/to/dir```)  \n**output**: ```lusstr_output``` output file/directory name; (indicate using ```--out dir/sampleid e.g. --out test_030923```)   \n**kit**: ```sigprep``` (sigprep/kintelligence) (invoke using the ```--kintelligence``` flag if using Kintelligence data)  \n\n### format settings  \n**types**: ```all``` choices are \"all\", \"i\" (identity SNPs only), \"p\" (phenotype only), \"a\" (ancestry only) or any combination (indicate using the ```--snp-type e.g. --snp-type i, p```)  \n**nofilter**: ```False``` (True/False); if no filtering is desired at the format step; if False, will remove any allele designated as Not Typed (invoke using the ```--nofiltering```)  \n\n### convert settings  \n**strand**: ```forward``` (forward/uas); indicates which orientation to report the alleles for the SigPrep SNPs; uas indicates the orientation as reported by the UAS or the forward strand  \n**references**: ```None```; list IDs of the samples to be run as references in EFM; default is no reference samples  \n**separate**: ```False``` (True/False); if want to separate samples into individual files for use in EFM  \n**thresh**: ```0.03```; Analytical threshold value    \n\n\nOne additional argument can be provided with ```lusstr config --snps```:  \n```-w```/```-workdir``` sets the working directory (e.g. ```-w lusstr_files/```) and all created files are stored in that directory.\n\n**Once the config file is created with all the desired settings, the SNP workflow can be run. The config file must be located in the working directory.**\n___\n## Running the lusSTR SNP workflow\n\nThe lusSTR SNP workflow consists of two steps:  \n(1) ```format```: formatting input and calling alleles if using STRait Razor data  \n(2) ```convert```: applying analytical threshold and converting data to correct format for input into EuroForMix\n\nEither the first step, format, or both steps can be run. In order to run both steps, the following command can be used:  \n```\nlusstr snps all\n```\n\nOne additional argument can be provided, a working directory.  \n**This working directory must contain the config file.**  \nThe default working directory is the current directory.  \n```\nlusstr snps all -w lusstr_files/  \n```\n\nIndividual format step can also be run  \n```\nlusstr snps format -w lusstr_files/  \n```\n\n**In order to run the ```all``` step, the appropriately formatted ```.csv``` file containing the sequences normally created in the ```format``` step must be present in the working directory. See the below ```Usage``` section for specific information about that file (required columns, etc.).**  \n\n----\n\n## Additional information about each step  \n\n\n### Formatting input for SNP data  \n\nIf inputting data from either the UAS Sample Details Report/Phenotype Report/Sample Report or STRait Razor output, the user must first invoke the ```format``` step to extract necessary information and format for the final ```convert``` step.  \n\nThe ```format``` command removes unnecessary rows/columns and outputs a table in CSV format containing the following columns:  \n*  Sample ID  \n*  Project ID  \n*  Analysis ID  \n*  SNP (rsID)  \n*  Reads  \n*  Forward Strand Allele  \n*  UAS orientation Allele  \n*  Type (ancestry/identity/phenotype/kintelligence)  \n*  Issues  \n\n### Converting to appropriately formatted files for use in EuroForMix  \n\nThis final step will convert the table generated in the ```format``` step into the correct format for use in EuroForMix. An analytical threshold can be applied (this is especially useful for data analyzed using STRait Razor) in this step.  \n\nIf any samples are to be used as references, their IDs can be provided in the config file to create a separate file appropriately formatted for use as reference profiles in EFM. Any samples not specified as references are assumed to be evidence samples and will be formatted as such.  \n\nThere is the option to create separate evidence files for each sample (as specified in the config file); this is especially useful for Kintelligence profiles given their larger size.  \n\nThis command also changes the alleles to numeric (```A```=```1```, ```C```=```2```, ```G```=```3```, ```T```=```4```)\n\n\n----\n\n\nlusSTR is still under development and any suggestions/issues found are welcome!\n"
+          }
+        ],
+        "tool_names": [
+          "_version",
+          "_version.py",
+          "config",
+          "config.py",
+          "convert",
+          "convert.py",
+          "file_selector",
+          "file_selector.py",
+          "filter",
+          "filter.py",
+          "filter_settings",
+          "filter_settings.py",
+          "folder_selector",
+          "folder_selector.py",
+          "format",
+          "format.py",
+          "gui",
+          "gui.py",
+          "lusSTR",
+          "lusstr",
+          "marker",
+          "marker.py",
+          "repeat",
+          "repeat.py",
+          "snps",
+          "snps.py",
+          "snps_convert",
+          "snps_convert.py",
+          "snps_format",
+          "snps_format.py",
+          "strs",
+          "strs.py",
+          "versioneer",
+          "versioneer.py"
+        ],
+        "tree_paths": [
+          ".coveragerc",
+          ".gitattributes",
+          ".gitignore",
+          "LICENSE.txt",
+          "MANIFEST.in",
+          "Makefile",
+          "README.md",
+          "lusSTR/__init__.py",
+          "lusSTR/_version.py",
+          "lusSTR/cli/__init__.py",
+          "lusSTR/cli/config.py",
+          "lusSTR/cli/gui.py",
+          "lusSTR/cli/logo.png",
+          "lusSTR/cli/snps.py",
+          "lusSTR/cli/strs.py",
+          "lusSTR/data/__init__.py",
+          "lusSTR/data/config.yaml",
+          "lusSTR/data/filters.json",
+          "lusSTR/data/snp_config.yaml",
+          "lusSTR/data/snp_data.json",
+          "lusSTR/data/str_lists.json",
+          "lusSTR/data/str_markers.json",
+          "lusSTR/scripts/__init__.py",
+          "lusSTR/scripts/file_selector.py",
+          "lusSTR/scripts/filter_settings.py",
+          "lusSTR/scripts/folder_selector.py",
+          "lusSTR/scripts/marker.py",
+          "lusSTR/scripts/repeat.py",
+          "lusSTR/tests/__init__.py",
+          "lusSTR/tests/data/2800M_formatted_full.csv",
+          "lusSTR/tests/data/2800M_formatted_uas.csv",
+          "lusSTR/tests/data/2800M_full_convert.txt",
+          "lusSTR/tests/data/2800M_full_convert_no_combined_reads.txt",
+          "lusSTR/tests/data/2800M_uas_convert.txt",
+          "lusSTR/tests/data/D7_microvariant_flagged.csv",
+          "lusSTR/tests/data/Flanks_testing_file.csv",
+          "lusSTR/tests/data/LUSPlus_stutter_test/EFM_test_reference_lusplus.csv",
+          "lusSTR/tests/data/LUSPlus_stutter_test/LUSPlus_sequence_info.csv",
+          "lusSTR/tests/data/LUSPlus_stutter_test/test_filtering_EFMoutput_lusplus.csv",
+          "lusSTR/tests/data/LUSPlus_stutter_test/test_filtering_EFMoutput_sequence_info.csv",
+          "lusSTR/tests/data/MPSproto_test/EFM_test_reference_ngs.csv",
+          "lusSTR/tests/data/MPSproto_test/test_filtering_EFMoutput_ngs.csv",
+          "lusSTR/tests/data/MPSproto_test/test_filtering_EFMoutput_sequence_info.csv",
+          "lusSTR/tests/data/NA24385 Sample Report 2023_09_07_15_11_11.xlsx",
+          "lusSTR/tests/data/NGS_stutter_test/Flagged_Loci.csv",
+          "lusSTR/tests/data/NGS_stutter_test/Positive_Control_reference_ngs.csv",
+          "lusSTR/tests/data/NGS_stutter_test/STRmix_Files_sequence_info.csv",
+          "lusSTR/tests/data/NGS_stutter_test/Sample1_forwardstrand.csv",
+          "lusSTR/tests/data/NGS_stutter_test/Sample1_ngs.csv",
+          "lusSTR/tests/data/NGS_stutter_test/Sample1_nofilter.csv",
+          "lusSTR/tests/data/NGS_stutter_test/custom/Sample1_evidence_ngs.csv",
+          "lusSTR/tests/data/NGS_stutter_test/custom/test_stutter_custom_range.txt",
+          "lusSTR/tests/data/NGS_stutter_test/custom/test_stutter_sequence_info.csv",
+          "lusSTR/tests/data/RU_stutter_test/EFM_test_reference_ce.csv",
+          "lusSTR/tests/data/RU_stutter_test/Flagged_Loci.csv",
+          "lusSTR/tests/data/RU_stutter_test/Positive_Control_reference_ce.csv",
+          "lusSTR/tests/data/RU_stutter_test/STRmix_Files_sequence_info.csv",
+          "lusSTR/tests/data/RU_stutter_test/Sample1_ce.csv",
+          "lusSTR/tests/data/RU_stutter_test/test_filtering_EFMoutput_ce.csv",
+          "lusSTR/tests/data/RU_stutter_test/test_filtering_EFMoutput_sequence_info.csv",
+          "lusSTR/tests/data/STRaitRazor_output_test_A001.csv",
+          "lusSTR/tests/data/STRait_Razor_test_output.csv",
+          "lusSTR/tests/data/STRait_Razor_test_output/A001.txt",
+          "lusSTR/tests/data/STRait_Razor_test_output/A002.txt",
+          "lusSTR/tests/data/STRait_Razor_test_output/A003.txt",
+          "lusSTR/tests/data/STRait_Razor_test_output/A004.txt",
+          "lusSTR/tests/data/STRait_Razor_test_output/A005.txt",
+          "lusSTR/tests/data/STRait_Razor_test_output/A006.txt",
+          "lusSTR/tests/data/STRait_Razor_test_output/A007.txt",
+          "lusSTR/tests/data/STRait_Razor_test_output/A008.txt",
+          "lusSTR/tests/data/STRait_Razor_test_output/A009.txt",
+          "lusSTR/tests/data/STRait_Razor_test_output/A010.txt",
+          "lusSTR/tests/data/STRait_Razor_test_output/A011.txt",
+          "lusSTR/tests/data/STRait_Razor_test_output/A012.txt",
+          "lusSTR/tests/data/UAS_bulk_input/Positive Control Sample Details Report 2315.xlsx",
+          "lusSTR/tests/data/UAS_bulk_input/Positive Control Sample Details Report 2316.xlsx",
+          "lusSTR/tests/data/UAS_bulk_test.csv",
+          "lusSTR/tests/data/UAS_bulk_test_sexloci.csv",
+          "lusSTR/tests/data/genemarker/2800M_strresults_filtered.csv",
+          "lusSTR/tests/data/genemarker/genemarker_test.csv",
+          "lusSTR/tests/data/genemarker/genemarker_test.txt",
+          "lusSTR/tests/data/genemarker/genemarker_test_flanks.txt",
+          "lusSTR/tests/data/genemarker/genemarker_test_sexloci.csv",
+          "lusSTR/tests/data/genemarker/genemarker_test_sexloci.txt",
+          "lusSTR/tests/data/genemarker/genemarker_test_sexloci_flanks.txt",
+          "lusSTR/tests/data/kinsnps/Kin_pos_1ng Sample Report 2023_07_11_13_16_31.xlsx",
+          "lusSTR/tests/data/kinsnps/Kin_pos_1ng_reference Sample Report 2023_07_11_13_16_31.xlsx",
+          "lusSTR/tests/data/kinsnps/Kin_pos_1ng_snpsetscombined_evidence.tsv",
+          "lusSTR/tests/data/kinsnps/evidence.tsv",
+          "lusSTR/tests/data/kinsnps/multiplerefs.tsv",
+          "lusSTR/tests/data/kinsnps/reference.tsv",
+          "lusSTR/tests/data/kinsnps/snps_kin_all.tsv",
+          "lusSTR/tests/data/kinsnps/snps_kin_filtered.tsv",
+          "lusSTR/tests/data/kinsnps/uasversion_snp_evidence.tsv",
+          "lusSTR/tests/data/lusstr_output.csv",
+          "lusSTR/tests/data/lusstr_output.txt",
+          "lusSTR/tests/data/lusstr_output/Positive_Control_evidence_ngs.csv",
+          "lusSTR/tests/data/powerseq.csv",
+          "lusSTR/tests/data/powerseq_example_evidence_ngs.csv",
+          "lusSTR/tests/data/powerseq_example_sexloci_sequence_info.csv",
+          "lusSTR/tests/data/powerseq_flanking_convert_test.csv",
+          "lusSTR/tests/data/powerseq_flanking_convert_test_flanks.txt",
+          "lusSTR/tests/data/powerseq_flanking_convert_test_sexloci.csv",
+          "lusSTR/tests/data/powerseq_flanking_convert_test_sexloci.txt",
+          "lusSTR/tests/data/powerseq_flanking_convert_test_sexloci_flanks.txt",
+          "lusSTR/tests/data/powerseq_sexloci.csv",
+          "lusSTR/tests/data/powerseq_sexloci.txt",
+          "lusSTR/tests/data/powerseq_sexloci_flanks_anno.txt",
+          "lusSTR/tests/data/snps/2800M_STRaitRazor.txt",
+          "lusSTR/tests/data/snps/Positive Control Phenotype Report 2256.xlsx",
+          "lusSTR/tests/data/snps/Positive Control Sample Details Report 2315.xlsx",
+          "lusSTR/tests/data/snps_sr_all.tsv",
+          "lusSTR/tests/data/snps_sr_all_full_output.tsv",
+          "lusSTR/tests/data/snps_uas_all.tsv",
+          "lusSTR/tests/data/snps_uas_filtered.tsv",
+          "lusSTR/tests/data/test_D7.txt",
+          "lusSTR/tests/data/test_FGA_short_seq.csv",
+          "lusSTR/tests/data/test_flank.csv",
+          "lusSTR/tests/data/test_format_uas.csv",
+          "lusSTR/tests/data/test_indels.csv",
+          "lusSTR/tests/data/test_indels.txt",
+          "lusSTR/tests/data/test_references.txt",
+          "lusSTR/tests/data/test_stutter.txt",
+          "lusSTR/tests/data/test_stutter_lusp.txt",
+          "lusSTR/tests/data/testflanks.txt",
+          "lusSTR/tests/data/testflanks_flanks.txt",
+          "lusSTR/tests/data/testformat.csv",
+          "lusSTR/tests/data/testformat_sr.csv",
+          "lusSTR/tests/data/testformat_sr_sexloci.csv",
+          "lusSTR/tests/data/testformat_sr_sexloci.txt",
+          "lusSTR/tests/data/testformat_sr_sexloci_flanks.txt",
+          "lusSTR/tests/data/testformat_uas.csv",
+          "lusSTR/tests/data/testformat_uas_sexloci.csv",
+          "lusSTR/tests/data/testformat_uas_sexloci.txt",
+          "lusSTR/tests/test_filters.py",
+          "lusSTR/tests/test_format.py",
+          "lusSTR/tests/test_marker.py",
+          "lusSTR/tests/test_repeat.py",
+          "lusSTR/tests/test_snps.py",
+          "lusSTR/tests/test_suite.py",
+          "lusSTR/workflows/snps.smk",
+          "lusSTR/workflows/strs.smk",
+          "lusSTR/wrappers/convert.py",
+          "lusSTR/wrappers/filter.py",
+          "lusSTR/wrappers/format.py",
+          "lusSTR/wrappers/snps_convert.py",
+          "lusSTR/wrappers/snps_format.py",
+          "pytest.ini",
+          "setup.cfg",
+          "setup.py",
+          "versioneer.py"
+        ],
+        "tree_truncated": false,
+        "upstream_files": {}
+      },
+      "limitations": [
+        "input_type_guessed",
+        "install_profile_unsupported",
+        "no_reference_dataset"
+      ],
+      "caveat_items": [
+        "Environment: no proven installation profile; STRhub did not manufacture installation steps.",
+        "Input: no sentence in the README says what the tool takes; illumina-snp-fastq is only a guess from mentions; it is not authorization to execute.",
+        "Run command: the README's own command, rewritten to STRhub's mounts; the capture wrapper is planned only if the procedure review passes."
+      ]
+    }
+  },
+  "provenance": {
+    "from_upstream": {
+      "install": {
+        "method": "pip",
+        "evidence_source": "repo_file:setup.py"
+      },
+      "command": {
+        "value": "lusstr strs all",
+        "evidence_source": "README.md:L112"
+      },
+      "input_kind": {
+        "value": "fastq",
+        "evidence_source": null
+      },
+      "supported_platforms": [],
+      "assembly": {
+        "declared": null,
+        "evidence_source": null
+      },
+      "regions_schema": null,
+      "output_format": {
+        "glob": "**/*.csv",
+        "evidence_source": "README.md:L28"
+      }
+    },
+    "derived": {
+      "command_rewrites": [],
+      "regions_layout_binding": null,
+      "single_sample_adaptation": null
+    },
+    "harness_choices": {
+      "dataset": {
+        "selected": "illumina-snp-fastq",
+        "reason": "STRhub selected 'illumina-snp-fastq' as compatible with upstream input 'fastq' and platform 'illumina'"
+      },
+      "platform": {
+        "selected": "illumina",
+        "basis": "counted_unproven",
+        "supported_platforms": []
+      },
+      "assembly": null,
+      "regions_layout": null,
+      "base_environment": null
+    }
+  },
+  "procedure_validation": {
+    "schema": "strhub-procedure-evidence/1",
+    "valid": true,
+    "reason": "Procedure evidence matches the effective manifest and recomputed decision."
+  },
+  "verdict": {
+    "code": "undetermined",
+    "title": "Could not be determined",
+    "basis": "recipe",
+    "reason": "STRhub holds no reference sample of the kind this procedure reads, and the repository ships no example to run, so nothing was executed.",
+    "readme_gaps": [
+      {
+        "item": "command_input",
+        "text": "The README's example commands do not show where the input file goes."
+      }
+    ],
+    "status_code": "UNVERIFIED_INSUFFICIENT_DOCS",
+    "blockers": [
+      {
+        "code": "no_reference_dataset",
+        "what": "STRhub has no reference sample of the kind this tool reads, and the repository ships no example to run, so nothing was executed.",
+        "ask_owner": {
+          "title": "Ship a small example dataset",
+          "body": "STRhub Verified could not run the tool: it holds no public reference sample of the input type the README describes, and the repository ships no example data. A small example (a few reads and the expected output) would let a new user, and STRhub, run it end-to-end."
+        }
+      },
+      {
+        "code": "build_failed",
+        "what": "The environment did not build from the install steps found in the repository.",
+        "ask_owner": {
+          "title": "Build fails from a clean checkout",
+          "body": "STRhub Verified tried to build the tool from a clean checkout at the pinned commit, following the repository's own install steps, and the build failed. The build log is linked from the run."
+        }
+      }
+    ]
+  },
+  "recommendations": [
+    {
+      "code": "example_data",
+      "text": "The repository ships no example input. A small example the documented command can read, with the output it should produce, would let any user reproduce the run without outside data."
+    }
+  ],
+  "step1": {
+    "code": "ours",
+    "headline": "STRhub could not attempt the documented run.",
+    "body": "STRhub holds no reference sample of the kind this procedure reads, and the repository ships no example to run, so nothing was executed. The limitation is ours. Nothing here is a finding about the tool.",
+    "missing": [],
+    "missing_text": [],
+    "guide": "docs/GUIA-PASO-1.md"
+  },
+  "certificate": {
+    "schema": "strhub-verified/certificate/1",
+    "label": "Could not be determined",
+    "reached": "Available",
+    "stages": [
+      {
+        "key": "available",
+        "label": "Source available",
+        "status": "PASS"
+      },
+      {
+        "key": "installs",
+        "label": "Installation",
+        "status": "NOT ATTEMPTED"
+      },
+      {
+        "key": "runs",
+        "label": "End-to-end execution",
+        "status": "NOT ATTEMPTED"
+      },
+      {
+        "key": "output",
+        "label": "Output generated",
+        "status": "NOT ATTEMPTED"
+      }
+    ],
+    "summary": {
+      "purpose": "Evaluate whether the tool installs, runs end-to-end, and produces structurally valid output.",
+      "result": "Could not be determined",
+      "reached": "Available, 1/5 gates passed",
+      "why": "STRhub holds no reference sample of the kind this procedure reads, and the repository ships no example to run, so nothing was executed.",
+      "scope": "Installation, execution, and output structure evaluation.",
+      "not_evaluated": [
+        "Genotype accuracy",
+        "Concordance",
+        "Forensic validity",
+        "Regulatory compliance"
+      ]
+    },
+    "conclusion": [
+      {
+        "title": "Procedure not established",
+        "body": "The recorded gate observations do not establish whether the documented procedure succeeded or failed."
+      },
+      {
+        "title": "Observations retained",
+        "body": "The supplied run and output observations remain in the report; they do not replace procedure evidence."
+      },
+      {
+        "title": "Verdict: Could not be determined",
+        "body": "STRhub holds no reference sample of the kind this procedure reads, and the repository ships no example to run, so nothing was executed."
+      },
+      {
+        "title": "Reproducibility not established",
+        "body": "These observations are insufficient to establish a reproducible documented execution finding."
+      }
+    ],
+    "out_of_scope": [
+      "Genotype correctness or accuracy",
+      "Concordance against known truth sets",
+      "Sensitivity, specificity, or stutter performance",
+      "Allele calling accuracy or forensic casework suitability",
+      "Regulatory compliance or ISO accreditation",
+      "Multi-laboratory or multi-dataset reproducibility"
+    ],
+    "limitations": [
+      "Single reference dataset per input type",
+      "Single containerized environment (Docker / ubuntu-22.04)",
+      "No truth-set comparison or ground-truth genotypes",
+      "No accuracy or concordance assessment",
+      "No forensic or clinical validation of results",
+      "No sequencing data were processed because execution did not complete"
+    ],
+    "scope": {
+      "statement": "Independent automated evaluation of reproducible execution. It checks whether the tool installs, runs end-to-end, and produces structurally valid output in a standardized environment.",
+      "not": "This is not an analytical validation. Genotype accuracy, concordance, forensic suitability, and regulatory compliance are out of scope.",
+      "disclaimer": "Each result is a dated snapshot, verified on the tool's public repository at a pinned commit. STRhub does not store tool source code."
+    }
+  }
+}

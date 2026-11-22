@@ -1,7 +1,7 @@
 {
   "schema": "strhub-verified/index/3",
-  "generated": "2026-11-22T19:14:14+00:00",
-  "count": 8,
+  "generated": "2026-11-22T19:14:23+00:00",
+  "count": 9,
   "tools": [
     {
       "slug": "expansionhunter",
@@ -130,6 +130,50 @@
           "report": "longtr-ont/2be6cf5ec0b108601719c16171a3f0099d1cb88d/longtr-ont.json",
           "page": "longtr-ont/2be6cf5ec0b108601719c16171a3f0099d1cb88d/longtr-ont.html",
           "pdf": "longtr-ont/2be6cf5ec0b108601719c16171a3f0099d1cb88d/longtr-ont.pdf"
+        }
+      ]
+    },
+    {
+      "slug": "lusstr-snp",
+      "name": "lusSTR",
+      "version": "0.11",
+      "variant": null,
+      "sha": "2425112706d03929ee3cf82588ddd6a2f315083c",
+      "committed": "2025-06-05T16:18:38Z",
+      "instrument": "documented",
+      "level": "available",
+      "label": "Could not be determined",
+      "verdict": "undetermined",
+      "errors_reported": false,
+      "generated": "2026-11-22T19:13:53+00:00",
+      "source_repo": "https://github.com/bioforensics/lusSTR",
+      "source_ref": "2425112706d03929ee3cf82588ddd6a2f315083c",
+      "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/45059493742",
+      "distinct_str_loci": null,
+      "distinct_snp_markers": null,
+      "total_reads": null,
+      "external_state": "na",
+      "dataset_types": [
+        "illumina-snp-fastq"
+      ],
+      "report": "lusstr-snp.json",
+      "page": "lusstr-snp.html",
+      "versions": [
+        {
+          "sha": "2425112706d03929ee3cf82588ddd6a2f315083c",
+          "instrument": "documented",
+          "version": "0.11",
+          "variant": null,
+          "committed": "2025-06-05T16:18:38Z",
+          "generated": "2026-11-22T19:13:53+00:00",
+          "level": "available",
+          "label": "Could not be determined",
+          "verdict": "undetermined",
+          "errors_reported": false,
+          "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/45059493742",
+          "report": "lusstr-snp/2425112706d03929ee3cf82588ddd6a2f315083c/lusstr-snp.json",
+          "page": "lusstr-snp/2425112706d03929ee3cf82588ddd6a2f315083c/lusstr-snp.html",
+          "pdf": "lusstr-snp/2425112706d03929ee3cf82588ddd6a2f315083c/lusstr-snp.pdf"
         }
       ]
     },
