@@ -1,0 +1,899 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from source-install.Dockerfile
+#1 transferring dockerfile: 565B done
+#1 DONE 0.0s
+
+#2 [auth] library/ubuntu:pull token for registry-1.docker.io
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/ubuntu:22.04
+#3 DONE 0.7s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [1/6] FROM docker.io/library/ubuntu:22.04@sha256:f64b2ffc2f10ab8f8505aa56b2664bd846cbb9df87c7e2532e30f7667021c0e6
+#5 resolve docker.io/library/ubuntu:22.04@sha256:f64b2ffc2f10ab8f8505aa56b2664bd846cbb9df87c7e2532e30f7667021c0e6 done
+#5 sha256:ba082564e6605eeb2e1abc91a762985d2e8afea393433de08e798c1eee36d028 0B / 30.07MB 0.1s
+#5 sha256:f64b2ffc2f10ab8f8505aa56b2664bd846cbb9df87c7e2532e30f7667021c0e6 6.69kB / 6.69kB done
+#5 sha256:b682e31336cc8e0a73ed91ab32b7a95e32591c5ff09994490a20accf9b3600f9 424B / 424B done
+#5 sha256:4c738ec33362ed21d54f5e6ca4eadc9f2707fd6516cd7eb5be2a772dfdfaa938 2.05kB / 2.05kB done
+#5 sha256:ba082564e6605eeb2e1abc91a762985d2e8afea393433de08e798c1eee36d028 16.78MB / 30.07MB 0.2s
+#5 ...
+
+#6 [internal] load build context
+#6 transferring context: 51.53MB 0.2s done
+#6 DONE 0.2s
+
+#5 [1/6] FROM docker.io/library/ubuntu:22.04@sha256:f64b2ffc2f10ab8f8505aa56b2664bd846cbb9df87c7e2532e30f7667021c0e6
+#5 sha256:ba082564e6605eeb2e1abc91a762985d2e8afea393433de08e798c1eee36d028 30.07MB / 30.07MB 0.3s
+#5 extracting sha256:ba082564e6605eeb2e1abc91a762985d2e8afea393433de08e798c1eee36d028
+#5 sha256:ba082564e6605eeb2e1abc91a762985d2e8afea393433de08e798c1eee36d028 30.07MB / 30.07MB 0.4s done
+#5 extracting sha256:ba082564e6605eeb2e1abc91a762985d2e8afea393433de08e798c1eee36d028 0.7s done
+#5 DONE 1.2s
+
+#7 [2/6] RUN ["bash", "-c", "echo 'APT::Get::Assume-Yes "true";' > /etc/apt/apt.conf.d/90strhub && apt-get update"]
+#7 0.206 Get:1 http://security.ubuntu.com/ubuntu jammy-security InRelease [129 kB]
+#7 0.375 Get:2 http://archive.ubuntu.com/ubuntu jammy InRelease [270 kB]
+#7 0.421 Get:3 http://security.ubuntu.com/ubuntu jammy-security/universe amd64 Packages [1329 kB]
+#7 0.581 Get:4 http://security.ubuntu.com/ubuntu jammy-security/main amd64 Packages [4547 kB]
+#7 0.655 Get:5 http://security.ubuntu.com/ubuntu jammy-security/restricted amd64 Packages [8111 kB]
+#7 0.715 Get:6 http://security.ubuntu.com/ubuntu jammy-security/multiverse amd64 Packages [96.7 kB]
+#7 1.034 Get:7 http://archive.ubuntu.com/ubuntu jammy-updates InRelease [128 kB]
+#7 1.233 Get:8 http://archive.ubuntu.com/ubuntu jammy-backports InRelease [127 kB]
+#7 1.392 Get:9 http://archive.ubuntu.com/ubuntu jammy/universe amd64 Packages [17.5 MB]
+#7 2.251 Get:10 http://archive.ubuntu.com/ubuntu jammy/main amd64 Packages [1792 kB]
+#7 2.309 Get:11 http://archive.ubuntu.com/ubuntu jammy/multiverse amd64 Packages [266 kB]
+#7 2.314 Get:12 http://archive.ubuntu.com/ubuntu jammy/restricted amd64 Packages [164 kB]
+#7 2.318 Get:13 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 Packages [4884 kB]
+#7 2.447 Get:14 http://archive.ubuntu.com/ubuntu jammy-updates/restricted amd64 Packages [8422 kB]
+#7 2.677 Get:15 http://archive.ubuntu.com/ubuntu jammy-updates/universe amd64 Packages [1631 kB]
+#7 2.721 Get:16 http://archive.ubuntu.com/ubuntu jammy-updates/multiverse amd64 Packages [104 kB]
+#7 2.723 Get:17 http://archive.ubuntu.com/ubuntu jammy-backports/universe amd64 Packages [35.6 kB]
+#7 2.724 Get:18 http://archive.ubuntu.com/ubuntu jammy-backports/main amd64 Packages [82.9 kB]
+#7 3.303 Fetched 49.6 MB in 3s (15.9 MB/s)
+#7 3.303 Reading package lists...
+#7 DONE 10.9s
+
+#8 [3/6] RUN ["bash", "-c", "apt-get install --no-install-recommends git ca-certificates"]
+#8 0.135 Reading package lists...
+#8 1.036 Building dependency tree...
+#8 1.277 Reading state information...
+#8 1.438 The following additional packages will be installed:
+#8 1.438   git-man libbrotli1 libcurl3-gnutls liberror-perl libexpat1 libgdbm-compat4
+#8 1.438   libgdbm6 libldap-2.5-0 libnghttp2-14 libperl5.34 libpsl5 librtmp1 libsasl2-2
+#8 1.439   libsasl2-modules-db libssh-4 openssl perl perl-modules-5.34
+#8 1.440 Suggested packages:
+#8 1.440   gettext-base git-daemon-run | git-daemon-sysvinit git-doc git-email git-gui
+#8 1.440   gitk gitweb git-cvs git-mediawiki git-svn gdbm-l10n perl-doc
+#8 1.440   libterm-readline-gnu-perl | libterm-readline-perl-perl make
+#8 1.440   libtap-harness-archive-perl
+#8 1.440 Recommended packages:
+#8 1.440   patch less ssh-client libldap-common publicsuffix libsasl2-modules netbase
+#8 1.508 The following NEW packages will be installed:
+#8 1.509   ca-certificates git git-man libbrotli1 libcurl3-gnutls liberror-perl
+#8 1.509   libexpat1 libgdbm-compat4 libgdbm6 libldap-2.5-0 libnghttp2-14 libperl5.34
+#8 1.509   libpsl5 librtmp1 libsasl2-2 libsasl2-modules-db libssh-4 openssl perl
+#8 1.510   perl-modules-5.34
+#8 1.615 0 upgraded, 20 newly installed, 0 to remove and 0 not upgraded.
+#8 1.615 Need to get 14.9 MB of archives.
+#8 1.615 After this operation, 75.4 MB of additional disk space will be used.
+#8 1.615 Get:1 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 perl-modules-5.34 all 5.34.0-3ubuntu1.10 [2977 kB]
+#8 2.011 Get:2 http://archive.ubuntu.com/ubuntu jammy/main amd64 libgdbm6 amd64 1.23-1 [33.9 kB]
+#8 2.011 Get:3 http://archive.ubuntu.com/ubuntu jammy/main amd64 libgdbm-compat4 amd64 1.23-1 [6606 B]
+#8 2.012 Get:4 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libperl5.34 amd64 5.34.0-3ubuntu1.10 [4796 kB]
+#8 2.074 Get:5 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 perl amd64 5.34.0-3ubuntu1.10 [232 kB]
+#8 2.076 Get:6 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 openssl amd64 3.0.2-0ubuntu1.30 [1186 kB]
+#8 2.087 Get:7 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 ca-certificates all 20260816ubuntu0.22.04.2 [140 kB]
+#8 2.088 Get:8 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libexpat1 amd64 2.4.7-1ubuntu0.9 [96.9 kB]
+#8 2.089 Get:9 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libnghttp2-14 amd64 1.43.0-1ubuntu0.4 [76.9 kB]
+#8 2.090 Get:10 http://archive.ubuntu.com/ubuntu jammy/main amd64 libpsl5 amd64 0.21.0-1.2build2 [58.4 kB]
+#8 2.090 Get:11 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libbrotli1 amd64 1.0.9-2ubuntu0.1 [315 kB]
+#8 2.097 Get:12 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libsasl2-modules-db amd64 2.1.27+dfsg2-3ubuntu1.2 [20.5 kB]
+#8 2.098 Get:13 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libsasl2-2 amd64 2.1.27+dfsg2-3ubuntu1.2 [53.8 kB]
+#8 2.141 Get:14 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libldap-2.5-0 amd64 2.5.20+dfsg-0ubuntu0.22.04.1 [184 kB]
+#8 2.142 Get:15 http://archive.ubuntu.com/ubuntu jammy/main amd64 librtmp1 amd64 2.4+20151223.gitfa8646d.1-2build4 [58.2 kB]
+#8 2.143 Get:16 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libssh-4 amd64 0.9.6-2ubuntu0.22.04.8 [189 kB]
+#8 2.144 Get:17 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libcurl3-gnutls amd64 7.81.0-1ubuntu1.30 [287 kB]
+#8 2.146 Get:18 http://archive.ubuntu.com/ubuntu jammy/main amd64 liberror-perl all 0.17029-1 [26.5 kB]
+#8 2.146 Get:19 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 git-man all 1:2.34.1-1ubuntu1.18 [954 kB]
+#8 2.151 Get:20 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 git amd64 1:2.34.1-1ubuntu1.18 [3174 kB]
+#8 2.285 debconf: delaying package configuration, since apt-utils is not installed
+#8 2.312 Fetched 14.9 MB in 1s (22.0 MB/s)
+#8 2.324 Selecting previously unselected package perl-modules-5.34.
+#8 2.324 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 4393 files and directories currently installed.)
+#8 2.329 Preparing to unpack .../00-perl-modules-5.34_5.34.0-3ubuntu1.10_all.deb ...
+#8 2.330 Unpacking perl-modules-5.34 (5.34.0-3ubuntu1.10) ...
+#8 2.565 Selecting previously unselected package libgdbm6:amd64.
+#8 2.566 Preparing to unpack .../01-libgdbm6_1.23-1_amd64.deb ...
+#8 2.568 Unpacking libgdbm6:amd64 (1.23-1) ...
+#8 2.583 Selecting previously unselected package libgdbm-compat4:amd64.
+#8 2.584 Preparing to unpack .../02-libgdbm-compat4_1.23-1_amd64.deb ...
+#8 2.585 Unpacking libgdbm-compat4:amd64 (1.23-1) ...
+#8 2.598 Selecting previously unselected package libperl5.34:amd64.
+#8 2.599 Preparing to unpack .../03-libperl5.34_5.34.0-3ubuntu1.10_amd64.deb ...
+#8 2.600 Unpacking libperl5.34:amd64 (5.34.0-3ubuntu1.10) ...
+#8 2.750 Selecting previously unselected package perl.
+#8 2.751 Preparing to unpack .../04-perl_5.34.0-3ubuntu1.10_amd64.deb ...
+#8 2.755 Unpacking perl (5.34.0-3ubuntu1.10) ...
+#8 2.775 Selecting previously unselected package openssl.
+#8 2.776 Preparing to unpack .../05-openssl_3.0.2-0ubuntu1.30_amd64.deb ...
+#8 2.776 Unpacking openssl (3.0.2-0ubuntu1.30) ...
+#8 2.808 Selecting previously unselected package ca-certificates.
+#8 2.810 Preparing to unpack .../06-ca-certificates_20260816ubuntu0.22.04.2_all.deb ...
+#8 2.810 Unpacking ca-certificates (20260816ubuntu0.22.04.2) ...
+#8 2.844 Selecting previously unselected package libexpat1:amd64.
+#8 2.845 Preparing to unpack .../07-libexpat1_2.4.7-1ubuntu0.9_amd64.deb ...
+#8 2.846 Unpacking libexpat1:amd64 (2.4.7-1ubuntu0.9) ...
+#8 2.859 Selecting previously unselected package libnghttp2-14:amd64.
+#8 2.860 Preparing to unpack .../08-libnghttp2-14_1.43.0-1ubuntu0.4_amd64.deb ...
+#8 2.861 Unpacking libnghttp2-14:amd64 (1.43.0-1ubuntu0.4) ...
+#8 2.873 Selecting previously unselected package libpsl5:amd64.
+#8 2.875 Preparing to unpack .../09-libpsl5_0.21.0-1.2build2_amd64.deb ...
+#8 2.879 Unpacking libpsl5:amd64 (0.21.0-1.2build2) ...
+#8 2.963 Selecting previously unselected package libbrotli1:amd64.
+#8 2.964 Preparing to unpack .../10-libbrotli1_1.0.9-2ubuntu0.1_amd64.deb ...
+#8 2.965 Unpacking libbrotli1:amd64 (1.0.9-2ubuntu0.1) ...
+#8 2.979 Selecting previously unselected package libsasl2-modules-db:amd64.
+#8 2.981 Preparing to unpack .../11-libsasl2-modules-db_2.1.27+dfsg2-3ubuntu1.2_amd64.deb ...
+#8 2.981 Unpacking libsasl2-modules-db:amd64 (2.1.27+dfsg2-3ubuntu1.2) ...
+#8 2.994 Selecting previously unselected package libsasl2-2:amd64.
+#8 2.995 Preparing to unpack .../12-libsasl2-2_2.1.27+dfsg2-3ubuntu1.2_amd64.deb ...
+#8 2.996 Unpacking libsasl2-2:amd64 (2.1.27+dfsg2-3ubuntu1.2) ...
+#8 3.010 Selecting previously unselected package libldap-2.5-0:amd64.
+#8 3.011 Preparing to unpack .../13-libldap-2.5-0_2.5.20+dfsg-0ubuntu0.22.04.1_amd64.deb ...
+#8 3.012 Unpacking libldap-2.5-0:amd64 (2.5.20+dfsg-0ubuntu0.22.04.1) ...
+#8 3.026 Selecting previously unselected package librtmp1:amd64.
+#8 3.028 Preparing to unpack .../14-librtmp1_2.4+20151223.gitfa8646d.1-2build4_amd64.deb ...
+#8 3.028 Unpacking librtmp1:amd64 (2.4+20151223.gitfa8646d.1-2build4) ...
+#8 3.050 Selecting previously unselected package libssh-4:amd64.
+#8 3.051 Preparing to unpack .../15-libssh-4_0.9.6-2ubuntu0.22.04.8_amd64.deb ...
+#8 3.052 Unpacking libssh-4:amd64 (0.9.6-2ubuntu0.22.04.8) ...
+#8 3.066 Selecting previously unselected package libcurl3-gnutls:amd64.
+#8 3.067 Preparing to unpack .../16-libcurl3-gnutls_7.81.0-1ubuntu1.30_amd64.deb ...
+#8 3.069 Unpacking libcurl3-gnutls:amd64 (7.81.0-1ubuntu1.30) ...
+#8 3.091 Selecting previously unselected package liberror-perl.
+#8 3.092 Preparing to unpack .../17-liberror-perl_0.17029-1_all.deb ...
+#8 3.093 Unpacking liberror-perl (0.17029-1) ...
+#8 3.105 Selecting previously unselected package git-man.
+#8 3.106 Preparing to unpack .../18-git-man_1%3a2.34.1-1ubuntu1.18_all.deb ...
+#8 3.107 Unpacking git-man (1:2.34.1-1ubuntu1.18) ...
+#8 3.127 Selecting previously unselected package git.
+#8 3.128 Preparing to unpack .../19-git_1%3a2.34.1-1ubuntu1.18_amd64.deb ...
+#8 3.133 Unpacking git (1:2.34.1-1ubuntu1.18) ...
+#8 3.255 Setting up libexpat1:amd64 (2.4.7-1ubuntu0.9) ...
+#8 3.258 Setting up libpsl5:amd64 (0.21.0-1.2build2) ...
+#8 3.260 Setting up libbrotli1:amd64 (1.0.9-2ubuntu0.1) ...
+#8 3.262 Setting up libnghttp2-14:amd64 (1.43.0-1ubuntu0.4) ...
+#8 3.264 Setting up perl-modules-5.34 (5.34.0-3ubuntu1.10) ...
+#8 3.265 Setting up libsasl2-modules-db:amd64 (2.1.27+dfsg2-3ubuntu1.2) ...
+#8 3.267 Setting up librtmp1:amd64 (2.4+20151223.gitfa8646d.1-2build4) ...
+#8 3.269 Setting up libsasl2-2:amd64 (2.1.27+dfsg2-3ubuntu1.2) ...
+#8 3.271 Setting up libssh-4:amd64 (0.9.6-2ubuntu0.22.04.8) ...
+#8 3.273 Setting up git-man (1:2.34.1-1ubuntu1.18) ...
+#8 3.275 Setting up openssl (3.0.2-0ubuntu1.30) ...
+#8 3.279 Setting up libgdbm6:amd64 (1.23-1) ...
+#8 3.281 Setting up libldap-2.5-0:amd64 (2.5.20+dfsg-0ubuntu0.22.04.1) ...
+#8 3.283 Setting up ca-certificates (20260816ubuntu0.22.04.2) ...
+#8 3.615 Clearing symlinks in /etc/ssl/certs...
+#8 3.617 done.
+#8 3.617 Updating certificates in /etc/ssl/certs...
+#8 4.037 120 added, 0 removed; done.
+#8 4.048 Setting up libgdbm-compat4:amd64 (1.23-1) ...
+#8 4.050 Setting up libperl5.34:amd64 (5.34.0-3ubuntu1.10) ...
+#8 4.052 Setting up libcurl3-gnutls:amd64 (7.81.0-1ubuntu1.30) ...
+#8 4.054 Setting up perl (5.34.0-3ubuntu1.10) ...
+#8 4.061 Setting up liberror-perl (0.17029-1) ...
+#8 4.063 Setting up git (1:2.34.1-1ubuntu1.18) ...
+#8 4.070 Processing triggers for libc-bin (2.35-0ubuntu3.18) ...
+#8 4.080 Processing triggers for ca-certificates (20260816ubuntu0.22.04.2) ...
+#8 4.083 Updating certificates in /etc/ssl/certs...
+#8 4.413 0 added, 0 removed; done.
+#8 4.413 Running hooks in /etc/ca-certificates/update.d...
+#8 4.414 done.
+#8 DONE 4.9s
+
+#9 [4/6] COPY [., /opt/tool]
+#9 DONE 0.3s
+
+#10 [5/6] WORKDIR /opt/tool
+#10 DONE 0.0s
+
+#11 [6/6] RUN ["bash", "-lc", "set -eo pipefail\napt install make g++ zlib1g-dev libhts-dev libbz2-dev liblzma-dev\nmake\n"]
+#11 0.114 
+#11 0.114 WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
+#11 0.114 
+#11 0.139 Reading package lists...
+#11 1.086 Building dependency tree...
+#11 1.335 Reading state information...
+#11 1.524 The following additional packages will be installed:
+#11 1.524   binutils binutils-common binutils-x86-64-linux-gnu bzip2-doc cpp cpp-11
+#11 1.524   fontconfig-config fonts-dejavu-core g++-11 gcc gcc-11 gcc-11-base libasan6
+#11 1.524   libatomic1 libbinutils libbsd0 libc-dev-bin libc-devtools libc6-dev libcc1-0
+#11 1.524   libcrypt-dev libctf-nobfd0 libctf0 libcurl4-gnutls-dev libdeflate-dev
+#11 1.524   libdeflate0 libfontconfig1 libfreetype6 libgcc-11-dev libgd3 libgomp1
+#11 1.524   libhts3 libhtscodecs2 libisl23 libitm1 libjbig0 libjpeg-turbo8 libjpeg8
+#11 1.524   liblsan0 libmd0 libmpc3 libmpfr6 libnsl-dev libpng16-16 libquadmath0
+#11 1.524   libstdc++-11-dev libtiff5 libtirpc-dev libtsan0 libubsan1 libwebp7 libx11-6
+#11 1.525   libx11-data libxau6 libxcb1 libxdmcp6 libxpm4 linux-libc-dev manpages
+#11 1.525   manpages-dev rpcsvc-proto ucf
+#11 1.526 Suggested packages:
+#11 1.526   binutils-doc cpp-doc gcc-11-locales g++-multilib g++-11-multilib gcc-11-doc
+#11 1.526   gcc-multilib autoconf automake libtool flex bison gdb gcc-doc
+#11 1.526   gcc-11-multilib glibc-doc libcurl4-doc libgnutls28-dev libidn11-dev
+#11 1.526   libkrb5-dev libldap2-dev librtmp-dev libssh2-1-dev pkg-config libgd-tools
+#11 1.526   liblzma-doc libstdc++-11-doc make-doc man-browser
+#11 1.650 The following NEW packages will be installed:
+#11 1.650   binutils binutils-common binutils-x86-64-linux-gnu bzip2-doc cpp cpp-11
+#11 1.650   fontconfig-config fonts-dejavu-core g++ g++-11 gcc gcc-11 gcc-11-base
+#11 1.650   libasan6 libatomic1 libbinutils libbsd0 libbz2-dev libc-dev-bin
+#11 1.650   libc-devtools libc6-dev libcc1-0 libcrypt-dev libctf-nobfd0 libctf0
+#11 1.650   libcurl4-gnutls-dev libdeflate-dev libdeflate0 libfontconfig1 libfreetype6
+#11 1.652   libgcc-11-dev libgd3 libgomp1 libhts-dev libhts3 libhtscodecs2 libisl23
+#11 1.652   libitm1 libjbig0 libjpeg-turbo8 libjpeg8 liblsan0 liblzma-dev libmd0 libmpc3
+#11 1.652   libmpfr6 libnsl-dev libpng16-16 libquadmath0 libstdc++-11-dev libtiff5
+#11 1.652   libtirpc-dev libtsan0 libubsan1 libwebp7 libx11-6 libx11-data libxau6
+#11 1.652   libxcb1 libxdmcp6 libxpm4 linux-libc-dev make manpages manpages-dev
+#11 1.652   rpcsvc-proto ucf zlib1g-dev
+#11 1.932 0 upgraded, 68 newly installed, 0 to remove and 0 not upgraded.
+#11 1.932 Need to get 77.8 MB of archives.
+#11 1.932 After this operation, 244 MB of additional disk space will be used.
+#11 1.932 Get:1 http://archive.ubuntu.com/ubuntu jammy/main amd64 libmd0 amd64 1.0.4-1build1 [23.0 kB]
+#11 2.215 Get:2 http://archive.ubuntu.com/ubuntu jammy/main amd64 libbsd0 amd64 0.11.5-1 [44.8 kB]
+#11 2.357 Get:3 http://archive.ubuntu.com/ubuntu jammy/main amd64 ucf all 3.0043 [56.1 kB]
+#11 2.492 Get:4 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libpng16-16 amd64 1.6.37-3ubuntu0.7 [192 kB]
+#11 2.678 Get:5 http://archive.ubuntu.com/ubuntu jammy/main amd64 libxau6 amd64 1:1.0.9-1build5 [7634 B]
+#11 2.683 Get:6 http://archive.ubuntu.com/ubuntu jammy/main amd64 libxdmcp6 amd64 1:1.1.3-0ubuntu5 [10.9 kB]
+#11 2.688 Get:7 http://archive.ubuntu.com/ubuntu jammy/main amd64 libxcb1 amd64 1.14-3ubuntu3 [49.0 kB]
+#11 2.715 Get:8 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libx11-data all 2:1.7.5-1ubuntu0.4 [120 kB]
+#11 2.766 Get:9 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libx11-6 amd64 2:1.7.5-1ubuntu0.4 [668 kB]
+#11 2.928 Get:10 http://archive.ubuntu.com/ubuntu jammy/main amd64 manpages all 5.10-1ubuntu1 [1375 kB]
+#11 3.075 Get:11 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 binutils-common amd64 2.38-4ubuntu2.12 [223 kB]
+#11 3.090 Get:12 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libbinutils amd64 2.38-4ubuntu2.12 [663 kB]
+#11 3.130 Get:13 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libctf-nobfd0 amd64 2.38-4ubuntu2.12 [108 kB]
+#11 3.137 Get:14 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libctf0 amd64 2.38-4ubuntu2.12 [103 kB]
+#11 3.142 Get:15 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 binutils-x86-64-linux-gnu amd64 2.38-4ubuntu2.12 [2324 kB]
+#11 3.240 Get:16 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 binutils amd64 2.38-4ubuntu2.12 [3184 B]
+#11 3.240 Get:17 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 bzip2-doc all 1.0.8-5ubuntu0.1 [500 kB]
+#11 3.252 Get:18 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 gcc-11-base amd64 11.4.0-1ubuntu1~22.04.3 [216 kB]
+#11 3.258 Get:19 http://archive.ubuntu.com/ubuntu jammy/main amd64 libisl23 amd64 0.24-2build1 [727 kB]
+#11 3.277 Get:20 http://archive.ubuntu.com/ubuntu jammy/main amd64 libmpfr6 amd64 4.1.0-3build3 [1425 kB]
+#11 3.339 Get:21 http://archive.ubuntu.com/ubuntu jammy/main amd64 libmpc3 amd64 1.2.1-2build1 [46.9 kB]
+#11 3.339 Get:22 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 cpp-11 amd64 11.4.0-1ubuntu1~22.04.3 [10.0 MB]
+#11 3.646 Get:23 http://archive.ubuntu.com/ubuntu jammy/main amd64 cpp amd64 4:11.2.0-1ubuntu1 [27.7 kB]
+#11 3.646 Get:24 http://archive.ubuntu.com/ubuntu jammy/main amd64 fonts-dejavu-core all 2.37-2build1 [1041 kB]
+#11 3.673 Get:25 http://archive.ubuntu.com/ubuntu jammy/main amd64 fontconfig-config all 2.13.1-4.2ubuntu5 [29.1 kB]
+#11 3.674 Get:26 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libcc1-0 amd64 12.3.0-1ubuntu1~22.04.3 [48.3 kB]
+#11 3.674 Get:27 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libgomp1 amd64 12.3.0-1ubuntu1~22.04.3 [127 kB]
+#11 3.676 Get:28 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libitm1 amd64 12.3.0-1ubuntu1~22.04.3 [30.2 kB]
+#11 3.677 Get:29 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libatomic1 amd64 12.3.0-1ubuntu1~22.04.3 [10.5 kB]
+#11 3.678 Get:30 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libasan6 amd64 11.4.0-1ubuntu1~22.04.3 [2283 kB]
+#11 3.764 Get:31 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 liblsan0 amd64 12.3.0-1ubuntu1~22.04.3 [1069 kB]
+#11 3.790 Get:32 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libtsan0 amd64 11.4.0-1ubuntu1~22.04.3 [2260 kB]
+#11 3.908 Get:33 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libubsan1 amd64 12.3.0-1ubuntu1~22.04.3 [976 kB]
+#11 3.918 Get:34 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libquadmath0 amd64 12.3.0-1ubuntu1~22.04.3 [154 kB]
+#11 3.920 Get:35 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libgcc-11-dev amd64 11.4.0-1ubuntu1~22.04.3 [2517 kB]
+#11 3.992 Get:36 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 gcc-11 amd64 11.4.0-1ubuntu1~22.04.3 [20.1 MB]
+#11 4.687 Get:37 http://archive.ubuntu.com/ubuntu jammy/main amd64 gcc amd64 4:11.2.0-1ubuntu1 [5112 B]
+#11 4.687 Get:38 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libc-dev-bin amd64 2.35-0ubuntu3.18 [20.3 kB]
+#11 4.688 Get:39 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 linux-libc-dev amd64 5.15.0-204.214 [1423 kB]
+#11 4.707 Get:40 http://archive.ubuntu.com/ubuntu jammy/main amd64 libcrypt-dev amd64 1:4.4.27-1 [112 kB]
+#11 4.711 Get:41 http://archive.ubuntu.com/ubuntu jammy/main amd64 rpcsvc-proto amd64 1.4.2-0ubuntu6 [68.5 kB]
+#11 4.712 Get:42 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libtirpc-dev amd64 1.3.2-2ubuntu0.1 [192 kB]
+#11 4.718 Get:43 http://archive.ubuntu.com/ubuntu jammy/main amd64 libnsl-dev amd64 1.3.0-2build2 [71.3 kB]
+#11 4.721 Get:44 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libc6-dev amd64 2.35-0ubuntu3.18 [2100 kB]
+#11 4.786 Get:45 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libstdc++-11-dev amd64 11.4.0-1ubuntu1~22.04.3 [2101 kB]
+#11 4.867 Get:46 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 g++-11 amd64 11.4.0-1ubuntu1~22.04.3 [11.4 MB]
+#11 5.236 Get:47 http://archive.ubuntu.com/ubuntu jammy/main amd64 g++ amd64 4:11.2.0-1ubuntu1 [1412 B]
+#11 5.236 Get:48 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libbz2-dev amd64 1.0.8-5ubuntu0.1 [32.5 kB]
+#11 5.237 Get:49 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libfreetype6 amd64 2.11.1+dfsg-1ubuntu0.4 [388 kB]
+#11 5.246 Get:50 http://archive.ubuntu.com/ubuntu jammy/main amd64 libfontconfig1 amd64 2.13.1-4.2ubuntu5 [131 kB]
+#11 5.249 Get:51 http://archive.ubuntu.com/ubuntu jammy/main amd64 libjpeg-turbo8 amd64 2.1.2-0ubuntu1 [134 kB]
+#11 5.252 Get:52 http://archive.ubuntu.com/ubuntu jammy/main amd64 libjpeg8 amd64 8c-2ubuntu10 [2264 B]
+#11 5.253 Get:53 http://archive.ubuntu.com/ubuntu jammy/main amd64 libdeflate0 amd64 1.10-2 [70.9 kB]
+#11 5.254 Get:54 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libjbig0 amd64 2.1-3.1ubuntu0.22.04.1 [29.2 kB]
+#11 5.255 Get:55 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libwebp7 amd64 1.2.2-2ubuntu0.22.04.2 [206 kB]
+#11 5.368 Get:56 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libtiff5 amd64 4.3.0-6ubuntu0.13 [185 kB]
+#11 5.372 Get:57 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libxpm4 amd64 1:3.5.12-1ubuntu0.22.04.4 [36.5 kB]
+#11 5.373 Get:58 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libgd3 amd64 2.3.0-2ubuntu2.3 [129 kB]
+#11 5.498 Get:59 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libc-devtools amd64 2.35-0ubuntu3.18 [29.0 kB]
+#11 5.499 Get:60 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libcurl4-gnutls-dev amd64 7.81.0-1ubuntu1.30 [381 kB]
+#11 5.508 Get:61 http://archive.ubuntu.com/ubuntu jammy/main amd64 libdeflate-dev amd64 1.10-2 [59.2 kB]
+#11 5.509 Get:62 http://archive.ubuntu.com/ubuntu jammy/universe amd64 libhtscodecs2 amd64 1.1.1-3 [53.2 kB]
+#11 5.510 Get:63 http://archive.ubuntu.com/ubuntu jammy/universe amd64 libhts3 amd64 1.13+ds-2build1 [390 kB]
+#11 5.520 Get:64 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 liblzma-dev amd64 5.2.5-2ubuntu1.2 [159 kB]
+#11 5.524 Get:65 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 zlib1g-dev amd64 1:1.2.11.dfsg-2ubuntu9.2 [164 kB]
+#11 5.628 Get:66 http://archive.ubuntu.com/ubuntu jammy/universe amd64 libhts-dev amd64 1.13+ds-2build1 [5602 kB]
+#11 5.797 Get:67 http://archive.ubuntu.com/ubuntu jammy/main amd64 make amd64 4.3-4.1build1 [180 kB]
+#11 5.800 Get:68 http://archive.ubuntu.com/ubuntu jammy/main amd64 manpages-dev all 5.10-1ubuntu1 [2309 kB]
+#11 5.957 debconf: delaying package configuration, since apt-utils is not installed
+#11 5.986 Fetched 77.8 MB in 4s (18.5 MB/s)
+#11 5.999 Selecting previously unselected package libmd0:amd64.
+#11 5.999 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 7892 files and directories currently installed.)
+#11 6.005 Preparing to unpack .../00-libmd0_1.0.4-1build1_amd64.deb ...
+#11 6.006 Unpacking libmd0:amd64 (1.0.4-1build1) ...
+#11 6.018 Selecting previously unselected package libbsd0:amd64.
+#11 6.019 Preparing to unpack .../01-libbsd0_0.11.5-1_amd64.deb ...
+#11 6.020 Unpacking libbsd0:amd64 (0.11.5-1) ...
+#11 6.032 Selecting previously unselected package ucf.
+#11 6.034 Preparing to unpack .../02-ucf_3.0043_all.deb ...
+#11 6.035 Moving old data out of the way
+#11 6.036 Unpacking ucf (3.0043) ...
+#11 6.051 Selecting previously unselected package libpng16-16:amd64.
+#11 6.052 Preparing to unpack .../03-libpng16-16_1.6.37-3ubuntu0.7_amd64.deb ...
+#11 6.053 Unpacking libpng16-16:amd64 (1.6.37-3ubuntu0.7) ...
+#11 6.065 Selecting previously unselected package libxau6:amd64.
+#11 6.067 Preparing to unpack .../04-libxau6_1%3a1.0.9-1build5_amd64.deb ...
+#11 6.067 Unpacking libxau6:amd64 (1:1.0.9-1build5) ...
+#11 6.078 Selecting previously unselected package libxdmcp6:amd64.
+#11 6.079 Preparing to unpack .../05-libxdmcp6_1%3a1.1.3-0ubuntu5_amd64.deb ...
+#11 6.080 Unpacking libxdmcp6:amd64 (1:1.1.3-0ubuntu5) ...
+#11 6.091 Selecting previously unselected package libxcb1:amd64.
+#11 6.092 Preparing to unpack .../06-libxcb1_1.14-3ubuntu3_amd64.deb ...
+#11 6.093 Unpacking libxcb1:amd64 (1.14-3ubuntu3) ...
+#11 6.104 Selecting previously unselected package libx11-data.
+#11 6.105 Preparing to unpack .../07-libx11-data_2%3a1.7.5-1ubuntu0.4_all.deb ...
+#11 6.106 Unpacking libx11-data (2:1.7.5-1ubuntu0.4) ...
+#11 6.154 Selecting previously unselected package libx11-6:amd64.
+#11 6.155 Preparing to unpack .../08-libx11-6_2%3a1.7.5-1ubuntu0.4_amd64.deb ...
+#11 6.156 Unpacking libx11-6:amd64 (2:1.7.5-1ubuntu0.4) ...
+#11 6.171 Selecting previously unselected package manpages.
+#11 6.172 Preparing to unpack .../09-manpages_5.10-1ubuntu1_all.deb ...
+#11 6.173 Unpacking manpages (5.10-1ubuntu1) ...
+#11 6.247 Selecting previously unselected package binutils-common:amd64.
+#11 6.249 Preparing to unpack .../10-binutils-common_2.38-4ubuntu2.12_amd64.deb ...
+#11 6.249 Unpacking binutils-common:amd64 (2.38-4ubuntu2.12) ...
+#11 6.263 Selecting previously unselected package libbinutils:amd64.
+#11 6.264 Preparing to unpack .../11-libbinutils_2.38-4ubuntu2.12_amd64.deb ...
+#11 6.265 Unpacking libbinutils:amd64 (2.38-4ubuntu2.12) ...
+#11 6.284 Selecting previously unselected package libctf-nobfd0:amd64.
+#11 6.285 Preparing to unpack .../12-libctf-nobfd0_2.38-4ubuntu2.12_amd64.deb ...
+#11 6.286 Unpacking libctf-nobfd0:amd64 (2.38-4ubuntu2.12) ...
+#11 6.297 Selecting previously unselected package libctf0:amd64.
+#11 6.299 Preparing to unpack .../13-libctf0_2.38-4ubuntu2.12_amd64.deb ...
+#11 6.299 Unpacking libctf0:amd64 (2.38-4ubuntu2.12) ...
+#11 6.310 Selecting previously unselected package binutils-x86-64-linux-gnu.
+#11 6.311 Preparing to unpack .../14-binutils-x86-64-linux-gnu_2.38-4ubuntu2.12_amd64.deb ...
+#11 6.312 Unpacking binutils-x86-64-linux-gnu (2.38-4ubuntu2.12) ...
+#11 6.378 Selecting previously unselected package binutils.
+#11 6.379 Preparing to unpack .../15-binutils_2.38-4ubuntu2.12_amd64.deb ...
+#11 6.380 Unpacking binutils (2.38-4ubuntu2.12) ...
+#11 6.393 Selecting previously unselected package bzip2-doc.
+#11 6.395 Preparing to unpack .../16-bzip2-doc_1.0.8-5ubuntu0.1_all.deb ...
+#11 6.395 Unpacking bzip2-doc (1.0.8-5ubuntu0.1) ...
+#11 6.407 Selecting previously unselected package gcc-11-base:amd64.
+#11 6.408 Preparing to unpack .../17-gcc-11-base_11.4.0-1ubuntu1~22.04.3_amd64.deb ...
+#11 6.409 Unpacking gcc-11-base:amd64 (11.4.0-1ubuntu1~22.04.3) ...
+#11 6.421 Selecting previously unselected package libisl23:amd64.
+#11 6.422 Preparing to unpack .../18-libisl23_0.24-2build1_amd64.deb ...
+#11 6.423 Unpacking libisl23:amd64 (0.24-2build1) ...
+#11 6.442 Selecting previously unselected package libmpfr6:amd64.
+#11 6.443 Preparing to unpack .../19-libmpfr6_4.1.0-3build3_amd64.deb ...
+#11 6.444 Unpacking libmpfr6:amd64 (4.1.0-3build3) ...
+#11 6.463 Selecting previously unselected package libmpc3:amd64.
+#11 6.464 Preparing to unpack .../20-libmpc3_1.2.1-2build1_amd64.deb ...
+#11 6.465 Unpacking libmpc3:amd64 (1.2.1-2build1) ...
+#11 6.476 Selecting previously unselected package cpp-11.
+#11 6.477 Preparing to unpack .../21-cpp-11_11.4.0-1ubuntu1~22.04.3_amd64.deb ...
+#11 6.478 Unpacking cpp-11 (11.4.0-1ubuntu1~22.04.3) ...
+#11 6.575 Selecting previously unselected package cpp.
+#11 6.577 Preparing to unpack .../22-cpp_4%3a11.2.0-1ubuntu1_amd64.deb ...
+#11 6.577 Unpacking cpp (4:11.2.0-1ubuntu1) ...
+#11 6.589 Selecting previously unselected package fonts-dejavu-core.
+#11 6.590 Preparing to unpack .../23-fonts-dejavu-core_2.37-2build1_all.deb ...
+#11 6.591 Unpacking fonts-dejavu-core (2.37-2build1) ...
+#11 6.664 Selecting previously unselected package fontconfig-config.
+#11 6.666 Preparing to unpack .../24-fontconfig-config_2.13.1-4.2ubuntu5_all.deb ...
+#11 6.666 Unpacking fontconfig-config (2.13.1-4.2ubuntu5) ...
+#11 6.686 Selecting previously unselected package libcc1-0:amd64.
+#11 6.688 Preparing to unpack .../25-libcc1-0_12.3.0-1ubuntu1~22.04.3_amd64.deb ...
+#11 6.688 Unpacking libcc1-0:amd64 (12.3.0-1ubuntu1~22.04.3) ...
+#11 6.699 Selecting previously unselected package libgomp1:amd64.
+#11 6.701 Preparing to unpack .../26-libgomp1_12.3.0-1ubuntu1~22.04.3_amd64.deb ...
+#11 6.701 Unpacking libgomp1:amd64 (12.3.0-1ubuntu1~22.04.3) ...
+#11 6.713 Selecting previously unselected package libitm1:amd64.
+#11 6.715 Preparing to unpack .../27-libitm1_12.3.0-1ubuntu1~22.04.3_amd64.deb ...
+#11 6.715 Unpacking libitm1:amd64 (12.3.0-1ubuntu1~22.04.3) ...
+#11 6.727 Selecting previously unselected package libatomic1:amd64.
+#11 6.728 Preparing to unpack .../28-libatomic1_12.3.0-1ubuntu1~22.04.3_amd64.deb ...
+#11 6.728 Unpacking libatomic1:amd64 (12.3.0-1ubuntu1~22.04.3) ...
+#11 6.740 Selecting previously unselected package libasan6:amd64.
+#11 6.741 Preparing to unpack .../29-libasan6_11.4.0-1ubuntu1~22.04.3_amd64.deb ...
+#11 6.742 Unpacking libasan6:amd64 (11.4.0-1ubuntu1~22.04.3) ...
+#11 6.778 Selecting previously unselected package liblsan0:amd64.
+#11 6.779 Preparing to unpack .../30-liblsan0_12.3.0-1ubuntu1~22.04.3_amd64.deb ...
+#11 6.780 Unpacking liblsan0:amd64 (12.3.0-1ubuntu1~22.04.3) ...
+#11 6.803 Selecting previously unselected package libtsan0:amd64.
+#11 6.804 Preparing to unpack .../31-libtsan0_11.4.0-1ubuntu1~22.04.3_amd64.deb ...
+#11 6.805 Unpacking libtsan0:amd64 (11.4.0-1ubuntu1~22.04.3) ...
+#11 6.840 Selecting previously unselected package libubsan1:amd64.
+#11 6.841 Preparing to unpack .../32-libubsan1_12.3.0-1ubuntu1~22.04.3_amd64.deb ...
+#11 6.842 Unpacking libubsan1:amd64 (12.3.0-1ubuntu1~22.04.3) ...
+#11 6.862 Selecting previously unselected package libquadmath0:amd64.
+#11 6.864 Preparing to unpack .../33-libquadmath0_12.3.0-1ubuntu1~22.04.3_amd64.deb ...
+#11 6.864 Unpacking libquadmath0:amd64 (12.3.0-1ubuntu1~22.04.3) ...
+#11 6.875 Selecting previously unselected package libgcc-11-dev:amd64.
+#11 6.877 Preparing to unpack .../34-libgcc-11-dev_11.4.0-1ubuntu1~22.04.3_amd64.deb ...
+#11 6.877 Unpacking libgcc-11-dev:amd64 (11.4.0-1ubuntu1~22.04.3) ...
+#11 6.942 Selecting previously unselected package gcc-11.
+#11 6.944 Preparing to unpack .../35-gcc-11_11.4.0-1ubuntu1~22.04.3_amd64.deb ...
+#11 6.944 Unpacking gcc-11 (11.4.0-1ubuntu1~22.04.3) ...
+#11 7.123 Selecting previously unselected package gcc.
+#11 7.124 Preparing to unpack .../36-gcc_4%3a11.2.0-1ubuntu1_amd64.deb ...
+#11 7.125 Unpacking gcc (4:11.2.0-1ubuntu1) ...
+#11 7.138 Selecting previously unselected package libc-dev-bin.
+#11 7.139 Preparing to unpack .../37-libc-dev-bin_2.35-0ubuntu3.18_amd64.deb ...
+#11 7.140 Unpacking libc-dev-bin (2.35-0ubuntu3.18) ...
+#11 7.151 Selecting previously unselected package linux-libc-dev:amd64.
+#11 7.152 Preparing to unpack .../38-linux-libc-dev_5.15.0-204.214_amd64.deb ...
+#11 7.153 Unpacking linux-libc-dev:amd64 (5.15.0-204.214) ...
+#11 7.307 Selecting previously unselected package libcrypt-dev:amd64.
+#11 7.308 Preparing to unpack .../39-libcrypt-dev_1%3a4.4.27-1_amd64.deb ...
+#11 7.309 Unpacking libcrypt-dev:amd64 (1:4.4.27-1) ...
+#11 7.321 Selecting previously unselected package rpcsvc-proto.
+#11 7.323 Preparing to unpack .../40-rpcsvc-proto_1.4.2-0ubuntu6_amd64.deb ...
+#11 7.323 Unpacking rpcsvc-proto (1.4.2-0ubuntu6) ...
+#11 7.337 Selecting previously unselected package libtirpc-dev:amd64.
+#11 7.339 Preparing to unpack .../41-libtirpc-dev_1.3.2-2ubuntu0.1_amd64.deb ...
+#11 7.339 Unpacking libtirpc-dev:amd64 (1.3.2-2ubuntu0.1) ...
+#11 7.358 Selecting previously unselected package libnsl-dev:amd64.
+#11 7.359 Preparing to unpack .../42-libnsl-dev_1.3.0-2build2_amd64.deb ...
+#11 7.361 Unpacking libnsl-dev:amd64 (1.3.0-2build2) ...
+#11 7.374 Selecting previously unselected package libc6-dev:amd64.
+#11 7.376 Preparing to unpack .../43-libc6-dev_2.35-0ubuntu3.18_amd64.deb ...
+#11 7.376 Unpacking libc6-dev:amd64 (2.35-0ubuntu3.18) ...
+#11 7.487 Selecting previously unselected package libstdc++-11-dev:amd64.
+#11 7.489 Preparing to unpack .../44-libstdc++-11-dev_11.4.0-1ubuntu1~22.04.3_amd64.deb ...
+#11 7.490 Unpacking libstdc++-11-dev:amd64 (11.4.0-1ubuntu1~22.04.3) ...
+#11 7.646 Selecting previously unselected package g++-11.
+#11 7.648 Preparing to unpack .../45-g++-11_11.4.0-1ubuntu1~22.04.3_amd64.deb ...
+#11 7.681 Unpacking g++-11 (11.4.0-1ubuntu1~22.04.3) ...
+#11 7.795 Selecting previously unselected package g++.
+#11 7.797 Preparing to unpack .../46-g++_4%3a11.2.0-1ubuntu1_amd64.deb ...
+#11 7.797 Unpacking g++ (4:11.2.0-1ubuntu1) ...
+#11 7.808 Selecting previously unselected package libbz2-dev:amd64.
+#11 7.809 Preparing to unpack .../47-libbz2-dev_1.0.8-5ubuntu0.1_amd64.deb ...
+#11 7.810 Unpacking libbz2-dev:amd64 (1.0.8-5ubuntu0.1) ...
+#11 7.822 Selecting previously unselected package libfreetype6:amd64.
+#11 7.823 Preparing to unpack .../48-libfreetype6_2.11.1+dfsg-1ubuntu0.4_amd64.deb ...
+#11 7.824 Unpacking libfreetype6:amd64 (2.11.1+dfsg-1ubuntu0.4) ...
+#11 7.838 Selecting previously unselected package libfontconfig1:amd64.
+#11 7.840 Preparing to unpack .../49-libfontconfig1_2.13.1-4.2ubuntu5_amd64.deb ...
+#11 7.840 Unpacking libfontconfig1:amd64 (2.13.1-4.2ubuntu5) ...
+#11 7.853 Selecting previously unselected package libjpeg-turbo8:amd64.
+#11 7.854 Preparing to unpack .../50-libjpeg-turbo8_2.1.2-0ubuntu1_amd64.deb ...
+#11 7.855 Unpacking libjpeg-turbo8:amd64 (2.1.2-0ubuntu1) ...
+#11 7.867 Selecting previously unselected package libjpeg8:amd64.
+#11 7.869 Preparing to unpack .../51-libjpeg8_8c-2ubuntu10_amd64.deb ...
+#11 7.870 Unpacking libjpeg8:amd64 (8c-2ubuntu10) ...
+#11 7.880 Selecting previously unselected package libdeflate0:amd64.
+#11 7.882 Preparing to unpack .../52-libdeflate0_1.10-2_amd64.deb ...
+#11 7.883 Unpacking libdeflate0:amd64 (1.10-2) ...
+#11 7.895 Selecting previously unselected package libjbig0:amd64.
+#11 7.896 Preparing to unpack .../53-libjbig0_2.1-3.1ubuntu0.22.04.1_amd64.deb ...
+#11 7.898 Unpacking libjbig0:amd64 (2.1-3.1ubuntu0.22.04.1) ...
+#11 7.910 Selecting previously unselected package libwebp7:amd64.
+#11 7.912 Preparing to unpack .../54-libwebp7_1.2.2-2ubuntu0.22.04.2_amd64.deb ...
+#11 7.913 Unpacking libwebp7:amd64 (1.2.2-2ubuntu0.22.04.2) ...
+#11 7.925 Selecting previously unselected package libtiff5:amd64.
+#11 7.927 Preparing to unpack .../55-libtiff5_4.3.0-6ubuntu0.13_amd64.deb ...
+#11 7.928 Unpacking libtiff5:amd64 (4.3.0-6ubuntu0.13) ...
+#11 7.941 Selecting previously unselected package libxpm4:amd64.
+#11 7.943 Preparing to unpack .../56-libxpm4_1%3a3.5.12-1ubuntu0.22.04.4_amd64.deb ...
+#11 7.944 Unpacking libxpm4:amd64 (1:3.5.12-1ubuntu0.22.04.4) ...
+#11 7.956 Selecting previously unselected package libgd3:amd64.
+#11 7.958 Preparing to unpack .../57-libgd3_2.3.0-2ubuntu2.3_amd64.deb ...
+#11 7.958 Unpacking libgd3:amd64 (2.3.0-2ubuntu2.3) ...
+#11 7.971 Selecting previously unselected package libc-devtools.
+#11 7.973 Preparing to unpack .../58-libc-devtools_2.35-0ubuntu3.18_amd64.deb ...
+#11 7.973 Unpacking libc-devtools (2.35-0ubuntu3.18) ...
+#11 7.997 Selecting previously unselected package libcurl4-gnutls-dev:amd64.
+#11 7.999 Preparing to unpack .../59-libcurl4-gnutls-dev_7.81.0-1ubuntu1.30_amd64.deb ...
+#11 7.999 Unpacking libcurl4-gnutls-dev:amd64 (7.81.0-1ubuntu1.30) ...
+#11 8.019 Selecting previously unselected package libdeflate-dev:amd64.
+#11 8.020 Preparing to unpack .../60-libdeflate-dev_1.10-2_amd64.deb ...
+#11 8.021 Unpacking libdeflate-dev:amd64 (1.10-2) ...
+#11 8.034 Selecting previously unselected package libhtscodecs2:amd64.
+#11 8.036 Preparing to unpack .../61-libhtscodecs2_1.1.1-3_amd64.deb ...
+#11 8.037 Unpacking libhtscodecs2:amd64 (1.1.1-3) ...
+#11 8.049 Selecting previously unselected package libhts3:amd64.
+#11 8.051 Preparing to unpack .../62-libhts3_1.13+ds-2build1_amd64.deb ...
+#11 8.052 Unpacking libhts3:amd64 (1.13+ds-2build1) ...
+#11 8.067 Selecting previously unselected package liblzma-dev:amd64.
+#11 8.068 Preparing to unpack .../63-liblzma-dev_5.2.5-2ubuntu1.2_amd64.deb ...
+#11 8.069 Unpacking liblzma-dev:amd64 (5.2.5-2ubuntu1.2) ...
+#11 8.085 Selecting previously unselected package zlib1g-dev:amd64.
+#11 8.087 Preparing to unpack .../64-zlib1g-dev_1%3a1.2.11.dfsg-2ubuntu9.2_amd64.deb ...
+#11 8.087 Unpacking zlib1g-dev:amd64 (1:1.2.11.dfsg-2ubuntu9.2) ...
+#11 8.101 Selecting previously unselected package libhts-dev:amd64.
+#11 8.103 Preparing to unpack .../65-libhts-dev_1.13+ds-2build1_amd64.deb ...
+#11 8.104 Unpacking libhts-dev:amd64 (1.13+ds-2build1) ...
+#11 8.155 Selecting previously unselected package make.
+#11 8.157 Preparing to unpack .../66-make_4.3-4.1build1_amd64.deb ...
+#11 8.157 Unpacking make (4.3-4.1build1) ...
+#11 8.171 Selecting previously unselected package manpages-dev.
+#11 8.172 Preparing to unpack .../67-manpages-dev_5.10-1ubuntu1_all.deb ...
+#11 8.173 Unpacking manpages-dev (5.10-1ubuntu1) ...
+#11 8.393 Setting up libhtscodecs2:amd64 (1.1.1-3) ...
+#11 8.395 Setting up bzip2-doc (1.0.8-5ubuntu0.1) ...
+#11 8.397 Setting up gcc-11-base:amd64 (11.4.0-1ubuntu1~22.04.3) ...
+#11 8.399 Setting up libxau6:amd64 (1:1.0.9-1build5) ...
+#11 8.400 Setting up manpages (5.10-1ubuntu1) ...
+#11 8.402 Setting up binutils-common:amd64 (2.38-4ubuntu2.12) ...
+#11 8.404 Setting up libdeflate0:amd64 (1.10-2) ...
+#11 8.405 Setting up linux-libc-dev:amd64 (5.15.0-204.214) ...
+#11 8.407 Setting up libctf-nobfd0:amd64 (2.38-4ubuntu2.12) ...
+#11 8.409 Setting up libgomp1:amd64 (12.3.0-1ubuntu1~22.04.3) ...
+#11 8.410 Setting up libcurl4-gnutls-dev:amd64 (7.81.0-1ubuntu1.30) ...
+#11 8.412 Setting up libjbig0:amd64 (2.1-3.1ubuntu0.22.04.1) ...
+#11 8.413 Setting up libasan6:amd64 (11.4.0-1ubuntu1~22.04.3) ...
+#11 8.415 Setting up libtirpc-dev:amd64 (1.3.2-2ubuntu0.1) ...
+#11 8.417 Setting up rpcsvc-proto (1.4.2-0ubuntu6) ...
+#11 8.418 Setting up libx11-data (2:1.7.5-1ubuntu0.4) ...
+#11 8.420 Setting up make (4.3-4.1build1) ...
+#11 8.421 Setting up libmpfr6:amd64 (4.1.0-3build3) ...
+#11 8.423 Setting up libquadmath0:amd64 (12.3.0-1ubuntu1~22.04.3) ...
+#11 8.425 Setting up libpng16-16:amd64 (1.6.37-3ubuntu0.7) ...
+#11 8.426 Setting up libmpc3:amd64 (1.2.1-2build1) ...
+#11 8.428 Setting up libatomic1:amd64 (12.3.0-1ubuntu1~22.04.3) ...
+#11 8.429 Setting up fonts-dejavu-core (2.37-2build1) ...
+#11 8.437 Setting up ucf (3.0043) ...
+#11 8.488 Setting up libjpeg-turbo8:amd64 (2.1.2-0ubuntu1) ...
+#11 8.489 Setting up libwebp7:amd64 (1.2.2-2ubuntu0.22.04.2) ...
+#11 8.491 Setting up liblzma-dev:amd64 (5.2.5-2ubuntu1.2) ...
+#11 8.493 Setting up libubsan1:amd64 (12.3.0-1ubuntu1~22.04.3) ...
+#11 8.494 Setting up libmd0:amd64 (1.0.4-1build1) ...
+#11 8.496 Setting up libnsl-dev:amd64 (1.3.0-2build2) ...
+#11 8.498 Setting up libcrypt-dev:amd64 (1:4.4.27-1) ...
+#11 8.500 Setting up libbinutils:amd64 (2.38-4ubuntu2.12) ...
+#11 8.501 Setting up libisl23:amd64 (0.24-2build1) ...
+#11 8.503 Setting up libc-dev-bin (2.35-0ubuntu3.18) ...
+#11 8.504 Setting up libbsd0:amd64 (0.11.5-1) ...
+#11 8.506 Setting up libdeflate-dev:amd64 (1.10-2) ...
+#11 8.508 Setting up libcc1-0:amd64 (12.3.0-1ubuntu1~22.04.3) ...
+#11 8.509 Setting up liblsan0:amd64 (12.3.0-1ubuntu1~22.04.3) ...
+#11 8.511 Setting up libitm1:amd64 (12.3.0-1ubuntu1~22.04.3) ...
+#11 8.513 Setting up libtsan0:amd64 (11.4.0-1ubuntu1~22.04.3) ...
+#11 8.514 Setting up libctf0:amd64 (2.38-4ubuntu2.12) ...
+#11 8.516 Setting up libjpeg8:amd64 (8c-2ubuntu10) ...
+#11 8.517 Setting up cpp-11 (11.4.0-1ubuntu1~22.04.3) ...
+#11 8.519 Setting up manpages-dev (5.10-1ubuntu1) ...
+#11 8.521 Setting up libxdmcp6:amd64 (1:1.1.3-0ubuntu5) ...
+#11 8.522 Setting up libhts3:amd64 (1.13+ds-2build1) ...
+#11 8.524 Setting up libxcb1:amd64 (1.14-3ubuntu3) ...
+#11 8.525 Setting up fontconfig-config (2.13.1-4.2ubuntu5) ...
+#11 8.552 Setting up libfreetype6:amd64 (2.11.1+dfsg-1ubuntu0.4) ...
+#11 8.554 Setting up libgcc-11-dev:amd64 (11.4.0-1ubuntu1~22.04.3) ...
+#11 8.555 Setting up cpp (4:11.2.0-1ubuntu1) ...
+#11 8.560 Setting up libc6-dev:amd64 (2.35-0ubuntu3.18) ...
+#11 8.561 Setting up libx11-6:amd64 (2:1.7.5-1ubuntu0.4) ...
+#11 8.563 Setting up libtiff5:amd64 (4.3.0-6ubuntu0.13) ...
+#11 8.565 Setting up libfontconfig1:amd64 (2.13.1-4.2ubuntu5) ...
+#11 8.567 Setting up binutils-x86-64-linux-gnu (2.38-4ubuntu2.12) ...
+#11 8.568 Setting up libbz2-dev:amd64 (1.0.8-5ubuntu0.1) ...
+#11 8.570 Setting up libxpm4:amd64 (1:3.5.12-1ubuntu0.22.04.4) ...
+#11 8.572 Setting up binutils (2.38-4ubuntu2.12) ...
+#11 8.573 Setting up libgd3:amd64 (2.3.0-2ubuntu2.3) ...
+#11 8.575 Setting up libstdc++-11-dev:amd64 (11.4.0-1ubuntu1~22.04.3) ...
+#11 8.577 Setting up zlib1g-dev:amd64 (1:1.2.11.dfsg-2ubuntu9.2) ...
+#11 8.579 Setting up gcc-11 (11.4.0-1ubuntu1~22.04.3) ...
+#11 8.580 Setting up libc-devtools (2.35-0ubuntu3.18) ...
+#11 8.582 Setting up g++-11 (11.4.0-1ubuntu1~22.04.3) ...
+#11 8.584 Setting up libhts-dev:amd64 (1.13+ds-2build1) ...
+#11 8.586 Setting up gcc (4:11.2.0-1ubuntu1) ...
+#11 8.629 Setting up g++ (4:11.2.0-1ubuntu1) ...
+#11 8.638 update-alternatives: using /usr/bin/g++ to provide /usr/bin/c++ (c++) in auto mode
+#11 8.638 update-alternatives: warning: skip creation of /usr/share/man/man1/c++.1.gz because associated file /usr/share/man/man1/g++.1.gz (of link group c++) doesn't exist
+#11 8.642 Processing triggers for libc-bin (2.35-0ubuntu3.18) ...
+#11 8.692 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o src/base_quality.o -c src/base_quality.cpp
+#11 9.058 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o src/error.o -c src/error.cpp
+#11 9.230 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o src/region.o -c src/region.cpp
+#11 10.25 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o src/stringops.o -c src/stringops.cpp
+#11 10.61 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o src/zalgorithm.o -c src/zalgorithm.cpp
+#11 10.90 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o src/alignment_filters.o -c src/alignment_filters.cpp
+#11 11.47 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o src/extract_indels.o -c src/extract_indels.cpp
+#11 11.95 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o src/mathops.o -c src/mathops.cpp
+#11 12.13 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o src/pcr_duplicates.o -c src/pcr_duplicates.cpp
+#11 14.75 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o src/bam_io.o -c src/bam_io.cpp
+#11 16.22 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o src/adapter_trimmer.o -c src/adapter_trimmer.cpp
+#11 16.85 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o src/hipstr_main.o -c src/hipstr_main.cpp
+#11 20.61 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o src/bam_processor.o -c src/bam_processor.cpp
+#11 23.88 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o src/stutter_model.o -c src/stutter_model.cpp
+#11 24.34 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o src/snp_phasing_quality.o -c src/snp_phasing_quality.cpp
+#11 25.14 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o src/snp_tree.o -c src/snp_tree.cpp
+#11 26.32 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o src/em_stutter_genotyper.o -c src/em_stutter_genotyper.cpp
+#11 26.95 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o src/seq_stutter_genotyper.o -c src/seq_stutter_genotyper.cpp
+#11 32.78 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o src/snp_bam_processor.o -c src/snp_bam_processor.cpp
+#11 34.58 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o src/genotyper_bam_processor.o -c src/genotyper_bam_processor.cpp
+#11 38.62 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o src/vcf_input.o -c src/vcf_input.cpp
+#11 39.51 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o src/read_pooler.o -c src/read_pooler.cpp
+#11 40.15 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o src/version.o -c src/version.cpp
+#11 40.27 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o src/haplotype_tracker.o -c src/haplotype_tracker.cpp
+#11 41.48 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o src/pedigree.o -c src/pedigree.cpp
+#11 43.50 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o src/vcf_reader.o -c src/vcf_reader.cpp
+#11 44.30 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o src/genotyper.o -c src/genotyper.cpp
+#11 45.32 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o src/directed_graph.o -c src/directed_graph.cpp
+#11 46.01 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o src/debruijn_graph.o -c src/debruijn_graph.cpp
+#11 47.60 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o src/fasta_reader.o -c src/fasta_reader.cpp
+#11 48.13 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o src/vcf_writer.o -c src/vcf_writer.cpp
+#11 48.46 cd lib/cephes && make
+#11 48.46 make[1]: Entering directory '/opt/tool/lib/cephes'
+#11 48.46 gcc -O2 -Wall   -c -o bdtr.o bdtr.c
+#11 48.48 gcc -O2 -Wall   -c -o btdtr.o btdtr.c
+#11 48.49 gcc -O2 -Wall   -c -o chdtr.o chdtr.c
+#11 48.51 gcc -O2 -Wall   -c -o drand.o drand.c
+#11 48.53 gcc -O2 -Wall   -c -o expx2.o expx2.c
+#11 48.55 gcc -O2 -Wall   -c -o fdtr.o fdtr.c
+#11 48.57 gcc -O2 -Wall   -c -o gamma.o gamma.c
+#11 48.60 gcc -O2 -Wall   -c -o gdtr.o gdtr.c
+#11 48.62 gcc -O2 -Wall   -c -o igam.o igam.c
+#11 48.64 gcc -O2 -Wall   -c -o igami.o igami.c
+#11 48.67 gcc -O2 -Wall   -c -o incbet.o incbet.c
+#11 48.71 gcc -O2 -Wall   -c -o incbi.o incbi.c
+#11 48.75 gcc -O2 -Wall   -c -o mtherr.o mtherr.c
+#11 48.77 gcc -O2 -Wall   -c -o nbdtr.o nbdtr.c
+#11 48.79 gcc -O2 -Wall   -c -o ndtr.o ndtr.c
+#11 48.81 gcc -O2 -Wall   -c -o ndtri.o ndtri.c
+#11 48.83 gcc -O2 -Wall   -c -o pdtr.o pdtr.c
+#11 48.85 gcc -O2 -Wall   -c -o stdtr.o stdtr.c
+#11 48.86 stdtr.c: In function 'stdtr':
+#11 48.86 stdtr.c:180:1: warning: this 'if' clause does not guard... [-Wmisleading-indentation]
+#11 48.86   180 | if( t < 0 )
+#11 48.86       | ^~
+#11 48.86 stdtr.c:183:9: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
+#11 48.86   183 |         p = 0.5 + 0.5 * p;
+#11 48.86       |         ^
+#11 48.88 gcc -O2 -Wall   -c -o unity.o unity.c
+#11 48.90 gcc -O2 -Wall   -c -o polevl.o polevl.c
+#11 48.92 gcc -O2 -Wall   -c -o const.o const.c
+#11 48.93 gcc -O2 -Wall   -c -o isnan.o isnan.c
+#11 48.94 ar rv libprob.a bdtr.o btdtr.o chdtr.o drand.o expx2.o fdtr.o gamma.o gdtr.o igam.o igami.o incbet.o incbi.o mtherr.o nbdtr.o ndtr.o ndtri.o pdtr.o stdtr.o unity.o polevl.o const.o isnan.o
+#11 48.94 ar: creating libprob.a
+#11 48.94 a - bdtr.o
+#11 48.94 a - btdtr.o
+#11 48.94 a - chdtr.o
+#11 48.94 a - drand.o
+#11 48.94 a - expx2.o
+#11 48.94 a - fdtr.o
+#11 48.94 a - gamma.o
+#11 48.94 a - gdtr.o
+#11 48.94 a - igam.o
+#11 48.94 a - igami.o
+#11 48.94 a - incbet.o
+#11 48.94 a - incbi.o
+#11 48.94 a - mtherr.o
+#11 48.94 a - nbdtr.o
+#11 48.94 a - ndtr.o
+#11 48.94 a - ndtri.o
+#11 48.94 a - pdtr.o
+#11 48.94 a - stdtr.o
+#11 48.94 a - unity.o
+#11 48.94 a - polevl.o
+#11 48.94 a - const.o
+#11 48.94 a - isnan.o
+#11 48.95 ranlib libprob.a
+#11 48.95 make[1]: Leaving directory '/opt/tool/lib/cephes'
+#11 48.95 cd lib/htslib && make
+#11 48.96 make[1]: Entering directory '/opt/tool/lib/htslib'
+#11 48.96 echo '/* Default config.h generated by Makefile */' > config.h
+#11 48.96 echo '#define HAVE_LIBBZ2 1' >> config.h
+#11 48.96 echo '#define HAVE_LIBLZMA 1' >> config.h
+#11 48.96 echo '#define HAVE_LZMA_H 1' >> config.h
+#11 48.96 echo '#define HAVE_FSEEKO 1' >> config.h
+#11 48.97 echo '#define HAVE_DRAND48 1' >> config.h
+#11 48.97 gcc -g -Wall -O2 -I.  -c -o kfunc.o kfunc.c
+#11 49.05 gcc -g -Wall -O2 -I.  -c -o knetfile.o knetfile.c
+#11 49.18 gcc -g -Wall -O2 -I.  -c -o kstring.o kstring.c
+#11 49.31 gcc -g -Wall -O2 -I.  -c -o bcf_sr_sort.o bcf_sr_sort.c
+#11 49.66 gcc -g -Wall -O2 -I.  -c -o bgzf.o bgzf.c
+#11 50.17 gcc -g -Wall -O2 -I.  -c -o errmod.o errmod.c
+#11 50.31 gcc -g -Wall -O2 -I.  -c -o faidx.o faidx.c
+#11 50.61 gcc -g -Wall -O2 -I.  -c -o hfile.o hfile.c
+#11 50.85 gcc -g -Wall -O2 -I.  -c -o hfile_net.o hfile_net.c
+#11 50.88 echo '#define HTS_VERSION "1.9"' > version.h
+#11 50.88 gcc -g -Wall -O2 -I.  -c -o hts.o hts.c
+#11 50.93 hts.c: In function 'hts_idx_init':
+#11 50.93 hts.c:1386:59: warning: overflow in conversion from 'uint32_t' {aka 'unsigned int'} to 'int' changes value from 'idx->z.last_bin = 4294967295' to '-1' [-Woverflow]
+#11 50.93  1386 |     idx->z.save_bin = idx->z.save_tid = idx->z.last_tid = idx->z.last_bin = 0xffffffffu;
+#11 50.93       |                                                           ^~~
+#11 51.91 gcc -g -Wall -O2 -I.  -c -o hts_os.o hts_os.c
+#11 51.93 gcc -g -Wall -O2 -I.  -c -o md5.o md5.c
+#11 52.02 gcc -g -Wall -O2 -I.  -c -o multipart.o multipart.c
+#11 52.11 gcc -g -Wall -O2 -I.  -c -o probaln.o probaln.c
+#11 52.23 gcc -g -Wall -O2 -I.  -c -o realn.o realn.c
+#11 52.37 gcc -g -Wall -O2 -I.  -c -o regidx.o regidx.c
+#11 52.54 gcc -g -Wall -O2 -I.  -c -o sam.o sam.c
+#11 53.77 gcc -g -Wall -O2 -I.  -c -o synced_bcf_reader.o synced_bcf_reader.c
+#11 54.16 gcc -g -Wall -O2 -I.  -c -o vcf_sweep.o vcf_sweep.c
+#11 54.22 gcc -g -Wall -O2 -I.  -c -o tbx.o tbx.c
+#11 54.35 gcc -g -Wall -O2 -I.  -c -o textutils.o textutils.c
+#11 54.48 gcc -g -Wall -O2 -I.  -c -o thread_pool.o thread_pool.c
+#11 54.61 gcc -g -Wall -O2 -I.  -c -o vcf.o vcf.c
+#11 56.42 gcc -g -Wall -O2 -I.  -c -o vcfutils.o vcfutils.c
+#11 56.85 gcc -g -Wall -O2 -I.  -c -o cram/cram_codecs.o cram/cram_codecs.c
+#11 57.38 gcc -g -Wall -O2 -I.  -c -o cram/cram_decode.o cram/cram_decode.c
+#11 58.41 gcc -g -Wall -O2 -I.  -c -o cram/cram_encode.o cram/cram_encode.c
+#11 59.38 gcc -g -Wall -O2 -I.  -c -o cram/cram_external.o cram/cram_external.c
+#11 59.49 gcc -g -Wall -O2 -I.  -c -o cram/cram_index.o cram/cram_index.c
+#11 59.68 gcc -g -Wall -O2 -I.  -c -o cram/cram_io.o cram/cram_io.c
+#11 60.26 In file included from /usr/include/string.h:535,
+#11 60.26                  from cram/cram_io.c:53:
+#11 60.26 In function 'strncpy',
+#11 60.26     inlined from 'cram_populate_ref' at cram/cram_io.c:2095:9:
+#11 60.26 /usr/include/x86_64-linux-gnu/bits/string_fortified.h:95:10: warning: '__builtin_strncpy' specified bound 4096 equals destination size [-Wstringop-truncation]
+#11 60.26    95 |   return __builtin___strncpy_chk (__dest, __src, __len,
+#11 60.26       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#11 60.26    96 |                                   __glibc_objsize (__dest));
+#11 60.26       |                                   ~~~~~~~~~~~~~~~~~~~~~~~~~
+#11 60.53 In function 'strncpy',
+#11 60.53     inlined from 'full_path' at cram/cram_io.c:3748:13,
+#11 60.53     inlined from 'cram_write_SAM_hdr' at cram/cram_io.c:3823:17:
+#11 60.53 /usr/include/x86_64-linux-gnu/bits/string_fortified.h:95:10: warning: '__builtin_strncpy' specified bound 4096 equals destination size [-Wstringop-truncation]
+#11 60.53    95 |   return __builtin___strncpy_chk (__dest, __src, __len,
+#11 60.53       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#11 60.53    96 |                                   __glibc_objsize (__dest));
+#11 60.53       |                                   ~~~~~~~~~~~~~~~~~~~~~~~~~
+#11 60.58 In function 'strncpy',
+#11 60.58     inlined from 'cram_dopen' at cram/cram_io.c:4126:9:
+#11 60.58 /usr/include/x86_64-linux-gnu/bits/string_fortified.h:95:10: warning: '__builtin_strncpy' specified bound 20 equals destination size [-Wstringop-truncation]
+#11 60.58    95 |   return __builtin___strncpy_chk (__dest, __src, __len,
+#11 60.58       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#11 60.58    96 |                                   __glibc_objsize (__dest));
+#11 60.58       |                                   ~~~~~~~~~~~~~~~~~~~~~~~~~
+#11 60.74 gcc -g -Wall -O2 -I.  -c -o cram/cram_samtools.o cram/cram_samtools.c
+#11 60.81 gcc -g -Wall -O2 -I.  -c -o cram/cram_stats.o cram/cram_stats.c
+#11 60.92 gcc -g -Wall -O2 -I.  -c -o cram/files.o cram/files.c
+#11 60.95 gcc -g -Wall -O2 -I.  -c -o cram/mFILE.o cram/mFILE.c
+#11 61.05 gcc -g -Wall -O2 -I.  -c -o cram/open_trace_file.o cram/open_trace_file.c
+#11 61.14 gcc -g -Wall -O2 -I.  -c -o cram/pooled_alloc.o cram/pooled_alloc.c
+#11 61.18 gcc -g -Wall -O2 -I.  -c -o cram/rANS_static.o cram/rANS_static.c
+#11 61.44 gcc -g -Wall -O2 -I.  -c -o cram/sam_header.o cram/sam_header.c
+#11 61.86 gcc -g -Wall -O2 -I.  -c -o cram/string_alloc.o cram/string_alloc.c
+#11 61.89 In file included from /usr/include/string.h:535,
+#11 61.89                  from cram/string_alloc.c:41:
+#11 61.89 In function 'strncpy',
+#11 61.89     inlined from 'string_ndup' at cram/string_alloc.c:151:5,
+#11 61.89     inlined from 'string_dup' at cram/string_alloc.c:143:12:
+#11 61.89 /usr/include/x86_64-linux-gnu/bits/string_fortified.h:95:10: warning: '__builtin_strncpy' output truncated before terminating nul copying as many bytes from a string as its length [-Wstringop-truncation]
+#11 61.89    95 |   return __builtin___strncpy_chk (__dest, __src, __len,
+#11 61.89       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#11 61.89    96 |                                   __glibc_objsize (__dest));
+#11 61.89       |                                   ~~~~~~~~~~~~~~~~~~~~~~~~~
+#11 61.89 cram/string_alloc.c: In function 'string_dup':
+#11 61.89 cram/string_alloc.c:143:12: note: length computed here
+#11 61.89   143 |     return string_ndup(a_str, instr, strlen(instr));
+#11 61.89       |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#11 61.90 ar -rc libhts.a kfunc.o knetfile.o kstring.o bcf_sr_sort.o bgzf.o errmod.o faidx.o hfile.o hfile_net.o hts.o hts_os.o md5.o multipart.o probaln.o realn.o regidx.o sam.o synced_bcf_reader.o vcf_sweep.o tbx.o textutils.o thread_pool.o vcf.o vcfutils.o cram/cram_codecs.o cram/cram_decode.o cram/cram_encode.o cram/cram_external.o cram/cram_index.o cram/cram_io.o cram/cram_samtools.o cram/cram_stats.o cram/files.o cram/mFILE.o cram/open_trace_file.o cram/pooled_alloc.o cram/rANS_static.o cram/sam_header.o cram/string_alloc.o
+#11 61.93 ranlib libhts.a
+#11 61.95 gcc -g -Wall -O2 -I.  -fpic -c -o kfunc.pico kfunc.c
+#11 62.03 gcc -g -Wall -O2 -I.  -fpic -c -o knetfile.pico knetfile.c
+#11 62.17 gcc -g -Wall -O2 -I.  -fpic -c -o kstring.pico kstring.c
+#11 62.30 gcc -g -Wall -O2 -I.  -fpic -c -o bcf_sr_sort.pico bcf_sr_sort.c
+#11 62.64 gcc -g -Wall -O2 -I.  -fpic -c -o bgzf.pico bgzf.c
+#11 63.08 gcc -g -Wall -O2 -I.  -fpic -c -o errmod.pico errmod.c
+#11 63.22 gcc -g -Wall -O2 -I.  -fpic -c -o faidx.pico faidx.c
+#11 63.52 gcc -g -Wall -O2 -I.  -fpic -c -o hfile.pico hfile.c
+#11 63.75 gcc -g -Wall -O2 -I.  -fpic -c -o hfile_net.pico hfile_net.c
+#11 63.79 gcc -g -Wall -O2 -I.  -fpic -c -o hts.pico hts.c
+#11 63.83 hts.c: In function 'hts_idx_init':
+#11 63.83 hts.c:1386:59: warning: overflow in conversion from 'uint32_t' {aka 'unsigned int'} to 'int' changes value from 'idx->z.last_bin = 4294967295' to '-1' [-Woverflow]
+#11 63.83  1386 |     idx->z.save_bin = idx->z.save_tid = idx->z.last_tid = idx->z.last_bin = 0xffffffffu;
+#11 63.83       |                                                           ^~~
+#11 64.80 gcc -g -Wall -O2 -I.  -fpic -c -o hts_os.pico hts_os.c
+#11 64.83 gcc -g -Wall -O2 -I.  -fpic -c -o md5.pico md5.c
+#11 64.91 gcc -g -Wall -O2 -I.  -fpic -c -o multipart.pico multipart.c
+#11 65.00 gcc -g -Wall -O2 -I.  -fpic -c -o probaln.pico probaln.c
+#11 65.12 gcc -g -Wall -O2 -I.  -fpic -c -o realn.pico realn.c
+#11 65.26 gcc -g -Wall -O2 -I.  -fpic -c -o regidx.pico regidx.c
+#11 65.43 gcc -g -Wall -O2 -I.  -fpic -c -o sam.pico sam.c
+#11 66.62 gcc -g -Wall -O2 -I.  -fpic -c -o synced_bcf_reader.pico synced_bcf_reader.c
+#11 67.01 gcc -g -Wall -O2 -I.  -fpic -c -o vcf_sweep.pico vcf_sweep.c
+#11 67.07 gcc -g -Wall -O2 -I.  -fpic -c -o tbx.pico tbx.c
+#11 67.20 gcc -g -Wall -O2 -I.  -fpic -c -o textutils.pico textutils.c
+#11 67.33 gcc -g -Wall -O2 -I.  -fpic -c -o thread_pool.pico thread_pool.c
+#11 67.46 gcc -g -Wall -O2 -I.  -fpic -c -o vcf.pico vcf.c
+#11 69.20 gcc -g -Wall -O2 -I.  -fpic -c -o vcfutils.pico vcfutils.c
+#11 69.63 gcc -g -Wall -O2 -I.  -fpic -c -o cram/cram_codecs.pico cram/cram_codecs.c
+#11 70.16 gcc -g -Wall -O2 -I.  -fpic -c -o cram/cram_decode.pico cram/cram_decode.c
+#11 71.20 gcc -g -Wall -O2 -I.  -fpic -c -o cram/cram_encode.pico cram/cram_encode.c
+#11 72.19 gcc -g -Wall -O2 -I.  -fpic -c -o cram/cram_external.pico cram/cram_external.c
+#11 72.29 gcc -g -Wall -O2 -I.  -fpic -c -o cram/cram_index.pico cram/cram_index.c
+#11 72.47 gcc -g -Wall -O2 -I.  -fpic -c -o cram/cram_io.pico cram/cram_io.c
+#11 73.02 In file included from /usr/include/string.h:535,
+#11 73.02                  from cram/cram_io.c:53:
+#11 73.02 In function 'strncpy',
+#11 73.02     inlined from 'cram_populate_ref' at cram/cram_io.c:2095:9:
+#11 73.02 /usr/include/x86_64-linux-gnu/bits/string_fortified.h:95:10: warning: '__builtin_strncpy' specified bound 4096 equals destination size [-Wstringop-truncation]
+#11 73.02    95 |   return __builtin___strncpy_chk (__dest, __src, __len,
+#11 73.02       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#11 73.02    96 |                                   __glibc_objsize (__dest));
+#11 73.02       |                                   ~~~~~~~~~~~~~~~~~~~~~~~~~
+#11 73.27 In function 'strncpy',
+#11 73.27     inlined from 'full_path' at cram/cram_io.c:3748:13,
+#11 73.27     inlined from 'cram_write_SAM_hdr' at cram/cram_io.c:3823:17:
+#11 73.27 /usr/include/x86_64-linux-gnu/bits/string_fortified.h:95:10: warning: '__builtin_strncpy' specified bound 4096 equals destination size [-Wstringop-truncation]
+#11 73.27    95 |   return __builtin___strncpy_chk (__dest, __src, __len,
+#11 73.27       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#11 73.27    96 |                                   __glibc_objsize (__dest));
+#11 73.27       |                                   ~~~~~~~~~~~~~~~~~~~~~~~~~
+#11 73.31 In function 'strncpy',
+#11 73.31     inlined from 'cram_dopen' at cram/cram_io.c:4126:9:
+#11 73.31 /usr/include/x86_64-linux-gnu/bits/string_fortified.h:95:10: warning: '__builtin_strncpy' specified bound 20 equals destination size [-Wstringop-truncation]
+#11 73.31    95 |   return __builtin___strncpy_chk (__dest, __src, __len,
+#11 73.31       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#11 73.31    96 |                                   __glibc_objsize (__dest));
+#11 73.31       |                                   ~~~~~~~~~~~~~~~~~~~~~~~~~
+#11 73.46 gcc -g -Wall -O2 -I.  -fpic -c -o cram/cram_samtools.pico cram/cram_samtools.c
+#11 73.53 gcc -g -Wall -O2 -I.  -fpic -c -o cram/cram_stats.pico cram/cram_stats.c
+#11 73.64 gcc -g -Wall -O2 -I.  -fpic -c -o cram/files.pico cram/files.c
+#11 73.67 gcc -g -Wall -O2 -I.  -fpic -c -o cram/mFILE.pico cram/mFILE.c
+#11 73.76 gcc -g -Wall -O2 -I.  -fpic -c -o cram/open_trace_file.pico cram/open_trace_file.c
+#11 73.86 gcc -g -Wall -O2 -I.  -fpic -c -o cram/pooled_alloc.pico cram/pooled_alloc.c
+#11 73.89 gcc -g -Wall -O2 -I.  -fpic -c -o cram/rANS_static.pico cram/rANS_static.c
+#11 74.15 gcc -g -Wall -O2 -I.  -fpic -c -o cram/sam_header.pico cram/sam_header.c
+#11 74.58 gcc -g -Wall -O2 -I.  -fpic -c -o cram/string_alloc.pico cram/string_alloc.c
+#11 74.61 gcc -shared -Wl,-soname,libhts.so.2  -o libhts.so kfunc.pico knetfile.pico kstring.pico bcf_sr_sort.pico bgzf.pico errmod.pico faidx.pico hfile.pico hfile_net.pico hts.pico hts_os.pico md5.pico multipart.pico probaln.pico realn.pico regidx.pico sam.pico synced_bcf_reader.pico vcf_sweep.pico tbx.pico textutils.pico thread_pool.pico vcf.pico vcfutils.pico cram/cram_codecs.pico cram/cram_decode.pico cram/cram_encode.pico cram/cram_external.pico cram/cram_index.pico cram/cram_io.pico cram/cram_samtools.pico cram/cram_stats.pico cram/files.pico cram/mFILE.pico cram/open_trace_file.pico cram/pooled_alloc.pico cram/rANS_static.pico cram/sam_header.pico cram/string_alloc.pico -lz -lm -lbz2 -llzma -lpthread
+#11 74.67 ln -sf libhts.so libhts.so.2
+#11 74.67 gcc -g -Wall -O2 -I.  -c -o bgzip.o bgzip.c
+#11 74.77 gcc  -o bgzip bgzip.o libhts.a -lz -lm -lbz2 -llzma -lpthread
+#11 74.81 gcc -g -Wall -O2 -I.  -c -o htsfile.o htsfile.c
+#11 74.88 gcc  -o htsfile htsfile.o libhts.a -lz -lm -lbz2 -llzma -lpthread
+#11 74.92 gcc -g -Wall -O2 -I.  -c -o tabix.o tabix.c
+#11 75.07 gcc  -o tabix tabix.o libhts.a -lz -lm -lbz2 -llzma -lpthread
+#11 75.11 gcc -g -Wall -O2 -I.  -c -o test/hts_endian.o test/hts_endian.c
+#11 75.28 gcc  -o test/hts_endian test/hts_endian.o -lz -lm -lbz2 -llzma
+#11 75.29 gcc -g -Wall -O2 -I.  -c -o test/fieldarith.o test/fieldarith.c
+#11 75.32 gcc  -o test/fieldarith test/fieldarith.o libhts.a -lz -lm -lbz2 -llzma -lpthread
+#11 75.36 gcc -g -Wall -O2 -I.  -c -o test/hfile.o test/hfile.c
+#11 75.49 gcc  -o test/hfile test/hfile.o libhts.a -lz -lm -lbz2 -llzma -lpthread
+#11 75.53 gcc -g -Wall -O2 -I.  -c -o test/sam.o test/sam.c
+#11 75.67 gcc  -o test/sam test/sam.o libhts.a -lz -lm -lbz2 -llzma -lpthread
+#11 75.71 gcc -g -Wall -O2 -I.  -c -o test/test_bgzf.o test/test_bgzf.c
+#11 75.89 gcc  -o test/test_bgzf test/test_bgzf.o libhts.a -lz -lz -lm -lbz2 -llzma -lpthread
+#11 75.93 gcc -g -Wall -O2 -I.  -c -o test/test_realn.o test/test_realn.c
+#11 75.98 gcc  -o test/test_realn test/test_realn.o libhts.a -lz -lm -lbz2 -llzma -lpthread
+#11 76.02 gcc -g -Wall -O2 -I.  -c -o test/test-regidx.o test/test-regidx.c
+#11 76.07 gcc  -o test/test-regidx test/test-regidx.o libhts.a -lz -lm -lbz2 -llzma -lpthread
+#11 76.11 gcc -g -Wall -O2 -I.  -c -o test/test_view.o test/test_view.c
+#11 76.21 gcc  -o test/test_view test/test_view.o libhts.a -lz -lm -lbz2 -llzma -lpthread
+#11 76.25 gcc -g -Wall -O2 -I.  -c -o test/test-vcf-api.o test/test-vcf-api.c
+#11 76.34 gcc  -o test/test-vcf-api test/test-vcf-api.o libhts.a -lz -lm -lbz2 -llzma -lpthread
+#11 76.38 gcc -g -Wall -O2 -I.  -c -o test/test-vcf-sweep.o test/test-vcf-sweep.c
+#11 76.42 gcc  -o test/test-vcf-sweep test/test-vcf-sweep.o libhts.a -lz -lm -lbz2 -llzma -lpthread
+#11 76.46 gcc -g -Wall -O2 -I.  -c -o test/test-bcf-sr.o test/test-bcf-sr.c
+#11 76.53 gcc  -o test/test-bcf-sr test/test-bcf-sr.o libhts.a -lz -lz -lm -lbz2 -llzma -lpthread
+#11 76.58 gcc -g -Wall -O2 -I.  -c -o test/test-bcf-translate.o test/test-bcf-translate.c
+#11 76.62 gcc  -o test/test-bcf-translate test/test-bcf-translate.o libhts.a -lz -lz -lm -lbz2 -llzma -lpthread
+#11 76.66 make[1]: Leaving directory '/opt/tool/lib/htslib'
+#11 76.66 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o src/SeqAlignment/HapAligner.o -c src/SeqAlignment/HapAligner.cpp
+#11 78.08 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o src/SeqAlignment/AlignmentModel.o -c src/SeqAlignment/AlignmentModel.cpp
+#11 78.32 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o src/SeqAlignment/AlignmentOps.o -c src/SeqAlignment/AlignmentOps.cpp
+#11 79.23 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o src/SeqAlignment/HapBlock.o -c src/SeqAlignment/HapBlock.cpp
+#11 79.64 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o src/SeqAlignment/NeedlemanWunsch.o -c src/SeqAlignment/NeedlemanWunsch.cpp
+#11 80.65 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o src/SeqAlignment/Haplotype.o -c src/SeqAlignment/Haplotype.cpp
+#11 81.83 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o src/SeqAlignment/HaplotypeGenerator.o -c src/SeqAlignment/HaplotypeGenerator.cpp
+#11 84.08 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o src/SeqAlignment/HTMLCreator.o -c src/SeqAlignment/HTMLCreator.cpp
+#11 84.44 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o src/SeqAlignment/AlignmentViz.o -c src/SeqAlignment/AlignmentViz.cpp
+#11 85.64 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o src/SeqAlignment/AlignmentTraceback.o -c src/SeqAlignment/AlignmentTraceback.cpp
+#11 86.33 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o src/SeqAlignment/StutterAlignerClass.o -c src/SeqAlignment/StutterAlignerClass.cpp
+#11 86.72 g++  -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o HipSTR src/base_quality.o src/error.o src/region.o src/stringops.o src/zalgorithm.o src/alignment_filters.o src/extract_indels.o src/mathops.o src/pcr_duplicates.o src/bam_io.o src/adapter_trimmer.o src/hipstr_main.o src/bam_processor.o src/stutter_model.o src/snp_phasing_quality.o src/snp_tree.o src/em_stutter_genotyper.o src/seq_stutter_genotyper.o src/snp_bam_processor.o src/genotyper_bam_processor.o src/vcf_input.o src/read_pooler.o src/version.o src/haplotype_tracker.o src/pedigree.o src/vcf_reader.o src/genotyper.o src/directed_graph.o src/debruijn_graph.o src/fasta_reader.o src/vcf_writer.o lib/cephes/libprob.a lib/htslib/libhts.a src/SeqAlignment/HapAligner.o src/SeqAlignment/AlignmentModel.o src/SeqAlignment/AlignmentOps.o src/SeqAlignment/HapBlock.o src/SeqAlignment/NeedlemanWunsch.o src/SeqAlignment/Haplotype.o src/SeqAlignment/HaplotypeGenerator.o src/SeqAlignment/HTMLCreator.o src/SeqAlignment/AlignmentViz.o src/SeqAlignment/AlignmentTraceback.o src/SeqAlignment/StutterAlignerClass.o -L./ -lm -Llib/htslib/ -lz -Llib/cephes/ -llzma -lbz2
+#11 87.01 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o src/denovos/denovo_main.o -c src/denovos/denovo_main.cpp
+#11 88.17 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o src/denovos/denovo_scanner.o -c src/denovos/denovo_scanner.cpp
+#11 89.81 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o src/denovos/denovo_allele_priors.o -c src/denovos/denovo_allele_priors.cpp
+#11 90.29 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o src/denovos/trio_denovo_scanner.o -c src/denovos/trio_denovo_scanner.cpp
+#11 91.08 g++  -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o DenovoFinder src/denovos/denovo_main.o src/error.o src/stringops.o src/version.o src/pedigree.o src/haplotype_tracker.o src/vcf_input.o src/denovos/denovo_scanner.o src/mathops.o src/vcf_reader.o src/denovos/denovo_allele_priors.o src/denovos/trio_denovo_scanner.o lib/htslib/libhts.a -L./ -lm -Llib/htslib/ -lz -Llib/cephes/ -llzma -lbz2
+#11 91.20 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o test/fast_ops_test test/fast_ops_test.cpp src/mathops.cpp
+#11 91.74 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o test/haplotype_test test/haplotype_test.cpp src/SeqAlignment/Haplotype.cpp src/SeqAlignment/HapBlock.cpp src/SeqAlignment/NeedlemanWunsch.cpp src/error.cpp src/stringops.cpp -L./ -lm -Llib/htslib/ -lz -Llib/cephes/ -llzma -lbz2
+#11 96.43 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o test/read_vcf_alleles_test test/read_vcf_alleles_test.cpp src/error.cpp src/region.cpp src/vcf_input.cpp src/vcf_reader.cpp lib/htslib/libhts.a -L./ -lm -Llib/htslib/ -lz -Llib/cephes/ -llzma -lbz2
+#11 99.80 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o test/snp_tree_test src/snp_tree.cpp src/error.cpp test/snp_tree_test.cpp src/haplotype_tracker.cpp src/vcf_reader.cpp lib/htslib/libhts.a -L./ -lm -Llib/htslib/ -lz -Llib/cephes/ -llzma -lbz2
+#11 104.0 g++ -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread  -Ilib -Ilib/htslib -o test/vcf_snp_tree_test test/vcf_snp_tree_test.cpp src/error.cpp src/snp_tree.cpp src/haplotype_tracker.cpp src/vcf_reader.cpp lib/htslib/libhts.a -L./ -lm -Llib/htslib/ -lz -Llib/cephes/ -llzma -lbz2
+#11 DONE 108.3s
+
+#12 exporting to image
+#12 exporting layers
+#12 exporting layers 1.3s done
+#12 writing image sha256:8aabf4fa02633e112020e3a809a49b1a9f7a4f9ca64ea6b7df92105ef500d870 done
+#12 naming to docker.io/library/toolimg:ci done
+#12 DONE 1.3s

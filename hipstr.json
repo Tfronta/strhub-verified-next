@@ -1,0 +1,1693 @@
+{
+  "schema": "strhub-verified/1",
+  "mode": "publish",
+  "tool": {
+    "name": "HipSTR",
+    "version": "v0.7",
+    "contact": "https://github.com/tfwillems/HipSTR/issues"
+  },
+  "submission": {
+    "by": "third_party"
+  },
+  "source": {
+    "repo": "https://github.com/tfwillems/HipSTR",
+    "ref": "12e989be4a8f9ab59f0c4c5da3784b82018cac82",
+    "ref_resolved": "12e989be4a8f9ab59f0c4c5da3784b82018cac82",
+    "committed": "2020-04-16T22:16:31Z"
+  },
+  "environment": {
+    "dockerfile": "Dockerfile",
+    "os": [
+      "ubuntu-22.04"
+    ],
+    "source": "documented"
+  },
+  "generated": "2026-11-22T19:14:06+00:00",
+  "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/45059250503",
+  "run": {
+    "cmd": "./HipSTR --bams          /data/in/input.bam --fasta         /data/ref/hg38.fa --regions       /data/in/regions.bed --str-vcf       str_calls.vcf.gz",
+    "cwd": ".",
+    "effective_cmd": "cd '.' && touch /tmp/.strhub_mark && ( ./HipSTR --bams          /data/in/input.bam --fasta         /data/ref/hg38.fa --regions       /data/in/regions.bed --str-vcf       str_calls.vcf.gz ); rc=$?; find . -xdev -type f -newer /tmp/.strhub_mark -size +0 ! -path './.git/*' ! -path './proc/*' ! -path './sys/*' ! -path './dev/*' ! -path './data/*' ! -path '*/__pycache__/*' ! -name '*.pyc' ! -name '*.pyo' 2>/dev/null | head -500 | while IFS= read -r f; do mkdir -p \"/data/out/$(dirname \"$f\")\" && cp \"$f\" \"/data/out/$f\"; done; exit $rc",
+    "step_outcome": "success"
+  },
+  "instrument": "documented",
+  "recipe": {
+    "origin": "proposed"
+  },
+  "gates": {
+    "available": true,
+    "installs": true,
+    "runs": true,
+    "io": true,
+    "content": true
+  },
+  "input_contract": {
+    "type": "illumina-bam-hg38",
+    "regions": "hipstr"
+  },
+  "level": "content",
+  "io_detail": {
+    "gate": "io",
+    "passed": true,
+    "outputs": [
+      {
+        "path": "**/*.vcf*",
+        "format": "vcf",
+        "checks": {
+          "confined": true,
+          "exists": true,
+          "has_called_genotypes": true,
+          "min_records": true,
+          "non_empty": true,
+          "parses_as_vcf": true
+        },
+        "resolved": "str_calls.vcf.gz",
+        "files": [
+          {
+            "resolved": "str_calls.vcf.gz",
+            "checks": {
+              "non_empty": true,
+              "parses_as_vcf": true,
+              "min_records": true,
+              "has_called_genotypes": true
+            },
+            "records": 21,
+            "called_records": 21,
+            "uncalled_rows": 0,
+            "records_without_gt": 0,
+            "version": "4.1",
+            "validation_status": "valid",
+            "passed": true
+          }
+        ],
+        "validation_profile": "strhub-vcf-structure/1",
+        "passed": true,
+        "records": 21,
+        "called_records": 21,
+        "uncalled_rows": 0,
+        "records_without_gt": 0,
+        "validation_status": "valid"
+      }
+    ]
+  },
+  "content_detail": {
+    "gate": "content",
+    "applicable": true,
+    "passed": true,
+    "outputs": [
+      {
+        "path": "**/*.vcf*",
+        "resolved": "str_calls.vcf.gz",
+        "mode": "auto",
+        "checks": {
+          "records_present": true,
+          "genotypes_called": true,
+          "given_loci_recognised": true
+        },
+        "stats": {
+          "rows": 21,
+          "header_row_dropped": false,
+          "malformed_rows": 0,
+          "dna_invalid_rows": 0,
+          "count_invalid_rows": 0,
+          "distinct_loci": 21,
+          "distinct_str_loci": 21,
+          "distinct_snp_markers": 0,
+          "loci": [
+            "CSF1PO",
+            "D10S1248",
+            "D12S391",
+            "D13S317",
+            "D16S539",
+            "D18S51",
+            "D19S433",
+            "D1S1656",
+            "D22S1045",
+            "D2S441",
+            "D3S1358",
+            "D5S818",
+            "D6S1043",
+            "D7S820",
+            "D8S1179",
+            "FGA",
+            "PentaD",
+            "PentaE",
+            "TH01",
+            "TPOX",
+            "vWA"
+          ],
+          "str_loci": [
+            "CSF1PO",
+            "D10S1248",
+            "D12S391",
+            "D13S317",
+            "D16S539",
+            "D18S51",
+            "D19S433",
+            "D1S1656",
+            "D22S1045",
+            "D2S441",
+            "D3S1358",
+            "D5S818",
+            "D6S1043",
+            "D7S820",
+            "D8S1179",
+            "FGA",
+            "PentaD",
+            "PentaE",
+            "TH01",
+            "TPOX",
+            "vWA"
+          ],
+          "snp_markers": [],
+          "total_reads": 7851,
+          "max_sequence_depth": 517,
+          "top_loci_by_depth": [
+            [
+              "D18S51",
+              517
+            ],
+            [
+              "FGA",
+              477
+            ],
+            [
+              "vWA",
+              456
+            ],
+            [
+              "PentaD",
+              431
+            ],
+            [
+              "D2S441",
+              428
+            ],
+            [
+              "D3S1358",
+              419
+            ],
+            [
+              "D22S1045",
+              414
+            ],
+            [
+              "D7S820",
+              405
+            ],
+            [
+              "PentaE",
+              401
+            ],
+            [
+              "D5S818",
+              399
+            ],
+            [
+              "D16S539",
+              371
+            ],
+            [
+              "D6S1043",
+              360
+            ],
+            [
+              "D1S1656",
+              359
+            ],
+            [
+              "D12S391",
+              349
+            ],
+            [
+              "D8S1179",
+              346
+            ],
+            [
+              "D13S317",
+              316
+            ],
+            [
+              "D10S1248",
+              309
+            ],
+            [
+              "D19S433",
+              289
+            ],
+            [
+              "TH01",
+              275
+            ],
+            [
+              "CSF1PO",
+              275
+            ],
+            [
+              "TPOX",
+              255
+            ]
+          ],
+          "called_genotypes": 21,
+          "regions_given": 24,
+          "regions_hit": 21,
+          "depth_source": "FORMAT/DP"
+        },
+        "passed": true
+      }
+    ]
+  },
+  "example_detail": null,
+  "datasets": [
+    {
+      "leg": "external",
+      "label": "External data",
+      "available": true,
+      "type": "illumina-bam-hg38",
+      "dataset": "Illumina BAM (hg38), NA12878 (autosomal, female)",
+      "io": true,
+      "content": true,
+      "passed": true
+    },
+    {
+      "leg": "example",
+      "label": "Tool's own example",
+      "available": false,
+      "io": false,
+      "content": null,
+      "passed": false,
+      "matches_expected": null,
+      "produced_count": null
+    }
+  ],
+  "scope": "Assessment of documented execution in the stated environment and output format. Concerns reproducible execution only; no claim of accuracy, casework fitness, or regulatory validation.",
+  "upstream": {
+    "checked": "2026-11-22T19:14:07+00:00",
+    "repo_exists": true,
+    "ref_exists": true,
+    "default_branch": "master",
+    "status": "ahead",
+    "behind_by": 1
+  },
+  "needed_beyond_repo": [
+    "Test data: no sample from the repository was used, so a public reference sample stood in.",
+    "A base environment for the documented installation: STRhub ran the repository's install commands unchanged on Ubuntu 22.04, package lists refreshed, apt answering yes, plus minimal build toolchain (git, ca-certificates; no tool-specific libraries). Base-image and package versions are not frozen by the commands.",
+    "A reference genome (GRCh38 / hg38): the command names one, and STRhub mounted the public copy at /data/ref/hg38.fa."
+  ],
+  "evidence": [
+    {
+      "claim": "install_method",
+      "kind": "tree",
+      "path": "Makefile",
+      "text": "make",
+      "url": "https://github.com/tfwillems/HipSTR/blob/12e989be4a8f9ab59f0c4c5da3784b82018cac82/Makefile"
+    },
+    {
+      "claim": "run_command",
+      "kind": "readme",
+      "path": "README.md",
+      "line": 69,
+      "text": "./HipSTR --bams          run1.bam,run2.bam,run3.bam,run4.bam",
+      "url": "https://github.com/tfwillems/HipSTR/blob/12e989be4a8f9ab59f0c4c5da3784b82018cac82/README.md#L69"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "test/input/chr1_regions.bed",
+      "text": "bed",
+      "url": "https://github.com/tfwillems/HipSTR/blob/12e989be4a8f9ab59f0c4c5da3784b82018cac82/test/input/chr1_regions.bed"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "test/input/chr1_regions_v2.bed",
+      "text": "bed",
+      "url": "https://github.com/tfwillems/HipSTR/blob/12e989be4a8f9ab59f0c4c5da3784b82018cac82/test/input/chr1_regions_v2.bed"
+    },
+    {
+      "claim": "example_data",
+      "kind": "tree",
+      "path": "test/input/1kg.chr1.imputed.vcf.gz",
+      "text": "vcf",
+      "url": "https://github.com/tfwillems/HipSTR/blob/12e989be4a8f9ab59f0c4c5da3784b82018cac82/test/input/1kg.chr1.imputed.vcf.gz"
+    },
+    {
+      "claim": "documented_input",
+      "kind": "readme",
+      "path": "README.md",
+      "line": 69,
+      "text": "./HipSTR --bams          run1.bam,run2.bam,run3.bam,run4.bam",
+      "url": "https://github.com/tfwillems/HipSTR/blob/12e989be4a8f9ab59f0c4c5da3784b82018cac82/README.md#L69"
+    },
+    {
+      "claim": "platform_advice",
+      "kind": "readme",
+      "path": "README.md",
+      "line": 435,
+      "text": "We do not recommend running it on PacBio or Oxford Nanopore data, as the difference in error profiles will be problematic",
+      "url": "https://github.com/tfwillems/HipSTR/blob/12e989be4a8f9ab59f0c4c5da3784b82018cac82/README.md#L435"
+    }
+  ],
+  "repo_test_data": {
+    "known": true,
+    "present": true,
+    "count": 3,
+    "examples": [
+      "test/input/chr1_regions.bed",
+      "test/input/chr1_regions_v2.bed",
+      "test/input/1kg.chr1.imputed.vcf.gz"
+    ]
+  },
+  "caveats": {
+    "source": "detect_recipe",
+    "items": [
+      "Environment: STRhub transcribed the documented installation commands unchanged into its own carrier (Ubuntu 22.04, package lists refreshed, apt answering yes, plus minimal build toolchain (git, ca-certificates; no tool-specific libraries)).",
+      "Input: the README documents BAM (line 69); this plan selects STRhub's illumina-bam-hg38 reference data.",
+      "read_path: run1.bam,run2.bam,run3.bam,run4.bam -> /data/in/input.bam.",
+      "reference_path: genome.fa -> /data/ref/hg38.fa.",
+      "regions_path: str_regions.bed -> /data/in/regions.bed.",
+      "Run command: the README's own command, rewritten to STRhub's mounts; the capture wrapper is planned only if the procedure review passes."
+    ]
+  },
+  "logs": {
+    "external": "hipstr.log-external.txt",
+    "build": "hipstr.log-build.txt"
+  },
+  "terminals": {
+    "external": "hipstr.terminal-external.txt",
+    "build": "hipstr.terminal-build.txt"
+  },
+  "diagnostics": {
+    "external": [
+      {
+        "id": "low_bq_reads",
+        "severity": "info",
+        "title": "Reads filtered by base quality",
+        "count": 22,
+        "examples": [
+          "4",
+          "3",
+          "1",
+          "5",
+          "8",
+          "7",
+          "6",
+          "2"
+        ],
+        "suggestion": "Reads were removed by the program's base-quality filter, at the program's own threshold."
+      },
+      {
+        "id": "unpaired_reads",
+        "severity": "info",
+        "title": "Reads filtered (no mate pair)",
+        "count": 22,
+        "examples": [
+          "2",
+          "3",
+          "13",
+          "11",
+          "5",
+          "7",
+          "4",
+          "8",
+          "6",
+          "16",
+          "9"
+        ],
+        "suggestion": "Reads without a mate pair were filtered by the program. The mates of a slice's reads can fall outside the sliced region; the slice was mounted as it is."
+      },
+      {
+        "id": "str_too_long",
+        "severity": "warning",
+        "title": "Locus skipped: reference allele too long (127 vs max 100)",
+        "count": 2,
+        "examples": [
+          "127",
+          "102"
+        ],
+        "suggestion": "Loci were skipped because their reference allele exceeds the program's maximum length. The threshold is the program's own and was not changed."
+      },
+      {
+        "id": "too_few_reads",
+        "severity": "warning",
+        "title": "Loci skipped (too few reads)",
+        "count": 1,
+        "examples": [
+          "1"
+        ],
+        "suggestion": "Loci were skipped for having too few reads after the program's own filtering, at the program's own thresholds. On STRhub's reference slice this can reflect the sample's coverage at those loci."
+      },
+      {
+        "id": "genotyping_summary",
+        "severity": "info",
+        "title": "Genotyping: 21/21 loci succeeded",
+        "count": 1,
+        "examples": [
+          "21"
+        ]
+      }
+    ]
+  },
+  "procedure_review": {
+    "may_say_runs": true,
+    "status_code": "VERIFIED_PROCEDURE_READY",
+    "basis": "gates",
+    "attribution": "tool",
+    "blocker": "ready",
+    "reason": "The repository states how to install (make) and STRhub holds the sample. The container is that install, packaged. If the documented command then fails, the failure is that command's.",
+    "amendments": [],
+    "inferences": {
+      "install": {
+        "evidence_source": "README.md:L49-L59",
+        "verified": true
+      },
+      "run_command": {
+        "evidence_source": "README.md:L69-L72",
+        "verified": true,
+        "kind": "doc",
+        "path": "README.md",
+        "document_sha256": "77e3332e5114926dc4fcd384660217cc9f83bf8928e3fa9b7e8685a84206efb1"
+      },
+      "input_type": {
+        "verified": true,
+        "kind": "doc",
+        "path": "README.md",
+        "line": 69,
+        "end_line": 69,
+        "document_sha256": "77e3332e5114926dc4fcd384660217cc9f83bf8928e3fa9b7e8685a84206efb1",
+        "evidence_source": "README.md:L69",
+        "upstream_input_kind": "bam",
+        "selected_dataset": "illumina-bam-hg38"
+      },
+      "platform": {
+        "verified": true,
+        "kind": "doc",
+        "path": "README.md",
+        "line": 36,
+        "end_line": 36,
+        "document_sha256": "77e3332e5114926dc4fcd384660217cc9f83bf8928e3fa9b7e8685a84206efb1",
+        "evidence_source": "README.md:L36",
+        "selected": "illumina",
+        "selection_basis": "upstream_single_platform",
+        "supported_platforms": [
+          "illumina"
+        ]
+      },
+      "regions": {
+        "verified": true,
+        "kind": "doc",
+        "path": "README.md",
+        "line": 308,
+        "end_line": 322,
+        "document_sha256": "77e3332e5114926dc4fcd384660217cc9f83bf8928e3fa9b7e8685a84206efb1",
+        "evidence_source": "README.md:L308-L322"
+      },
+      "single_sample_bams": {
+        "verified": true,
+        "kind": "doc",
+        "path": "README.md",
+        "line": 75,
+        "end_line": 75,
+        "document_sha256": "77e3332e5114926dc4fcd384660217cc9f83bf8928e3fa9b7e8685a84206efb1",
+        "evidence_source": "README.md:L75"
+      },
+      "output": {
+        "verified": true,
+        "kind": "doc",
+        "path": "README.md",
+        "line": 69,
+        "end_line": 69,
+        "document_sha256": "77e3332e5114926dc4fcd384660217cc9f83bf8928e3fa9b7e8685a84206efb1",
+        "evidence_source": "README.md:L69"
+      }
+    },
+    "unbacked_inferences": [],
+    "provenance": {
+      "from_upstream": {
+        "install": {
+          "method": "make",
+          "evidence_source": "README.md:L49-L59"
+        },
+        "command": {
+          "value": "./HipSTR --bams          run1.bam,run2.bam,run3.bam,run4.bam --fasta         genome.fa --regions       str_regions.bed --str-vcf       str_calls.vcf.gz",
+          "evidence_source": "README.md:L69-L72"
+        },
+        "input_kind": {
+          "value": "bam",
+          "evidence_source": "README.md:L69"
+        },
+        "supported_platforms": [
+          {
+            "platform": "illumina",
+            "evidence_source": "README.md:L36"
+          }
+        ],
+        "assembly": {
+          "declared": null,
+          "evidence_source": null
+        },
+        "regions_schema": {
+          "format": "hipstr",
+          "evidence_source": "README.md:L308-L322"
+        },
+        "output_format": {
+          "glob": "**/*.vcf*",
+          "evidence_source": "README.md:L69"
+        }
+      },
+      "derived": {
+        "command_rewrites": [
+          {
+            "role": "read_path",
+            "original": "run1.bam,run2.bam,run3.bam,run4.bam",
+            "replacement": "/data/in/input.bam",
+            "basis": "declared dataset mount"
+          },
+          {
+            "role": "reference_path",
+            "original": "genome.fa",
+            "replacement": "/data/ref/hg38.fa",
+            "basis": "registered reference genome mount"
+          },
+          {
+            "role": "regions_path",
+            "original": "str_regions.bed",
+            "replacement": "/data/in/regions.bed",
+            "basis": "registered regions file (hipstr)"
+          }
+        ],
+        "regions_layout_binding": {
+          "documented_schema": "hipstr",
+          "evidence_source": "README.md:L308-L322",
+          "strhub_regions_layout": "hipstr"
+        },
+        "single_sample_adaptation": {
+          "applied": true,
+          "original": "run1.bam,run2.bam,run3.bam,run4.bam",
+          "replacement": "/data/in/input.bam",
+          "evidence_source": "README.md:L75",
+          "note": "STRhub trial mounted one compatible sample for the documented multi-file placeholder list"
+        }
+      },
+      "harness_choices": {
+        "dataset": {
+          "selected": "illumina-bam-hg38",
+          "reason": "STRhub selected 'illumina-bam-hg38' as compatible with upstream input 'bam' and platform 'illumina'"
+        },
+        "platform": {
+          "selected": "illumina",
+          "basis": "upstream_single_platform",
+          "supported_platforms": [
+            "illumina"
+          ]
+        },
+        "assembly": {
+          "selected": "hg38",
+          "basis": "harness_choice_unstated",
+          "note": "Upstream did not specify an assembly; STRhub supplied an internally coherent hg38 BAM, FASTA and regions set"
+        },
+        "regions_layout": "hipstr",
+        "base_environment": {
+          "image": "ubuntu:22.04",
+          "description": "Ubuntu 22.04, package lists refreshed, apt answering yes, plus minimal build toolchain (git, ca-certificates; no tool-specific libraries)",
+          "added_packages": [
+            "git",
+            "ca-certificates"
+          ],
+          "miniforge": false,
+          "submodules": false
+        }
+      }
+    },
+    "install_method": "make",
+    "citable_install": true,
+    "input_type": "illumina-bam-hg38",
+    "output_glob": "**/*.vcf*",
+    "profile": "strhub-upstream-procedure/1",
+    "install_ready": true,
+    "example_ready": false,
+    "installation": {
+      "profile": "strhub-documented-install/1",
+      "ready": true,
+      "method": "make",
+      "reason": "Transcribe the installation commands the repository documents, unchanged and in order, into a fixed evaluator carrier; no step, dependency, option or choice was added.",
+      "repo": "https://github.com/tfwillems/HipSTR",
+      "ref": "12e989be4a8f9ab59f0c4c5da3784b82018cac82",
+      "documents": [
+        {
+          "path": "README.md",
+          "sha256": "77e3332e5114926dc4fcd384660217cc9f83bf8928e3fa9b7e8685a84206efb1"
+        }
+      ],
+      "commands": [
+        {
+          "file": "README.md",
+          "line": 49,
+          "text": "apt install make g++ zlib1g-dev libhts-dev libbz2-dev liblzma-dev",
+          "argv": [
+            "apt",
+            "install",
+            "make",
+            "g++",
+            "zlib1g-dev",
+            "libhts-dev",
+            "libbz2-dev",
+            "liblzma-dev"
+          ]
+        },
+        {
+          "file": "README.md",
+          "line": 59,
+          "text": "make",
+          "argv": [
+            "make"
+          ]
+        }
+      ],
+      "published_alternatives": [],
+      "conda_environment": null,
+      "base_condition": {
+        "image": "ubuntu:22.04",
+        "description": "Ubuntu 22.04, package lists refreshed, apt answering yes, plus minimal build toolchain (git, ca-certificates; no tool-specific libraries)",
+        "role": "evaluator base environment",
+        "added_packages": [
+          "git",
+          "ca-certificates"
+        ],
+        "miniforge": false,
+        "submodules": false
+      },
+      "citation": {
+        "repo": "https://github.com/tfwillems/HipSTR",
+        "ref": "12e989be4a8f9ab59f0c4c5da3784b82018cac82",
+        "path": "README.md",
+        "line": 49,
+        "end_line": 59,
+        "verified": true,
+        "document_sha256": "77e3332e5114926dc4fcd384660217cc9f83bf8928e3fa9b7e8685a84206efb1"
+      },
+      "carrier_dockerfile": "# Evaluator carrier: strhub-documented-install/1; not an upstream Dockerfile.\nFROM ubuntu:22.04\nENV DEBIAN_FRONTEND=noninteractive\nRUN [\"bash\", \"-c\", \"echo 'APT::Get::Assume-Yes \\\"true\\\";' > /etc/apt/apt.conf.d/90strhub && apt-get update\"]\nRUN [\"bash\", \"-c\", \"apt-get install --no-install-recommends git ca-certificates\"]\nCOPY [\".\", \"/opt/tool\"]\nWORKDIR /opt/tool\nRUN [\"bash\", \"-lc\", \"set -eo pipefail\\napt install make g++ zlib1g-dev libhts-dev libbz2-dev liblzma-dev\\nmake\\n\"]\nENTRYPOINT [\"/bin/bash\", \"-lc\"]\n",
+      "carrier_sha256": "6d0b11f3323d88730c1eadf572daa3153c938771ce6b108b19b0982c13dcb0f7"
+    },
+    "command_review": {
+      "profile": "strhub-upstream-procedure/1",
+      "cited": "./HipSTR --bams          run1.bam,run2.bam,run3.bam,run4.bam --fasta         genome.fa --regions       str_regions.bed --str-vcf       str_calls.vcf.gz",
+      "command": "./HipSTR --bams          /data/in/input.bam --fasta         /data/ref/hg38.fa --regions       /data/in/regions.bed --str-vcf       str_calls.vcf.gz",
+      "substitutions": [
+        {
+          "token": 2,
+          "original": "run1.bam,run2.bam,run3.bam,run4.bam",
+          "replacement": "/data/in/input.bam",
+          "role": "read_path",
+          "basis": "declared dataset mount"
+        },
+        {
+          "token": 4,
+          "original": "genome.fa",
+          "replacement": "/data/ref/hg38.fa",
+          "role": "reference_path",
+          "basis": "registered reference genome mount"
+        },
+        {
+          "token": 6,
+          "original": "str_regions.bed",
+          "replacement": "/data/in/regions.bed",
+          "role": "regions_path",
+          "basis": "registered regions file (hipstr)"
+        }
+      ],
+      "read_bindings": [
+        {
+          "token": 2,
+          "original": "run1.bam,run2.bam,run3.bam,run4.bam",
+          "target": "/data/in/input.bam"
+        }
+      ],
+      "limitations": [],
+      "expected": "./HipSTR --bams          /data/in/input.bam --fasta         /data/ref/hg38.fa --regions       /data/in/regions.bed --str-vcf       str_calls.vcf.gz",
+      "executed": "./HipSTR --bams          /data/in/input.bam --fasta         /data/ref/hg38.fa --regions       /data/in/regions.bed --str-vcf       str_calls.vcf.gz",
+      "cited_sha256": "abab90b16c8a21829728ae0a4fb0edb9c32c8f0a66e765cd0f3b9609ef29741f",
+      "executed_sha256": "3937c327964070c0760c5c203fc5b2ba8b55981fc2d794ff4444f2319e2a9320",
+      "citations": [
+        {
+          "repo": "https://github.com/tfwillems/HipSTR",
+          "ref": "12e989be4a8f9ab59f0c4c5da3784b82018cac82",
+          "path": "README.md",
+          "line": 69,
+          "verified": true,
+          "end_line": 72,
+          "continued": true,
+          "document_sha256": "77e3332e5114926dc4fcd384660217cc9f83bf8928e3fa9b7e8685a84206efb1",
+          "command_sha256": "abab90b16c8a21829728ae0a4fb0edb9c32c8f0a66e765cd0f3b9609ef29741f"
+        }
+      ]
+    },
+    "manifest_sha256": "9c15f9e41c9e182061468448e950d44aefb668033c24998bb56c4cc02b80aaca",
+    "evidence_sha256": "f2315d9ea6e5a2eb93979caa56c937fd1d6d8631b569a174900a0ea1ca259a86",
+    "evidence": {
+      "schema": "strhub-procedure-evidence/1",
+      "manifest": {
+        "caveats": {
+          "items": [
+            "Environment: STRhub transcribed the documented installation commands unchanged into its own carrier (Ubuntu 22.04, package lists refreshed, apt answering yes, plus minimal build toolchain (git, ca-certificates; no tool-specific libraries)).",
+            "Input: the README documents BAM (line 69); this plan selects STRhub's illumina-bam-hg38 reference data.",
+            "read_path: run1.bam,run2.bam,run3.bam,run4.bam -> /data/in/input.bam.",
+            "reference_path: genome.fa -> /data/ref/hg38.fa.",
+            "regions_path: str_regions.bed -> /data/in/regions.bed.",
+            "Run command: the README's own command, rewritten to STRhub's mounts; the capture wrapper is planned only if the procedure review passes."
+          ],
+          "source": "detect_recipe"
+        },
+        "environment": {
+          "dockerfile": "Dockerfile",
+          "os": [
+            "ubuntu-22.04"
+          ],
+          "source": "documented"
+        },
+        "inputs": {
+          "regions": "hipstr",
+          "type": "illumina-bam-hg38"
+        },
+        "outputs": [
+          {
+            "format": "vcf",
+            "min_records": 1,
+            "path": "**/*.vcf*"
+          }
+        ],
+        "recipe": {
+          "origin": "proposed"
+        },
+        "report": {
+          "slug": "hipstr"
+        },
+        "run": {
+          "cmd": "cd '.' && touch /tmp/.strhub_mark && ( ./HipSTR --bams          /data/in/input.bam --fasta         /data/ref/hg38.fa --regions       /data/in/regions.bed --str-vcf       str_calls.vcf.gz ); rc=$?; find . -xdev -type f -newer /tmp/.strhub_mark -size +0 ! -path './.git/*' ! -path './proc/*' ! -path './sys/*' ! -path './dev/*' ! -path './data/*' ! -path '*/__pycache__/*' ! -name '*.pyc' ! -name '*.pyo' 2>/dev/null | head -500 | while IFS= read -r f; do mkdir -p \"/data/out/$(dirname \"$f\")\" && cp \"$f\" \"/data/out/$f\"; done; exit $rc",
+          "timeout_minutes": 20
+        },
+        "source": {
+          "ref": "12e989be4a8f9ab59f0c4c5da3784b82018cac82",
+          "repo": "https://github.com/tfwillems/HipSTR"
+        },
+        "submission": {
+          "by": "third_party"
+        },
+        "tool": {
+          "contact": "https://github.com/tfwillems/HipSTR/issues",
+          "name": "HipSTR",
+          "version": "v0.7"
+        }
+      },
+      "proposal": {
+        "build": {
+          "also_published": null,
+          "asset": null,
+          "candidates": [
+            {
+              "file": "Makefile",
+              "method": "make"
+            }
+          ],
+          "digest": null,
+          "dir": null,
+          "evidence_source": "repo_file:Makefile",
+          "file": "Makefile",
+          "image": null,
+          "method": "make",
+          "package": null,
+          "readme_install_lines": [
+            "apt install make g++ zlib1g-dev libhts-dev libbz2-dev liblzma-dev",
+            "make"
+          ],
+          "readme_line": null,
+          "spec_list": false,
+          "ssh_urls_in": [],
+          "tag": null,
+          "then": [],
+          "url": null
+        },
+        "commands": [
+          {
+            "cmd": "./HipSTR --bams          run1.bam,run2.bam,run3.bam,run4.bam --fasta         genome.fa --regions       str_regions.bed --str-vcf       str_calls.vcf.gz",
+            "entry_point": false,
+            "evidence_source": "README.md:L69",
+            "file": "README.md",
+            "has_input_flag": true,
+            "has_output_flag": true,
+            "help_only": false,
+            "invokes": "HipSTR",
+            "line": 69,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "readme",
+            "piped": false,
+            "rst": false,
+            "source_rank": 0,
+            "subcommand": null,
+            "synopsis": false
+          },
+          {
+            "cmd": "./HipSTR --bams             run1.bam,run2.bam,run3.bam,run4.bam --fasta            genome.fa --regions          str_regions.bed --str-vcf          str_calls.vcf.gz",
+            "entry_point": false,
+            "evidence_source": "README.md:L115",
+            "file": "README.md",
+            "has_input_flag": true,
+            "has_output_flag": true,
+            "help_only": false,
+            "invokes": "HipSTR",
+            "line": 115,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "readme",
+            "piped": false,
+            "rst": false,
+            "source_rank": 0,
+            "subcommand": null,
+            "synopsis": false
+          },
+          {
+            "cmd": "./HipSTR --bams             run1.bam,run2.bam,run3.bam,run4.bam --fasta            genome.fa --regions          str_regions.bed --stutter-in       ext_stutter_models.txt --str-vcf          str_calls.vcf.gz",
+            "entry_point": false,
+            "evidence_source": "README.md:L127",
+            "file": "README.md",
+            "has_input_flag": true,
+            "has_output_flag": true,
+            "help_only": false,
+            "invokes": "HipSTR",
+            "line": 127,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "readme",
+            "piped": false,
+            "rst": false,
+            "source_rank": 0,
+            "subcommand": null,
+            "synopsis": false
+          },
+          {
+            "cmd": "./HipSTR --bams             run1.bam,run2.bam,run3.bam,run4.bam --fasta            genome.fa --regions          str_regions.bed --stutter-in       ext_stutter_models.txt --ref-vcf          ref_strs.vcf.gz --str-vcf          str_calls.vcf.gz",
+            "entry_point": false,
+            "evidence_source": "README.md:L141",
+            "file": "README.md",
+            "has_input_flag": true,
+            "has_output_flag": true,
+            "help_only": false,
+            "invokes": "HipSTR",
+            "line": 141,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "readme",
+            "piped": false,
+            "rst": false,
+            "source_rank": 0,
+            "subcommand": null,
+            "synopsis": false
+          },
+          {
+            "cmd": "./HipSTR --bams             run1.bam,run2.bam,run3.bam,run4.cram --fasta            genome.fa --regions          str_regions.bed --str-vcf          str_calls.vcf.gz --bam-samps        SAMPLE1,SAMPLE1,SAMPLE2,SAMPLE3 --bam-libs         LIB1,LIB2,LIB3,LIB4",
+            "entry_point": false,
+            "evidence_source": "README.md:L293",
+            "file": "README.md",
+            "has_input_flag": true,
+            "has_output_flag": true,
+            "help_only": false,
+            "invokes": "HipSTR",
+            "line": 293,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "readme",
+            "piped": false,
+            "rst": false,
+            "source_rank": 0,
+            "subcommand": null,
+            "synopsis": false
+          },
+          {
+            "cmd": "python scripts/filter_vcf.py  --vcf                   diploid_calls.vcf.gz --min-call-qual         0.9 --max-call-flank-indel  0.15 --max-call-stutter      0.15 --min-call-allele-bias  -2 --min-call-strand-bias  -2",
+            "entry_point": false,
+            "evidence_source": "README.md:L204",
+            "file": "README.md",
+            "has_input_flag": false,
+            "has_output_flag": true,
+            "help_only": false,
+            "invokes": "filter_vcf.py",
+            "line": 204,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "readme",
+            "piped": false,
+            "rst": false,
+            "source_rank": 0,
+            "subcommand": null,
+            "synopsis": false
+          },
+          {
+            "cmd": "python scripts/filter_haploid_vcf.py  --vcf                   haploid_calls.vcf.gz --min-call-qual         0.9 --max-call-flank-indel  0.15 --max-call-stutter      0.15",
+            "entry_point": false,
+            "evidence_source": "README.md:L211",
+            "file": "README.md",
+            "has_input_flag": false,
+            "has_output_flag": true,
+            "help_only": false,
+            "invokes": "filter_haploid_vcf.py",
+            "line": 211,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "readme",
+            "piped": false,
+            "rst": false,
+            "source_rank": 0,
+            "subcommand": null,
+            "synopsis": false
+          },
+          {
+            "cmd": "./HipSTR --help",
+            "entry_point": false,
+            "evidence_source": "README.md:L63",
+            "file": "README.md",
+            "has_input_flag": false,
+            "has_output_flag": false,
+            "help_only": true,
+            "invokes": "HipSTR",
+            "line": 63,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "readme",
+            "piped": false,
+            "rst": false,
+            "source_rank": 0,
+            "subcommand": null,
+            "synopsis": false
+          },
+          {
+            "cmd": "python scripts/filter_vcf.py -h",
+            "entry_point": false,
+            "evidence_source": "README.md:L220",
+            "file": "README.md",
+            "has_input_flag": false,
+            "has_output_flag": false,
+            "help_only": true,
+            "invokes": "filter_vcf.py",
+            "line": 220,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "readme",
+            "piped": false,
+            "rst": false,
+            "source_rank": 0,
+            "subcommand": null,
+            "synopsis": false
+          },
+          {
+            "cmd": "python scripts/filter_haploid_vcf.py -h",
+            "entry_point": false,
+            "evidence_source": "README.md:L221",
+            "file": "README.md",
+            "has_input_flag": false,
+            "has_output_flag": false,
+            "help_only": true,
+            "invokes": "filter_haploid_vcf.py",
+            "line": 221,
+            "main_verb": false,
+            "named_in_tree": true,
+            "needs_external_aux": false,
+            "origin": "readme",
+            "piped": false,
+            "rst": false,
+            "source_rank": 0,
+            "subcommand": null,
+            "synopsis": false
+          }
+        ],
+        "dockerfile": null,
+        "docs_read": [],
+        "docs_text": "",
+        "evidence": [
+          {
+            "claim": "install_method",
+            "kind": "tree",
+            "path": "Makefile",
+            "text": "make",
+            "url": "https://github.com/tfwillems/HipSTR/blob/12e989be4a8f9ab59f0c4c5da3784b82018cac82/Makefile"
+          },
+          {
+            "claim": "run_command",
+            "kind": "readme",
+            "line": 69,
+            "path": "README.md",
+            "text": "./HipSTR --bams          run1.bam,run2.bam,run3.bam,run4.bam",
+            "url": "https://github.com/tfwillems/HipSTR/blob/12e989be4a8f9ab59f0c4c5da3784b82018cac82/README.md#L69"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "test/input/chr1_regions.bed",
+            "text": "bed",
+            "url": "https://github.com/tfwillems/HipSTR/blob/12e989be4a8f9ab59f0c4c5da3784b82018cac82/test/input/chr1_regions.bed"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "test/input/chr1_regions_v2.bed",
+            "text": "bed",
+            "url": "https://github.com/tfwillems/HipSTR/blob/12e989be4a8f9ab59f0c4c5da3784b82018cac82/test/input/chr1_regions_v2.bed"
+          },
+          {
+            "claim": "example_data",
+            "kind": "tree",
+            "path": "test/input/1kg.chr1.imputed.vcf.gz",
+            "text": "vcf",
+            "url": "https://github.com/tfwillems/HipSTR/blob/12e989be4a8f9ab59f0c4c5da3784b82018cac82/test/input/1kg.chr1.imputed.vcf.gz"
+          },
+          {
+            "claim": "documented_input",
+            "kind": "readme",
+            "line": 69,
+            "path": "README.md",
+            "text": "./HipSTR --bams          run1.bam,run2.bam,run3.bam,run4.bam",
+            "url": "https://github.com/tfwillems/HipSTR/blob/12e989be4a8f9ab59f0c4c5da3784b82018cac82/README.md#L69"
+          },
+          {
+            "claim": "platform_advice",
+            "kind": "readme",
+            "line": 435,
+            "path": "README.md",
+            "text": "We do not recommend running it on PacBio or Oxford Nanopore data, as the difference in error profiles will be problematic",
+            "url": "https://github.com/tfwillems/HipSTR/blob/12e989be4a8f9ab59f0c4c5da3784b82018cac82/README.md#L435"
+          }
+        ],
+        "example": null,
+        "example_data": [
+          {
+            "in_example_dir": true,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "test/input/chr1_regions.bed",
+            "size": 713
+          },
+          {
+            "in_example_dir": true,
+            "kind": "bed",
+            "looks_like_output": false,
+            "path": "test/input/chr1_regions_v2.bed",
+            "size": 980
+          },
+          {
+            "in_example_dir": true,
+            "kind": "vcf",
+            "looks_like_output": false,
+            "path": "test/input/1kg.chr1.imputed.vcf.gz",
+            "size": 18485802
+          }
+        ],
+        "inferences": {
+          "build": "repo_file:Makefile",
+          "example": null,
+          "input_type": "README.md:L69",
+          "output": "README.md:L69",
+          "platform": "README.md:L36",
+          "regions": "README.md:L308-L322",
+          "run_command": "README.md:L69",
+          "single_sample_bams": "README.md:L75"
+        },
+        "input_type": {
+          "assembly": {
+            "against_hg38": null,
+            "declared": null,
+            "evidence_source": null,
+            "hg19_evidence_source": null,
+            "hg19_hits": 0,
+            "hg38_evidence_source": null,
+            "hg38_hits": 0,
+            "incompatible_with_hg38": false
+          },
+          "best": "illumina-bam-hg38",
+          "candidates": [
+            "illumina-bam-hg38",
+            "illumina-snp-fastq"
+          ],
+          "evidence_source": "README.md:L69",
+          "how": "read",
+          "platform": "illumina",
+          "platform_evidence_source": "README.md:L36",
+          "platform_how": "stated",
+          "signals": {
+            "bam": 37,
+            "ce": 0,
+            "fastq": 0,
+            "hg19": 0,
+            "hg38": 0,
+            "illumina": 6,
+            "ont": 1,
+            "snp": 16,
+            "ystr": 0
+          },
+          "statements": {
+            "against": [
+              {
+                "line": 435,
+                "platform": "ont",
+                "text": "We do not recommend running it on PacBio or Oxford Nanopore data, as the difference in error profiles will be problematic"
+              },
+              {
+                "line": 435,
+                "platform": "pacbio",
+                "text": "We do not recommend running it on PacBio or Oxford Nanopore data, as the difference in error profiles will be problematic"
+              }
+            ],
+            "determined": true,
+            "inputs": [
+              {
+                "kind": "bam",
+                "line": 69,
+                "text": "./HipSTR --bams          run1.bam,run2.bam,run3.bam,run4.bam"
+              }
+            ],
+            "platform": [
+              {
+                "historical": false,
+                "line": 36,
+                "platform": "illumina",
+                "text": "In our opinion, all of these factors make **HipSTR** the most reliable tool for genotyping STRs from **Illumina** sequencing data."
+              }
+            ],
+            "recommendation": null
+          },
+          "statements_file": null,
+          "supported_platforms": [
+            {
+              "evidence_source": "README.md:L36",
+              "historical": false,
+              "line": 36,
+              "platform": "illumina",
+              "text": "In our opinion, all of these factors make **HipSTR** the most reliable tool for genotyping STRs from **Illumina** sequencing data."
+            }
+          ],
+          "unsupported": null,
+          "warnings": []
+        },
+        "known_issues": [],
+        "limitations": [],
+        "output": {
+          "evidence_source": "README.md:L69",
+          "format": "vcf",
+          "signals": {
+            "csv": 4,
+            "json": 0,
+            "tsv": 7,
+            "vcf": 61
+          }
+        },
+        "packaging": {
+          "executables": [],
+          "packages": []
+        },
+        "readme": {
+          "gaps": [],
+          "name": "README.md",
+          "sufficient_to_attempt": true
+        },
+        "readme_name": "README.md",
+        "readme_text": "# HipSTR\n**H**aplotype **i**nference and **p**hasing for **S**hort **T**andem **R**epeats  \n![HipSTR icon!](https://raw.githubusercontent.com/tfwillems/HipSTR/master/img/HipSTR_icon_small.png)\t\n\n#### Author: Thomas Willems <hipstrtool@gmail.com> <br> License: GNU v2\n\n[Introduction](#introduction)  \n[Requirements](#requirements)  \n[Installation](#installation)  \n[Quick Start](#quick-start)       \n[Tutorial](#tutorial)  \n[In-depth Usage](#in-depth-usage)  \n[Data Requirements](#data-requirements)  \n[Phasing](#phasing)     \n[Speed](#speed)  \n[Default Filtering](#default-filtering)  \n[Call Filtering](#call-filtering)  \n[Additional Usage Options](#additional-usage-options)\t\t  \n[File Formats](#file-formats)     \n[FAQ](#faq)     \n[Help](#help)       \n[Citation](#citation)\n\n## Introduction\nShort tandem repeats [(STRs)](http://en.wikipedia.org/wiki/Microsatellite) are highly repetitive genomic sequences comprised of repeated copies of an underlying motif. Prevalent in most organisms' genomes, STRs are of particular interest because they mutate much more rapidly than most other genomic elements. As a result, they're extremely informative for genomic identification, ancestry inference and genealogy.\n\nDespite their utility, STRs are particularly difficult to genotype. The repetitive sequence responsible for their high mutability also results in frequent alignment errors that can complicate and bias downstream analyses. In addition, PCR stutter errors often result in reads that contain additional or fewer repeat copies than the true underlying genotype. \n\n**HipSTR** was specifically developed to deal with these errors in the hopes of obtaining more robust STR genotypes. In particular, it accomplishes this by:\n\n1. Learning locus-specific PCR stutter models using an [EM algorithm](http://en.wikipedia.org/wiki/Expectation-maximization_algorithm)\n2. Mining candidate STR alleles from population-scale sequencing data\n3. Employing a specialized hidden Markov model to align reads to candidate alleles while accounting for STR artifacts\n4. Utilizing phased SNP haplotypes to genotype and phase STRs\n\nIn our opinion, all of these factors make **HipSTR** the most reliable tool for genotyping STRs from **Illumina** sequencing data.\n\n## Requirements\nTo compile HipSTR, the following packages are required:\n- make\n- g++\n- zlib\n- libhts\n- libbz2\n- liblzma\n\nIf you are running Ubuntu 16+, they can be easily installed by running:\n\n    apt install make g++ zlib1g-dev libhts-dev libbz2-dev liblzma-dev\n\n## Installation\nHipSTR requires a standard c++ compiler. To obtain HipSTR, use:\n\n    git clone https://github.com/HipSTR-Tool/HipSTR\n\nTo build, use Make:\n\n    cd HipSTR\n    make\n\nThe commands will construct an executable file called **HipSTR** in the current directory, for which you can view detailed help information by typing \n\n\t./HipSTR --help\n\n## Quick Start\nTo run HipSTR in its most broadly applicable mode, run it on **all samples concurrently** using the syntax:\n\n```\n./HipSTR --bams          run1.bam,run2.bam,run3.bam,run4.bam\n         --fasta         genome.fa\n         --regions       str_regions.bed\n         --str-vcf       str_calls.vcf.gz\n```\n\n* **bams** :  a comma-separated list of [BAM/CRAM](#bams) files generated by [BWA-MEM](http://bio-bwa.sourceforge.net/bwa.shtml) and sorted and indexed using [samtools](http://www.htslib.org/)\n* **regions** : a [BED](#str-bed) file containing the coordinates for each STR region of interest. Download BED files for various organisms, including humans, from [here](https://github.com/HipSTR-Tool/HipSTR-references/)\n* **fasta** : [FASTA file](https://en.wikipedia.org/wiki/FASTA_format) containing the sequence for each chromosome in the BED file. This build's coordinates must match those of the STR regions\n* **str-vcf** : The output path for the STR genotypes\n\nFor each region in *str_regions.bed*, **HipSTR** will:\n\n1. Learn a stutter model for each locus\n2. Use the stutter model and haplotype-based alignment algorithm to genotype each individual\n3. Output the resulting STR genotypes to *str_calls.vcf.gz*, a [bgzipped](http://www.htslib.org/doc/tabix.html) [VCF](#str-vcf) file. This VCF will contain calls for each sample in any of the BAM/CRAM files' read groups.\n\n## Tutorial\nTo demonstrate how you can quickly apply HipSTR to whole-genome sequencing datasets, we've built a simple [tutorial](https://hipstr-tool.github.io/HipSTR-tutorial/). In less than 10 minutes, this tutorial will teach you how to genotype ~600 STRs in a deeply sequenced trio of individuals and inspect the results.\n\n## In-depth Usage\n**HipSTR** has a variety of usage options designed to accomodate scenarios in which the sequencing data varies in terms of the number of samples and the coverage. Most scenarios will fall into one of the following categories:\n\n1. 100 or more low-coverage (~5x) samples\n    * Sufficient reads for stutter estimation\n    * Sufficient reads to detect candidate STR alleles\n    * [**Use de novo stutter estimation + STR calling with de novo allele generation**](#mode-1)\n2. 20 or more high-coverage (~30x) samples\n    * Sufficient reads for stutter estimation\n    * Sufficient reads to detect candidate STR alleles\n    * [**Use de novo stutter estimation + STR calling with de novo allele generation**](#mode-1)\n3. Handful of low-coverage  (~5x) samples\n    * Insufficient reads for stutter estimation\n    * Insufficient reads to detect candidate STR alleles\n    * [**Use external/default stutter models + STR calling with a reference panel**](#mode-3)\n4. Handful of high-coverage (~30x) samples\n    * Insufficient samples for stutter estimation\n    * Sufficient reads to detect candidate STR alleles\n    * [**Use external/default stutter models + STR calling with de novo allele generation**](#mode-2)\n\n<a id=\"mode-1\"></a>\n\n#### Mode 1: De novo stutter estimation + STR calling with de novo allele generation\nThis mode is identical to the one suggested in the **Quick Start** section as it suits most applications. HipSTR will output the STR genotypes in bgzipped VCF format to *str_calls.vcf.gz* \n\n```\n./HipSTR --bams             run1.bam,run2.bam,run3.bam,run4.bam\n         --fasta            genome.fa\n         --regions          str_regions.bed\n         --str-vcf          str_calls.vcf.gz\n```\n\n<a id=\"mode-2\"></a>\n\n#### Mode 2: External stutter models + STR calling with de novo allele generation\nThe sole difference in this mode is that we no longer learn stutter models using the EM algorithm but instead input them from the **stutter-in** file. For more details on the stutter model file format, see [below](#stutter-file).\n\n```\n./HipSTR --bams             run1.bam,run2.bam,run3.bam,run4.bam\n         --fasta            genome.fa\n         --regions          str_regions.bed\n         --stutter-in       ext_stutter_models.txt\n         --str-vcf          str_calls.vcf.gz\n```\nIf you don't have access to external stutter models for the **stutter-in** option, use **def-stutter-model**. This will use a simplistic stutter model for all loci (see the HipSTR help message for specifics).\n\n<a id=\"mode-3\"></a>\n\n#### Mode 3: External stutter models + STR calling with a reference panel\nThis mode is very similar to mode 2, except that we provide an additional VCF file containing known STR genotypes at each locus using the **str-vcf** option. **HipSTR** will not identify any additional candidate STR alleles in the BAMs/CRAMs when this option is specified, so it's best to use a VCF that contains STR genotypes for a wide range of populations and individuals. \n\n```\n./HipSTR --bams             run1.bam,run2.bam,run3.bam,run4.bam\n         --fasta            genome.fa\n         --regions          str_regions.bed\n         --stutter-in       ext_stutter_models.txt\n         --ref-vcf          ref_strs.vcf.gz\n         --str-vcf          str_calls.vcf.gz\n```\n\nIf you don't have access to external stutter models for the **stutter-in** option, use **def-stutter-model**. This will use a simplistic stutter model for all loci (see the HipSTR help message for specifics).\n\n## Data Requirements\nTo genotype STRs, **HipSTR** requires Illumina sequencing data. However, as the depth of sequencing and the read length in these datasets can vary dramatically, here we briefly describe key factors to consider before generating data for HipSTR analyses.\n\nBecause of the repetitive nature of STRs, reads that do not fully extend across the repeat only provide a lower bound on its length. While this lower bound is informative and is leveraged by **HipSTR**, obtaining accurate and robust STR genotypes requires reads that fully extend across the repetitive sequence (*i.e. spanning reads*). The number of reads that span an STR is a function of the read length, the sequencing depth, and the length of the repeat (as well as various other factors). The interplay between these factors is relatively complex, but [**Figure 2** in a recent review](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4254273/figure/F2/) by *Press et al.* nicely highlights these dependencies. As one would intuitively expect, using longer read lengths and higher sequencing coverage increases the number of spanning reads. Conversely, increasing the length of the repeat reduces the number of spanning reads, making it more difficult to accurately genotype long STRs. When the number of spanning reads approaches single digits, you statistically run the risk of observing reads from only 1 out of 2 chromosome copies, making it impossible to correctly call both alleles in a heterozygous individual. \n\nIn our own analyses, we've found that 100 bp Illumina reads are sufficient to characterize the majority of STRs in the human genome. However, genotyping STRs that exceed 70bp (such as very long forensic STRs) invariably requires longer reads, but most human STRs are much shorter than this threshold. This read length will likely be sufficient for most model organisms unless their repeats are substantially longer than those in humans.\n\nThe optimal minimum sequencing depth for HipSTR largely depends on your intended analyses. If you are interested in studying how STRs mutate or [want to identify de novo mutations](#de-novo-mutations), 30x coverage is an ideal minimum that allows HipSTR to provide the required high degree of specificity. Conversely, if you are merely interested in studying the allele frequencies for various STRs in a population, 10x coverage will likely be sufficient. However, in this setting, there will likely be many genotyping errors in which heterozygous genotypes are miscalled as homozygotes.\n\nBased on the nature of your sequencing data, one important HipSTR option to consider is **min-reads**. HipSTR uses the value of this parameter to skip any STRs where few than *N* reads are available for genotyping across all individuals. By default, this value is 100, as we've found that this is a good minimum threshold for learning stutter models prior to genotyping. If you're analyzing very few samples (e.g. a single mother-father-child trio), you may want to consider lowering this threshold as you will seldom have 100 reads. In this setting, it makes sense to use options like **--min-reads 15 --def-stutter-model**, where the latter option uses a default stutter model as too few reads are available for accurately inferring one. However, if you're analyzing many samples (e.g. more than ten 30x genomes or more than thirty 10x genomes), it likely doesn't make sense to change this parameter. In these settings, regions with fewer than 100 reads may have high GC content that is problematic for Illumina sequencing, may be difficult to map to, or may merely be too long for your chosen read length.  \n\n## Phasing\nHipSTR utilizes phased SNP haplotypes to phase the resulting STR genotypes. To do so, it looks for pairs of reads in which the STR-containing read or its mate pair overlap a samples's heterozygous SNP. In these instances, the quality score for the overlapping base can be used to determine the likelihood that the read came from each haplotype. Alternatively, when this information is not available, we assign the read an equal likelihood of coming from either strand. These likelihoods are incorporated into the HipSTR genotyping model which outputs phased genotypes. The quality of a phasing is reflected in the *PQ* FORMAT field, which provides the posterior probability of each sample's phased genotype. For homozygous genotypes, this value will always equal the *Q* FORMAT field as phasing is irrelevant. However, for heterozygous genotypes, if *PQ ~ Q*, it indicates that one of the two phasings is much more favorable. Alterneatively, if none of a sample's reads overlap heterozygous SNPs, both phasings will be equally probable and *PQ ~ Q/2*. To enable the use of physical phasing, supply HipSTR with the **snp-vcf** option and a SNP VCF containing **phased** haplotypes. The schematic below outlines the concepts underlying HipSTR's physical phasing model:\n\n![Phasing schematic!](https://raw.githubusercontent.com/tfwillems/HipSTR/master/img/phasing.png)\n\n## Speed\nHipSTR doesn't currently have multi-threaded support, but there are several options available to accelerate analyses:\n\n1. Analyze each chromosome in parallel using the **--chrom** option. For example, **--chrom chr2** will only genotype BED regions on chr2\n2. Split your BED file into *N* files and analyze each of the *N* files in parallel. This allows you to parallelize analyses in a manner similar to option 1 but can be used for increased speed if *N* is much greater than the number of chromosomes.\n\n## Default Filtering\nHipSTR sometimes automatically filters genotypes on a per-sample basis and will report a missing value in the VCF file. These filters are applied when a sample's data suggests that HipSTR will not be able to produce a reliable genotype. For each locus, a summary of the number of filtered samples is output in the **log** file. If you specify the **--output-filters** command line option, a FORMAT field called **FILTER** will be reported in the VCF for each sample, where *PASS* designates ok samples and other values indicate the reason for filtering. \n\n**Samples with a PASS value should still undergo additional variant filtering (see below), as this merely indicates that no catastrophic issues were encountered during the genotyping process**. The table below summarizes the potential filtering reasons:  \n\n| Filter | Explanation \n| :----- | :---------\n| NO_READS                | No alignments were available for the sample at the current STR. If reads overlap the STR in the BAM/CRAM, they may have been filtered due to read quality issues, mapping uniqueness or other reasons\n| FLANK_ASSEMBLY_CYCLIC   | During the genotyping process, HipSTR attempts to assemble the sequences upstream and downstream of the STR (*flank*) to identify any potential SNPs it should consider. This assembly process fails if the resulting assembly graph contains a cycle, resulting in this filter\n| FLANK_ASSEMBLY_INDEL    |This filter is triggered if the assembly process identifies an insertion or deletion in the *flanks*. These indels are problematic for HipSTR's model and thus it does not attempt to genotype the sample\n| FLANK_INDEL_FRAC        | When genotyping is complete, HipSTR determines the maximum-likelihood alignment of each read relative to its sample's called alleles. If a large fraction of the resulting alignments have indels in the *flanks*, it's a strong indicator that they're misaligned and the sample's genotype is therefore ignored\n| LOW_FREQUENCY_ALT_FLANK | Flanking sequences identified by the assembly process in each sample are pooled together to generate all candidate haplotypes. As the number of haplotypes grows exponentially with the number of such sequences, HipSTR conserves time by discarding flanks that are only present in a few samples. If a sample's data supports a low-frequency flank, it is not genotyped. To adjust this frequency cutoff, use the **--min-flank-freq** option \n\n\n\n## Call Filtering\nAlthough **HipSTR** mitigates many of the most common sources of STR genotyping errors, it's still extremely important to filter the resulting VCFs to discard low quality calls. To facilitate this process, the VCF output contains various FORMAT and INFO fields that are usually indicators of problematic calls. The INFO fields indicate the aggregate data for a locus and, if certain flags are raised, may suggest that the entire locus should be discarded. In contrast, FORMAT fields are available on a per-sample basis for each locus and, if certain flags are raised, suggest that some samples' genotypes should be discarded. The list below includes some of these fields and how they can be informative:\n\n#### INFO fields:  \n1. **DP**: Reports the total depth/number of informative reads for all samples at the locus. The mean coverage per-sample can obtained by dividing this value by the number of samples with non-missing genotypes. In general, genotypes with a low mean coverage are unreliable because the reads may only have captured one of the two alleles if an individual is heterozygous.\n2. **DSTUTTER**: Reports the total number of reads at a locus with what HipSTR thinks is a stutter artifact. If the total fraction of reads with stutter (DSTUTTER/DP) is high, genotypes for a locus will be unreliable because the reads frequently don't reflect the true underlying genotype. A high fraction of stutter-containing reads can be caused by too much PCR amplification, a duplicated locus that is mapping to a single location in the genome, or a failure of HipSTR to identify sufficient candidate alleles.  \n3. **DFLANKINDEL**: Reports the total number of reads for which the maximum likelihood alignment contains an indel in the regions flanking the STR. A high fraction of reads with this artifact (DFLANKINDEL/DP) can be caused by an actual indel in a region neighboring the STR. However, it can also arise if HipSTR fails to identify sufficient candidate alleles. When these alleles are very different in size from the candidate alleles or are non-unit multiples, they're frequently aligned as indels in the flanking sequences.\n\n#### FORMAT fields:  \n1. **Q**: Reports the posterior probability of the genotype. We've found that this is the best indicator of quality of an individual sample's genotype and almost always use it to filter calls.   \n2. **DP**, **DSTUTTER** and **DFLANKINDEL**: Identical to the INFO field case, these fields are also available for each sample and can be used in the same way to identify problematic individual calls.  \n3. **AB** and **FS**: Quantify the log10 p-value of the allele bias and the Fisher strand bias, respectively. Large negative values indicate that the degree of bias observed is very unlikely to occur by random chance. In the case of **AB**, this indicates that the number of reads observed per allele is unlikely given the predicted genotype. In the case of **FS**, this indicates that there is a non-random association between sequencing strand and the allele each read is assigned to, suggesting that sequencing errors may be causing one of the reported alleles. Note that these fields are only applicable to diploid genotypes.   \n\n**So what thresholds do we suggest for each of these fields?** The answer really depends on the quality of the sequencing data, the ploidy of the chromosome and the downstream applications. However, we typically apply the following filters usings scripts we've provided in the **scripts** subdirectory of the HipSTR folder:\n\n```\npython scripts/filter_vcf.py  --vcf                   diploid_calls.vcf.gz\n                              --min-call-qual         0.9\n                              --max-call-flank-indel  0.15\n                              --max-call-stutter      0.15\n\t\t\t      --min-call-allele-bias  -2\n\t\t\t      --min-call-strand-bias  -2\n    \npython scripts/filter_haploid_vcf.py  --vcf                   haploid_calls.vcf.gz\n                              ",
+        "ref": "12e989be4a8f9ab59f0c4c5da3784b82018cac82",
+        "regions": {
+          "ambiguous": false,
+          "candidates": [
+            {
+              "end_line": 322,
+              "evidence_source": "README.md:L308-L322",
+              "file": "README.md",
+              "format": "hipstr",
+              "line": 308,
+              "text": "CHROM | START       | END         | MOTIF_LEN | NUM_COPIES | NAME"
+            }
+          ],
+          "end_line": 322,
+          "evidence_source": "README.md:L308-L322",
+          "file": "README.md",
+          "format": "hipstr",
+          "line": 308,
+          "text": "CHROM | START       | END         | MOTIF_LEN | NUM_COPIES | NAME"
+        },
+        "registry": {
+          "bioconda": {
+            "hipstr": {
+              "has_tag_version": true,
+              "latest": "0.7",
+              "versions": 1
+            }
+          },
+          "documented": []
+        },
+        "repo": "https://github.com/tfwillems/HipSTR",
+        "schema": "strhub-verified/recipe-proposal/1",
+        "single_sample_bams": {
+          "allowed": true,
+          "evidence_source": "README.md:L75",
+          "file": "README.md",
+          "line": 75,
+          "paired_flags": [],
+          "text": "* **bams** :  a comma-separated list of [BAM/CRAM](#bams) files generated by [BWA-MEM](http://bio-bwa.sourceforge.net/bwa.shtml) and sorted and indexed using [samtools](http://www.htslib.org/)"
+        },
+        "source_documents": [
+          {
+            "file": "README.md",
+            "origin": "readme",
+            "text": "# HipSTR\n**H**aplotype **i**nference and **p**hasing for **S**hort **T**andem **R**epeats  \n![HipSTR icon!](https://raw.githubusercontent.com/tfwillems/HipSTR/master/img/HipSTR_icon_small.png)\t\n\n#### Author: Thomas Willems <hipstrtool@gmail.com> <br> License: GNU v2\n\n[Introduction](#introduction)  \n[Requirements](#requirements)  \n[Installation](#installation)  \n[Quick Start](#quick-start)       \n[Tutorial](#tutorial)  \n[In-depth Usage](#in-depth-usage)  \n[Data Requirements](#data-requirements)  \n[Phasing](#phasing)     \n[Speed](#speed)  \n[Default Filtering](#default-filtering)  \n[Call Filtering](#call-filtering)  \n[Additional Usage Options](#additional-usage-options)\t\t  \n[File Formats](#file-formats)     \n[FAQ](#faq)     \n[Help](#help)       \n[Citation](#citation)\n\n## Introduction\nShort tandem repeats [(STRs)](http://en.wikipedia.org/wiki/Microsatellite) are highly repetitive genomic sequences comprised of repeated copies of an underlying motif. Prevalent in most organisms' genomes, STRs are of particular interest because they mutate much more rapidly than most other genomic elements. As a result, they're extremely informative for genomic identification, ancestry inference and genealogy.\n\nDespite their utility, STRs are particularly difficult to genotype. The repetitive sequence responsible for their high mutability also results in frequent alignment errors that can complicate and bias downstream analyses. In addition, PCR stutter errors often result in reads that contain additional or fewer repeat copies than the true underlying genotype. \n\n**HipSTR** was specifically developed to deal with these errors in the hopes of obtaining more robust STR genotypes. In particular, it accomplishes this by:\n\n1. Learning locus-specific PCR stutter models using an [EM algorithm](http://en.wikipedia.org/wiki/Expectation-maximization_algorithm)\n2. Mining candidate STR alleles from population-scale sequencing data\n3. Employing a specialized hidden Markov model to align reads to candidate alleles while accounting for STR artifacts\n4. Utilizing phased SNP haplotypes to genotype and phase STRs\n\nIn our opinion, all of these factors make **HipSTR** the most reliable tool for genotyping STRs from **Illumina** sequencing data.\n\n## Requirements\nTo compile HipSTR, the following packages are required:\n- make\n- g++\n- zlib\n- libhts\n- libbz2\n- liblzma\n\nIf you are running Ubuntu 16+, they can be easily installed by running:\n\n    apt install make g++ zlib1g-dev libhts-dev libbz2-dev liblzma-dev\n\n## Installation\nHipSTR requires a standard c++ compiler. To obtain HipSTR, use:\n\n    git clone https://github.com/HipSTR-Tool/HipSTR\n\nTo build, use Make:\n\n    cd HipSTR\n    make\n\nThe commands will construct an executable file called **HipSTR** in the current directory, for which you can view detailed help information by typing \n\n\t./HipSTR --help\n\n## Quick Start\nTo run HipSTR in its most broadly applicable mode, run it on **all samples concurrently** using the syntax:\n\n```\n./HipSTR --bams          run1.bam,run2.bam,run3.bam,run4.bam\n         --fasta         genome.fa\n         --regions       str_regions.bed\n         --str-vcf       str_calls.vcf.gz\n```\n\n* **bams** :  a comma-separated list of [BAM/CRAM](#bams) files generated by [BWA-MEM](http://bio-bwa.sourceforge.net/bwa.shtml) and sorted and indexed using [samtools](http://www.htslib.org/)\n* **regions** : a [BED](#str-bed) file containing the coordinates for each STR region of interest. Download BED files for various organisms, including humans, from [here](https://github.com/HipSTR-Tool/HipSTR-references/)\n* **fasta** : [FASTA file](https://en.wikipedia.org/wiki/FASTA_format) containing the sequence for each chromosome in the BED file. This build's coordinates must match those of the STR regions\n* **str-vcf** : The output path for the STR genotypes\n\nFor each region in *str_regions.bed*, **HipSTR** will:\n\n1. Learn a stutter model for each locus\n2. Use the stutter model and haplotype-based alignment algorithm to genotype each individual\n3. Output the resulting STR genotypes to *str_calls.vcf.gz*, a [bgzipped](http://www.htslib.org/doc/tabix.html) [VCF](#str-vcf) file. This VCF will contain calls for each sample in any of the BAM/CRAM files' read groups.\n\n## Tutorial\nTo demonstrate how you can quickly apply HipSTR to whole-genome sequencing datasets, we've built a simple [tutorial](https://hipstr-tool.github.io/HipSTR-tutorial/). In less than 10 minutes, this tutorial will teach you how to genotype ~600 STRs in a deeply sequenced trio of individuals and inspect the results.\n\n## In-depth Usage\n**HipSTR** has a variety of usage options designed to accomodate scenarios in which the sequencing data varies in terms of the number of samples and the coverage. Most scenarios will fall into one of the following categories:\n\n1. 100 or more low-coverage (~5x) samples\n    * Sufficient reads for stutter estimation\n    * Sufficient reads to detect candidate STR alleles\n    * [**Use de novo stutter estimation + STR calling with de novo allele generation**](#mode-1)\n2. 20 or more high-coverage (~30x) samples\n    * Sufficient reads for stutter estimation\n    * Sufficient reads to detect candidate STR alleles\n    * [**Use de novo stutter estimation + STR calling with de novo allele generation**](#mode-1)\n3. Handful of low-coverage  (~5x) samples\n    * Insufficient reads for stutter estimation\n    * Insufficient reads to detect candidate STR alleles\n    * [**Use external/default stutter models + STR calling with a reference panel**](#mode-3)\n4. Handful of high-coverage (~30x) samples\n    * Insufficient samples for stutter estimation\n    * Sufficient reads to detect candidate STR alleles\n    * [**Use external/default stutter models + STR calling with de novo allele generation**](#mode-2)\n\n<a id=\"mode-1\"></a>\n\n#### Mode 1: De novo stutter estimation + STR calling with de novo allele generation\nThis mode is identical to the one suggested in the **Quick Start** section as it suits most applications. HipSTR will output the STR genotypes in bgzipped VCF format to *str_calls.vcf.gz* \n\n```\n./HipSTR --bams             run1.bam,run2.bam,run3.bam,run4.bam\n         --fasta            genome.fa\n         --regions          str_regions.bed\n         --str-vcf          str_calls.vcf.gz\n```\n\n<a id=\"mode-2\"></a>\n\n#### Mode 2: External stutter models + STR calling with de novo allele generation\nThe sole difference in this mode is that we no longer learn stutter models using the EM algorithm but instead input them from the **stutter-in** file. For more details on the stutter model file format, see [below](#stutter-file).\n\n```\n./HipSTR --bams             run1.bam,run2.bam,run3.bam,run4.bam\n         --fasta            genome.fa\n         --regions          str_regions.bed\n         --stutter-in       ext_stutter_models.txt\n         --str-vcf          str_calls.vcf.gz\n```\nIf you don't have access to external stutter models for the **stutter-in** option, use **def-stutter-model**. This will use a simplistic stutter model for all loci (see the HipSTR help message for specifics).\n\n<a id=\"mode-3\"></a>\n\n#### Mode 3: External stutter models + STR calling with a reference panel\nThis mode is very similar to mode 2, except that we provide an additional VCF file containing known STR genotypes at each locus using the **str-vcf** option. **HipSTR** will not identify any additional candidate STR alleles in the BAMs/CRAMs when this option is specified, so it's best to use a VCF that contains STR genotypes for a wide range of populations and individuals. \n\n```\n./HipSTR --bams             run1.bam,run2.bam,run3.bam,run4.bam\n         --fasta            genome.fa\n         --regions          str_regions.bed\n         --stutter-in       ext_stutter_models.txt\n         --ref-vcf          ref_strs.vcf.gz\n         --str-vcf          str_calls.vcf.gz\n```\n\nIf you don't have access to external stutter models for the **stutter-in** option, use **def-stutter-model**. This will use a simplistic stutter model for all loci (see the HipSTR help message for specifics).\n\n## Data Requirements\nTo genotype STRs, **HipSTR** requires Illumina sequencing data. However, as the depth of sequencing and the read length in these datasets can vary dramatically, here we briefly describe key factors to consider before generating data for HipSTR analyses.\n\nBecause of the repetitive nature of STRs, reads that do not fully extend across the repeat only provide a lower bound on its length. While this lower bound is informative and is leveraged by **HipSTR**, obtaining accurate and robust STR genotypes requires reads that fully extend across the repetitive sequence (*i.e. spanning reads*). The number of reads that span an STR is a function of the read length, the sequencing depth, and the length of the repeat (as well as various other factors). The interplay between these factors is relatively complex, but [**Figure 2** in a recent review](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4254273/figure/F2/) by *Press et al.* nicely highlights these dependencies. As one would intuitively expect, using longer read lengths and higher sequencing coverage increases the number of spanning reads. Conversely, increasing the length of the repeat reduces the number of spanning reads, making it more difficult to accurately genotype long STRs. When the number of spanning reads approaches single digits, you statistically run the risk of observing reads from only 1 out of 2 chromosome copies, making it impossible to correctly call both alleles in a heterozygous individual. \n\nIn our own analyses, we've found that 100 bp Illumina reads are sufficient to characterize the majority of STRs in the human genome. However, genotyping STRs that exceed 70bp (such as very long forensic STRs) invariably requires longer reads, but most human STRs are much shorter than this threshold. This read length will likely be sufficient for most model organisms unless their repeats are substantially longer than those in humans.\n\nThe optimal minimum sequencing depth for HipSTR largely depends on your intended analyses. If you are interested in studying how STRs mutate or [want to identify de novo mutations](#de-novo-mutations), 30x coverage is an ideal minimum that allows HipSTR to provide the required high degree of specificity. Conversely, if you are merely interested in studying the allele frequencies for various STRs in a population, 10x coverage will likely be sufficient. However, in this setting, there will likely be many genotyping errors in which heterozygous genotypes are miscalled as homozygotes.\n\nBased on the nature of your sequencing data, one important HipSTR option to consider is **min-reads**. HipSTR uses the value of this parameter to skip any STRs where few than *N* reads are available for genotyping across all individuals. By default, this value is 100, as we've found that this is a good minimum threshold for learning stutter models prior to genotyping. If you're analyzing very few samples (e.g. a single mother-father-child trio), you may want to consider lowering this threshold as you will seldom have 100 reads. In this setting, it makes sense to use options like **--min-reads 15 --def-stutter-model**, where the latter option uses a default stutter model as too few reads are available for accurately inferring one. However, if you're analyzing many samples (e.g. more than ten 30x genomes or more than thirty 10x genomes), it likely doesn't make sense to change this parameter. In these settings, regions with fewer than 100 reads may have high GC content that is problematic for Illumina sequencing, may be difficult to map to, or may merely be too long for your chosen read length.  \n\n## Phasing\nHipSTR utilizes phased SNP haplotypes to phase the resulting STR genotypes. To do so, it looks for pairs of reads in which the STR-containing read or its mate pair overlap a samples's heterozygous SNP. In these instances, the quality score for the overlapping base can be used to determine the likelihood that the read came from each haplotype. Alternatively, when this information is not available, we assign the read an equal likelihood of coming from either strand. These likelihoods are incorporated into the HipSTR genotyping model which outputs phased genotypes. The quality of a phasing is reflected in the *PQ* FORMAT field, which provides the posterior probability of each sample's phased genotype. For homozygous genotypes, this value will always equal the *Q* FORMAT field as phasing is irrelevant. However, for heterozygous genotypes, if *PQ ~ Q*, it indicates that one of the two phasings is much more favorable. Alterneatively, if none of a sample's reads overlap heterozygous SNPs, both phasings will be equally probable and *PQ ~ Q/2*. To enable the use of physical phasing, supply HipSTR with the **snp-vcf** option and a SNP VCF containing **phased** haplotypes. The schematic below outlines the concepts underlying HipSTR's physical phasing model:\n\n![Phasing schematic!](https://raw.githubusercontent.com/tfwillems/HipSTR/master/img/phasing.png)\n\n## Speed\nHipSTR doesn't currently have multi-threaded support, but there are several options available to accelerate analyses:\n\n1. Analyze each chromosome in parallel using the **--chrom** option. For example, **--chrom chr2** will only genotype BED regions on chr2\n2. Split your BED file into *N* files and analyze each of the *N* files in parallel. This allows you to parallelize analyses in a manner similar to option 1 but can be used for increased speed if *N* is much greater than the number of chromosomes.\n\n## Default Filtering\nHipSTR sometimes automatically filters genotypes on a per-sample basis and will report a missing value in the VCF file. These filters are applied when a sample's data suggests that HipSTR will not be able to produce a reliable genotype. For each locus, a summary of the number of filtered samples is output in the **log** file. If you specify the **--output-filters** command line option, a FORMAT field called **FILTER** will be reported in the VCF for each sample, where *PASS* designates ok samples and other values indicate the reason for filtering. \n\n**Samples with a PASS value should still undergo additional variant filtering (see below), as this merely indicates that no catastrophic issues were encountered during the genotyping process**. The table below summarizes the potential filtering reasons:  \n\n| Filter | Explanation \n| :----- | :---------\n| NO_READS                | No alignments were available for the sample at the current STR. If reads overlap the STR in the BAM/CRAM, they may have been filtered due to read quality issues, mapping uniqueness or other reasons\n| FLANK_ASSEMBLY_CYCLIC   | During the genotyping process, HipSTR attempts to assemble the sequences upstream and downstream of the STR (*flank*) to identify any potential SNPs it should consider. This assembly process fails if the resulting assembly graph contains a cycle, resulting in this filter\n| FLANK_ASSEMBLY_INDEL    |This filter is triggered if the assembly process identifies an insertion or deletion in the *flanks*. These indels are problematic for HipSTR's model and thus it does not attempt to genotype the sample\n| FLANK_INDEL_FRAC        | When genotyping is complete, HipSTR determines the maximum-likelihood alignment of each read relative to its sample's called alleles. If a large fraction of the resulting alignments have indels in the *flanks*, it's a strong indicator that they're misaligned and the sample's genotype is therefore ignored\n| LOW_FREQUENCY_ALT_FLANK | Flanking sequences identified by the assembly process in each sample are pooled together to generate all candidate haplotypes. As the number of haplotypes grows exponentially with the number of such sequences, HipSTR conserves time by discarding flanks that are only present in a few samples. If a sample's data supports a low-frequency flank, it is not genotyped. To adjust this frequency cutoff, use the **--min-flank-freq** option \n\n\n\n## Call Filtering\nAlthough **HipSTR** mitigates many of the most common sources of STR genotyping errors, it's still extremely important to filter the resulting VCFs to discard low quality calls. To facilitate this process, the VCF output contains various FORMAT and INFO fields that are usually indicators of problematic calls. The INFO fields indicate the aggregate data for a locus and, if certain flags are raised, may suggest that the entire locus should be discarded. In contrast, FORMAT fields are available on a per-sample basis for each locus and, if certain flags are raised, suggest that some samples' genotypes should be discarded. The list below includes some of these fields and how they can be informative:\n\n#### INFO fields:  \n1. **DP**: Reports the total depth/number of informative reads for all samples at the locus. The mean coverage per-sample can obtained by dividing this value by the number of samples with non-missing genotypes. In general, genotypes with a low mean coverage are unreliable because the reads may only have captured one of the two alleles if an individual is heterozygous.\n2. **DSTUTTER**: Reports the total number of reads at a locus with what HipSTR thinks is a stutter artifact. If the total fraction of reads with stutter (DSTUTTER/DP) is high, genotypes for a locus will be unreliable because the reads frequently don't reflect the true underlying genotype. A high fraction of stutter-containing reads can be caused by too much PCR amplification, a duplicated locus that is mapping to a single location in the genome, or a failure of HipSTR to identify sufficient candidate alleles.  \n3. **DFLANKINDEL**: Reports the total number of reads for which the maximum likelihood alignment contains an indel in the regions flanking the STR. A high fraction of reads with this artifact (DFLANKINDEL/DP) can be caused by an actual indel in a region neighboring the STR. However, it can also arise if HipSTR fails to identify sufficient candidate alleles. When these alleles are very different in size from the candidate alleles or are non-unit multiples, they're frequently aligned as indels in the flanking sequences.\n\n#### FORMAT fields:  \n1. **Q**: Reports the posterior probability of the genotype. We've found that this is the best indicator of quality of an individual sample's genotype and almost always use it to filter calls.   \n2. **DP**, **DSTUTTER** and **DFLANKINDEL**: Identical to the INFO field case, these fields are also available for each sample and can be used in the same way to identify problematic individual calls.  \n3. **AB** and **FS**: Quantify the log10 p-value of the allele bias and the Fisher strand bias, respectively. Large negative values indicate that the degree of bias observed is very unlikely to occur by random chance. In the case of **AB**, this indicates that the number of reads observed per allele is unlikely given the predicted genotype. In the case of **FS**, this indicates that there is a non-random association between sequencing strand and the allele each read is assigned to, suggesting that sequencing errors may be causing one of the reported alleles. Note that these fields are only applicable to diploid genotypes.   \n\n**So what thresholds do we suggest for each of these fields?** The answer really depends on the quality of the sequencing data, the ploidy of the chromosome and the downstream applications. However, we typically apply the following filters usings scripts we've provided in the **scripts** subdirectory of the HipSTR folder:\n\n```\npython scripts/filter_vcf.py  --vcf                   diploid_calls.vcf.gz\n                              --min-call-qual         0.9\n                              --max-call-flank-indel  0.15\n                              --max-call-stutter      0.15\n\t\t\t      --min-call-allele-bias  -2\n\t\t\t      --min-call-strand-bias  -2\n    \npython scripts/filter_haploid_vcf.py  --vcf                   haploid_calls.vcf.gz\n                                      --min-call-qual         0.9\n                                      --max-call-flank-indel  0.15\n                                      --max-call-stutter      0.15\n```\n\nThe resulting VCF, which is printed to the standard output stream, will omit calls on a sample-by-sample basis in which any of the following conditions are met: i) the posterior < 90%, ii) more than 15% of reads have a flank indel or iii) more than 15% of reads have a stutter artifact. For the diploid VCF, these filters will also remove genotypes with an allele bias or Fisher strand bias p-value less than 0.01 (10^-2). Calls for samples failing these criteria will be replaced with a \".\" missing symbol as per the VCF specification. For more filtering options, type either\n\n```\npython scripts/filter_vcf.py -h\npython scripts/filter_haploid_vcf.py -h\n```\n\n## Additional Usage Options\n\n| Option  | Description  \n| :------- | :----------- \n| **viz-out**       aln_viz.gz     | Output a file of each locus' alignments for visualization with VizAln or [VizAlnPdf](#aln-viz) <br> **Why? You want to visualize or inspect the STR genotypes**\n| **log**         log.txt               | Output the log information to the provided file (Default = Standard error)  \n| **haploid-chrs**  list_of_chroms      | Comma separated list of chromosomes to treat as haploid (Default = all diploid) <br> **Why? You're analyzing a haploid chromosome like chrY**  \n| **no-rmdup**                            | Don't remove PCR duplicates. By default, they'll be removed <br> **Why? Your sequencing data  is for PCR-amplified regions**  \n| **use-unpaired**                        | Use unpaired reads when genotyping (Default = False) <br> **Why? Your sequencing data only contains single-ended reads**  \n| **snp-vcf**    phased_snps.vcf.gz     | Bgzipped input VCF file containing phased SNP genotypes for the samples to be genotyped. These SNPs will be used to physically phase STRs<br> **Why? You have available phased SNP genotypes**  \n| **bam-samps**     list_of_read_groups | Comma separated list of samples in same order as BAM files. <br> Assign each read the sample corresponding to its file. By default, <br> each read must have an RG tag and and the sample is determined from the SM field <br> **Why? Your BAM file RG tags don't have an SM field**  \n| **bam-libs**      list_of_read_groups | Comma separated list of libraries in same order as BAM files. <br> Assign each read the library corresponding to its file. By default, <br> each read must have an RG tag and and the library is determined from the LB field <br> NOTE: This option is required when --bam-samps has been specified <br> **Why? Your BAM file RG tags don't have an LB tag**  \n| **lib-field**   rg_field                        | Read group field used to assign each read a library. By default, <br> the library is determined from the LB field associated with RG <br> **Why? Your BAM file RG tags don't have an LB tag and you want to use a different tag instead (e.g. SM)** \t\n| **def-stutter-model**                   | For each locus, use a stutter model with PGEOM=0.9 and UP=DOWN=0.05 for in-frame artifacts and PGEOM=0.9 and UP=DOWN=0.01 for out-of-frame artifacts <br> **Why? You have too few samples for stutter estimation and don't have stutter models**  \n| **min-reads** num_reads                           | \tMinimum total reads required to genotype a locus (Default = 100) <br> **Why? Refer to the discussion [above](#data-requirements)**  \n|**output-filters**                        | Write why individual calls were filtered to the VCF (Default = False)\n\n\nThis list is comprised of the most useful and frequently used additional options, but is not all encompassing. For a complete list of options, please type\n\n\t./HipSTR --help\n\n<a id=\"aln-viz\"></a>\n\n## Alignment Visualization\nWhen deciphering and inspecting STR calls, it's extremely useful to visualize the supporting reads. HipSTR facilitates this through the **viz-out** option, which writes a compressed file containing alignments for each call that can be readily visualized using the **VizAln** command included in HipSTR's main directory. If you're interested in visualizing alignments, you first need to index the file using tabix. \nFor example, if you ran HipSTR with the option `--viz-out aln.viz.gz`, you should use the command\n\n\ttabix -p bed aln.viz.gz\n\nto generate a [tabix](http://www.htslib.org/doc/tabix.html) index for the file so that we can rapidly extract alignments for a locus of interest. This command only needs to be run once after the file has been generated. \n\nYou could then visualize the calls for sample *NA12878* at locus *chr1 3784267* using the command\n\n\t./VizAln aln.viz.gz chr1 3784267 NA12878\n\nThis command will automatically open a rendering of the alignments in your browser and might look something like:\n![Read more words!](https://raw.githubusercontent.com/HipSTR-Tool/HipSTR-tutorial/master/viz_NA12878.png)\nThe top bar represents the reference sequence and the red text indicates the name of the sample and its associated call at the locus. The remaining rows indicate the alignment for each read used in genotyping. In this particular example, 14 reads have an *8bp deletion* and 14 reads have a *4bp insertion*. HipSTR therefore genotypes this sample as *-8 | 4*\n\nIf we wanted to inspect all calls for the same locus, we could  use the command \n\n\t./VizAln aln.viz.gz chr1 3784267\n\nTo facilitate rendering these images for publications, we've also created a similar script that converts\nthese alignments into a PDF. This script can only be applied to one sample at a time, but the image above\ncan be generated in a file alignments.pdf as follows:\n\n\t./VizAlnPdf aln.viz.gz chr1 3784267 NA12878 alignments 1\n\nNOTE: Because the **viz-out** file can become fairly large if you're genotyping thousands of loci or thousands of samples, in some scenarios it may be best to rerun HipSTR using this option on the subset of loci which you wish to visualize.\n\n## File Formats\n<a id=\"bams\"></a>\n\n### BAM/CRAM files\nHipSTR requires [BAM/CRAM](https://samtools.github.io/hts-specs/SAMv1.pdf) files produced by any indel-sensitive aligner. These files must have been sorted by position using the `samtools sort` command and then indexed using `samtools index`. To associate a read with its sample of interest, HipSTR uses read group information in the BAM/CRAM header lines. These *@*RG lines must contain an *ID* field, an *LB* field indicating the library and an *SM* field indicating the sample. For example, if a BAM/CRAM contained the following header line\n\n\t@RG     ID:RUN1 LB:ERR12345        SM:SAMPLE789\n\nan alignment with the RG tag \n\n\tRG:Z:RUN1\n\nwill be associated with sample *SAMPLE789* and library *ERR12345*. In this manner, HipSTR can analyze BAMs/CRAMs containing more than one sample and/or more than one library and can handle cases in which a single sample's reads are spread across multiple files.\n\nAlternatively, if your BAM/CRAM files lack *RG* information, you can use the **bam-samps** and **bam-libs** flags to specify the sample and library associated with each file. In this setting, however, a BAM/CRAM can only contain a single library and a single read group. For example, the command\n\n```\n./HipSTR --bams             run1.bam,run2.bam,run3.bam,run4.cram\n         --fasta            genome.fa\n         --regions          str_regions.bed\n         --str-vcf          str_calls.vcf.gz\n         --bam-samps        SAMPLE1,SAMPLE1,SAMPLE2,SAMPLE3\n         --bam-libs         LIB1,LIB2,LIB3,LIB4\n```\n\nessentially tells HipSTR to associate all the reads in the first two BAMS with *SAMPLE1*, all the reads in the third file with *SAMPLE2* and all the reads in the last BAM with *SAMPLE3*.\n\n\nHipSTR can analyze both BAM and CRAM files simultaneously, so if your project contains a mixture of these two file types, HipSTR will automatically perform CRAM decompression as necessary. **When analyzing CRAM files, please ensure that the file provided to --fasta is the same FASTA file used during CRAM generation**. Otherwise, CRAM decompression will likely fail and bizarre behavior may occur.\n\n<a id=\"str-bed\"></a>\n\n### STR region BED file\nThe BED file containing each STR region of interest is a tab-delimited file comprised of 5 required columns and one optional column: \n\n1. The name of the chromosome on which the STR is located\n2. The start position of the STR on its chromosome\n3. The end position of the STR on its chromosome\n4. The motif length (i.e. the number of bases in the repeat unit)\n5. The number of copies of the repeat unit in the reference allele\n\nThe 6th column is optional and contains the name of the STR locus, which will be written to the ID column in the VCF. \nBelow is an example file which contains 5 STR loci \n\n**NOTE: The table header is for descriptive purposes. The BED file should not have a header**\n\nCHROM | START       | END         | MOTIF_LEN | NUM_COPIES | NAME\n----  | ----        | ----        | ---       | ---        | ---\nchr1  | 13784267    | 13784306    | 4         | 10         | GATA27E01\nchr1  | 18789523    | 18789555    | 3         | 11         | ATA008\nchr2  | 32079410    | 32079469    | 4         | 15         | AGAT117\nchr17 | 38994441    | 38994492    | 4         | 12         | GATA25A04\nchr17 | 55299940    | 55299992    | 4         | 13         | AAT245\n\nWe've provided various *BED* files containing STR loci for different organisms, including humans, [here](https://github.com/HipSTR-Tool/HipSTR-references/)\n\nFor other model organisms, we recommend that you modify the [framework](https://github.com/HipSTR-Tool/HipSTR-references/blob/master/mouse/mouse_reference.md)\nwe used to build the mouse BED file.\n\n<a id=\"str-vcf\"></a>\n\n### VCF file\nFor more information on the VCF file format, please see the [VCF spec](http://samtools.github.io/hts-specs/VCFv4.2.pdf). \n\n#### INFO fields\nINFO fields contains aggregated statistics about each genotyped STR in the VCF. The INFO fields reported by HipSTR primarily describe the learned/supplied stutter model for the locus, the STR's reference coordinates (START and END) and information about the allele counts (AC) and number of reads used to genotype all samples (DP).\n\nFIELD | DESCRIPTION\n----- | -----------\nINFRAME_PGEOM  | Parameter for in-frame geometric step size distribution\nINFRAME_UP     | Probability that stutter causes an in-frame increase in obs. STR size\nINFRAME_DOWN   | Probability that stutter causes an in-frame decrease in obs. STR size\nOUTFRAME_PGEOM | Parameter for out-of-frame geometric step size distribution\nOUTFRAME_UP    | Probability that stutter causes an out-of-frame increase in obs. STR size\nOUTFRAME_DOWN  | Probability that stutter causes an out-of-frame decrease in obs. STR size\nBPDIFFS        | Base pair difference of each alternate allele from the reference allele\nSTART          | Inclusive start coodinate for the repetitive portion of the reference allele\nEND            | Inclusive end coordinate for the repetitive portion of the reference allele\nPERIOD         | Length of STR motif\nAN             | Total number of alleles in called genotypes\nREFAC          | Reference allele count\nAC             | Alternate allele counts\nNSKIP          | Number of samples not genotyped due to various issues\nNFILT          | Number of samples that were originally genotyped but have since been filtered\nDP             | Total number of reads used to genotype all samples\nDSNP           | Total number of reads with SNP information\nDSTUTTER       | Total number of reads with a stutter indel in the STR region\nDFLANKINDEL    | Total number of reads with an indel in the regions flanking the STR\n\n#### FORMAT fields\nFORMAT fields contain information about the genotype for each sample at the locus. In addition to the most probable phased genotype (GT), HipSTR reports information about the posterior likelihood of this genotype (PQ) and its unphased analog (Q). Other useful information reported are the number of reads that were used to determine the genotype (DP) and whether these had any alignment artifacts (DSTUTTER and DFLANKINDEL).\n\nFIELD     | DESCRIPTION\n--------- | -----------\nGT        | Genotype\nGB        | Base pair differences of genotype from reference\nQ         | Posterior probability of unphased genotype\nPQ        | Posterior probability of phased genotype\nDP        | Number of valid reads used for sample's genotype\nDSNP      | Number of reads with SNP phasing information\nPDP       | Fractional reads supporting each haploid genotype\nGLDIFF    | Difference in likelihood between the reported and next best genotypes\nDSNP      | Total number of reads with SNP information\nPSNP      | Number of reads with SNPs supporting each haploid genotype\nDSTUTTER  | Number of reads with a stutter indel in the STR region\nDFLANKINDEL | Number of reads with an indel in the regions flanking the STR\nAB        | log10 of the allele bias pvalue, where 0 is no bias and more negative values are increasingly biased. For homozygous genotypes, this can be negative if the haplotypes are heterozygous\nFS        | log10 of the strand bias pvalue from Fisher's exact test, where 0 is no bias and more negative values are increasingly biased. For homozygous genotypes, this can be negative if the haplotypes are heterozygous\nDAB       | Number of reads used in the allele bias calculation\nALLREADS  | Base pair difference observed in each read's Needleman-Wunsch alignment\nMALLREADS | Maximum likelihood bp diff in each read based on haplotype alignments\nGL        | log-10 genotype likelihoods\nPL        | Phred-scaled genotype likelihoods\n\n<a id=\"stutter-file\"></a>\n\n### Stutter model\nTo model PCR stutter artifacts, we assume that there are three types of stutter artifacts:\n\n1. **In-frame changes**: Change the size of the STR in the read by multiples of the repeat unit. For instance, if the repeat motif is AGAT, in-frame changes could lead to differences of -8, -4, 4, 8, and so on. \n2. **Out-of-frame changes**: Change the size of the STR by non-multiples of the repeat unit. For instance, if the repeat motif is AGAT, out-of-frame changes could lead to differences of -3, -2, -1, 1, 2, 3 and so on. \n3. **No stutter change**: The size of the STR in the read is the same as the size of the underlying STR. \n\n\nStutter model files contain the information necessary to model each of these artifacts in a **tab-delimited BED-like** format with exactly 9 columns. An example of such a file is as follows:\n\nCHROM  | START      | END       | IGEOM | IDOWN | IUP   | OGEOM | ODOWN | OUP   | PERIOD\n-----  | ---------- | --------  | ----  | ----  | ---   | ----  | ---   | ---   | ---\nchr1   | 18789523   | 18789555  | 0.8   | 0.01  | 0.05  | 0.9   | 0.001 | 0.001 | 3\nchr2   | 32079410   | 32079469  | 0.9   | 0.01  | 0.01  | 0.9   | 0.001 | 0.001 | 4\nchr17  | 38994441   | 38994492  | 0.9   | 0.001 | 0.001 | 0.9   | 0.001 | 0.001 | 4\nchr9   | 3859351    | 3859400   | 0.9   | 0.1   | 0.02  | 0.9   | 0.001 | 0.001 | 2\n\n\n**NOTE: The table header is for descriptive purposes. The stutter file should not have a header**\n\n\nEach of the stutter parameters is defined as follows:\n\n| VARIABLE | DESCRIPTION\n| -------- | --------\n| IDOWN    | Probability that in-frame changes decrease the size of the observed STR allele\n| IUP      |  Probability that in-frame changes increase the size of the observed STR allele\n| ODOWN    | Probability that out-of-frame changes decrease the size of the observed STR allele\n| OUP      |  Probability that out-of-frame changes increase the size of the observed STR allele\n| IGEOM    | Parameter governing geometric step size distribution for in-frame changes\n| OGEOM    | Paramter  governing geometric step size distribution for out-of-frame changes\n| PERIOD   | Length of STR motif\n\n## FAQ\n1. **Can I run HipSTR if my dataset only contains single-ended reads?**     \n**Yes.** HipSTR is designed for paired-end reads and uses mate pair information to filter reads that are potentially aligned to an incorrect STR prior to genotyping. By default, HipSTR therefore removes all reads without mate pairs. However, if your dataset only contains single-ended reads, specify the **use-unpaired** option to avoid performing this filtering.  \n2. **Can I use HipSTR to analyze PCR-amplified reads?**     \n**Yes.** As HipSTR was designed to analyze WGS data, HipSTR automatically identifies and filters out PCR duplicates prior to genotyping. When analyzing PCR-amplified reads, HipSTR will label most reads as PCR duplicates as they share exactly the same coordinates. To overcome this issue, specify the **no-rmdup** option to disable duplicate removal when analyzing this type of data.\n3. **Why are some of the STRs in my BED file not present in the output VCF?**    \nHipSTR only genotypes a region if at least **min-reads** and at most **max-reads** overlap the STR. It then attempts to learn the stutter model (if appropriate), build haplotypes for the region and perform genotyping. If any of these stages is unsuccessful, it skips the STR and continues on to the next region. The **log** file contains the failure reason for each failed region as well as an overall summary of why regions were skipped at the end of the log.      \n4. **How can I run HipSTR if I have too few samples to learn stutter models and don't have external ones?**     \nIn this scenario, you can run HipSTR with **def-stutter-model**. Invoking this option will disable the algorithm it uses to learn stutter models. Instead, HipSTR will use the same fixed stutter model to genotype every locus. We don't recommend using this option unless necessary, as genotypes are more accurate if you learn a specific model for each STR.\n5. **What sequencing platforms does HipSTR support?**\t\t\nHipSTR was designed to analyze **Illumina** sequencing data. We do not recommend running it on PacBio or Oxford Nanopore data, as the difference in error profiles will be problematic \n\n## Help\nIf you're having trouble getting your analysis up and running:      \n\n    i.   Check out the HipSTR tutorial at https://hipstr-tool.github.io/HipSTR-tutorial\n    ii.  Type ./HipSTR --help for details about each command line option\n    iii. Email us at hipstrtool@gmail.com\n\nIf you encounter a bug/issue or have a feature request:     \n\n     i.  File an issue on GitHub (https://github.com/tfwillems/HipSTR)\n\tii. Email us at hipstrtool@gmail.com\n\n## Citation\nIf you found HipSTR useful, we would appreciate it if you could cite our manuscript describing HipSTR and its applications: **[Genome-wide profiling of heritable and de novo STR variations](http://www.nature.com/nmeth/journal/vaop/ncurrent/full/nmeth.4267.html)**\n"
+          }
+        ],
+        "tool_names": [
+          "GetStutterModels",
+          "HipSTR",
+          "annotate_vcf_with_denovo_lls",
+          "annotate_vcf_with_denovo_lls.py",
+          "filter_haploid_vcf",
+          "filter_haploid_vcf.py",
+          "filter_vcf",
+          "filter_vcf.py",
+          "generate_aln_html",
+          "generate_aln_html.py",
+          "hipstr",
+          "html_alns_to_pdf",
+          "html_alns_to_pdf.py",
+          "plot_stutter_results",
+          "plot_stutter_results.py",
+          "run_stutter_em_test",
+          "run_stutter_em_test.sh",
+          "run_stutter_em_tests",
+          "run_stutter_em_tests.sh",
+          "run_tests",
+          "run_tests.sh"
+        ],
+        "tree_paths": [
+          ".gitignore",
+          ".travis.yml",
+          "LICENSE",
+          "Makefile",
+          "README.md",
+          "VizAln",
+          "VizAlnPdf",
+          "_config.yml",
+          "img/HipSTR_icon_small.png",
+          "img/phasing.png",
+          "scripts/GetStutterModels",
+          "scripts/filter_haploid_vcf.py",
+          "scripts/filter_vcf.py",
+          "scripts/generate_aln_html.py",
+          "scripts/html_alns_to_pdf.py",
+          "src/SeqAlignment/AlignmentData.h",
+          "src/SeqAlignment/AlignmentModel.cpp",
+          "src/SeqAlignment/AlignmentModel.h",
+          "src/SeqAlignment/AlignmentOps.cpp",
+          "src/SeqAlignment/AlignmentOps.h",
+          "src/SeqAlignment/AlignmentTraceback.cpp",
+          "src/SeqAlignment/AlignmentTraceback.h",
+          "src/SeqAlignment/AlignmentViz.cpp",
+          "src/SeqAlignment/AlignmentViz.h",
+          "src/SeqAlignment/HTMLCreator.cpp",
+          "src/SeqAlignment/HTMLCreator.h",
+          "src/SeqAlignment/HapAligner.cpp",
+          "src/SeqAlignment/HapAligner.h",
+          "src/SeqAlignment/HapBlock.cpp",
+          "src/SeqAlignment/HapBlock.h",
+          "src/SeqAlignment/Haplotype.cpp",
+          "src/SeqAlignment/Haplotype.h",
+          "src/SeqAlignment/HaplotypeGenerator.cpp",
+          "src/SeqAlignment/HaplotypeGenerator.h",
+          "src/SeqAlignment/NeedlemanWunsch.cpp",
+          "src/SeqAlignment/NeedlemanWunsch.h",
+          "src/SeqAlignment/RepeatBlock.h",
+          "src/SeqAlignment/RepeatStutterInfo.h",
+          "src/SeqAlignment/StutterAlignerClass.cpp",
+          "src/SeqAlignment/StutterAlignerClass.h",
+          "src/adapter_trimmer.cpp",
+          "src/adapter_trimmer.h",
+          "src/alignment_filters.cpp",
+          "src/alignment_filters.h",
+          "src/bam_io.cpp",
+          "src/bam_io.h",
+          "src/bam_processor.cpp",
+          "src/bam_processor.h",
+          "src/base_quality.cpp",
+          "src/base_quality.h",
+          "src/bgzf_streams.h",
+          "src/check_phasing.cpp",
+          "src/debruijn_graph.cpp",
+          "src/debruijn_graph.h",
+          "src/denovos/annotate_vcf_with_denovo_lls.py",
+          "src/denovos/denovo_allele_priors.cpp",
+          "src/denovos/denovo_allele_priors.h",
+          "src/denovos/denovo_main.cpp",
+          "src/denovos/denovo_scanner.cpp",
+          "src/denovos/denovo_scanner.h",
+          "src/denovos/mutation_model.h",
+          "src/denovos/trio_denovo_scanner.cpp",
+          "src/denovos/trio_denovo_scanner.h",
+          "src/directed_graph.cpp",
+          "src/directed_graph.h",
+          "src/em_stutter_genotyper.cpp",
+          "src/em_stutter_genotyper.h",
+          "src/error.cpp",
+          "src/error.h",
+          "src/extract_indels.cpp",
+          "src/extract_indels.h",
+          "src/fasta_reader.cpp",
+          "src/fasta_reader.h",
+          "src/fastonebigheader.h",
+          "src/genotyper.cpp",
+          "src/genotyper.h",
+          "src/genotyper_bam_processor.cpp",
+          "src/genotyper_bam_processor.h",
+          "src/haplotype_tracker.cpp",
+          "src/haplotype_tracker.h",
+          "src/hipstr_main.cpp",
+          "src/mathops.cpp",
+          "src/mathops.h",
+          "src/null_ostream.h",
+          "src/pcr_duplicates.cpp",
+          "src/pcr_duplicates.h",
+          "src/pedigree.cpp",
+          "src/pedigree.h",
+          "src/process_timer.h",
+          "src/read_pooler.cpp",
+          "src/read_pooler.h",
+          "src/region.cpp",
+          "src/region.h",
+          "src/seq_stutter_genotyper.cpp",
+          "src/seq_stutter_genotyper.h",
+          "src/snp_bam_processor.cpp",
+          "src/snp_bam_processor.h",
+          "src/snp_phasing_quality.cpp",
+          "src/snp_phasing_quality.h",
+          "src/snp_tree.cpp",
+          "src/snp_tree.h",
+          "src/stringops.cpp",
+          "src/stringops.h",
+          "src/stutter_model.cpp",
+          "src/stutter_model.h",
+          "src/vcf_input.cpp",
+          "src/vcf_input.h",
+          "src/vcf_reader.cpp",
+          "src/vcf_reader.h",
+          "src/vcf_writer.cpp",
+          "src/vcf_writer.h",
+          "src/version.cpp",
+          "src/version.h",
+          "src/zalgorithm.cpp",
+          "src/zalgorithm.h",
+          "test/em_stutter_test.cpp",
+          "test/fast_ops_test.cpp",
+          "test/haplotype_test.cpp",
+          "test/input/1kg.chr1.imputed.vcf.gz",
+          "test/input/1kg.chr1.imputed.vcf.gz.tbi",
+          "test/input/chr1_regions.bed",
+          "test/input/chr1_regions_v2.bed",
+          "test/plot_stutter_results.py",
+          "test/read_vcf_alleles_test.cpp",
+          "test/run_stutter_em_test.sh",
+          "test/run_stutter_em_tests.sh",
+          "test/run_tests.sh",
+          "test/snp_tree_test.cpp",
+          "test/vcf_snp_tree_test.cpp"
+        ],
+        "tree_truncated": false,
+        "upstream_files": {
+          "Makefile": "##\n## Makefile for all executables\n##\n\n## Default compilation flags.\n## Override with:\n##   make CXXFLAGS=XXXXX\nCXXFLAGS= -O3 -g -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64 -std=c++0x -DMACOSX -pthread #-pedantic -Wunreachable-code -Weverything\n\n## To create a static distribution file, run:\n##   make static-dist\nifeq ($(STATIC),1)\nLDFLAGS=-static\nelse\nLDFLAGS=\nendif\n\n## Source code files, add new files to this list\nSRC_COMMON  = src/base_quality.cpp src/error.cpp src/region.cpp src/stringops.cpp src/zalgorithm.cpp src/alignment_filters.cpp src/extract_indels.cpp src/mathops.cpp src/pcr_duplicates.cpp src/bam_io.cpp src/adapter_trimmer.cpp\nSRC_HIPSTR  = src/hipstr_main.cpp src/bam_processor.cpp src/stutter_model.cpp src/snp_phasing_quality.cpp src/snp_tree.cpp src/em_stutter_genotyper.cpp src/seq_stutter_genotyper.cpp src/snp_bam_processor.cpp src/genotyper_bam_processor.cpp src/vcf_input.cpp src/read_pooler.cpp src/version.cpp src/haplotype_tracker.cpp src/pedigree.cpp src/vcf_reader.cpp src/genotyper.cpp src/directed_graph.cpp src/debruijn_graph.cpp src/fasta_reader.cpp src/vcf_writer.cpp\nSRC_SEQALN  = src/SeqAlignment/HapAligner.cpp src/SeqAlignment/AlignmentModel.cpp src/SeqAlignment/AlignmentOps.cpp src/SeqAlignment/HapBlock.cpp src/SeqAlignment/NeedlemanWunsch.cpp src/SeqAlignment/Haplotype.cpp src/SeqAlignment/HaplotypeGenerator.cpp src/SeqAlignment/HTMLCreator.cpp src/SeqAlignment/AlignmentViz.cpp src/SeqAlignment/AlignmentTraceback.cpp src/SeqAlignment/StutterAlignerClass.cpp\nSRC_DENOVO  = src/denovos/denovo_main.cpp src/error.cpp src/stringops.cpp src/version.cpp src/pedigree.cpp src/haplotype_tracker.cpp src/vcf_input.cpp src/denovos/denovo_scanner.cpp src/mathops.cpp src/vcf_reader.cpp src/denovos/denovo_allele_priors.cpp src/denovos/trio_denovo_scanner.cpp\n\n# For each CPP file, generate an object file\nOBJ_COMMON  := $(SRC_COMMON:.cpp=.o)\nOBJ_HIPSTR  := $(SRC_HIPSTR:.cpp=.o)\nOBJ_SEQALN  := $(SRC_SEQALN:.cpp=.o)\nOBJ_DENOVO  := $(SRC_DENOVO:.cpp=.o)\n\nCEPHES_ROOT=lib/cephes\nHTSLIB_ROOT=lib/htslib\n\nLIBS              = -L./ -lm -L$(HTSLIB_ROOT)/ -lz -L$(CEPHES_ROOT)/ -llzma -lbz2\nINCLUDE           = -Ilib -Ilib/htslib\nCEPHES_LIB        = lib/cephes/libprob.a\nHTSLIB_LIB        = $(HTSLIB_ROOT)/libhts.a\n\n.PHONY: all\nall: HipSTR DenovoFinder test/fast_ops_test test/haplotype_test test/read_vcf_alleles_test test/snp_tree_test test/vcf_snp_tree_test\n\n# Create a tarball with static binaries\n.PHONY: static-dist\nstatic-dist:\n\trm -f HipSTR\n\t$(MAKE) STATIC=1\n\t( VER=\"$$(git describe --abbrev=7 --dirty --always --tags)\" ;\\\n\t  DST=\"HipSTR-$${VER}-static-$$(uname -s)-$$(uname -m)\" ; \\\n\t  mkdir \"$${DST}\" && \\\n            mkdir \"$${DST}/scripts\" && \\\n            cp HipSTR VizAln VizAlnPdf README.md \"$${DST}\" && \\\n            cp scripts/filter_haploid_vcf.py scripts/filter_vcf.py scripts/generate_aln_html.py scripts/html_alns_to_pdf.py \"$${DST}/scripts\" && \\\n            tar -czvf \"$${DST}.tar.gz\" \"$${DST}\" && \\\n            rm -r \"$${DST}/\" \\\n        )\n\nversion:\n\tgit describe --abbrev=7 --dirty --always --tags | awk '{print \"#include \\\"version.h\\\"\"; print \"const std::string VERSION = \\\"\"$$0\"\\\";\"}' > src/version.cpp\n\n# Clean the generated files of the main project only\n.PHONY: clean\nclean:\n\trm -f *~ src/*.o src/*.d src/*~ src/SeqAlignment/*~ src/SeqAlignment/*.o src/denovos/*~ src/denovos/*.o HipSTR DenovoFinder test/allele_expansion_test test/fast_ops_test test/haplotype_test test/read_vcf_alleles_test test/snp_tree_test test/vcf_snp_tree_test\n\n# Clean all compiled files\n.PHONY: clean-all\nclean-all: clean\n\tcd lib/htslib && $(MAKE) clean\n\trm lib/cephes/*.o $(CEPHES_LIB)\n\n# The GNU Make trick to include the \".d\" (dependencies) files.\n# If the files don't exist, they will be re-generated, then included.\n# If this causes problems with non-gnu make (e.g. on MacOS/FreeBSD), remove it.\ninclude $(subst .cpp,.d,$(SRC))\n\n# The resulting binary executable\n\nHipSTR: $(OBJ_COMMON) $(OBJ_HIPSTR) $(CEPHES_LIB) $(HTSLIB_LIB) $(OBJ_SEQALN)\n\t$(CXX) $(LDFLAGS) $(CXXFLAGS) $(INCLUDE) -o $@ $^ $(LIBS)\n\nDenovoFinder: $(OBJ_DENOVO) $(HTSLIB_LIB)\n\t$(CXX) $(LDFLAGS) $(CXXFLAGS) $(INCLUDE) -o $@ $^ $(LIBS)\n\nPhasingChecker: src/check_phasing.cpp src/region.cpp src/error.cpp src/haplotype_tracker.cpp src/version.cpp src/pedigree.cpp src/vcf_reader.cpp src/stringops.cpp $(HTSLIB_LIB)\n\t$(CXX) $(LDFLAGS) $(CXXFLAGS) $(INCLUDE) -o $@ $^ $(LIBS)\n\ntest/haplotype_test: test/haplotype_test.cpp src/SeqAlignment/Haplotype.cpp src/SeqAlignment/HapBlock.cpp src/SeqAlignment/NeedlemanWunsch.cpp src/error.cpp src/stringops.cpp\n\t$(CXX) $(CXXFLAGS) $(INCLUDE) -o $@ $^ $(LIBS)\n\ntest/em_stutter_test: test/em_stutter_test.cpp src/em_stutter_genotyper.cpp src/genotyper_bam_processor.cpp src/error.cpp src/mathops.cpp src/stringops.cpp src/stutter_model.cpp\n\t$(CXX) $(CXXFLAGS) $(INCLUDE) -o $@ $^ $(LIBS)\n\ntest/fast_ops_test: test/fast_ops_test.cpp src/mathops.cpp\n\t$(CXX) $(CXXFLAGS) $(INCLUDE) -o $@ $^\n\ntest/read_vcf_alleles_test: test/read_vcf_alleles_test.cpp src/error.cpp src/region.cpp src/vcf_input.cpp src/vcf_reader.cpp $(HTSLIB_LIB)\n\t$(CXX) $(CXXFLAGS) $(INCLUDE) -o $@ $^ $(LIBS)\n\ntest/snp_tree_test: src/snp_tree.cpp src/error.cpp test/snp_tree_test.cpp src/haplotype_tracker.cpp src/vcf_reader.cpp $(HTSLIB_LIB)\n\t$(CXX) $(CXXFLAGS) $(INCLUDE) -o $@ $^ $(LIBS)\n\ntest/vcf_snp_tree_test: test/vcf_snp_tree_test.cpp src/error.cpp src/snp_tree.cpp src/haplotype_tracker.cpp src/vcf_reader.cpp $(HTSLIB_LIB)\n\t$(CXX) $(CXXFLAGS) $(INCLUDE) -o $@ $^ $(LIBS)\n\n# Build each object file independently\n%.o: %.cpp\n\t$(CXX) $(CXXFLAGS) $(INCLUDE) -o $@ -c $<\n\n# Auto-Generate header dependencies for each CPP file.\n%.d: %.cpp\n\t$(CXX) -c -MP -MD $(CXXFLAGS) $(INCLUDE) $< > $@\n\n# Rebuild CEPHES library if needed\n$(CEPHES_LIB):\n\tcd lib/cephes && $(MAKE)\n\n# Rebuild htslib library if needed\n$(HTSLIB_LIB):\n\tcd lib/htslib && $(MAKE)\n"
+        }
+      },
+      "limitations": [],
+      "caveat_items": [
+        "Environment: STRhub transcribed the documented installation commands unchanged into its own carrier (Ubuntu 22.04, package lists refreshed, apt answering yes, plus minimal build toolchain (git, ca-certificates; no tool-specific libraries)).",
+        "Input: the README documents BAM (line 69); this plan selects STRhub's illumina-bam-hg38 reference data.",
+        "read_path: run1.bam,run2.bam,run3.bam,run4.bam -> /data/in/input.bam.",
+        "reference_path: genome.fa -> /data/ref/hg38.fa.",
+        "regions_path: str_regions.bed -> /data/in/regions.bed.",
+        "Run command: the README's own command, rewritten to STRhub's mounts; the capture wrapper is planned only if the procedure review passes."
+      ]
+    }
+  },
+  "provenance": {
+    "from_upstream": {
+      "install": {
+        "method": "make",
+        "evidence_source": "README.md:L49-L59"
+      },
+      "command": {
+        "value": "./HipSTR --bams          run1.bam,run2.bam,run3.bam,run4.bam --fasta         genome.fa --regions       str_regions.bed --str-vcf       str_calls.vcf.gz",
+        "evidence_source": "README.md:L69-L72"
+      },
+      "input_kind": {
+        "value": "bam",
+        "evidence_source": "README.md:L69"
+      },
+      "supported_platforms": [
+        {
+          "platform": "illumina",
+          "evidence_source": "README.md:L36"
+        }
+      ],
+      "assembly": {
+        "declared": null,
+        "evidence_source": null
+      },
+      "regions_schema": {
+        "format": "hipstr",
+        "evidence_source": "README.md:L308-L322"
+      },
+      "output_format": {
+        "glob": "**/*.vcf*",
+        "evidence_source": "README.md:L69"
+      }
+    },
+    "derived": {
+      "command_rewrites": [
+        {
+          "role": "read_path",
+          "original": "run1.bam,run2.bam,run3.bam,run4.bam",
+          "replacement": "/data/in/input.bam",
+          "basis": "declared dataset mount"
+        },
+        {
+          "role": "reference_path",
+          "original": "genome.fa",
+          "replacement": "/data/ref/hg38.fa",
+          "basis": "registered reference genome mount"
+        },
+        {
+          "role": "regions_path",
+          "original": "str_regions.bed",
+          "replacement": "/data/in/regions.bed",
+          "basis": "registered regions file (hipstr)"
+        }
+      ],
+      "regions_layout_binding": {
+        "documented_schema": "hipstr",
+        "evidence_source": "README.md:L308-L322",
+        "strhub_regions_layout": "hipstr"
+      },
+      "single_sample_adaptation": {
+        "applied": true,
+        "original": "run1.bam,run2.bam,run3.bam,run4.bam",
+        "replacement": "/data/in/input.bam",
+        "evidence_source": "README.md:L75",
+        "note": "STRhub trial mounted one compatible sample for the documented multi-file placeholder list"
+      }
+    },
+    "harness_choices": {
+      "dataset": {
+        "selected": "illumina-bam-hg38",
+        "reason": "STRhub selected 'illumina-bam-hg38' as compatible with upstream input 'bam' and platform 'illumina'"
+      },
+      "platform": {
+        "selected": "illumina",
+        "basis": "upstream_single_platform",
+        "supported_platforms": [
+          "illumina"
+        ]
+      },
+      "assembly": {
+        "selected": "hg38",
+        "basis": "harness_choice_unstated",
+        "note": "Upstream did not specify an assembly; STRhub supplied an internally coherent hg38 BAM, FASTA and regions set"
+      },
+      "regions_layout": "hipstr",
+      "base_environment": {
+        "image": "ubuntu:22.04",
+        "description": "Ubuntu 22.04, package lists refreshed, apt answering yes, plus minimal build toolchain (git, ca-certificates; no tool-specific libraries)",
+        "added_packages": [
+          "git",
+          "ca-certificates"
+        ],
+        "miniforge": false,
+        "submodules": false
+      }
+    }
+  },
+  "procedure_validation": {
+    "schema": "strhub-procedure-evidence/1",
+    "valid": true,
+    "reason": "Procedure evidence matches the effective manifest and recomputed decision."
+  },
+  "mounted_inputs": {
+    "schema": "strhub-mounted-inputs/1",
+    "leg": "external",
+    "evaluator_commit": "e2d3b6da5bc4bcfa7c2532c315e07f91ba0ce93f",
+    "dataset_registry": "datasets/index.json",
+    "input_type": "illumina-bam-hg38",
+    "dataset": "Illumina BAM (hg38), NA12878 (autosomal, female)",
+    "assembly": "hg38",
+    "source": "https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/data/NA12878/NIST_NA12878_HG001_HiSeq_300x/",
+    "procedure_evidence_sha256": "f2315d9ea6e5a2eb93979caa56c937fd1d6d8631b569a174900a0ea1ca259a86",
+    "files": [
+      {
+        "mount_path": "/data/in/input.bam",
+        "sha256": "f5f73e9f4f4a483794716111a61231e478c0de10113a8d55598ed4b31481e9b7",
+        "size_bytes": 9844336,
+        "source_path": "illumina_slices/NA12878.autosomal.bam",
+        "source_sha256": "f5f73e9f4f4a483794716111a61231e478c0de10113a8d55598ed4b31481e9b7",
+        "transformation": "none"
+      },
+      {
+        "mount_path": "/data/in/input.bam.bai",
+        "sha256": "e657838c2f3d875f37ab5b7099996569b1ade8cab7336b97dddc2052fd704c3d",
+        "size_bytes": 843920,
+        "source_path": "illumina_slices/NA12878.autosomal.bam.bai",
+        "source_sha256": "e657838c2f3d875f37ab5b7099996569b1ade8cab7336b97dddc2052fd704c3d",
+        "transformation": "none"
+      },
+      {
+        "mount_path": "/data/in/regions.bed",
+        "sha256": "3ece80557d3c288f4165e4cf49c75fd7eaf1632b61913e4bfdd605aa0ae1e0ef",
+        "size_bytes": 984,
+        "source_path": "datasets/illumina-bam-hg38/regions/hipstr.bed",
+        "source_sha256": "3ece80557d3c288f4165e4cf49c75fd7eaf1632b61913e4bfdd605aa0ae1e0ef",
+        "transformation": "none"
+      }
+    ],
+    "reference": {
+      "mount_path": "/data/ref/hg38.fa",
+      "index_mount_path": "/data/ref/hg38.fa.fai",
+      "assembly": "GRCh38 / hg38",
+      "source_url": "https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz",
+      "sha256": "5be01555d98347fdb3714dc84c6f77c9d8bc774adcf32c6f7a8fa06f5baf5e51",
+      "size_bytes": 3273481150,
+      "transformation": "gunzip; samtools faidx"
+    }
+  },
+  "verdict": {
+    "code": "runs",
+    "title": "Runs",
+    "basis": "gates",
+    "reason": "The tool installed and its run produced its documented output.",
+    "readme_gaps": [],
+    "status_code": "PASSED",
+    "blockers": []
+  },
+  "recommendations": [
+    {
+      "code": "reference_assembly",
+      "text": "The documented command reads a reference genome and the README does not say which assembly it expects. STRhub mounted hg38; stating the assembly would remove the guess."
+    }
+  ],
+  "step1": {
+    "code": "runs",
+    "headline": "As documented, it runs.",
+    "body": "A third party installed the tool with the steps this commit states and ran the command it writes, and the output file that command names appeared. This says nothing about genotypes or about concordance on any reference panel.",
+    "missing": [],
+    "missing_text": [],
+    "guide": "docs/GUIA-PASO-1.md"
+  },
+  "certificate": {
+    "schema": "strhub-verified/certificate/1",
+    "label": "Runs as documented",
+    "reached": "Runs + Plausible output",
+    "stages": [
+      {
+        "key": "available",
+        "label": "Source available",
+        "status": "PASS"
+      },
+      {
+        "key": "installs",
+        "label": "Installation",
+        "status": "PASS"
+      },
+      {
+        "key": "runs",
+        "label": "End-to-end execution",
+        "status": "PASS"
+      },
+      {
+        "key": "output",
+        "label": "Output generated",
+        "status": "PASS"
+      }
+    ],
+    "summary": {
+      "purpose": "Evaluate whether the tool installs, runs end-to-end, and produces structurally valid output.",
+      "result": "Runs as documented",
+      "reached": "Runs + Plausible output, 5/5 gates passed",
+      "why": "The tool installed and its run produced its documented output.",
+      "scope": "Installation, execution, and output structure evaluation.",
+      "not_evaluated": [
+        "Genotype accuracy",
+        "Concordance",
+        "Forensic validity",
+        "Regulatory compliance"
+      ]
+    },
+    "conclusion": [
+      {
+        "title": "Runs end-to-end",
+        "body": "HipSTR v0.7 installs and executes without error in a clean ubuntu-22.04 environment at the pinned commit."
+      },
+      {
+        "title": "Produces plausible output",
+        "body": "The tool generated a structurally valid VCF output file containing 21 distinct recognizable loci (target forensic STR loci); structural plausibility checks verify output format and locus presence, not genotype validity or completeness across every listed locus."
+      },
+      {
+        "title": "Verdict: Runs",
+        "body": "The tool installed and its run produced its documented output."
+      },
+      {
+        "title": "Repository test data not used",
+        "body": "The repository ships example data (3 file(s)), which this run did not use: the gates above ran on STRhub's reference dataset. STRhub Verified supplied Illumina BAM (hg38), NA12878 (autosomal, female) as the reference input for this verification run. Users replicating this result should use the same or equivalent publicly available reference material."
+      },
+      {
+        "title": "Repeatability of this verification run",
+        "body": "The pinned commit, declared base environment, executed installation and analysis commands, reference input metadata, and CI logs recorded in this report document the procedure attempted. Base image and unpinned package versions can change over time, so exact reproduction requires matching those dependency versions."
+      }
+    ],
+    "out_of_scope": [
+      "Genotype correctness or accuracy",
+      "Concordance against known truth sets",
+      "Sensitivity, specificity, or stutter performance",
+      "Allele calling accuracy or forensic casework suitability",
+      "Regulatory compliance or ISO accreditation",
+      "Multi-laboratory or multi-dataset reproducibility"
+    ],
+    "limitations": [
+      "Single reference dataset per input type",
+      "Single containerized environment (Docker / ubuntu-22.04)",
+      "No truth-set comparison or ground-truth genotypes",
+      "No accuracy or concordance assessment",
+      "No forensic or clinical validation of results",
+      "Short-read limitations apply (very long STR alleles may not span single short reads)"
+    ],
+    "scope": {
+      "statement": "Independent automated evaluation of reproducible execution. It checks whether the tool installs, runs end-to-end, and produces structurally valid output in a standardized environment.",
+      "not": "This is not an analytical validation. Genotype accuracy, concordance, forensic suitability, and regulatory compliance are out of scope.",
+      "disclaimer": "Each result is a dated snapshot, verified on the tool's public repository at a pinned commit. STRhub does not store tool source code."
+    }
+  }
+}
