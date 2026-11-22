@@ -1,7 +1,7 @@
 {
   "schema": "strhub-verified/index/3",
-  "generated": "2026-11-22T19:14:26+00:00",
-  "count": 10,
+  "generated": "2026-11-22T19:14:31+00:00",
+  "count": 11,
   "tools": [
     {
       "slug": "expansionhunter",
@@ -436,6 +436,48 @@
           "report": "trgt-hifi/b21c6217eeaef9a080205932fe29f730dc00e31f/trgt-hifi.json",
           "page": "trgt-hifi/b21c6217eeaef9a080205932fe29f730dc00e31f/trgt-hifi.html",
           "pdf": "trgt-hifi/b21c6217eeaef9a080205932fe29f730dc00e31f/trgt-hifi.pdf"
+        }
+      ]
+    },
+    {
+      "slug": "trtools",
+      "name": "TRTools",
+      "version": "v6.1.0",
+      "variant": null,
+      "sha": "ce22d847ea954e4f015818dc288dfa87a47761a8",
+      "committed": "2024-11-06T22:16:17Z",
+      "instrument": "documented",
+      "level": "available",
+      "label": "Could not be determined",
+      "verdict": "undetermined",
+      "errors_reported": false,
+      "generated": "2026-11-22T19:14:06+00:00",
+      "source_repo": "https://github.com/gymreklab/TRTools",
+      "source_ref": "ce22d847ea954e4f015818dc288dfa87a47761a8",
+      "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/45059511855",
+      "distinct_str_loci": null,
+      "distinct_snp_markers": null,
+      "total_reads": null,
+      "external_state": "na",
+      "dataset_types": [],
+      "report": "trtools.json",
+      "page": "trtools.html",
+      "versions": [
+        {
+          "sha": "ce22d847ea954e4f015818dc288dfa87a47761a8",
+          "instrument": "documented",
+          "version": "v6.1.0",
+          "variant": null,
+          "committed": "2024-11-06T22:16:17Z",
+          "generated": "2026-11-22T19:14:06+00:00",
+          "level": "available",
+          "label": "Could not be determined",
+          "verdict": "undetermined",
+          "errors_reported": false,
+          "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/45059511855",
+          "report": "trtools/ce22d847ea954e4f015818dc288dfa87a47761a8/trtools.json",
+          "page": "trtools/ce22d847ea954e4f015818dc288dfa87a47761a8/trtools.html",
+          "pdf": "trtools/ce22d847ea954e4f015818dc288dfa87a47761a8/trtools.pdf"
         }
       ]
     }
