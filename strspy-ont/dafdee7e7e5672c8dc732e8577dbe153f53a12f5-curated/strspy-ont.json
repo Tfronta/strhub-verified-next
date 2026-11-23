@@ -1,0 +1,127 @@
+{
+  "schema": "strhub-verified/1",
+  "instrument": "curated",
+  "mode": "publish",
+  "generated": "2026-11-23T14:07:59+00:00",
+  "tool": {
+    "name": "STRspy",
+    "version": "v2.0",
+    "contact": "https://github.com/unique379r/strspy/issues"
+  },
+  "source": {
+    "repo": "https://github.com/unique379r/strspy",
+    "ref": "dafdee7e7e5672c8dc732e8577dbe153f53a12f5",
+    "ref_resolved": "dafdee7e7e5672c8dc732e8577dbe153f53a12f5",
+    "committed": "2026-05-04T14:47:38-05:00"
+  },
+  "environment": {
+    "os": [
+      "Ubuntu 22.04 + Conda (manual workstation)"
+    ],
+    "source": "prepared"
+  },
+  "preparation": {
+    "file": "strspy-v2-notes.yml",
+    "dataset": "ont-bam-hg38",
+    "installation": "strhub",
+    "base": "Ubuntu 22.04 + Miniforge (Conda environment strspy_env)",
+    "without_preparation": "The STRspy v2.0 README (line 61) instructs downloading a Miniconda shell installer via wget (`wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh`) and running interactive setup scripts, which cannot be executed literally under the automated profile.",
+    "why": [],
+    "steps": [
+      "git clone https://github.com/Tfronta/strspy.git",
+      "cd strspy",
+      "conda env create -f setup/STRspy_2.0_env.yml",
+      "conda activate strspy_env"
+    ],
+    "run_cmd": "bash src/STRspy_Normal_v2.0_Args.sh -i /data/in/input.bam -r yes -t ont -f db-v2/STRspy2.0-DB-fixed -b db-v2/STRspy2.0-DB-fixed -l db-v2/STRspy_v2.DB.sort.bed -k 0.4 -o Results -c config/UserToolsConfig.txt -d 4",
+    "files": [
+      {
+        "path": "STRspy_run_v2.0_Args.sh & src/STRspy_Normal_v2.0_Args.sh",
+        "replaces": "fixes src/ path check on lines 180/193, accepts single-file -i BAM input, auto-creates -o directory, and outputs STR locus names instead of GenBank accessions"
+      },
+      {
+        "path": "setup/STRspy_2.0_env.yml",
+        "replaces": "pins python>=3.9 and samtools>=1.12 to avoid broken OpenSSL 1.0 samtools build"
+      }
+    ],
+    "fork_url": "https://github.com/Tfronta/strspy",
+    "proposed_fix_note": "With these targeted fixes applied in the suggested fork (Tfronta/strspy, commit 14d5494), automated verification in GitHub Actions (run 44934862541) passed all 5/5 gates and genotyped 22 forensic STR loci on the 1000 Genomes ONT hg38 CODIS reference slice. The official upstream commit (dafdee7) remains marked Manual \u00b7 Fails until updated upstream."
+  },
+  "recommendations": [
+    "Fix lines 180 and 193 in STRspy_run_v2.0_Args.sh to check `[[ -f \"src/STRspy_Normal_v2.0_Args.sh\" ]]` (and `src/STRspy_Parallel_v2.0_Args.sh`) matching the `bash src/...` invocation below them.",
+    "Update README.md line 120 to include the required getopts flags (`bash ./STRspy_run_v2.0_Args.sh -i config/InputConfig.txt -t config/UserToolsConfig.txt -j normal`) and align `THREAD` vs `THREADS` in config/InputConfig.txt.",
+    "Pin `python>=3.9` and `samtools>=1.12` in `setup/STRspy_2.0_env.yml` so clean Linux environments do not pull a legacy OpenSSL 1.0 samtools binary.",
+    "Tag a GitHub release for STRspy v2.0 on the default branch so users and automated evaluators resolve v2.0 by default instead of v1.1.1 (2021)."
+  ],
+  "gates": {
+    "available": true,
+    "installs": true,
+    "runs": false,
+    "io": false,
+    "content": false
+  },
+  "level": "installs",
+  "verdict": {
+    "code": "fails",
+    "title": "Fails in manual verification",
+    "basis": "gates",
+    "reason": "Even after creating the Conda environment, generating config/UserToolsConfig.txt, and supplying the -i and -t flags omitted by README line 120, the unmodified upstream wrapper STRspy_run_v2.0_Args.sh fails immediately with exit code 1: lines 180 and 193 check `if [[ -f \"STRspy_Normal_v2.0_Args.sh\" ]]` in the repository root even though the script lives under `src/STRspy_Normal_v2.0_Args.sh` (which line 199 then invokes). Because the file check and invocation path disagree, the wrapper exits with `please make sure you are in the same directory of STRspy` from any working directory.",
+    "readme_gaps": []
+  },
+  "run": {
+    "cmd": "bash ./STRspy_run_v2.0_Args.sh -i config/InputConfig.txt -t config/UserToolsConfig.txt -j normal",
+    "cwd": ".",
+    "step_outcome": "failure"
+  },
+  "datasets": [
+    {
+      "leg": "external",
+      "label": "External data",
+      "available": true,
+      "type": "ont-bam-hg38",
+      "dataset": "1000 Genomes ONT, hg38 CODIS slice (R10 SUP)",
+      "io": false,
+      "content": false,
+      "passed": false
+    }
+  ],
+  "logs": {
+    "external": "strspy-ont.log-external.txt"
+  },
+  "terminals": {
+    "external": "strspy-ont.terminal-external.txt"
+  },
+  "certificate": {
+    "schema": "strhub-verified/certificate/1",
+    "label": "Manual verification: fails",
+    "reached": "Installs",
+    "summary": {
+      "purpose": "Independent manual verification of reproducible execution on unmodified upstream source.",
+      "result": "Even after creating the Conda environment, generating config/UserToolsConfig.txt, and supplying the -i and -t flags omitted by README line 120, the unmodified upstream wrapper STRspy_run_v2.0_Args.sh fails immediately with exit code 1: lines 180 and 193 check `if [[ -f \"STRspy_Normal_v2.0_Args.sh\" ]]` in the repository root even though the script lives under `src/STRspy_Normal_v2.0_Args.sh` (which line 199 then invokes). Because the file check and invocation path disagree, the wrapper exits with `please make sure you are in the same directory of STRspy` from any working directory.",
+      "reached": "Installs",
+      "scope": "Reproducible execution only; does not evaluate genotype concordance or forensic casework fitness.",
+      "not_evaluated": [
+        "Genotype accuracy",
+        "Concordance against truth",
+        "Forensic casework fitness"
+      ]
+    },
+    "conclusion": [
+      {
+        "title": "Manual verification finding",
+        "body": "Even after creating the Conda environment, generating config/UserToolsConfig.txt, and supplying the -i and -t flags omitted by README line 120, the unmodified upstream wrapper STRspy_run_v2.0_Args.sh fails immediately with exit code 1: lines 180 and 193 check `if [[ -f \"STRspy_Normal_v2.0_Args.sh\" ]]` in the repository root even though the script lives under `src/STRspy_Normal_v2.0_Args.sh` (which line 199 then invokes). Because the file check and invocation path disagree, the wrapper exits with `please make sure you are in the same directory of STRspy` from any working directory."
+      }
+    ],
+    "out_of_scope": [
+      "Genotype accuracy and concordance",
+      "Forensic casework accreditation"
+    ],
+    "limitations": [],
+    "scope": {
+      "statement": "This report records a manual execution against the pinned upstream commit.",
+      "not": "It does not establish genotype accuracy or forensic casework fitness.",
+      "disclaimer": "Each result is a fixed, dated attestation verified on the tool's public repository at an immutable commit. It evaluates reproducible execution only, not genotype accuracy or forensic fitness."
+    }
+  },
+  "scope": "Manual verification of reproducible execution against unmodified upstream commit."
+}
