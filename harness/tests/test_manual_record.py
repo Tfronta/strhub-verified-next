@@ -101,6 +101,9 @@ def test_records_manual_failure_mechanically_with_real_terminal(tmp_path):
     term = (bundle / "strspy-ont.terminal-external.txt").read_text(encoding="utf-8")
     assert "please make sure you are in the same directory of STRspy" in term
     assert "[exit 1]" in term
+    assert report["certificate"]["summary"]["why"]
+    pdf_path = bundle / "strspy-ont.pdf"
+    assert pdf_path.is_file() and pdf_path.read_bytes().startswith(b"%PDF")
 
 
 def test_records_manual_pass_and_validates_tabular_output(tmp_path):

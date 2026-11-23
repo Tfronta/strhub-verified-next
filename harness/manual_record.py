@@ -310,6 +310,184 @@ def _validate_outputs(
     return io_passed, content_passed, {"gate": "io", "passed": io_passed, "outputs": [io_entry]}, content_detail
 
 
+def _render_manual_pdf(report: dict, terminal_text: str, out_pdf: pathlib.Path) -> bool:
+    """Generate a streamlined 4-section Manual Verification PDF matching the web layout."""
+    try:
+        from reportlab.lib import colors
+        from reportlab.lib.pagesizes import A4
+        from reportlab.lib.styles import ParagraphStyle
+        from reportlab.lib.units import mm
+        from reportlab.platypus import HRFlowable, Paragraph, Preformatted, SimpleDocTemplate, Spacer, Table, TableStyle
+    except ImportError:
+        return False
+
+    passed = (report.get("verdict") or {}).get("code") == "runs"
+    accent = colors.HexColor("#4338ca") if passed else colors.HexColor("#b45309")
+    accent_bg = colors.HexColor("#eef2ff") if passed else colors.HexColor("#fffbeb")
+    ink = colors.HexColor("#1f2937")
+    muted = colors.HexColor("#4b5563")
+    border = colors.HexColor("#d1d5db")
+    teal = colors.HexColor("#0f766e")
+
+    doc = SimpleDocTemplate(
+        str(out_pdf),
+        pagesize=A4,
+        leftMargin=18 * mm,
+        rightMargin=18 * mm,
+        topMargin=18 * mm,
+        bottomMargin=18 * mm,
+        title=f"{report['tool'].get('name', '')} Manual Verification",
+    )
+
+    s_eyebrow = ParagraphStyle("eyebrow", fontName="Helvetica-Bold", fontSize=8.5, textColor=accent, spaceAfter=3)
+    s_title = ParagraphStyle("title", fontName="Helvetica-Bold", fontSize=18, leading=22, textColor=ink, spaceAfter=4)
+    s_badge = ParagraphStyle("badge", fontName="Helvetica-Bold", fontSize=10, textColor=accent, spaceAfter=8)
+    s_h2 = ParagraphStyle("h2", fontName="Helvetica-Bold", fontSize=11.5, textColor=teal, spaceBefore=12, spaceAfter=5)
+    s_body = ParagraphStyle("body", fontName="Helvetica", fontSize=9.5, leading=13.5, textColor=ink, spaceAfter=5)
+    s_muted = ParagraphStyle("muted", fontName="Helvetica", fontSize=8.5, leading=12, textColor=muted, spaceAfter=4)
+    s_label = ParagraphStyle("label", fontName="Helvetica-Bold", fontSize=8.5, textColor=muted)
+    s_val = ParagraphStyle("val", fontName="Helvetica", fontSize=8.5, leading=12, textColor=ink)
+    s_code = ParagraphStyle("code", fontName="Courier", fontSize=7.5, leading=10, textColor=colors.HexColor("#111827"))
+
+    def esc(val: object) -> str:
+        return html_lib.escape(str(val or ""))
+
+    gates = report.get("gates") or {}
+    gates_passed = sum(1 for k in ("available", "installs", "runs", "io", "content") if gates.get(k))
+    status_text = f"Manual · Verified ({gates_passed}/5)" if passed else f"Manual · Fails ({gates_passed}/5)"
+
+    story: list = []
+    story.append(Paragraph("STRHUB VERIFIED · MANUAL VERIFICATION", s_eyebrow))
+    tool_name = report["tool"].get("name", "")
+    tool_ver = report["tool"].get("version") or ""
+    story.append(Paragraph(f"{esc(tool_name)} {esc(tool_ver)}".strip(), s_title))
+    story.append(Paragraph(esc(status_text), s_badge))
+
+    cert_summary = (report.get("certificate") or {}).get("summary") or {}
+    prep = report.get("preparation") or {}
+    ds = (report.get("datasets") or [{}])[0]
+
+    cover_rows = [
+        [Paragraph("VERIFICATION DATE", s_label), Paragraph(esc((report.get("generated") or "")[:10]), s_val)],
+        [Paragraph("REPOSITORY", s_label), Paragraph(esc((report.get("source") or {}).get("repo", "")), s_val)],
+        [Paragraph("PINNED COMMIT", s_label), Paragraph(esc((report.get("source") or {}).get("ref_resolved", "")), s_val)],
+        [Paragraph("MODE", s_label), Paragraph("Manual verification (unmodified upstream code in prepared environment)", s_val)],
+        [Paragraph("ENVIRONMENT", s_label), Paragraph(esc(prep.get("base", "")), s_val)],
+    ]
+    if ds.get("dataset"):
+        cover_rows.append([Paragraph("DATASET", s_label), Paragraph(esc(ds["dataset"]), s_val)])
+    if cert_summary.get("why"):
+        cover_rows.append([Paragraph("WHY", s_label), Paragraph(esc(cert_summary["why"]), s_val)])
+
+    t_cover = Table(cover_rows, colWidths=[38 * mm, 136 * mm])
+    t_cover.setStyle(TableStyle([
+        ("VALIGN", (0, 0), (-1, -1), "TOP"),
+        ("TOPPADDING", (0, 0), (-1, -1), 4),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+        ("LINEBELOW", (0, 0), (-1, -1), 0.4, border),
+        ("BACKGROUND", (0, 0), (-1, 0), accent_bg),
+    ]))
+    story.append(t_cover)
+    story.append(Spacer(1, 4 * mm))
+
+    # Section 1: Execution on unmodified upstream code + Gates + Terminal
+    story.append(Paragraph("1. Execution on unmodified upstream code", s_h2))
+    story.append(HRFlowable(width="100%", thickness=0.6, color=teal, spaceAfter=4))
+    if prep.get("without_preparation"):
+        story.append(Paragraph(f"<b>Why manual verification was used:</b> {esc(prep['without_preparation'])}", s_body))
+    story.append(Paragraph(esc((report.get("verdict") or {}).get("reason", "")), s_body))
+
+    gate_names = [
+        ("Available", gates.get("available")),
+        ("Installs", gates.get("installs")),
+        ("Runs", gates.get("runs")),
+        ("Expected IO", gates.get("io")),
+        ("Plausible output", gates.get("content")),
+    ]
+    stopped_seen = False
+    gate_rows = [[Paragraph("GATE", s_label), Paragraph("RESULT", s_label)]]
+    for gname, gval in gate_names:
+        if gval:
+            st = "PASS"
+        elif not stopped_seen:
+            st = "FAIL (stopped here)"
+            stopped_seen = True
+        else:
+            st = "NOT REACHED"
+        gate_rows.append([Paragraph(esc(gname), s_val), Paragraph(esc(st), s_val)])
+    t_gates = Table(gate_rows, colWidths=[60 * mm, 114 * mm])
+    t_gates.setStyle(TableStyle([
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("TOPPADDING", (0, 0), (-1, -1), 3),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
+        ("LINEBELOW", (0, 0), (-1, -1), 0.4, border),
+        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#f3f4f6")),
+    ]))
+    story.append(t_gates)
+    story.append(Spacer(1, 3 * mm))
+
+    # Sanitized terminal excerpt (capped to keep PDF readable)
+    term_lines = terminal_text.splitlines()
+    excerpt = "\n".join(term_lines[:70]) + ("\n... (see full terminal log file)" if len(term_lines) > 70 else "")
+    term_box = Table([[Preformatted(excerpt, s_code)]], colWidths=[174 * mm])
+    term_box.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#f9fafb")),
+        ("BOX", (0, 0), (-1, -1), 0.5, border),
+        ("LEFTPADDING", (0, 0), (-1, -1), 6),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 6),
+        ("TOPPADDING", (0, 0), (-1, -1), 5),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+    ]))
+    story.append(term_box)
+
+    # Section 2: Step-by-step setup / Proposed fix
+    has_steps = bool(prep.get("steps") or prep.get("run_cmd") or prep.get("pr_url") or prep.get("fork_url"))
+    if has_steps:
+        story.append(Paragraph("2. Step-by-step setup and proposed fix", s_h2))
+        story.append(HRFlowable(width="100%", thickness=0.6, color=teal, spaceAfter=4))
+        if not passed:
+            story.append(Paragraph(
+                "<b>Proposed fix / temporary workaround (requires code changes):</b> "
+                "Shared as a suggestion for the author and temporary reference for users; "
+                "does not mark the official commit as passing.",
+                s_muted,
+            ))
+        if prep.get("steps"):
+            story.append(Paragraph("<b>Preparation commands:</b>", s_body))
+            story.append(Preformatted("\n".join(prep["steps"]), s_code))
+            story.append(Spacer(1, 2 * mm))
+        if prep.get("run_cmd"):
+            story.append(Paragraph("<b>Verified run command:</b>", s_body))
+            story.append(Preformatted(str(prep["run_cmd"]), s_code))
+            story.append(Spacer(1, 2 * mm))
+        if prep.get("pr_url"):
+            story.append(Paragraph(f"<b>Proposed PR:</b> {esc(prep['pr_url'])}", s_body))
+        if prep.get("fork_url"):
+            story.append(Paragraph(f"<b>Suggested fix (fork):</b> {esc(prep['fork_url'])}", s_body))
+        fix_note = prep.get("proposed_fix_note") or prep.get("fork_note")
+        if fix_note:
+            story.append(Paragraph(esc(fix_note), s_body))
+
+    # Section 3: Suggestions for the author
+    recs = report.get("recommendations") or []
+    if recs:
+        story.append(Paragraph("3. Suggestions for the author", s_h2))
+        story.append(HRFlowable(width="100%", thickness=0.6, color=teal, spaceAfter=4))
+        for item in recs:
+            story.append(Paragraph(f"&bull; {esc(item)}", s_body))
+
+    # Section 4: Conclusion and scope
+    story.append(Paragraph("4. Conclusion and scope", s_h2))
+    story.append(HRFlowable(width="100%", thickness=0.6, color=teal, spaceAfter=4))
+    story.append(Paragraph(esc((report.get("verdict") or {}).get("reason", "")), s_body))
+    disclaimer = ((report.get("certificate") or {}).get("scope") or {}).get("disclaimer", "")
+    if disclaimer:
+        story.append(Paragraph(esc(disclaimer), s_muted))
+
+    doc.build(story)
+    return out_pdf.is_file()
+
+
 def _render_static_html(report: dict, terminal_text: str) -> str:
     tool = report["tool"]
     verdict = report["verdict"]
@@ -426,6 +604,18 @@ def record_manual_run(
         )
     )
     reason = str(notes.get("failure_summary") or notes.get("summary") or default_reason).strip()
+    default_plain_why = (
+        "Automated verification could not run because the repository's installation or environment steps "
+        "could not be executed automatically. In manual verification, after preparing the environment, "
+        "the original software ran end-to-end without code changes (see Section 2 for reproducible steps)."
+        if passed
+        else (
+            "Automated verification could not run because the repository's installation instructions could not "
+            "be executed automatically. In manual verification, the original software failed to execute due to "
+            "an error in its own code or environment definition (see Section 1 for details)."
+        )
+    )
+    plain_why = str(notes.get("plain_summary") or default_plain_why).strip()
 
     tool_name = str(notes.get("tool_name") or verified["repo_display"].split("/")[-1])
     dataset_type = notes.get("dataset_type")
@@ -510,6 +700,7 @@ def record_manual_run(
                 "purpose": "Independent manual verification of reproducible execution on unmodified upstream source.",
                 "result": reason,
                 "reached": LEVEL_LABELS[level],
+                "why": plain_why,
                 "scope": "Reproducible execution only; does not evaluate genotype concordance or forensic casework fitness.",
                 "not_evaluated": ["Genotype accuracy", "Concordance against truth", "Forensic casework fitness"],
             },
@@ -542,6 +733,7 @@ def record_manual_run(
     (out_dir / f"{slug}.terminal-external.txt").write_text(terminal_text, encoding="utf-8")
     (out_dir / f"{slug}.log-external.txt").write_text(clean_output, encoding="utf-8")
     (out_dir / f"{slug}.html").write_text(_render_static_html(report, terminal_text), encoding="utf-8")
+    _render_manual_pdf(report, terminal_text, out_dir / f"{slug}.pdf")
 
     leaks = find_personal_leaks(report_json) + find_personal_leaks(terminal_text)
     if leaks:

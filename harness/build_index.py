@@ -136,12 +136,14 @@ def _summary_entry(slug: str, r: dict) -> dict:
     }
 
 
-def _version_entry(slug: str, sha: str | None, r: dict, prefix: str) -> dict:
+def _version_entry(slug: str, sha: str | None, r: dict, prefix: str, reports: pathlib.Path | None = None) -> dict:
     """One row of a tool's history: the commit, the instrument, both dates,
     the result, and where its files are. `prefix` is the directory the set
     lives in, or "" for a set that only exists at the root (published before
     the layout)."""
     e = _summary_entry(slug, r)
+    pdf_rel = f"{prefix}{slug}.pdf"
+    has_pdf = True if reports is None else (reports / pdf_rel).is_file()
     return {
         "sha": sha,
         "instrument": e["instrument"],
@@ -156,7 +158,7 @@ def _version_entry(slug: str, sha: str | None, r: dict, prefix: str) -> dict:
         "ci_run": e["ci_run"],
         "report": f"{prefix}{slug}.json",
         "page": f"{prefix}{slug}.html",
-        "pdf": f"{prefix}{slug}.pdf",
+        **({"pdf": pdf_rel} if has_pdf else {}),
         # A tombstone (publish_layout.retire): the run is still here and its
         # page still opens, but it is no longer a result — the web keeps it
         # out of the history's rows and says why on its page.
@@ -188,12 +190,12 @@ def versions_of(reports: pathlib.Path, slug: str, root: dict) -> list[dict]:
     directory yet is its own single version, at the root."""
     found = publish_layout.scan(reports, slug)
     entries = (
-        [_version_entry(slug, sha, r, f"{slug}/{sha}/") for sha, r in found]
+        [_version_entry(slug, sha, r, f"{slug}/{sha}/", reports) for sha, r in found]
         if found
-        else [_version_entry(slug, root.get("source", {}).get("ref_resolved"), root, "")]
+        else [_version_entry(slug, root.get("source", {}).get("ref_resolved"), root, "", reports)]
     )
     for folder_name, sha, r in _scan_manual(reports, slug):
-        entries.append(_version_entry(slug, sha, r, f"{slug}/{folder_name}/"))
+        entries.append(_version_entry(slug, sha, r, f"{slug}/{folder_name}/", reports))
     return entries
 
 
