@@ -645,11 +645,15 @@ def _render_manual_pdf(report: dict, terminal_text: str, out_pdf: pathlib.Path) 
                 rec_desc = f"{io_out['records']} data rows"
                 if isinstance(called, int):
                     rec_desc += f" ({called} with called genotypes)"
-                out_rows.append(("VCF records", esc(rec_desc)))
+                rec_label = "VCF records" if fmt == "VCF" else "Data records"
+                out_rows.append((rec_label, esc(rec_desc)))
         if c_stats:
             n_loci = c_stats.get("distinct_str_loci", c_stats.get("distinct_loci"))
             if isinstance(n_loci, int):
                 out_rows.append(("STR loci detected", f"<b>{n_loci}</b> distinct recognizable forensic STR loci"))
+            n_snps = c_stats.get("distinct_snp_markers")
+            if isinstance(n_snps, int) and n_snps > 0:
+                out_rows.append(("Identity SNPs", f"<b>{n_snps}</b> recognizable SNP markers (rsNNNN)"))
             loci_list = c_stats.get("str_loci") or c_stats.get("loci") or []
             if loci_list:
                 out_rows.append(("Loci called", f'<font name="Courier" size="7.5">{esc(", ".join(str(x) for x in loci_list))}</font>'))
