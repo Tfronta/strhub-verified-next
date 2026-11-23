@@ -2,7 +2,7 @@
   "schema": "strhub-verified/1",
   "instrument": "curated",
   "mode": "publish",
-  "generated": "2026-11-23T17:58:19+00:00",
+  "generated": "2026-11-23T18:28:16+00:00",
   "tool": {
     "name": "ExpansionHunter",
     "version": "v5.0.0",
@@ -24,8 +24,8 @@
     "file": "eh-v5-notes.yml",
     "dataset": "illumina-bam-hg38",
     "installation": "strhub",
-    "base": "Official ExpansionHunter v5.0.0 precompiled binary (GitHub Releases, documented in docs/02_Installation.md)",
-    "without_preparation": "Automated verification builds from source following docs/02_Installation.md (line 19), which lists `zlib1g` instead of `zlib1g-dev` on Ubuntu, causing CMake to stop before compilation. In addition, even with all development headers present, `CMakeLists.txt` (line 44) hardcodes the retired `boostorg.jfrog.io` URL for Boost 1.73.0, which now returns an HTML redirect instead of a tarball.",
+    "base": "Official ExpansionHunter v5.0.0 precompiled binary (GitHub Releases, documented in `docs/02_Installation.md`)",
+    "without_preparation": "Automated verification builds from source following `docs/02_Installation.md` (line 19), which lists `zlib1g` instead of `zlib1g-dev` on Ubuntu, causing CMake to stop before compilation. In addition, even with all development headers present, `CMakeLists.txt` (line 44) hardcodes the retired `boostorg.jfrog.io` URL for Boost 1.73.0, which now returns an HTML redirect instead of a tarball.",
     "why": [],
     "steps": [
       "curl -L -O https://github.com/Illumina/ExpansionHunter/releases/download/v5.0.0/ExpansionHunter-v5.0.0-linux_x86_64.tar.gz",
@@ -52,7 +52,7 @@
     "code": "runs",
     "title": "Runs in manual verification",
     "basis": "gates",
-    "reason": "Using the official precompiled ExpansionHunter v5.0.0 release binary documented in docs/02_Installation.md (lines 3-5) with zero modifications to upstream code, ExpansionHunter ran end-to-end on the GIAB NA12878 autosomal Illumina BAM slice (hg38) and genotyped all 24/24 forensic STR loci in the reference panel with PASS status.",
+    "reason": "Using the official precompiled ExpansionHunter v5.0.0 release binary documented in `docs/02_Installation.md` (lines 3-5) with zero modifications to upstream code, ExpansionHunter ran end-to-end on the GIAB NA12878 autosomal Illumina BAM slice (hg38) and genotyped all 24/24 forensic STR loci in the reference panel with PASS status.",
     "readme_gaps": []
   },
   "run": {
@@ -84,9 +84,9 @@
     "reached": "Runs + Plausible output",
     "summary": {
       "purpose": "Independent manual verification of reproducible execution on unmodified upstream source.",
-      "result": "Using the official precompiled ExpansionHunter v5.0.0 release binary documented in docs/02_Installation.md (lines 3-5) with zero modifications to upstream code, ExpansionHunter ran end-to-end on the GIAB NA12878 autosomal Illumina BAM slice (hg38) and genotyped all 24/24 forensic STR loci in the reference panel with PASS status.",
+      "result": "Using the official precompiled ExpansionHunter v5.0.0 release binary documented in `docs/02_Installation.md` (lines 3-5) with zero modifications to upstream code, ExpansionHunter ran end-to-end on the GIAB NA12878 autosomal Illumina BAM slice (hg38) and genotyped all 24/24 forensic STR loci in the reference panel with PASS status.",
       "reached": "Runs + Plausible output",
-      "why": "Automated verification failed to compile from source because the Ubuntu install instructions omit `zlib1g-dev` and `CMakeLists.txt` points to a retired Boost download URL. In manual verification, using the official precompiled v5.0.0 binary documented by the authors (without modifying any code), ExpansionHunter ran end-to-end and called all 24 forensic STR loci (see Section 2 for exact steps).",
+      "why": "Automated verification failed to compile from source because the Ubuntu install instructions omit `zlib1g-dev` and `CMakeLists.txt` points to a retired Boost download URL. In manual verification, using the official precompiled v5.0.0 binary documented by the authors (without modifying any code), ExpansionHunter ran end-to-end and called all 24 forensic STR loci (see Section 4 for exact steps).",
       "scope": "Reproducible execution only; does not evaluate genotype concordance or forensic casework fitness.",
       "not_evaluated": [
         "Genotype accuracy",
@@ -338,5 +338,29 @@
         }
       }
     ]
+  },
+  "i18n": {
+    "es": {
+      "plain_why": "La verificaci\u00f3n autom\u00e1tica fall\u00f3 al compilar desde fuente porque las instrucciones de Ubuntu omiten `zlib1g-dev` y `CMakeLists.txt` apunta a una URL retirada de Boost. En verificaci\u00f3n manual, usando el binario oficial precompilado v5.0.0 documentado por los autores (sin modificar c\u00f3digo), ExpansionHunter corri\u00f3 de principio a fin y genotip\u00f3 los 24 loci STR forenses (ver Secci\u00f3n 4 para los pasos exactos).",
+      "without_preparation": "La verificaci\u00f3n autom\u00e1tica compila desde c\u00f3digo fuente siguiendo `docs/02_Installation.md` (l\u00ednea 19), que lista `zlib1g` en lugar de `zlib1g-dev` en Ubuntu, por lo que CMake se detiene antes de compilar. Adem\u00e1s, incluso con todas las cabeceras de desarrollo instaladas, `CMakeLists.txt` (l\u00ednea 44) apunta a la URL retirada `boostorg.jfrog.io` para Boost 1.73.0, que devuelve una redirecci\u00f3n HTML en lugar del archivo `.tar.bz2`.",
+      "reason": "Usando el binario oficial precompilado del release ExpansionHunter v5.0.0 documentado en `docs/02_Installation.md` (l\u00edneas 3-5) y sin modificar una sola l\u00ednea del c\u00f3digo original, ExpansionHunter corri\u00f3 de principio a fin sobre el recorte autos\u00f3mico Illumina BAM de GIAB NA12878 (`hg38`) y genotip\u00f3 los 24/24 loci STR forenses del panel de referencia con estado PASS.",
+      "base": "Binario oficial precompilado de ExpansionHunter v5.0.0 (GitHub Releases, documentado en `docs/02_Installation.md`)",
+      "recommendations": [
+        "En `docs/02_Installation.md` (l\u00ednea 19), reemplazar `zlib1g` por `zlib1g-dev` para que las compilaciones desde fuente en Ubuntu/Debian cuenten con las cabeceras de desarrollo de ZLIB.",
+        "En `CMakeLists.txt` (l\u00ednea 44), reemplazar la URL retirada `https://boostorg.jfrog.io/artifactory/main/release/1.73.0/source/boost_1_73_0.tar.bz2` por el archivo oficial de Boost (`https://archives.boost.io/release/1.73.0/source/boost_1_73_0.tar.bz2`) para que la compilaci\u00f3n desde cero vuelva a funcionar.",
+        "Agregar un comando copiable de instalaci\u00f3n para el tarball oficial de GitHub Releases (o Bioconda `expansionhunter=5.0.0`) directamente en `README.md` para que evaluadores autom\u00e1ticos puedan correr v5.0.0 sin compilar Boost desde fuente."
+      ]
+    },
+    "pt": {
+      "plain_why": "A verifica\u00e7\u00e3o autom\u00e1tica falhou ao compilar a partir do c\u00f3digo-fonte porque as instru\u00e7\u00f5es do Ubuntu omitem `zlib1g-dev` e o `CMakeLists.txt` aponta para uma URL desativada do Boost. Na verifica\u00e7\u00e3o manual, usando o bin\u00e1rio oficial pr\u00e9-compilado v5.0.0 documentado pelos autores (sem modificar c\u00f3digo), o ExpansionHunter rodou de ponta a ponta e chamou todos os 24 loci STR forenses (veja a Se\u00e7\u00e3o 4 para os passos exatos).",
+      "without_preparation": "A verifica\u00e7\u00e3o autom\u00e1tica compila a partir do c\u00f3digo-fonte seguindo `docs/02_Installation.md` (linha 19), que lista `zlib1g` em vez de `zlib1g-dev` no Ubuntu, fazendo o CMake parar antes da compila\u00e7\u00e3o. Al\u00e9m disso, mesmo com todos os cabe\u00e7alhos de desenvolvimento instalados, `CMakeLists.txt` (linha 44) aponta para a URL desativada `boostorg.jfrog.io` do Boost 1.73.0, que retorna um redirecionamento HTML em vez do `.tar.bz2`.",
+      "reason": "Usando o bin\u00e1rio oficial pr\u00e9-compilado da release ExpansionHunter v5.0.0 documentado em `docs/02_Installation.md` (linhas 3-5) e sem modificar o c\u00f3digo original, o ExpansionHunter executou de ponta a ponta no recorte autoss\u00f4mico Illumina BAM do GIAB NA12878 (`hg38`) e genotipou todos os 24/24 loci STR forenses do painel de refer\u00eancia com status PASS.",
+      "base": "Bin\u00e1rio oficial pr\u00e9-compilado do ExpansionHunter v5.0.0 (GitHub Releases, documentado em `docs/02_Installation.md`)",
+      "recommendations": [
+        "Em `docs/02_Installation.md` (linha 19), substituir `zlib1g` por `zlib1g-dev` para que compila\u00e7\u00f5es a partir do c\u00f3digo-fonte no Ubuntu/Debian tenham os cabe\u00e7alhos de desenvolvimento da ZLIB.",
+        "Em `CMakeLists.txt` (linha 44), substituir a URL desativada `https://boostorg.jfrog.io/artifactory/main/release/1.73.0/source/boost_1_73_0.tar.bz2` pelo arquivo oficial do Boost (`https://archives.boost.io/release/1.73.0/source/boost_1_73_0.tar.bz2`) para restaurar a compila\u00e7\u00e3o limpa.",
+        "Adicionar um comando copi\u00e1vel de instala\u00e7\u00e3o do tarball oficial do GitHub Releases (ou Bioconda `expansionhunter=5.0.0`) diretamente no `README.md` para que avaliadores autom\u00e1ticos executem a v5.0.0 sem compilar o Boost do zero."
+      ]
+    }
   }
 }
