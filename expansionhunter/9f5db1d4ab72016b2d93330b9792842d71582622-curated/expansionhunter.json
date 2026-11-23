@@ -1,0 +1,324 @@
+{
+  "schema": "strhub-verified/1",
+  "instrument": "curated",
+  "mode": "publish",
+  "generated": "2026-11-23T17:31:29+00:00",
+  "tool": {
+    "name": "ExpansionHunter",
+    "version": "v5.0.0",
+    "contact": "https://github.com/Illumina/ExpansionHunter/issues"
+  },
+  "source": {
+    "repo": "https://github.com/Illumina/ExpansionHunter",
+    "ref": "9f5db1d4ab72016b2d93330b9792842d71582622",
+    "ref_resolved": "9f5db1d4ab72016b2d93330b9792842d71582622",
+    "committed": "2021-08-20T00:22:50Z"
+  },
+  "environment": {
+    "os": [
+      "macOS arm64 (official v5.0.0 release binary)"
+    ],
+    "source": "prepared"
+  },
+  "preparation": {
+    "file": "eh-v5-notes.yml",
+    "dataset": "illumina-bam-hg38",
+    "installation": "strhub",
+    "base": "Official ExpansionHunter v5.0.0 precompiled binary (GitHub Releases, documented in docs/02_Installation.md)",
+    "without_preparation": "Automated verification builds from source following docs/02_Installation.md (line 19), which lists `zlib1g` instead of `zlib1g-dev` on Ubuntu, causing CMake to stop before compilation. In addition, even with all development headers present, `CMakeLists.txt` (line 44) hardcodes the retired `boostorg.jfrog.io` URL for Boost 1.73.0, which now returns an HTML redirect instead of a tarball.",
+    "why": [],
+    "steps": [
+      "curl -L -O https://github.com/Illumina/ExpansionHunter/releases/download/v5.0.0/ExpansionHunter-v5.0.0-linux_x86_64.tar.gz",
+      "tar -xzf ExpansionHunter-v5.0.0-linux_x86_64.tar.gz",
+      "export PATH=\"$PWD/ExpansionHunter-v5.0.0-linux_x86_64/bin:$PATH\""
+    ],
+    "run_cmd": "ExpansionHunter --reads /data/in/input.bam --reference /data/in/hg38.fa --variant-catalog /data/in/regions.json --output-prefix /data/out/sample",
+    "files": []
+  },
+  "recommendations": [
+    "In `docs/02_Installation.md` (line 19), replace `zlib1g` with `zlib1g-dev` so Ubuntu/Debian source builds have the required ZLIB development headers.",
+    "In `CMakeLists.txt` (line 44), replace the retired `https://boostorg.jfrog.io/artifactory/main/release/1.73.0/source/boost_1_73_0.tar.bz2` URL with the official Boost archive (`https://archives.boost.io/release/1.73.0/source/boost_1_73_0.tar.bz2`) so clean source builds succeed again.",
+    "Add a copyable installation command for the official GitHub Release tarball (or Bioconda `expansionhunter=5.0.0`) directly in `README.md` so automated evaluators can run v5.0.0 without compiling Boost from source."
+  ],
+  "gates": {
+    "available": true,
+    "installs": true,
+    "runs": true,
+    "io": true,
+    "content": true
+  },
+  "level": "content",
+  "verdict": {
+    "code": "runs",
+    "title": "Runs in manual verification",
+    "basis": "gates",
+    "reason": "Using the official precompiled ExpansionHunter v5.0.0 release binary documented in docs/02_Installation.md (lines 3-5) with zero modifications to upstream code, ExpansionHunter ran end-to-end on the GIAB NA12878 autosomal Illumina BAM slice (hg38) and genotyped all 24/24 forensic STR loci in the reference panel with PASS status.",
+    "readme_gaps": []
+  },
+  "run": {
+    "cmd": "ExpansionHunter --reads /data/in/input.bam --reference /data/in/hg38.fa --variant-catalog /data/in/regions.json --output-prefix /data/out/sample",
+    "cwd": ".",
+    "step_outcome": "success"
+  },
+  "datasets": [
+    {
+      "leg": "external",
+      "label": "External data",
+      "available": true,
+      "type": "illumina-bam-hg38",
+      "dataset": "Illumina BAM (hg38), NA12878 (autosomal, female)",
+      "io": true,
+      "content": true,
+      "passed": true
+    }
+  ],
+  "logs": {
+    "external": "expansionhunter.log-external.txt"
+  },
+  "terminals": {
+    "external": "expansionhunter.terminal-external.txt"
+  },
+  "certificate": {
+    "schema": "strhub-verified/certificate/1",
+    "label": "Manual verification: verified",
+    "reached": "Runs + Plausible output",
+    "summary": {
+      "purpose": "Independent manual verification of reproducible execution on unmodified upstream source.",
+      "result": "Using the official precompiled ExpansionHunter v5.0.0 release binary documented in docs/02_Installation.md (lines 3-5) with zero modifications to upstream code, ExpansionHunter ran end-to-end on the GIAB NA12878 autosomal Illumina BAM slice (hg38) and genotyped all 24/24 forensic STR loci in the reference panel with PASS status.",
+      "reached": "Runs + Plausible output",
+      "why": "Automated verification failed to compile from source because the Ubuntu install instructions omit `zlib1g-dev` and `CMakeLists.txt` points to a retired Boost download URL. In manual verification, using the official precompiled v5.0.0 binary documented by the authors (without modifying any code), ExpansionHunter ran end-to-end and called all 24 forensic STR loci (see Section 2 for exact steps).",
+      "scope": "Reproducible execution only; does not evaluate genotype concordance or forensic casework fitness.",
+      "not_evaluated": [
+        "Genotype accuracy",
+        "Concordance against truth",
+        "Forensic casework fitness"
+      ]
+    },
+    "conclusion": [
+      {
+        "title": "Manual verification finding",
+        "body": "Using the official precompiled ExpansionHunter v5.0.0 release binary documented in docs/02_Installation.md (lines 3-5) with zero modifications to upstream code, ExpansionHunter ran end-to-end on the GIAB NA12878 autosomal Illumina BAM slice (hg38) and genotyped all 24/24 forensic STR loci in the reference panel with PASS status."
+      }
+    ],
+    "out_of_scope": [
+      "Genotype accuracy and concordance",
+      "Forensic casework accreditation"
+    ],
+    "limitations": [],
+    "scope": {
+      "statement": "This report records a manual execution against the pinned upstream commit.",
+      "not": "It does not establish genotype accuracy or forensic casework fitness.",
+      "disclaimer": "Each result is a fixed, dated attestation verified on the tool's public repository at an immutable commit. It evaluates reproducible execution only, not genotype accuracy or forensic fitness."
+    }
+  },
+  "scope": "Manual verification of reproducible execution against unmodified upstream commit.",
+  "io_detail": {
+    "gate": "io",
+    "passed": true,
+    "outputs": [
+      {
+        "path": "*.vcf",
+        "format": "vcf",
+        "resolved": "sample.vcf",
+        "validation_profile": "strhub-vcf-structure/1",
+        "validation_status": "valid",
+        "records": 24,
+        "called_records": 24,
+        "uncalled_rows": 0,
+        "records_without_gt": 0,
+        "checks": {
+          "exists": true,
+          "non_empty": true,
+          "parses_as_vcf": true,
+          "min_records": true,
+          "has_called_genotypes": true
+        },
+        "passed": true
+      }
+    ]
+  },
+  "content_detail": {
+    "gate": "content",
+    "applicable": true,
+    "passed": true,
+    "outputs": [
+      {
+        "path": "*.vcf",
+        "resolved": "sample.vcf",
+        "mode": "auto",
+        "checks": {
+          "records_present": true,
+          "genotypes_called": true,
+          "given_loci_recognised": true
+        },
+        "stats": {
+          "rows": 24,
+          "header_row_dropped": false,
+          "malformed_rows": 0,
+          "dna_invalid_rows": 0,
+          "count_invalid_rows": 0,
+          "distinct_loci": 24,
+          "distinct_str_loci": 24,
+          "distinct_snp_markers": 0,
+          "loci": [
+            "CSF1PO",
+            "D10S1248",
+            "D12S391",
+            "D13S317",
+            "D16S539",
+            "D18S51",
+            "D19S433",
+            "D1S1656",
+            "D21S11",
+            "D22S1045",
+            "D2S1338",
+            "D2S441",
+            "D3S1358",
+            "D5S818",
+            "D6S1043",
+            "D7S820",
+            "D8S1179",
+            "FGA",
+            "PentaD",
+            "PentaE",
+            "SE33",
+            "TH01",
+            "TPOX",
+            "vWA"
+          ],
+          "str_loci": [
+            "CSF1PO",
+            "D10S1248",
+            "D12S391",
+            "D13S317",
+            "D16S539",
+            "D18S51",
+            "D19S433",
+            "D1S1656",
+            "D21S11",
+            "D22S1045",
+            "D2S1338",
+            "D2S441",
+            "D3S1358",
+            "D5S818",
+            "D6S1043",
+            "D7S820",
+            "D8S1179",
+            "FGA",
+            "PentaD",
+            "PentaE",
+            "SE33",
+            "TH01",
+            "TPOX",
+            "vWA"
+          ],
+          "snp_markers": [],
+          "total_reads": 14206,
+          "max_sequence_depth": 855,
+          "top_loci_by_depth": [
+            [
+              "D18S51",
+              855
+            ],
+            [
+              "D21S11",
+              819
+            ],
+            [
+              "D5S818",
+              788
+            ],
+            [
+              "vWA",
+              727
+            ],
+            [
+              "D3S1358",
+              698
+            ],
+            [
+              "FGA",
+              697
+            ],
+            [
+              "D8S1179",
+              696
+            ],
+            [
+              "PentaD",
+              662
+            ],
+            [
+              "SE33",
+              655
+            ],
+            [
+              "D2S441",
+              626
+            ],
+            [
+              "D22S1045",
+              601
+            ],
+            [
+              "D12S391",
+              570
+            ],
+            [
+              "PentaE",
+              559
+            ],
+            [
+              "D7S820",
+              550
+            ],
+            [
+              "D16S539",
+              550
+            ],
+            [
+              "D6S1043",
+              523
+            ],
+            [
+              "TPOX",
+              516
+            ],
+            [
+              "D1S1656",
+              504
+            ],
+            [
+              "D10S1248",
+              499
+            ],
+            [
+              "D13S317",
+              484
+            ],
+            [
+              "D19S433",
+              456
+            ],
+            [
+              "D2S1338",
+              415
+            ],
+            [
+              "CSF1PO",
+              401
+            ],
+            [
+              "TH01",
+              355
+            ]
+          ],
+          "called_genotypes": 24,
+          "regions_given": 24,
+          "regions_hit": 24,
+          "depth_source": "FORMAT/ADSP+ADFL+ADIR"
+        }
+      }
+    ]
+  }
+}
