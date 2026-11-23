@@ -2,7 +2,7 @@
   "schema": "strhub-verified/1",
   "instrument": "curated",
   "mode": "publish",
-  "generated": "2026-11-23T17:16:35+00:00",
+  "generated": "2026-11-23T17:58:19+00:00",
   "tool": {
     "name": "STRspy",
     "version": "v2.0",
@@ -109,15 +109,37 @@
     },
     "conclusion": [
       {
-        "title": "Manual verification finding",
-        "body": "Even after creating the Conda environment, generating config/UserToolsConfig.txt, and supplying the -i and -t flags omitted by README line 120, the unmodified upstream wrapper STRspy_run_v2.0_Args.sh fails immediately with exit code 1: lines 180 and 193 check `if [[ -f \"STRspy_Normal_v2.0_Args.sh\" ]]` in the repository root even though the script lives under `src/STRspy_Normal_v2.0_Args.sh` (which line 199 then invokes). Because the file check and invocation path disagree, the wrapper exits with `please make sure you are in the same directory of STRspy` from any working directory."
+        "title": "STRspy v2.0 did not complete its run",
+        "body": "Even after preparing the environment manually, unmodified upstream commit dafdee7 stopped during execution (exit 1). See Section 1 for the recorded terminal output."
+      },
+      {
+        "title": "No expected output produced",
+        "body": "No validated output file was produced because execution did not complete."
+      },
+      {
+        "title": "Verification used STRhub reference data",
+        "body": "Verification used open-access STRhub reference dataset 1000 Genomes ONT, hg38 CODIS slice (R10 SUP) (ont-bam-hg38)."
+      },
+      {
+        "title": "Proposed fix / temporary workaround",
+        "body": "With these targeted fixes applied in the suggested fork (Tfronta/strspy, commit 14d5494), automated verification in GitHub Actions (run 44934862541) passed all 5/5 gates and genotyped 22 forensic STR loci on the 1000 Genomes ONT hg38 CODIS reference slice. The official upstream commit (dafdee7) remains marked Manual \u00b7 Fails until updated upstream."
+      },
+      {
+        "title": "Repeatability of this manual run",
+        "body": "The pinned upstream commit, prepared environment description, exact commands executed, and sanitized terminal output recorded in this report document the procedure for independent reproduction."
       }
     ],
     "out_of_scope": [
       "Genotype accuracy and concordance",
       "Forensic casework accreditation"
     ],
-    "limitations": [],
+    "limitations": [
+      "Results apply exclusively to the exact Git commit SHA and manually prepared environment recorded in this report.",
+      "Single regional reference slice per input type; low-coverage warnings on sliced BAMs do not imply defects on whole-genome data.",
+      "Plausible Output checks verify structural format and recognizable STR loci, not biological genotype truth.",
+      "Verification is a point-in-time snapshot; upstream repository changes after this commit are not covered until re-verification.",
+      "No truth-set concordance, forensic casework validation, or regulatory compliance assessment was performed."
+    ],
     "scope": {
       "statement": "This report records a manual execution against the pinned upstream commit.",
       "not": "It does not establish genotype accuracy or forensic casework fitness.",
