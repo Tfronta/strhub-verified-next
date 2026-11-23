@@ -101,7 +101,7 @@ LEVEL_LABEL = {
 # site, so a filename alone reaches nobody: every reference has to carry a URL.
 REPORTS_BASE = os.environ.get(
     "VERIFIED_REPORTS_BASE",
-    "https://raw.githubusercontent.com/Tfronta/strhub-verified/gh-pages",
+    "https://raw.githubusercontent.com/Tfronta/strhub-verified-next/gh-pages",
 ).rstrip("/")
 
 PANEL_MAP = {
