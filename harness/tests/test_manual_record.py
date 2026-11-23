@@ -193,3 +193,31 @@ def test_inline_code_renders_backticks_as_courier_and_escapes_html():
     assert "`" not in rendered
     assert '<font name="Courier" size="8.5">[[ -f &quot;src/a.sh&quot; ]]</font>' in rendered
     assert "&amp;" in rendered
+
+
+def test_records_optional_i18n_editorial_translations(tmp_path):
+    checkout = tmp_path / "upstream"
+    _init_repo(checkout)
+    notes = tmp_path / "notes.yml"
+    notes.write_text(
+        "summary: 'Ran cleanly.'\n"
+        "i18n:\n"
+        "  es:\n"
+        "    plain_summary: 'Corrió sin cambios.'\n"
+        "    summary: 'El código original corrió sin errores.'\n"
+        "    recommendations:\n"
+        "      - 'Agregar bloque `make` en el README.'\n",
+        encoding="utf-8",
+    )
+    bundle = tmp_path / "bundle"
+    report = mr.record_manual_run(
+        slug="demo-i18n",
+        repo="https://github.com/unique379r/strspy",
+        checkout=checkout,
+        cmd="echo ok",
+        out_dir=bundle,
+        notes_path=notes,
+    )
+    assert report["i18n"]["es"]["plain_why"] == "Corrió sin cambios."
+    assert report["i18n"]["es"]["reason"] == "El código original corrió sin errores."
+    assert report["i18n"]["es"]["recommendations"] == ["Agregar bloque `make` en el README."]

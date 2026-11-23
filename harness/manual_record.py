@@ -1170,6 +1170,33 @@ def record_manual_run(
         report["content_detail"] = content_detail
     if notes.get("ci_run"):
         report["ci_run"] = notes["ci_run"]
+    if isinstance(notes.get("i18n"), dict):
+        i18n_out: dict[str, dict] = {}
+        for lang, raw_loc in notes["i18n"].items():
+            if lang not in ("es", "en", "pt") or not isinstance(raw_loc, dict):
+                continue
+            loc_clean: dict = {}
+            plain_val = raw_loc.get("plain_why") or raw_loc.get("plain_summary")
+            if plain_val:
+                loc_clean["plain_why"] = str(plain_val).strip()
+            if raw_loc.get("without_preparation"):
+                loc_clean["without_preparation"] = str(raw_loc["without_preparation"]).strip()
+            reason_val = raw_loc.get("reason") or raw_loc.get("failure_summary") or raw_loc.get("summary")
+            if reason_val:
+                loc_clean["reason"] = str(reason_val).strip()
+            if raw_loc.get("base"):
+                loc_clean["base"] = str(raw_loc["base"]).strip()
+            fix_val = raw_loc.get("proposed_fix_note") or raw_loc.get("fork_note")
+            if fix_val:
+                loc_clean["proposed_fix_note"] = str(fix_val).strip()
+            if isinstance(raw_loc.get("recommendations"), list) and raw_loc["recommendations"]:
+                loc_clean["recommendations"] = [str(x).strip() for x in raw_loc["recommendations"] if str(x).strip()]
+            if isinstance(raw_loc.get("files"), list) and raw_loc["files"]:
+                loc_clean["files"] = raw_loc["files"]
+            if loc_clean:
+                i18n_out[lang] = loc_clean
+        if i18n_out:
+            report["i18n"] = i18n_out
 
     # Write bundle
     out_dir = out_dir.resolve()
