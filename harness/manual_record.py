@@ -96,7 +96,15 @@ def verify_checkout(
     if expected_sha and not sha.startswith(expected_sha.strip().lower()):
         raise ValueError(f"Checkout HEAD ({sha}) does not match expected --sha ({expected_sha})")
 
-    committed = _git(checkout, "show", "-s", "--format=%cI", "HEAD")
+    committed_raw = _git(checkout, "show", "-s", "--format=%cI", "HEAD")
+    try:
+        committed = (
+            dt.datetime.fromisoformat(committed_raw)
+            .astimezone(dt.timezone.utc)
+            .strftime("%Y-%m-%dT%H:%M:%SZ")
+        )
+    except ValueError:
+        committed = committed_raw
 
     # Refuse any modified/staged/deleted tracked file. Untracked files are allowed
     # only if explicitly listed via --allow-untracked (e.g. a generated config file).
