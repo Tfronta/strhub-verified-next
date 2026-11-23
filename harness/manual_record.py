@@ -39,6 +39,7 @@ import re
 import socket
 import subprocess
 import sys
+import textwrap
 from typing import Iterable
 
 import yaml
@@ -310,6 +311,55 @@ def _validate_outputs(
     return io_passed, content_passed, {"gate": "io", "passed": io_passed, "outputs": [io_entry]}, content_detail
 
 
+_INLINE_CODE_RE = re.compile(r"`([^`\n]+)`")
+
+
+def _inline_code(val: object) -> str:
+    """Escape HTML and render Markdown inline backticks as ReportLab Courier."""
+    escaped = html_lib.escape(str(val or ""))
+    return _INLINE_CODE_RE.sub(r'<font name="Courier" size="8.5">\1</font>', escaped)
+
+
+def _wrap_pre(text: str, width: int = 100, max_lines: int | None = None) -> str:
+    """Normalize tabs, collapse excess blank lines, and wrap lines for ReportLab Preformatted."""
+    raw = str(text or "").replace("\r\n", "\n").replace("\r", "\n").expandtabs(4)
+    wrapped: list[str] = []
+    blank_run = 0
+    for line in raw.split("\n"):
+        cleaned = line.rstrip()
+        if not cleaned:
+            blank_run += 1
+            if blank_run <= 1 and wrapped:
+                wrapped.append("")
+            continue
+        blank_run = 0
+        if len(cleaned) <= width:
+            wrapped.append(cleaned)
+        else:
+            chunks = textwrap.wrap(
+                cleaned,
+                width=width,
+                expand_tabs=False,
+                replace_whitespace=False,
+                drop_whitespace=False,
+                break_long_words=True,
+                break_on_hyphens=False,
+            )
+            wrapped.extend(c.rstrip() for c in chunks)
+    while wrapped and not wrapped[-1]:
+        wrapped.pop()
+    if max_lines is not None and len(wrapped) > max_lines:
+        head = max_lines // 2
+        tail = max_lines - head
+        omitted = len(wrapped) - head - tail
+        wrapped = (
+            wrapped[:head]
+            + [f"... ({omitted} lines omitted; see full terminal log file) ..."]
+            + wrapped[-tail:]
+        )
+    return "\n".join(wrapped)
+
+
 def _render_manual_pdf(report: dict, terminal_text: str, out_pdf: pathlib.Path) -> bool:
     """Generate a streamlined 4-section Manual Verification PDF matching the web layout."""
     try:
@@ -317,13 +367,23 @@ def _render_manual_pdf(report: dict, terminal_text: str, out_pdf: pathlib.Path) 
         from reportlab.lib.pagesizes import A4
         from reportlab.lib.styles import ParagraphStyle
         from reportlab.lib.units import mm
-        from reportlab.platypus import HRFlowable, Paragraph, Preformatted, SimpleDocTemplate, Spacer, Table, TableStyle
+        from reportlab.platypus import (
+            HRFlowable,
+            KeepTogether,
+            Paragraph,
+            Preformatted,
+            SimpleDocTemplate,
+            Spacer,
+            Table,
+            TableStyle,
+        )
     except ImportError:
         return False
 
     passed = (report.get("verdict") or {}).get("code") == "runs"
     accent = colors.HexColor("#4338ca") if passed else colors.HexColor("#b45309")
     accent_bg = colors.HexColor("#eef2ff") if passed else colors.HexColor("#fffbeb")
+    accent_border = colors.HexColor("#c7d2fe") if passed else colors.HexColor("#fde68a")
     ink = colors.HexColor("#1f2937")
     muted = colors.HexColor("#4b5563")
     border = colors.HexColor("#d1d5db")
@@ -339,25 +399,53 @@ def _render_manual_pdf(report: dict, terminal_text: str, out_pdf: pathlib.Path) 
         title=f"{report['tool'].get('name', '')} Manual Verification",
     )
 
-    s_eyebrow = ParagraphStyle("eyebrow", fontName="Helvetica-Bold", fontSize=8.5, textColor=accent, spaceAfter=3)
-    s_title = ParagraphStyle("title", fontName="Helvetica-Bold", fontSize=18, leading=22, textColor=ink, spaceAfter=4)
+    s_banner_l = ParagraphStyle("banner_l", fontName="Helvetica-Bold", fontSize=10, leading=13, textColor=accent)
+    s_banner_r = ParagraphStyle("banner_r", fontName="Helvetica", fontSize=8.5, leading=13, textColor=muted, alignment=2)
+    s_title = ParagraphStyle("title", fontName="Helvetica-Bold", fontSize=18, leading=22, textColor=ink, spaceBefore=6, spaceAfter=4)
     s_badge = ParagraphStyle("badge", fontName="Helvetica-Bold", fontSize=10, textColor=accent, spaceAfter=8)
     s_h2 = ParagraphStyle("h2", fontName="Helvetica-Bold", fontSize=11.5, textColor=teal, spaceBefore=12, spaceAfter=5)
     s_body = ParagraphStyle("body", fontName="Helvetica", fontSize=9.5, leading=13.5, textColor=ink, spaceAfter=5)
     s_muted = ParagraphStyle("muted", fontName="Helvetica", fontSize=8.5, leading=12, textColor=muted, spaceAfter=4)
     s_label = ParagraphStyle("label", fontName="Helvetica-Bold", fontSize=8.5, textColor=muted)
     s_val = ParagraphStyle("val", fontName="Helvetica", fontSize=8.5, leading=12, textColor=ink)
-    s_code = ParagraphStyle("code", fontName="Courier", fontSize=7.5, leading=10, textColor=colors.HexColor("#111827"))
+    s_code = ParagraphStyle("code", fontName="Courier", fontSize=7.2, leading=9.8, textColor=colors.HexColor("#111827"))
 
     def esc(val: object) -> str:
         return html_lib.escape(str(val or ""))
+
+    def code_box(raw_text: str, *, max_lines: int | None = None) -> Table:
+        formatted = _wrap_pre(raw_text, width=100, max_lines=max_lines)
+        box = Table([[Preformatted(formatted, s_code)]], colWidths=[174 * mm])
+        box.setStyle(TableStyle([
+            ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#f9fafb")),
+            ("BOX", (0, 0), (-1, -1), 0.5, border),
+            ("LEFTPADDING", (0, 0), (-1, -1), 6),
+            ("RIGHTPADDING", (0, 0), (-1, -1), 6),
+            ("TOPPADDING", (0, 0), (-1, -1), 5),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+        ]))
+        return box
 
     gates = report.get("gates") or {}
     gates_passed = sum(1 for k in ("available", "installs", "runs", "io", "content") if gates.get(k))
     status_text = f"Manual · Verified ({gates_passed}/5)" if passed else f"Manual · Fails ({gates_passed}/5)"
 
     story: list = []
-    story.append(Paragraph("STRHUB VERIFIED · MANUAL VERIFICATION", s_eyebrow))
+    banner = Table(
+        [[Paragraph("MANUAL VERIFICATION REPORT", s_banner_l), Paragraph("STRhub Verified", s_banner_r)]],
+        colWidths=[124 * mm, 50 * mm],
+    )
+    banner.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, -1), accent_bg),
+        ("BOX", (0, 0), (-1, -1), 0.6, accent_border),
+        ("LINEABOVE", (0, 0), (-1, 0), 2.2, accent),
+        ("LEFTPADDING", (0, 0), (-1, -1), 8),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 8),
+        ("TOPPADDING", (0, 0), (-1, -1), 6),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+    ]))
+    story.append(banner)
     tool_name = report["tool"].get("name", "")
     tool_ver = report["tool"].get("version") or ""
     story.append(Paragraph(f"{esc(tool_name)} {esc(tool_ver)}".strip(), s_title))
@@ -370,14 +458,14 @@ def _render_manual_pdf(report: dict, terminal_text: str, out_pdf: pathlib.Path) 
     cover_rows = [
         [Paragraph("VERIFICATION DATE", s_label), Paragraph(esc((report.get("generated") or "")[:10]), s_val)],
         [Paragraph("REPOSITORY", s_label), Paragraph(esc((report.get("source") or {}).get("repo", "")), s_val)],
-        [Paragraph("PINNED COMMIT", s_label), Paragraph(esc((report.get("source") or {}).get("ref_resolved", "")), s_val)],
+        [Paragraph("PINNED COMMIT", s_label), Paragraph(f'<font name="Courier" size="8">{esc((report.get("source") or {}).get("ref_resolved", ""))}</font>', s_val)],
         [Paragraph("MODE", s_label), Paragraph("Manual verification (unmodified upstream code in prepared environment)", s_val)],
-        [Paragraph("ENVIRONMENT", s_label), Paragraph(esc(prep.get("base", "")), s_val)],
+        [Paragraph("ENVIRONMENT", s_label), Paragraph(_inline_code(prep.get("base", "")), s_val)],
     ]
     if ds.get("dataset"):
         cover_rows.append([Paragraph("DATASET", s_label), Paragraph(esc(ds["dataset"]), s_val)])
     if cert_summary.get("why"):
-        cover_rows.append([Paragraph("WHY", s_label), Paragraph(esc(cert_summary["why"]), s_val)])
+        cover_rows.append([Paragraph("WHY", s_label), Paragraph(_inline_code(cert_summary["why"]), s_val)])
 
     t_cover = Table(cover_rows, colWidths=[38 * mm, 136 * mm])
     t_cover.setStyle(TableStyle([
@@ -391,11 +479,14 @@ def _render_manual_pdf(report: dict, terminal_text: str, out_pdf: pathlib.Path) 
     story.append(Spacer(1, 4 * mm))
 
     # Section 1: Execution on unmodified upstream code + Gates + Terminal
-    story.append(Paragraph("1. Execution on unmodified upstream code", s_h2))
-    story.append(HRFlowable(width="100%", thickness=0.6, color=teal, spaceAfter=4))
+    sec1_head: list = [
+        Paragraph("1. Execution on unmodified upstream code", s_h2),
+        HRFlowable(width="100%", thickness=0.6, color=teal, spaceAfter=4),
+    ]
     if prep.get("without_preparation"):
-        story.append(Paragraph(f"<b>Why manual verification was used:</b> {esc(prep['without_preparation'])}", s_body))
-    story.append(Paragraph(esc((report.get("verdict") or {}).get("reason", "")), s_body))
+        sec1_head.append(Paragraph(f"<b>Why manual verification was used:</b> {_inline_code(prep['without_preparation'])}", s_body))
+    sec1_head.append(Paragraph(_inline_code((report.get("verdict") or {}).get("reason", "")), s_body))
+    story.append(KeepTogether(sec1_head))
 
     gate_names = [
         ("Available", gates.get("available")),
@@ -426,63 +517,82 @@ def _render_manual_pdf(report: dict, terminal_text: str, out_pdf: pathlib.Path) 
     story.append(t_gates)
     story.append(Spacer(1, 3 * mm))
 
-    # Sanitized terminal excerpt (capped to keep PDF readable)
-    term_lines = terminal_text.splitlines()
-    excerpt = "\n".join(term_lines[:70]) + ("\n... (see full terminal log file)" if len(term_lines) > 70 else "")
-    term_box = Table([[Preformatted(excerpt, s_code)]], colWidths=[174 * mm])
-    term_box.setStyle(TableStyle([
-        ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#f9fafb")),
-        ("BOX", (0, 0), (-1, -1), 0.5, border),
-        ("LEFTPADDING", (0, 0), (-1, -1), 6),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 6),
-        ("TOPPADDING", (0, 0), (-1, -1), 5),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
-    ]))
-    story.append(term_box)
+    # Sanitized terminal excerpt (tabs expanded, lines wrapped, head+tail preserved)
+    story.append(code_box(terminal_text, max_lines=68))
 
     # Section 2: Step-by-step setup / Proposed fix
     has_steps = bool(prep.get("steps") or prep.get("run_cmd") or prep.get("pr_url") or prep.get("fork_url"))
     if has_steps:
-        story.append(Paragraph("2. Step-by-step setup and proposed fix", s_h2))
-        story.append(HRFlowable(width="100%", thickness=0.6, color=teal, spaceAfter=4))
+        sec2_lead: list = [
+            Paragraph("2. Step-by-step setup and proposed fix", s_h2),
+            HRFlowable(width="100%", thickness=0.6, color=teal, spaceAfter=4),
+        ]
         if not passed:
-            story.append(Paragraph(
+            sec2_lead.append(Paragraph(
                 "<b>Proposed fix / temporary workaround (requires code changes):</b> "
                 "Shared as a suggestion for the author and temporary reference for users; "
                 "does not mark the official commit as passing.",
                 s_muted,
             ))
         if prep.get("steps"):
-            story.append(Paragraph("<b>Preparation commands:</b>", s_body))
-            story.append(Preformatted("\n".join(prep["steps"]), s_code))
-            story.append(Spacer(1, 2 * mm))
-        if prep.get("run_cmd"):
-            story.append(Paragraph("<b>Verified run command:</b>", s_body))
-            story.append(Preformatted(str(prep["run_cmd"]), s_code))
-            story.append(Spacer(1, 2 * mm))
+            sec2_lead.extend([
+                Paragraph("<b>Preparation commands:</b>", s_body),
+                code_box("\n".join(prep["steps"])),
+                Spacer(1, 2.5 * mm),
+            ])
+            story.append(KeepTogether(sec2_lead))
+        elif prep.get("run_cmd"):
+            sec2_lead.extend([
+                Paragraph("<b>Verified run command:</b>", s_body),
+                code_box(str(prep["run_cmd"])),
+                Spacer(1, 2.5 * mm),
+            ])
+            story.append(KeepTogether(sec2_lead))
+        else:
+            story.append(KeepTogether(sec2_lead))
+
+        if prep.get("steps") and prep.get("run_cmd"):
+            story.append(KeepTogether([
+                Paragraph("<b>Verified run command:</b>", s_body),
+                code_box(str(prep["run_cmd"])),
+                Spacer(1, 2.5 * mm),
+            ]))
+        links_block: list = []
         if prep.get("pr_url"):
-            story.append(Paragraph(f"<b>Proposed PR:</b> {esc(prep['pr_url'])}", s_body))
+            links_block.append(Paragraph(f"<b>Proposed PR:</b> {esc(prep['pr_url'])}", s_body))
         if prep.get("fork_url"):
-            story.append(Paragraph(f"<b>Suggested fix (fork):</b> {esc(prep['fork_url'])}", s_body))
+            links_block.append(Paragraph(f"<b>Suggested fix (fork):</b> {esc(prep['fork_url'])}", s_body))
         fix_note = prep.get("proposed_fix_note") or prep.get("fork_note")
         if fix_note:
-            story.append(Paragraph(esc(fix_note), s_body))
+            links_block.append(Paragraph(_inline_code(fix_note), s_body))
+        if links_block:
+            story.append(KeepTogether(links_block))
 
     # Section 3: Suggestions for the author
     recs = report.get("recommendations") or []
     if recs:
-        story.append(Paragraph("3. Suggestions for the author", s_h2))
-        story.append(HRFlowable(width="100%", thickness=0.6, color=teal, spaceAfter=4))
-        for item in recs:
-            story.append(Paragraph(f"&bull; {esc(item)}", s_body))
+        sec3_first = [
+            Paragraph("3. Suggestions for the author", s_h2),
+            HRFlowable(width="100%", thickness=0.6, color=teal, spaceAfter=4),
+            Paragraph(f"&bull; {_inline_code(recs[0])}", s_body),
+        ]
+        story.append(KeepTogether(sec3_first))
+        for item in recs[1:]:
+            story.append(Paragraph(f"&bull; {_inline_code(item)}", s_body))
 
-    # Section 4: Conclusion and scope
-    story.append(Paragraph("4. Conclusion and scope", s_h2))
-    story.append(HRFlowable(width="100%", thickness=0.6, color=teal, spaceAfter=4))
-    story.append(Paragraph(esc((report.get("verdict") or {}).get("reason", "")), s_body))
+    # Section 4: Conclusion and scope (concise executive takeaway, no verbatim repeat of Section 1)
+    short_sha = ((report.get("source") or {}).get("ref_resolved") or "")[:7]
+    conclusion_lead = cert_summary.get("why") or (report.get("verdict") or {}).get("reason", "")
+    sec4: list = [
+        Paragraph("4. Conclusion and scope", s_h2),
+        HRFlowable(width="100%", thickness=0.6, color=teal, spaceAfter=4),
+        Paragraph(f"<b>Outcome:</b> {esc(status_text)} on unmodified upstream commit <font name=\"Courier\" size=\"8.5\">{esc(short_sha)}</font>.", s_body),
+        Paragraph(_inline_code(conclusion_lead), s_body),
+    ]
     disclaimer = ((report.get("certificate") or {}).get("scope") or {}).get("disclaimer", "")
     if disclaimer:
-        story.append(Paragraph(esc(disclaimer), s_muted))
+        sec4.append(Paragraph(esc(disclaimer), s_muted))
+    story.append(KeepTogether(sec4))
 
     doc.build(story)
     return out_pdf.is_file()
@@ -491,7 +601,7 @@ def _render_manual_pdf(report: dict, terminal_text: str, out_pdf: pathlib.Path) 
 def _render_static_html(report: dict, terminal_text: str) -> str:
     tool = report["tool"]
     verdict = report["verdict"]
-    title = html_lib.escape(f"{tool.get('name', 'Tool')} {tool.get('version') or ''} — STRhub Manual Verification".strip())
+    title = html_lib.escape(f"{tool.get('name', 'Tool')} {tool.get('version') or ''} · STRhub Manual Verification".strip())
     return (
         "<!doctype html>\n<html lang='en'><head><meta charset='utf-8'>"
         f"<title>{title}</title>"

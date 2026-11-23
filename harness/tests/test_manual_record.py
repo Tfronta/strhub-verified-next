@@ -177,3 +177,19 @@ def test_publish_manual_places_curated_without_overwriting_documented_alias(tmp_
     assert entry["instrument"] == "documented"
     assert len(entry["versions"]) == 2
     assert any(v["instrument"] == "curated" and v["verdict"] == "fails" for v in entry["versions"])
+
+
+def test_wrap_pre_expands_tabs_wraps_long_lines_and_preserves_tail():
+    raw = "\t\tbanner\tline\n" + ("A" * 130) + "\n\n\n\n" + "\n".join(f"line {i}" for i in range(80)) + "\n[exit 1]\n"
+    out = mr._wrap_pre(raw, width=90, max_lines=20)
+    assert "\t" not in out
+    assert all(len(line) <= 90 for line in out.splitlines())
+    assert "[exit 1]" in out
+    assert "omitted" in out
+
+
+def test_inline_code_renders_backticks_as_courier_and_escapes_html():
+    rendered = mr._inline_code("Fix `[[ -f \"src/a.sh\" ]]` & `python>=3.9`")
+    assert "`" not in rendered
+    assert '<font name="Courier" size="8.5">[[ -f &quot;src/a.sh&quot; ]]</font>' in rendered
+    assert "&amp;" in rendered
