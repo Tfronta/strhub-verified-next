@@ -1,0 +1,347 @@
+{
+  "schema": "strhub-verified/1",
+  "instrument": "curated",
+  "mode": "publish",
+  "generated": "2026-11-23T19:23:40+00:00",
+  "tool": {
+    "name": "LongTR",
+    "version": "v1.2",
+    "contact": "https://github.com/gymrek-lab/LongTR/issues"
+  },
+  "source": {
+    "repo": "https://github.com/gymrek-lab/LongTR",
+    "ref": "2be6cf5ec0b108601719c16171a3f0099d1cb88d",
+    "ref_resolved": "2be6cf5ec0b108601719c16171a3f0099d1cb88d",
+    "committed": "2025-01-30T23:00:05Z"
+  },
+  "environment": {
+    "os": [
+      "macOS arm64 (AppleClang + autotools + cmake + xz/openssl, compiled from unmodified upstream Makefile)"
+    ],
+    "source": "prepared"
+  },
+  "preparation": {
+    "file": "longtr-v1.2-notes.yml",
+    "dataset": "ont-bam-hg38",
+    "installation": "strhub",
+    "base": "C++ toolchain (`clang++`/`g++`, `make`, `autoconf`, `automake`, `libtool`, `cmake`, `zlib`, `bzip2`, `liblzma`, `libcurl`, `openssl`), compiled from unmodified upstream v1.2 `Makefile`",
+    "without_preparation": "Automated verification failed during installation (`cmd_not_found: autoreconf`) because `README.md` only lists `gcc`, `cmake`, `googletest`, and `zlib` before running `make`, omitting `autoconf`/`automake`/`libtool` and the HTSlib development headers (`libbz2-dev`, `liblzma-dev`, `libcurl4-openssl-dev`, `libssl-dev`) required by `Makefile` (line 91). In addition, `Makefile` (line 96) clones `spoa` over SSH (`git@github.com:rvaser/spoa.git`), which fails in clean environments without GitHub SSH keys.",
+    "why": [],
+    "steps": [
+      "# Option A (Bioconda package):",
+      "conda install -c bioconda longtr=1.2",
+      "# Option B (compile unmodified v1.2 from source on Ubuntu/Debian; run make sequentially without -j):",
+      "apt-get install -y build-essential git autoconf automake libtool cmake zlib1g-dev libbz2-dev liblzma-dev libcurl4-openssl-dev libssl-dev",
+      "CMAKE_POLICY_VERSION_MINIMUM=3.5 make"
+    ],
+    "run_cmd": "LongTR --bams /data/in/input.bam --fasta /data/in/hg38.fa --regions /data/in/regions.bed --tr-vcf /data/out/tr_calls.vcf.gz --phased-bam",
+    "files": []
+  },
+  "recommendations": [
+    "Document the full Ubuntu/Debian build dependencies in `README.md` (`autoconf`, `automake`, `libtool`, `zlib1g-dev`, `libbz2-dev`, `liblzma-dev`, `libcurl4-openssl-dev`, `libssl-dev`) as a single copyable `apt-get install` block before `make`, and/or document the official Bioconda package (`conda install -c bioconda longtr=1.2`).",
+    "Replace the SSH clone URLs in `Makefile` (line 96: `git@github.com:rvaser/spoa.git`) and `README.md` (line 20: `git@github.com:gymrek-lab/LongTR.git`) with HTTPS URLs (`https://github.com/...`) so clean builds succeed without GitHub SSH keys.",
+    "Add explicit target dependencies in `Makefile` (making object files and `LongTR` wait for `HTSLIB-docker` and `SPOA-docker`) so parallel builds (`make -j`) do not race ahead of `htslib` and `spoa`.",
+    "Pass `-DCMAKE_POLICY_VERSION_MINIMUM=3.5` (or update `spoa`/`googletest`) in `Makefile` (line 108) for CMake 4.x compatibility, and regenerate `src/version.cpp` on tagged releases (`--version` currently prints `638942f-dirty` on `v1.2`)."
+  ],
+  "gates": {
+    "available": true,
+    "installs": true,
+    "runs": true,
+    "io": true,
+    "content": true
+  },
+  "level": "content",
+  "verdict": {
+    "code": "runs",
+    "title": "Runs in manual verification",
+    "basis": "gates",
+    "reason": "Compiled unmodified upstream LongTR v1.2 (`2be6cf5`) sequentially with `make` after provisioning autotools, CMake, and the required HTSlib development headers (`CMAKE_POLICY_VERSION_MINIMUM=3.5` for CMake 4 compatibility with `spoa`'s bundled `googletest`, zero source modifications). Executed the documented `LongTR` command from `README.md` (lines 35-39, using `--phased-bam`) against the 1000 Genomes ONT R10 SUP `hg38` CODIS reference slice (`ont-bam-hg38`, `HG00113`). Execution completed in under 3 seconds (exit 0), producing `tr_calls.vcf.gz` with 20/20 called forensic autosomal CODIS STR loci (626 total reads in `FORMAT/DP`, depth 21 to 44 per locus, max 44 at `D19S433`).",
+    "readme_gaps": []
+  },
+  "run": {
+    "cmd": "LongTR --bams /data/in/input.bam --fasta /data/in/hg38.fa --regions /data/in/regions.bed --tr-vcf /data/out/tr_calls.vcf.gz --phased-bam",
+    "cwd": ".",
+    "step_outcome": "success"
+  },
+  "datasets": [
+    {
+      "leg": "external",
+      "label": "External data",
+      "available": true,
+      "type": "ont-bam-hg38",
+      "dataset": "1000 Genomes ONT, hg38 CODIS slice (R10 SUP)",
+      "io": true,
+      "content": true,
+      "passed": true
+    }
+  ],
+  "logs": {
+    "external": "longtr-ont.log-external.txt"
+  },
+  "terminals": {
+    "external": "longtr-ont.terminal-external.txt"
+  },
+  "certificate": {
+    "schema": "strhub-verified/certificate/1",
+    "label": "Manual verification: verified",
+    "reached": "Runs + Plausible output",
+    "summary": {
+      "purpose": "Independent manual verification of reproducible execution on unmodified upstream source.",
+      "result": "Compiled unmodified upstream LongTR v1.2 (`2be6cf5`) sequentially with `make` after provisioning autotools, CMake, and the required HTSlib development headers (`CMAKE_POLICY_VERSION_MINIMUM=3.5` for CMake 4 compatibility with `spoa`'s bundled `googletest`, zero source modifications). Executed the documented `LongTR` command from `README.md` (lines 35-39, using `--phased-bam`) against the 1000 Genomes ONT R10 SUP `hg38` CODIS reference slice (`ont-bam-hg38`, `HG00113`). Execution completed in under 3 seconds (exit 0), producing `tr_calls.vcf.gz` with 20/20 called forensic autosomal CODIS STR loci (626 total reads in `FORMAT/DP`, depth 21 to 44 per locus, max 44 at `D19S433`).",
+      "reached": "Runs + Plausible output",
+      "why": "Automated verification failed to compile because `README.md` omits `autoconf` (`autoreconf`) and HTSlib development libraries required by `Makefile`, and `Makefile` clones `spoa` over SSH. In manual verification, after provisioning those build prerequisites and compiling unmodified LongTR v1.2 from source (without editing any code), LongTR ran end-to-end on the 1000 Genomes ONT R10 SUP slice and called all 20/20 forensic CODIS STR loci (see Section 4 for exact steps).",
+      "scope": "Reproducible execution only; does not evaluate genotype concordance or forensic casework fitness.",
+      "not_evaluated": [
+        "Genotype accuracy",
+        "Concordance against truth",
+        "Forensic casework fitness"
+      ]
+    },
+    "conclusion": [
+      {
+        "title": "LongTR v1.2 executes end-to-end",
+        "body": "LongTR v1.2 ran to completion without code modifications in the prepared environment at unmodified upstream commit 2be6cf5."
+      },
+      {
+        "title": "Output passes plausibility checks",
+        "body": "The run produced a structurally valid, non-empty VCF output containing 20 distinct recognizable STR loci; structural plausibility checks verify output format and locus presence, not genotype accuracy."
+      },
+      {
+        "title": "Verification used STRhub reference data",
+        "body": "Verification used open-access STRhub reference dataset 1000 Genomes ONT, hg38 CODIS slice (R10 SUP) (ont-bam-hg38)."
+      },
+      {
+        "title": "Repeatability of this manual run",
+        "body": "The pinned upstream commit, prepared environment description, exact commands executed, and sanitized terminal output recorded in this report document the procedure for independent reproduction."
+      }
+    ],
+    "out_of_scope": [
+      "Genotype accuracy and concordance",
+      "Forensic casework accreditation"
+    ],
+    "limitations": [
+      "Results apply exclusively to the exact Git commit SHA and manually prepared environment recorded in this report.",
+      "Single regional reference slice per input type; low-coverage warnings on sliced BAMs do not imply defects on whole-genome data.",
+      "Plausible Output checks verify structural format and recognizable STR loci, not biological genotype truth.",
+      "Verification is a point-in-time snapshot; upstream repository changes after this commit are not covered until re-verification.",
+      "No truth-set concordance, forensic casework validation, or regulatory compliance assessment was performed."
+    ],
+    "scope": {
+      "statement": "This report records a manual execution against the pinned upstream commit.",
+      "not": "It does not establish genotype accuracy or forensic casework fitness.",
+      "disclaimer": "Each result is a fixed, dated attestation verified on the tool's public repository at an immutable commit. It evaluates reproducible execution only, not genotype accuracy or forensic fitness."
+    }
+  },
+  "scope": "Manual verification of reproducible execution against unmodified upstream commit.",
+  "io_detail": {
+    "gate": "io",
+    "passed": true,
+    "outputs": [
+      {
+        "path": "*.vcf.gz",
+        "format": "vcf",
+        "resolved": "tr_calls.vcf.gz",
+        "validation_profile": "strhub-vcf-structure/1",
+        "validation_status": "valid",
+        "records": 20,
+        "called_records": 20,
+        "uncalled_rows": 0,
+        "records_without_gt": 0,
+        "checks": {
+          "exists": true,
+          "non_empty": true,
+          "parses_as_vcf": true,
+          "min_records": true,
+          "has_called_genotypes": true
+        },
+        "passed": true
+      }
+    ]
+  },
+  "content_detail": {
+    "gate": "content",
+    "applicable": true,
+    "passed": true,
+    "outputs": [
+      {
+        "path": "*.vcf.gz",
+        "resolved": "tr_calls.vcf.gz",
+        "mode": "auto",
+        "checks": {
+          "records_present": true,
+          "genotypes_called": true,
+          "given_loci_recognised": true
+        },
+        "stats": {
+          "rows": 20,
+          "header_row_dropped": false,
+          "malformed_rows": 0,
+          "dna_invalid_rows": 0,
+          "count_invalid_rows": 0,
+          "distinct_loci": 20,
+          "distinct_str_loci": 20,
+          "distinct_snp_markers": 0,
+          "loci": [
+            "CSF1PO",
+            "D10S1248",
+            "D12S391",
+            "D13S317",
+            "D16S539",
+            "D18S51",
+            "D19S433",
+            "D1S1656",
+            "D21S11",
+            "D22S1045",
+            "D2S1338",
+            "D2S441",
+            "D3S1358",
+            "D5S818",
+            "D7S820",
+            "D8S1179",
+            "FGA",
+            "TH01",
+            "TPOX",
+            "vWA"
+          ],
+          "str_loci": [
+            "CSF1PO",
+            "D10S1248",
+            "D12S391",
+            "D13S317",
+            "D16S539",
+            "D18S51",
+            "D19S433",
+            "D1S1656",
+            "D21S11",
+            "D22S1045",
+            "D2S1338",
+            "D2S441",
+            "D3S1358",
+            "D5S818",
+            "D7S820",
+            "D8S1179",
+            "FGA",
+            "TH01",
+            "TPOX",
+            "vWA"
+          ],
+          "snp_markers": [],
+          "total_reads": 626,
+          "max_sequence_depth": 44,
+          "top_loci_by_depth": [
+            [
+              "D19S433",
+              44
+            ],
+            [
+              "TPOX",
+              39
+            ],
+            [
+              "FGA",
+              39
+            ],
+            [
+              "vWA",
+              37
+            ],
+            [
+              "D16S539",
+              35
+            ],
+            [
+              "D5S818",
+              35
+            ],
+            [
+              "D12S391",
+              34
+            ],
+            [
+              "D18S51",
+              34
+            ],
+            [
+              "D2S441",
+              33
+            ],
+            [
+              "D3S1358",
+              33
+            ],
+            [
+              "CSF1PO",
+              31
+            ],
+            [
+              "D10S1248",
+              30
+            ],
+            [
+              "D7S820",
+              28
+            ],
+            [
+              "D1S1656",
+              27
+            ],
+            [
+              "D21S11",
+              27
+            ],
+            [
+              "D13S317",
+              26
+            ],
+            [
+              "D8S1179",
+              26
+            ],
+            [
+              "D22S1045",
+              25
+            ],
+            [
+              "D2S1338",
+              22
+            ],
+            [
+              "TH01",
+              21
+            ]
+          ],
+          "called_genotypes": 20,
+          "regions_given": 20,
+          "regions_hit": 20,
+          "depth_source": "FORMAT/DP"
+        }
+      }
+    ]
+  },
+  "i18n": {
+    "es": {
+      "plain_why": "La verificaci\u00f3n autom\u00e1tica fall\u00f3 al compilar porque `README.md` omite `autoconf` (`autoreconf`) y las librer\u00edas de desarrollo de HTSlib requeridas por `Makefile`, y `Makefile` clona `spoa` por SSH. En verificaci\u00f3n manual, tras preparar esos prerrequisitos de compilaci\u00f3n y compilar LongTR v1.2 sin modificar desde c\u00f3digo fuente (sin editar una sola l\u00ednea), LongTR corri\u00f3 de principio a fin sobre el recorte ONT R10 SUP de 1000 Genomes y genotip\u00f3 los 20/20 loci STR CODIS forenses (ver Secci\u00f3n 4 para los pasos exactos).",
+      "without_preparation": "La verificaci\u00f3n autom\u00e1tica fall\u00f3 durante la instalaci\u00f3n (`cmd_not_found: autoreconf`) porque `README.md` solo lista `gcc`, `cmake`, `googletest` y `zlib` antes de ejecutar `make`, omitiendo `autoconf`/`automake`/`libtool` y las cabeceras de desarrollo de HTSlib (`libbz2-dev`, `liblzma-dev`, `libcurl4-openssl-dev`, `libssl-dev`) requeridas por `Makefile` (l\u00ednea 91). Adem\u00e1s, `Makefile` (l\u00ednea 96) clona `spoa` por SSH (`git@github.com:rvaser/spoa.git`), lo que falla en entornos limpios sin claves SSH de GitHub.",
+      "reason": "Se compil\u00f3 LongTR v1.2 original sin modificar (`2be6cf5`) de forma secuencial con `make` tras preparar autotools, CMake y las cabeceras de desarrollo de HTSlib (`CMAKE_POLICY_VERSION_MINIMUM=3.5` para compatibilidad de CMake 4 con el `googletest` incluido en `spoa`, cero modificaciones al c\u00f3digo). Se ejecut\u00f3 el comando documentado de `LongTR` en `README.md` (l\u00edneas 35-39, con `--phased-bam`) sobre el recorte de referencia ONT R10 SUP `hg38` de 1000 Genomes (`ont-bam-hg38`, `HG00113`). La ejecuci\u00f3n finaliz\u00f3 en menos de 3 segundos (exit 0), generando `tr_calls.vcf.gz` con los 20/20 loci STR CODIS autos\u00f3micos genotipados (626 lecturas totales en `FORMAT/DP`, profundidad de 21 a 44 por locus, m\u00e1ximo 44 en `D19S433`).",
+      "base": "Toolchain C++ (`clang++`/`g++`, `make`, `autoconf`, `automake`, `libtool`, `cmake`, `zlib`, `bzip2`, `liblzma`, `libcurl`, `openssl`), compilado desde el `Makefile` original sin modificar de v1.2",
+      "recommendations": [
+        "Documentar todas las dependencias de compilaci\u00f3n en Ubuntu/Debian en `README.md` (`autoconf`, `automake`, `libtool`, `zlib1g-dev`, `libbz2-dev`, `liblzma-dev`, `libcurl4-openssl-dev`, `libssl-dev`) como un bloque copiable de `apt-get install` antes de `make`, y/o documentar el paquete oficial de Bioconda (`conda install -c bioconda longtr=1.2`).",
+        "Reemplazar las URLs SSH en `Makefile` (l\u00ednea 96: `git@github.com:rvaser/spoa.git`) y `README.md` (l\u00ednea 20: `git@github.com:gymrek-lab/LongTR.git`) por URLs HTTPS (`https://github.com/...`) para que compilaciones limpias funcionen sin claves SSH de GitHub.",
+        "Agregar dependencias expl\u00edcitas de orden en `Makefile` (para que los archivos objeto y `LongTR` esperen a `HTSLIB-docker` y `SPOA-docker`) de modo que compilaciones paralelas (`make -j`) no fallen por condici\u00f3n de carrera.",
+        "Pasar `-DCMAKE_POLICY_VERSION_MINIMUM=3.5` (o actualizar `spoa`/`googletest`) en `Makefile` (l\u00ednea 108) para compatibilidad con CMake 4.x, y regenerar `src/version.cpp` en cada release etiquetado (`--version` actualmente imprime `638942f-dirty` en `v1.2`)."
+      ]
+    },
+    "pt": {
+      "plain_why": "A verifica\u00e7\u00e3o autom\u00e1tica falhou na compila\u00e7\u00e3o porque o `README.md` omite `autoconf` (`autoreconf`) e as bibliotecas de desenvolvimento da HTSlib exigidas pelo `Makefile`, e o `Makefile` clona o `spoa` via SSH. Na verifica\u00e7\u00e3o manual, ap\u00f3s preparar esses pr\u00e9-requisitos e compilar o LongTR v1.2 original a partir do c\u00f3digo-fonte (sem editar o c\u00f3digo), o LongTR executou de ponta a ponta no recorte ONT R10 SUP do 1000 Genomes e chamou todos os 20/20 loci STR CODIS forenses (veja a Se\u00e7\u00e3o 4 para os passos exatos).",
+      "without_preparation": "A verifica\u00e7\u00e3o autom\u00e1tica falhou durante a instala\u00e7\u00e3o (`cmd_not_found: autoreconf`) porque o `README.md` lista apenas `gcc`, `cmake`, `googletest` e `zlib` antes de executar `make`, omitindo `autoconf`/`automake`/`libtool` e os cabe\u00e7alhos de desenvolvimento da HTSlib (`libbz2-dev`, `liblzma-dev`, `libcurl4-openssl-dev`, `libssl-dev`) exigidos pelo `Makefile` (linha 91). Al\u00e9m disso, o `Makefile` (linha 96) clona o `spoa` via SSH (`git@github.com:rvaser/spoa.git`), falhando em ambientes limpos sem chaves SSH do GitHub.",
+      "reason": "Compilado o LongTR v1.2 original sem modifica\u00e7\u00f5es (`2be6cf5`) sequencialmente com `make` ap\u00f3s preparar autotools, CMake e os cabe\u00e7alhos de desenvolvimento da HTSlib (`CMAKE_POLICY_VERSION_MINIMUM=3.5` para compatibilidade do CMake 4 com o `googletest` embutido no `spoa`, zero edi\u00e7\u00f5es no c\u00f3digo). Executado o comando documentado do `LongTR` no `README.md` (linhas 35-39, com `--phased-bam`) sobre o recorte de refer\u00eancia ONT R10 SUP `hg38` do 1000 Genomes (`ont-bam-hg38`, `HG00113`). A execu\u00e7\u00e3o terminou em menos de 3 segundos (exit 0), gerando `tr_calls.vcf.gz` com 20/20 loci STR CODIS autoss\u00f4micos genotipados (626 leituras totais em `FORMAT/DP`, profundidade de 21 a 44 por locus, m\u00e1ximo de 44 em `D19S433`).",
+      "base": "Toolchain C++ (`clang++`/`g++`, `make`, `autoconf`, `automake`, `libtool`, `cmake`, `zlib`, `bzip2`, `liblzma`, `libcurl`, `openssl`), compilado a partir do `Makefile` original sem modifica\u00e7\u00f5es da v1.2",
+      "recommendations": [
+        "Documentar todas as depend\u00eancias de compila\u00e7\u00e3o no Ubuntu/Debian no `README.md` (`autoconf`, `automake`, `libtool`, `zlib1g-dev`, `libbz2-dev`, `liblzma-dev`, `libcurl4-openssl-dev`, `libssl-dev`) como um bloco copi\u00e1vel de `apt-get install` antes do `make`, e/ou documentar o pacote oficial no Bioconda (`conda install -c bioconda longtr=1.2`).",
+        "Substituir as URLs SSH no `Makefile` (linha 96: `git@github.com:rvaser/spoa.git`) e no `README.md` (linha 20: `git@github.com:gymrek-lab/LongTR.git`) por URLs HTTPS (`https://github.com/...`) para que compila\u00e7\u00f5es limpas funcionem sem chaves SSH do GitHub.",
+        "Adicionar depend\u00eancias expl\u00edcitas de ordena\u00e7\u00e3o no `Makefile` (fazendo objetos e `LongTR` aguardarem `HTSLIB-docker` e `SPOA-docker`) para que compila\u00e7\u00f5es paralelas (`make -j`) n\u00e3o falhem por corrida.",
+        "Passar `-DCMAKE_POLICY_VERSION_MINIMUM=3.5` (ou atualizar `spoa`/`googletest`) no `Makefile` (linha 108) para compatibilidade com CMake 4.x, e regenerar `src/version.cpp` nas releases tagueadas (`--version` atualmente imprime `638942f-dirty` na `v1.2`)."
+      ]
+    }
+  }
+}

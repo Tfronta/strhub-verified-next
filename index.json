@@ -1,6 +1,6 @@
 {
   "schema": "strhub-verified/index/3",
-  "generated": "2026-11-23T19:11:57+00:00",
+  "generated": "2026-11-23T19:24:18+00:00",
   "count": 23,
   "tools": [
     {
@@ -278,6 +278,22 @@
           "report": "longtr-ont/2be6cf5ec0b108601719c16171a3f0099d1cb88d/longtr-ont.json",
           "page": "longtr-ont/2be6cf5ec0b108601719c16171a3f0099d1cb88d/longtr-ont.html",
           "pdf": "longtr-ont/2be6cf5ec0b108601719c16171a3f0099d1cb88d/longtr-ont.pdf"
+        },
+        {
+          "sha": "2be6cf5ec0b108601719c16171a3f0099d1cb88d",
+          "instrument": "curated",
+          "version": "v1.2",
+          "variant": null,
+          "committed": "2025-01-30T23:00:05Z",
+          "generated": "2026-11-23T19:23:40+00:00",
+          "level": "content",
+          "label": "Not verified as documented",
+          "verdict": "runs",
+          "errors_reported": false,
+          "ci_run": null,
+          "report": "longtr-ont/2be6cf5ec0b108601719c16171a3f0099d1cb88d-curated/longtr-ont.json",
+          "page": "longtr-ont/2be6cf5ec0b108601719c16171a3f0099d1cb88d-curated/longtr-ont.html",
+          "pdf": "longtr-ont/2be6cf5ec0b108601719c16171a3f0099d1cb88d-curated/longtr-ont.pdf"
         }
       ]
     },
