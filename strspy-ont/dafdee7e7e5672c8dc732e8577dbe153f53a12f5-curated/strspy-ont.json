@@ -2,7 +2,7 @@
   "schema": "strhub-verified/1",
   "instrument": "curated",
   "mode": "publish",
-  "generated": "2026-11-23T14:10:20+00:00",
+  "generated": "2026-11-23T14:29:59+00:00",
   "tool": {
     "name": "STRspy",
     "version": "v2.0",
@@ -99,6 +99,7 @@
       "purpose": "Independent manual verification of reproducible execution on unmodified upstream source.",
       "result": "Even after creating the Conda environment, generating config/UserToolsConfig.txt, and supplying the -i and -t flags omitted by README line 120, the unmodified upstream wrapper STRspy_run_v2.0_Args.sh fails immediately with exit code 1: lines 180 and 193 check `if [[ -f \"STRspy_Normal_v2.0_Args.sh\" ]]` in the repository root even though the script lives under `src/STRspy_Normal_v2.0_Args.sh` (which line 199 then invokes). Because the file check and invocation path disagree, the wrapper exits with `please make sure you are in the same directory of STRspy` from any working directory.",
       "reached": "Installs",
+      "why": "Automated verification could not run because the repository's installation instructions require an interactive Miniconda installer. In manual verification, the unmodified software failed to run due to a path bug in its own wrapper script (see Section 1 for details and Section 2 for the proposed fix).",
       "scope": "Reproducible execution only; does not evaluate genotype concordance or forensic casework fitness.",
       "not_evaluated": [
         "Genotype accuracy",
