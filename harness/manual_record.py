@@ -61,7 +61,7 @@ LEVEL_LABELS = {
 }
 
 
-def _git(checkout: pathlib.Path, *args: str) -> str:
+def _git(checkout: pathlib.Path, *args: str, strip: bool = True) -> str:
     res = subprocess.run(
         ["git", "-C", str(checkout), *args],
         capture_output=True,
@@ -69,7 +69,7 @@ def _git(checkout: pathlib.Path, *args: str) -> str:
     )
     if res.returncode != 0:
         raise ValueError(f"git {' '.join(args)} failed in {checkout}: {res.stderr.strip()}")
-    return res.stdout.strip()
+    return res.stdout.strip() if strip else res.stdout
 
 
 def verify_checkout(
@@ -101,7 +101,7 @@ def verify_checkout(
     # Refuse any modified/staged/deleted tracked file. Untracked files are allowed
     # only if explicitly listed via --allow-untracked (e.g. a generated config file).
     allowed_set = {p.strip().lstrip("./") for p in allow_untracked if p.strip()}
-    status_lines = _git(checkout, "status", "--porcelain", "--untracked-files=all").splitlines()
+    status_lines = _git(checkout, "status", "--porcelain", "--untracked-files=all", strip=False).splitlines()
     bad: list[str] = []
     for line in status_lines:
         if not line.strip():
