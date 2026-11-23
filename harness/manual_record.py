@@ -624,8 +624,87 @@ def _render_manual_pdf(report: dict, terminal_text: str, out_pdf: pathlib.Path) 
         dark_terminal_box(terminal_text, max_lines=68),
     ]))
 
-    # Section 2: Step-by-step setup (and proposed fix when applicable)
     sec = 2
+
+    # Section: Output Content (Plausibility Evidence) when output was validated
+    io_out = ((report.get("io_detail") or {}).get("outputs") or [None])[0]
+    content_out = ((report.get("content_detail") or {}).get("outputs") or [None])[0]
+    c_stats = (content_out or {}).get("stats") or {}
+    if io_out or c_stats:
+        out_rows: list[tuple[str, str]] = []
+        if io_out:
+            fname = io_out.get("resolved") or io_out.get("path") or "-"
+            fmt = str(io_out.get("format") or "").upper()
+            out_rows.append(("Output file", f'<font name="Courier" size="8">{esc(fname)}</font>' + (f" ({esc(fmt)})" if fmt else "")))
+            if io_out.get("validation_status"):
+                st_str = str(io_out["validation_status"]).upper()
+                st_col = "#00909c" if io_out["validation_status"] == "valid" else "#ef4444"
+                out_rows.append(("Structural validation", f'<font color="{st_col}"><b>{esc(st_str)}</b></font>'))
+            if isinstance(io_out.get("records"), int):
+                called = io_out.get("called_records")
+                rec_desc = f"{io_out['records']} data rows"
+                if isinstance(called, int):
+                    rec_desc += f" ({called} with called genotypes)"
+                out_rows.append(("VCF records", esc(rec_desc)))
+        if c_stats:
+            n_loci = c_stats.get("distinct_str_loci", c_stats.get("distinct_loci"))
+            if isinstance(n_loci, int):
+                out_rows.append(("STR loci detected", f"<b>{n_loci}</b> distinct recognizable forensic STR loci"))
+            loci_list = c_stats.get("str_loci") or c_stats.get("loci") or []
+            if loci_list:
+                out_rows.append(("Loci called", f'<font name="Courier" size="7.5">{esc(", ".join(str(x) for x in loci_list))}</font>'))
+        if out_rows:
+            ot = Table(
+                [[Paragraph(k, gp.ST["meta_label"]), Paragraph(v, gp.ST["tbl_cell"])] for k, v in out_rows],
+                colWidths=[42 * mm, gp.CW - 42 * mm],
+            )
+            ot.setStyle(TableStyle([
+                ("VALIGN",        (0, 0), (-1, -1), "TOP"),
+                ("LEFTPADDING",   (0, 0), (-1, -1), 10),
+                ("RIGHTPADDING",  (0, 0), (-1, -1), 10),
+                ("TOPPADDING",    (0, 0), (-1, -1), 5),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+                ("ROWBACKGROUNDS", (0, 0), (-1, -1), [gp.WHITE, gp.GRAY_LIGHT]),
+                ("LINEBELOW",     (0, 0), (-1, -2), 0.3, gp.BORDER),
+                ("BOX",           (0, 0), (-1, -1), 0.5, gp.BORDER),
+            ]))
+            story.append(KeepTogether([
+                gp.section_num(str(sec), "Output Content (Plausibility Evidence)"),
+                ot,
+            ]))
+            sec += 1
+
+    # Section: Verification Data when a reference dataset is recorded
+    if ds.get("dataset") or dataset_type:
+        ds_rows: list[tuple[str, str]] = []
+        if ds.get("dataset"):
+            ds_rows.append(("Dataset", esc(ds["dataset"])))
+        if dataset_type:
+            ds_rows.append(("Dataset ID", f'<font name="Courier" size="8">{esc(dataset_type)}</font>'))
+        if panel_label:
+            ds_rows.append(("Panel", esc(panel_label)))
+        ds_rows.append(("Scope note", "Open-access regional reference slice staged by STRhub for execution verification only."))
+        dt_tbl = Table(
+            [[Paragraph(k, gp.ST["meta_label"]), Paragraph(v, gp.ST["tbl_cell"])] for k, v in ds_rows],
+            colWidths=[42 * mm, gp.CW - 42 * mm],
+        )
+        dt_tbl.setStyle(TableStyle([
+            ("VALIGN",        (0, 0), (-1, -1), "TOP"),
+            ("LEFTPADDING",   (0, 0), (-1, -1), 10),
+            ("RIGHTPADDING",  (0, 0), (-1, -1), 10),
+            ("TOPPADDING",    (0, 0), (-1, -1), 5),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+            ("ROWBACKGROUNDS", (0, 0), (-1, -1), [gp.WHITE, gp.GRAY_LIGHT]),
+            ("LINEBELOW",     (0, 0), (-1, -2), 0.3, gp.BORDER),
+            ("BOX",           (0, 0), (-1, -1), 0.5, gp.BORDER),
+        ]))
+        story.append(KeepTogether([
+            gp.section_num(str(sec), "Verification Data"),
+            dt_tbl,
+        ]))
+        sec += 1
+
+    # Section: Step-by-step setup (and proposed fix when applicable)
     has_steps = bool(prep.get("steps") or prep.get("run_cmd") or prep.get("pr_url") or prep.get("fork_url"))
     if has_steps:
         sec2_title = (
@@ -685,7 +764,7 @@ def _render_manual_pdf(report: dict, terminal_text: str, out_pdf: pathlib.Path) 
         if links_els:
             story.append(KeepTogether([gp.boxed(links_els, pad=10)]))
 
-    # Section 3: Suggestions for the author
+    # Section: Suggestions for the author
     recs = report.get("recommendations") or []
     if recs:
         rec_els = [
@@ -701,18 +780,42 @@ def _render_manual_pdf(report: dict, terminal_text: str, out_pdf: pathlib.Path) 
         ]))
         sec += 1
 
-    # Section 4: Conclusion and scope (exact teal conclusion card from generate_pdf.py)
-    short_sha = sha[:7]
-    conclusion_lead = cert_summary.get("why") or reason_text
-    con_items: list[tuple[str, str]] = [
-        (
-            f"Outcome: {esc(status_text)} (commit {esc(short_sha)})",
-            _inline_code(conclusion_lead),
+    # Section: Scope and Limitations (matches generate_pdf.py)
+    cert_block = report.get("certificate") or {}
+    lim_items = cert_block.get("limitations") or []
+    disclaimer = (cert_block.get("scope") or {}).get("disclaimer", "")
+    lim_els: list = [
+        Paragraph(
+            "Concerns reproducible execution only; no claim of genotype accuracy, "
+            "concordance, forensic casework suitability, or regulatory validation.",
+            gp.ST["body"],
         ),
+        gp.vspace(2),
     ]
-    disclaimer = ((report.get("certificate") or {}).get("scope") or {}).get("disclaimer", "")
+    for item in lim_items:
+        lim_els.append(Paragraph(
+            f'<font color="#9ca3af">–</font>  {esc(item)}',
+            gp.S("mlim", fontSize=8.5, textColor=gp.GRAY, leading=13.5, leftIndent=10, spaceAfter=1.5),
+        ))
     if disclaimer:
-        con_items.append(("Reproducibility & scope", esc(disclaimer)))
+        lim_els.extend([gp.vspace(2), Paragraph(esc(disclaimer), gp.ST["body"])])
+    story.append(KeepTogether([
+        gp.section_num(str(sec), "Scope and Limitations"),
+        gp.boxed(lim_els, pad=10),
+    ]))
+    sec += 1
+
+    # Section: Conclusion (exact teal conclusion card from generate_pdf.py)
+    raw_con = cert_block.get("conclusion") or []
+    con_items: list[tuple[str, str]] = [
+        (esc(c.get("title", "")), _inline_code(c.get("body", "")))
+        for c in raw_con
+        if isinstance(c, dict) and c.get("title") and c.get("body")
+    ]
+    if not con_items:
+        short_sha = sha[:7]
+        conclusion_lead = cert_summary.get("why") or reason_text
+        con_items = [(f"Outcome: {esc(status_text)} (commit {esc(short_sha)})", _inline_code(conclusion_lead))]
 
     con_content = []
     for c_title, c_body in con_items:
@@ -913,6 +1016,84 @@ def record_manual_run(
         if notes.get(opt_key):
             prep_block[opt_key] = notes[opt_key]
 
+    display_ver = version or notes.get("version") or verified["sha"][:7]
+    tool_display = f"{tool_name} {display_ver}".strip()
+    manual_limitations = [
+        "Results apply exclusively to the exact Git commit SHA and manually prepared environment recorded in this report.",
+        "Single regional reference slice per input type; low-coverage warnings on sliced BAMs do not imply defects on whole-genome data.",
+        "Plausible Output checks verify structural format and recognizable STR loci, not biological genotype truth.",
+        "Verification is a point-in-time snapshot; upstream repository changes after this commit are not covered until re-verification.",
+        "No truth-set concordance, forensic casework validation, or regulatory compliance assessment was performed.",
+    ]
+
+    manual_conclusion: list[dict[str, str]] = []
+    if runs:
+        manual_conclusion.append({
+            "title": f"{tool_display} executes end-to-end",
+            "body": (
+                f"{tool_display} ran to completion without code modifications in the prepared environment "
+                f"at unmodified upstream commit {verified['sha'][:7]}."
+            ),
+        })
+    elif installs:
+        manual_conclusion.append({
+            "title": f"{tool_display} did not complete its run",
+            "body": (
+                f"Even after preparing the environment manually, unmodified upstream commit {verified['sha'][:7]} "
+                f"stopped during execution (exit {rc}). See Section 1 for the recorded terminal output."
+            ),
+        })
+    else:
+        manual_conclusion.append({
+            "title": f"{tool_display} did not install in the prepared environment",
+            "body": f"Installation of unmodified upstream commit {verified['sha'][:7]} failed before execution could start.",
+        })
+
+    if content_passed:
+        c_stats_rec = ((content_detail or {}).get("outputs") or [{}])[0].get("stats") or {}
+        n_loci = c_stats_rec.get("distinct_str_loci", c_stats_rec.get("distinct_loci", 0))
+        out_fmt = str(((io_detail or {}).get("outputs") or [{}])[0].get("format") or "").upper()
+        fmt_str = f"{out_fmt} " if out_fmt else ""
+        manual_conclusion.append({
+            "title": "Output passes plausibility checks",
+            "body": (
+                f"The run produced a structurally valid, non-empty {fmt_str}output containing {n_loci} "
+                "distinct recognizable STR loci; structural plausibility checks verify output format and "
+                "locus presence, not genotype accuracy."
+            ),
+        })
+    elif io_passed:
+        manual_conclusion.append({
+            "title": "Output file produced; plausibility check not passed",
+            "body": "A non-empty output file was written, but it did not pass the STR plausibility check.",
+        })
+    else:
+        manual_conclusion.append({
+            "title": "No expected output produced",
+            "body": "No validated output file was produced because execution did not complete.",
+        })
+
+    if dataset_type:
+        manual_conclusion.append({
+            "title": "Verification used STRhub reference data",
+            "body": f"Verification used open-access STRhub reference dataset {dataset_label} ({dataset_type}).",
+        })
+
+    fix_note_rec = prep_block.get("proposed_fix_note") or prep_block.get("fork_note")
+    if fix_note_rec:
+        manual_conclusion.append({
+            "title": "Proposed fix / temporary workaround",
+            "body": str(fix_note_rec),
+        })
+
+    manual_conclusion.append({
+        "title": "Repeatability of this manual run",
+        "body": (
+            "The pinned upstream commit, prepared environment description, exact commands executed, "
+            "and sanitized terminal output recorded in this report document the procedure for independent reproduction."
+        ),
+    })
+
     generated = dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")
     report: dict = {
         "schema": "strhub-verified/1",
@@ -921,7 +1102,7 @@ def record_manual_run(
         "generated": generated,
         "tool": {
             "name": tool_name,
-            "version": version or notes.get("version") or verified["sha"][:7],
+            "version": display_ver,
             "contact": f"{verified['repo_display']}/issues",
         },
         "source": {
@@ -965,9 +1146,9 @@ def record_manual_run(
                 "scope": "Reproducible execution only; does not evaluate genotype concordance or forensic casework fitness.",
                 "not_evaluated": ["Genotype accuracy", "Concordance against truth", "Forensic casework fitness"],
             },
-            "conclusion": [{"title": "Manual verification finding", "body": reason}],
+            "conclusion": manual_conclusion,
             "out_of_scope": ["Genotype accuracy and concordance", "Forensic casework accreditation"],
-            "limitations": [],
+            "limitations": manual_limitations,
             "scope": {
                 "statement": "This report records a manual execution against the pinned upstream commit.",
                 "not": "It does not establish genotype accuracy or forensic casework fitness.",

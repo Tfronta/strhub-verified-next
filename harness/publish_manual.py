@@ -117,6 +117,7 @@ def main(argv: list[str] | None = None) -> int:
         )
         subprocess.run(["git", "-C", str(tmp), "push", "origin", "gh-pages"], check=True)
         print(f"Published {done['folder']} to gh-pages.")
+        print(f"Web URL: https://strhub.app/verified/{args.slug}?at={done['sha'][:7]}&recipe=curated")
         return 0
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
