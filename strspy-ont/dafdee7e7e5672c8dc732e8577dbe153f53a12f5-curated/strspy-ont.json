@@ -2,7 +2,7 @@
   "schema": "strhub-verified/1",
   "instrument": "curated",
   "mode": "publish",
-  "generated": "2026-11-23T14:07:59+00:00",
+  "generated": "2026-11-23T14:10:20+00:00",
   "tool": {
     "name": "STRspy",
     "version": "v2.0",
@@ -12,7 +12,7 @@
     "repo": "https://github.com/unique379r/strspy",
     "ref": "dafdee7e7e5672c8dc732e8577dbe153f53a12f5",
     "ref_resolved": "dafdee7e7e5672c8dc732e8577dbe153f53a12f5",
-    "committed": "2026-05-04T14:47:38-05:00"
+    "committed": "2026-05-04T19:47:38Z"
   },
   "environment": {
     "os": [

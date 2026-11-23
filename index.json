@@ -1,6 +1,6 @@
 {
   "schema": "strhub-verified/index/3",
-  "generated": "2026-11-23T14:08:56+00:00",
+  "generated": "2026-11-23T14:10:22+00:00",
   "count": 23,
   "tools": [
     {
@@ -788,28 +788,12 @@
           "pdf": "strspy-ont/dafdee7e7e5672c8dc732e8577dbe153f53a12f5/strspy-ont.pdf"
         },
         {
-          "sha": "cbf650081e92f5d36eb7409d7208dbde425fdf95",
-          "instrument": "documented",
-          "version": "v1.1.1",
-          "variant": null,
-          "committed": "2021-06-14T19:06:23Z",
-          "generated": "2026-11-22T19:11:43+00:00",
-          "level": "available",
-          "label": "Could not be determined",
-          "verdict": "undetermined",
-          "errors_reported": false,
-          "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/45059310337",
-          "report": "strspy-ont/cbf650081e92f5d36eb7409d7208dbde425fdf95/strspy-ont.json",
-          "page": "strspy-ont/cbf650081e92f5d36eb7409d7208dbde425fdf95/strspy-ont.html",
-          "pdf": "strspy-ont/cbf650081e92f5d36eb7409d7208dbde425fdf95/strspy-ont.pdf"
-        },
-        {
           "sha": "dafdee7e7e5672c8dc732e8577dbe153f53a12f5",
           "instrument": "curated",
           "version": "v2.0",
           "variant": null,
-          "committed": "2026-05-04T14:47:38-05:00",
-          "generated": "2026-11-23T14:07:59+00:00",
+          "committed": "2026-05-04T19:47:38Z",
+          "generated": "2026-11-23T14:10:20+00:00",
           "level": "installs",
           "label": "Not verified as documented",
           "verdict": "fails",
