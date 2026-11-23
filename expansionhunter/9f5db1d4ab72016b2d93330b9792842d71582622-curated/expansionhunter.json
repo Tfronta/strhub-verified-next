@@ -2,7 +2,7 @@
   "schema": "strhub-verified/1",
   "instrument": "curated",
   "mode": "publish",
-  "generated": "2026-11-23T17:31:29+00:00",
+  "generated": "2026-11-23T17:58:19+00:00",
   "tool": {
     "name": "ExpansionHunter",
     "version": "v5.0.0",
@@ -96,15 +96,33 @@
     },
     "conclusion": [
       {
-        "title": "Manual verification finding",
-        "body": "Using the official precompiled ExpansionHunter v5.0.0 release binary documented in docs/02_Installation.md (lines 3-5) with zero modifications to upstream code, ExpansionHunter ran end-to-end on the GIAB NA12878 autosomal Illumina BAM slice (hg38) and genotyped all 24/24 forensic STR loci in the reference panel with PASS status."
+        "title": "ExpansionHunter v5.0.0 executes end-to-end",
+        "body": "ExpansionHunter v5.0.0 ran to completion without code modifications in the prepared environment at unmodified upstream commit 9f5db1d."
+      },
+      {
+        "title": "Output passes plausibility checks",
+        "body": "The run produced a structurally valid, non-empty VCF output containing 24 distinct recognizable STR loci; structural plausibility checks verify output format and locus presence, not genotype accuracy."
+      },
+      {
+        "title": "Verification used STRhub reference data",
+        "body": "Verification used open-access STRhub reference dataset Illumina BAM (hg38), NA12878 (autosomal, female) (illumina-bam-hg38)."
+      },
+      {
+        "title": "Repeatability of this manual run",
+        "body": "The pinned upstream commit, prepared environment description, exact commands executed, and sanitized terminal output recorded in this report document the procedure for independent reproduction."
       }
     ],
     "out_of_scope": [
       "Genotype accuracy and concordance",
       "Forensic casework accreditation"
     ],
-    "limitations": [],
+    "limitations": [
+      "Results apply exclusively to the exact Git commit SHA and manually prepared environment recorded in this report.",
+      "Single regional reference slice per input type; low-coverage warnings on sliced BAMs do not imply defects on whole-genome data.",
+      "Plausible Output checks verify structural format and recognizable STR loci, not biological genotype truth.",
+      "Verification is a point-in-time snapshot; upstream repository changes after this commit are not covered until re-verification.",
+      "No truth-set concordance, forensic casework validation, or regulatory compliance assessment was performed."
+    ],
     "scope": {
       "statement": "This report records a manual execution against the pinned upstream commit.",
       "not": "It does not establish genotype accuracy or forensic casework fitness.",
