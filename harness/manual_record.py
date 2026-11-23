@@ -320,7 +320,7 @@ def _inline_code(val: object) -> str:
     return _INLINE_CODE_RE.sub(r'<font name="Courier" size="8.5">\1</font>', escaped)
 
 
-def _wrap_pre(text: str, width: int = 100, max_lines: int | None = None) -> str:
+def _wrap_pre(text: str, width: int = 100, max_lines: int | None = None, *, drop_wrap_space: bool = False) -> str:
     """Normalize tabs, collapse excess blank lines, and wrap lines for ReportLab Preformatted."""
     raw = str(text or "").replace("\r\n", "\n").replace("\r", "\n").expandtabs(4)
     wrapped: list[str] = []
@@ -341,7 +341,7 @@ def _wrap_pre(text: str, width: int = 100, max_lines: int | None = None) -> str:
                 width=width,
                 expand_tabs=False,
                 replace_whitespace=False,
-                drop_whitespace=False,
+                drop_whitespace=drop_wrap_space,
                 break_long_words=True,
                 break_on_hyphens=False,
             )
@@ -361,240 +361,385 @@ def _wrap_pre(text: str, width: int = 100, max_lines: int | None = None) -> str:
 
 
 def _render_manual_pdf(report: dict, terminal_text: str, out_pdf: pathlib.Path) -> bool:
-    """Generate a streamlined 4-section Manual Verification PDF matching the web layout."""
+    """Generate a streamlined 4-section Manual Verification PDF matching STRhub's brand identity."""
     try:
         from reportlab.lib import colors
-        from reportlab.lib.pagesizes import A4
         from reportlab.lib.styles import ParagraphStyle
         from reportlab.lib.units import mm
         from reportlab.platypus import (
-            HRFlowable,
             KeepTogether,
+            PageBreak,
             Paragraph,
             Preformatted,
             SimpleDocTemplate,
-            Spacer,
             Table,
             TableStyle,
         )
+        import generate_pdf as gp
     except ImportError:
         return False
 
     passed = (report.get("verdict") or {}).get("code") == "runs"
-    accent = colors.HexColor("#4338ca") if passed else colors.HexColor("#b45309")
-    accent_bg = colors.HexColor("#eef2ff") if passed else colors.HexColor("#fffbeb")
-    accent_border = colors.HexColor("#c7d2fe") if passed else colors.HexColor("#fde68a")
-    ink = colors.HexColor("#1f2937")
-    muted = colors.HexColor("#4b5563")
-    border = colors.HexColor("#d1d5db")
-    teal = colors.HexColor("#0f766e")
+    tool_name = str(report["tool"].get("name", ""))
+    tool_ver = str(report["tool"].get("version") or "")
+    tool_display = f"{tool_name} {tool_ver}".strip()
+    ver_date = str(report.get("generated") or "")[:10]
 
-    doc = SimpleDocTemplate(
-        str(out_pdf),
-        pagesize=A4,
-        leftMargin=18 * mm,
-        rightMargin=18 * mm,
-        topMargin=18 * mm,
-        bottomMargin=18 * mm,
-        title=f"{report['tool'].get('name', '')} Manual Verification",
-    )
-
-    s_banner_l = ParagraphStyle("banner_l", fontName="Helvetica-Bold", fontSize=10, leading=13, textColor=accent)
-    s_banner_r = ParagraphStyle("banner_r", fontName="Helvetica", fontSize=8.5, leading=13, textColor=muted, alignment=2)
-    s_title = ParagraphStyle("title", fontName="Helvetica-Bold", fontSize=18, leading=22, textColor=ink, spaceBefore=6, spaceAfter=4)
-    s_badge = ParagraphStyle("badge", fontName="Helvetica-Bold", fontSize=10, textColor=accent, spaceAfter=8)
-    s_h2 = ParagraphStyle("h2", fontName="Helvetica-Bold", fontSize=11.5, textColor=teal, spaceBefore=12, spaceAfter=5)
-    s_body = ParagraphStyle("body", fontName="Helvetica", fontSize=9.5, leading=13.5, textColor=ink, spaceAfter=5)
-    s_muted = ParagraphStyle("muted", fontName="Helvetica", fontSize=8.5, leading=12, textColor=muted, spaceAfter=4)
-    s_label = ParagraphStyle("label", fontName="Helvetica-Bold", fontSize=8.5, textColor=muted)
-    s_val = ParagraphStyle("val", fontName="Helvetica", fontSize=8.5, leading=12, textColor=ink)
-    s_code = ParagraphStyle("code", fontName="Courier", fontSize=7.2, leading=9.8, textColor=colors.HexColor("#111827"))
-
-    def esc(val: object) -> str:
-        return html_lib.escape(str(val or ""))
-
-    def code_box(raw_text: str, *, max_lines: int | None = None) -> Table:
-        formatted = _wrap_pre(raw_text, width=100, max_lines=max_lines)
-        box = Table([[Preformatted(formatted, s_code)]], colWidths=[174 * mm])
-        box.setStyle(TableStyle([
-            ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#f9fafb")),
-            ("BOX", (0, 0), (-1, -1), 0.5, border),
-            ("LEFTPADDING", (0, 0), (-1, -1), 6),
-            ("RIGHTPADDING", (0, 0), (-1, -1), 6),
-            ("TOPPADDING", (0, 0), (-1, -1), 5),
-            ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
-        ]))
-        return box
+    source = report.get("source") or {}
+    repo = str(source.get("repo") or "").rstrip("/")
+    sha = str(source.get("ref_resolved") or source.get("ref") or "")
+    commit_url = f"{repo}/commit/{sha}" if repo.startswith("https://github.com/") and sha else repo
 
     gates = report.get("gates") or {}
     gates_passed = sum(1 for k in ("available", "installs", "runs", "io", "content") if gates.get(k))
     status_text = f"Manual · Verified ({gates_passed}/5)" if passed else f"Manual · Fails ({gates_passed}/5)"
-
-    story: list = []
-    banner = Table(
-        [[Paragraph("MANUAL VERIFICATION REPORT", s_banner_l), Paragraph("STRhub Verified", s_banner_r)]],
-        colWidths=[124 * mm, 50 * mm],
-    )
-    banner.setStyle(TableStyle([
-        ("BACKGROUND", (0, 0), (-1, -1), accent_bg),
-        ("BOX", (0, 0), (-1, -1), 0.6, accent_border),
-        ("LINEABOVE", (0, 0), (-1, 0), 2.2, accent),
-        ("LEFTPADDING", (0, 0), (-1, -1), 8),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 8),
-        ("TOPPADDING", (0, 0), (-1, -1), 6),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
-        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-    ]))
-    story.append(banner)
-    tool_name = report["tool"].get("name", "")
-    tool_ver = report["tool"].get("version") or ""
-    story.append(Paragraph(f"{esc(tool_name)} {esc(tool_ver)}".strip(), s_title))
-    story.append(Paragraph(esc(status_text), s_badge))
+    res_color = "#00909c" if passed else "#ef4444"
+    level_label = LEVEL_LABELS.get(str(report.get("level") or ""), "Not run")
 
     cert_summary = (report.get("certificate") or {}).get("summary") or {}
     prep = report.get("preparation") or {}
     ds = (report.get("datasets") or [{}])[0]
+    dataset_type = str(ds.get("type") or prep.get("dataset") or "")
+    panel_label = gp.PANEL_MAP.get(dataset_type, "")
 
-    cover_rows = [
-        [Paragraph("VERIFICATION DATE", s_label), Paragraph(esc((report.get("generated") or "")[:10]), s_val)],
-        [Paragraph("REPOSITORY", s_label), Paragraph(esc((report.get("source") or {}).get("repo", "")), s_val)],
-        [Paragraph("PINNED COMMIT", s_label), Paragraph(f'<font name="Courier" size="8">{esc((report.get("source") or {}).get("ref_resolved", ""))}</font>', s_val)],
-        [Paragraph("MODE", s_label), Paragraph("Manual verification (unmodified upstream code in prepared environment)", s_val)],
-        [Paragraph("ENVIRONMENT", s_label), Paragraph(_inline_code(prep.get("base", "")), s_val)],
+    def esc(val: object) -> str:
+        return html_lib.escape(str(val or ""))
+
+    s_term = ParagraphStyle(
+        "manual_term",
+        fontName="Courier",
+        fontSize=6.8,
+        leading=9.2,
+        textColor=colors.HexColor("#e2e8f0"),
+    )
+    s_cmd = ParagraphStyle(
+        "manual_cmd",
+        fontName="Courier",
+        fontSize=7.4,
+        leading=10.5,
+        textColor=gp.INK,
+    )
+
+    def dark_terminal_box(raw_text: str, *, max_lines: int = 68) -> Table:
+        formatted = _wrap_pre(raw_text, width=96, max_lines=max_lines)
+        box = Table([[Preformatted(formatted, s_term)]], colWidths=[gp.CW])
+        box.setStyle(TableStyle([
+            ("BACKGROUND",    (0, 0), (-1, -1), colors.HexColor("#0f172a")),
+            ("BOX",           (0, 0), (-1, -1), 0.5, colors.HexColor("#334155")),
+            ("TOPPADDING",    (0, 0), (-1, -1), 8),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
+            ("LEFTPADDING",   (0, 0), (-1, -1), 10),
+            ("RIGHTPADDING",  (0, 0), (-1, -1), 10),
+        ]))
+        return box
+
+    def light_cmd_box(raw_text: str) -> Table:
+        formatted = _wrap_pre(raw_text, width=90, drop_wrap_space=True)
+        box = Table([[Preformatted(formatted, s_cmd)]], colWidths=[gp.CW])
+        box.setStyle(TableStyle([
+            ("BACKGROUND",    (0, 0), (-1, -1), gp.GRAY_LIGHT),
+            ("BOX",           (0, 0), (-1, -1), 0.5, gp.BORDER),
+            ("TOPPADDING",    (0, 0), (-1, -1), 8),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
+            ("LEFTPADDING",   (0, 0), (-1, -1), 12),
+            ("RIGHTPADDING",  (0, 0), (-1, -1), 12),
+        ]))
+        return box
+
+    def build_manual_header_inner() -> Table:
+        logo_h = 25
+        logo_img = gp.logo_image(logo_h)
+        logo_w = logo_img.drawWidth
+        title = Paragraph(
+            '<font name="Helvetica-Bold" size="11" color="#3d3d3d">STRhub</font>'
+            '<font name="Helvetica" size="11" color="#00909c"> Verified</font>',
+            gp.S("miht", leading=14),
+        )
+        sub = Paragraph(
+            f"{esc(tool_display)}  ·  Manual Verification Report  ·  {esc(ver_date)}",
+            gp.S("mihs", fontSize=7.5, textColor=gp.GRAY, leading=11),
+        )
+        text_w = gp.CW - logo_w
+        right = Table([[title], [sub]], colWidths=[text_w - gp.LOGO_TEXT_GAP_INNER])
+        right.setStyle(TableStyle([
+            ("VALIGN",        (0, 0), (-1, -1), "MIDDLE"),
+            ("LEFTPADDING",   (0, 0), (-1, -1), 0),
+            ("TOPPADDING",    (0, 0), (-1, -1), 1),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 1),
+        ]))
+        outer = Table([[logo_img, right]], colWidths=[logo_w, text_w])
+        outer.setStyle(TableStyle([
+            ("VALIGN",        (0, 0), (-1, -1), "MIDDLE"),
+            ("LEFTPADDING",   (0, 0), (0, -1),  0),
+            ("LEFTPADDING",   (1, 0), (1, -1),  gp.LOGO_TEXT_GAP_INNER),
+            ("RIGHTPADDING",  (0, 0), (-1, -1), 0),
+            ("TOPPADDING",    (0, 0), (-1, -1), 0),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
+        ]))
+        return outer
+
+    story: list = []
+
+    # ── Page 1: Cover (exact STRhub Verified visual identity) ────────────────
+    story.append(gp.build_header_cover())
+    story.append(gp.HR(gp.TEAL, thickness=1.5, spaceB=10, spaceA=14))
+
+    story.append(Paragraph("Manual Verification Report", gp.ST["report_title"]))
+    story.append(gp.vspace(2))
+    story.append(Paragraph(esc(tool_name), gp.ST["tool_name"]))
+    if tool_ver:
+        story.append(Paragraph(f"Version {esc(tool_ver)}", gp.ST["tool_sub"]))
+    if panel_label:
+        story.append(Paragraph(esc(panel_label), gp.ST["tool_sub"]))
+    story.append(gp.vspace(5))
+    story.append(gp.HR(spaceB=4, spaceA=10))
+
+    meta_rows: list[tuple[str, str]] = [
+        ("Verification date", esc(ver_date)),
+        ("Repository", gp.link(repo, esc(repo)) if repo else "-"),
+        ("Repository commit", gp.link(commit_url, esc(sha)) if sha else "-"),
+        ("Mode", "Manual verification (unmodified upstream code in prepared environment)"),
+        ("Result", f'<font color="{res_color}"><b>{esc(status_text)}</b></font>'),
+        ("Reached", f"{esc(level_label)}, {gates_passed}/5 gates passed"),
     ]
+    if prep.get("base"):
+        meta_rows.append(("Environment", _inline_code(prep["base"])))
     if ds.get("dataset"):
-        cover_rows.append([Paragraph("DATASET", s_label), Paragraph(esc(ds["dataset"]), s_val)])
+        meta_rows.append(("Dataset", esc(ds["dataset"])))
     if cert_summary.get("why"):
-        cover_rows.append([Paragraph("WHY", s_label), Paragraph(_inline_code(cert_summary["why"]), s_val)])
+        meta_rows.append(("Why", _inline_code(cert_summary["why"])))
+    meta_rows.append(("STRhub", gp.link("https://strhub.app")))
 
-    t_cover = Table(cover_rows, colWidths=[38 * mm, 136 * mm])
-    t_cover.setStyle(TableStyle([
-        ("VALIGN", (0, 0), (-1, -1), "TOP"),
-        ("TOPPADDING", (0, 0), (-1, -1), 4),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
-        ("LINEBELOW", (0, 0), (-1, -1), 0.4, border),
-        ("BACKGROUND", (0, 0), (-1, 0), accent_bg),
+    story.append(gp.kv_table(meta_rows))
+    story.append(gp.HR(spaceB=8, spaceA=8))
+
+    story.append(gp.section_title("SCOPE OF THIS REPORT"))
+    story.append(gp.vspace(1))
+    scope_text = (
+        "Independent manual verification of reproducible execution on the tool's unmodified public "
+        "repository at the pinned commit. It confirms whether the software installs, runs end-to-end, "
+        "and produces structurally valid output after preparing the required environment.<br/><br/>"
+        "This is <b>not</b> an analytical validation. Genotype accuracy, concordance, forensic "
+        "suitability, and regulatory compliance are out of scope."
+    )
+    story.append(gp.boxed([Paragraph(scope_text, gp.ST["body"])], pad=10))
+    story.append(gp.vspace(3))
+
+    def col_block(items: list[str], title_col, label: str) -> list:
+        dash_hex = f"#{gp.GRAY.hexval()[2:]}"
+        out = [Paragraph(label, gp.S(
+            "mbl", fontName="Helvetica-Bold", fontSize=8,
+            textColor=title_col, leading=12, spaceAfter=5,
+        ))]
+        for item in items:
+            out.append(Paragraph(
+                f'<font color="{dash_hex}">–</font>  {item}',
+                gp.S("mbi", fontSize=8.5, textColor=gp.INK, leading=13.5, leftIndent=8, spaceAfter=2),
+            ))
+        return out
+
+    stages = gp.stage_states(gates, execution_established=True)
+    status_colors = {"PASS": "#00909c", "FAIL": "#dc2626", "NOT ATTEMPTED": "#6b7280"}
+    status_items = [
+        f'{st["label"]}: <font color="{status_colors.get(st["status"], "#6b7280")}"><b>{st["status"]}</b></font>'
+        for st in stages
+    ]
+    v_col = col_block(status_items, gp.TEAL, "VERIFICATION STATUS")
+    nv_col = col_block(list(gp.NOT_EVALUATED), gp.GRAY, "NOT EVALUATED")
+
+    half = gp.CW / 2
+    verify_tbl = Table([[v_col, nv_col]], colWidths=[half, half])
+    verify_tbl.setStyle(TableStyle([
+        ("VALIGN",        (0, 0), (-1, -1), "TOP"),
+        ("BACKGROUND",    (0, 0), (0, 0),   gp.TEAL_LIGHT),
+        ("BACKGROUND",    (1, 0), (1, 0),   gp.GRAY_LIGHT),
+        ("BOX",           (0, 0), (0, 0),   0.5, gp.TEAL_MID),
+        ("BOX",           (1, 0), (1, 0),   0.5, gp.BORDER),
+        ("TOPPADDING",    (0, 0), (-1, -1), 10),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 10),
+        ("LEFTPADDING",   (0, 0), (-1, -1), 14),
+        ("RIGHTPADDING",  (0, 0), (-1, -1), 14),
     ]))
-    story.append(t_cover)
-    story.append(Spacer(1, 4 * mm))
+    story.append(verify_tbl)
+    story.append(PageBreak())
+
+    # ── Page 2+: Compact Inner Header + 4 Streamlined Sections ───────────────
+    story.append(build_manual_header_inner())
+    story.append(gp.HR(gp.TEAL, thickness=1.2, spaceB=4, spaceA=8))
 
     # Section 1: Execution on unmodified upstream code + Gates + Terminal
-    sec1_head: list = [
-        Paragraph("1. Execution on unmodified upstream code", s_h2),
-        HRFlowable(width="100%", thickness=0.6, color=teal, spaceAfter=4),
-    ]
+    story.append(gp.section_num("1", "Execution on Unmodified Upstream Code"))
+    sec1_box_els: list = []
     if prep.get("without_preparation"):
-        sec1_head.append(Paragraph(f"<b>Why manual verification was used:</b> {_inline_code(prep['without_preparation'])}", s_body))
-    sec1_head.append(Paragraph(_inline_code((report.get("verdict") or {}).get("reason", "")), s_body))
-    story.append(KeepTogether(sec1_head))
+        sec1_box_els.append(Paragraph(
+            f"<b>Why manual verification was used:</b> {_inline_code(prep['without_preparation'])}",
+            gp.ST["body"],
+        ))
+        sec1_box_els.append(gp.vspace(2))
+    reason_text = (report.get("verdict") or {}).get("reason", "")
+    if reason_text:
+        sec1_box_els.append(Paragraph(_inline_code(reason_text), gp.ST["body"]))
+    if sec1_box_els:
+        story.append(gp.boxed(sec1_box_els, pad=10))
+        story.append(gp.vspace(3))
 
-    gate_names = [
-        ("Available", gates.get("available")),
-        ("Installs", gates.get("installs")),
-        ("Runs", gates.get("runs")),
-        ("Expected IO", gates.get("io")),
-        ("Plausible output", gates.get("content")),
-    ]
-    stopped_seen = False
-    gate_rows = [[Paragraph("GATE", s_label), Paragraph("RESULT", s_label)]]
-    for gname, gval in gate_names:
-        if gval:
-            st = "PASS"
-        elif not stopped_seen:
-            st = "FAIL (stopped here)"
-            stopped_seen = True
+    # Gates ladder table matching generate_pdf.py
+    gdata = []
+    stopped_found = False
+    for key, gate_name, gate_desc in gp.GATE_DISPLAY:
+        ok = bool(gates.get(key, False))
+        if ok:
+            st = "pass"
+            desc_text = gate_desc
+        elif not stopped_found:
+            st = "stopped"
+            stopped_found = True
+            desc_text = f'{gate_desc} &nbsp; <font color="#ef4444"><b>The run stopped here.</b></font>'
         else:
-            st = "NOT REACHED"
-        gate_rows.append([Paragraph(esc(gname), s_val), Paragraph(esc(st), s_val)])
-    t_gates = Table(gate_rows, colWidths=[60 * mm, 114 * mm])
-    t_gates.setStyle(TableStyle([
-        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-        ("TOPPADDING", (0, 0), (-1, -1), 3),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
-        ("LINEBELOW", (0, 0), (-1, -1), 0.4, border),
-        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#f3f4f6")),
+            st = "na"
+            desc_text = f'{gate_desc} &nbsp; <font color="#9ca3af"><i>Not attempted, because the run had already stopped.</i></font>'
+        gdata.append([
+            Paragraph(gate_name, gp.ST["gate_name"]),
+            Paragraph(desc_text, gp.ST["gate_desc"]),
+            gp.pass_badge(st),
+        ])
+    gt = Table(gdata, colWidths=[46 * mm, gp.CW - 46 * mm - 18 * mm, 18 * mm])
+    gt.setStyle(TableStyle([
+        ("VALIGN",        (0, 0), (-1, -1), "MIDDLE"),
+        ("LEFTPADDING",   (0, 0), (-1, -1), 10),
+        ("RIGHTPADDING",  (0, 0), (-1, -1), 8),
+        ("TOPPADDING",    (0, 0), (-1, -1), 6),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+        ("ROWBACKGROUNDS", (0, 0), (-1, -1), [gp.WHITE, gp.GRAY_LIGHT]),
+        ("LINEBELOW",     (0, 0), (-1, -2), 0.3, gp.BORDER),
+        ("BOX",           (0, 0), (-1, -1), 0.5, gp.BORDER),
     ]))
-    story.append(t_gates)
-    story.append(Spacer(1, 3 * mm))
+    story.append(gt)
+    story.append(gp.vspace(4))
 
-    # Sanitized terminal excerpt (tabs expanded, lines wrapped, head+tail preserved)
-    story.append(code_box(terminal_text, max_lines=68))
+    story.append(KeepTogether([
+        Paragraph("<b>Recorded terminal output</b>", gp.ST["tbl_cell"]),
+        gp.vspace(2),
+        dark_terminal_box(terminal_text, max_lines=68),
+    ]))
 
-    # Section 2: Step-by-step setup / Proposed fix
+    # Section 2: Step-by-step setup and proposed fix
+    sec = 2
     has_steps = bool(prep.get("steps") or prep.get("run_cmd") or prep.get("pr_url") or prep.get("fork_url"))
     if has_steps:
-        sec2_lead: list = [
-            Paragraph("2. Step-by-step setup and proposed fix", s_h2),
-            HRFlowable(width="100%", thickness=0.6, color=teal, spaceAfter=4),
-        ]
+        sec2_lead: list = [gp.section_num(str(sec), "Step-by-Step Setup and Proposed Fix")]
+        sec += 1
         if not passed:
             sec2_lead.append(Paragraph(
                 "<b>Proposed fix / temporary workaround (requires code changes):</b> "
-                "Shared as a suggestion for the author and temporary reference for users; "
-                "does not mark the official commit as passing.",
-                s_muted,
+                "Shared as a suggestion for the author and temporary reference for users. "
+                "It does not mark the official upstream commit as passing.",
+                gp.ST["body"],
             ))
+            sec2_lead.append(gp.vspace(2))
         if prep.get("steps"):
-            sec2_lead.extend([
-                Paragraph("<b>Preparation commands:</b>", s_body),
-                code_box("\n".join(prep["steps"])),
-                Spacer(1, 2.5 * mm),
-            ])
+            sec2_lead.append(Paragraph("<b>Preparation commands</b>", gp.ST["tbl_cell"]))
+            sec2_lead.append(gp.vspace(1.5))
+            sec2_lead.append(light_cmd_box("\n".join(prep["steps"])))
+            sec2_lead.append(gp.vspace(3))
             story.append(KeepTogether(sec2_lead))
         elif prep.get("run_cmd"):
-            sec2_lead.extend([
-                Paragraph("<b>Verified run command:</b>", s_body),
-                code_box(str(prep["run_cmd"])),
-                Spacer(1, 2.5 * mm),
-            ])
+            sec2_lead.append(Paragraph("<b>Verified run command</b>", gp.ST["tbl_cell"]))
+            sec2_lead.append(gp.vspace(1.5))
+            sec2_lead.append(light_cmd_box(str(prep["run_cmd"])))
+            sec2_lead.append(gp.vspace(3))
             story.append(KeepTogether(sec2_lead))
         else:
             story.append(KeepTogether(sec2_lead))
 
         if prep.get("steps") and prep.get("run_cmd"):
             story.append(KeepTogether([
-                Paragraph("<b>Verified run command:</b>", s_body),
-                code_box(str(prep["run_cmd"])),
-                Spacer(1, 2.5 * mm),
+                Paragraph("<b>Verified run command</b>", gp.ST["tbl_cell"]),
+                gp.vspace(1.5),
+                light_cmd_box(str(prep["run_cmd"])),
+                gp.vspace(3),
             ]))
-        links_block: list = []
+
+        links_els: list = []
         if prep.get("pr_url"):
-            links_block.append(Paragraph(f"<b>Proposed PR:</b> {esc(prep['pr_url'])}", s_body))
+            links_els.append(Paragraph(
+                f"<b>Proposed fix (PR):</b> {gp.link(prep['pr_url'], esc(prep['pr_url']))}",
+                gp.ST["tbl_cell"],
+            ))
         if prep.get("fork_url"):
-            links_block.append(Paragraph(f"<b>Suggested fix (fork):</b> {esc(prep['fork_url'])}", s_body))
+            links_els.append(Paragraph(
+                f"<b>Suggested fix (fork):</b> {gp.link(prep['fork_url'], esc(prep['fork_url']))}",
+                gp.ST["tbl_cell"],
+            ))
         fix_note = prep.get("proposed_fix_note") or prep.get("fork_note")
         if fix_note:
-            links_block.append(Paragraph(_inline_code(fix_note), s_body))
-        if links_block:
-            story.append(KeepTogether(links_block))
+            if links_els:
+                links_els.append(gp.vspace(2))
+            links_els.append(Paragraph(_inline_code(fix_note), gp.ST["body"]))
+        if links_els:
+            story.append(KeepTogether([gp.boxed(links_els, pad=10)]))
 
     # Section 3: Suggestions for the author
     recs = report.get("recommendations") or []
     if recs:
-        sec3_first = [
-            Paragraph("3. Suggestions for the author", s_h2),
-            HRFlowable(width="100%", thickness=0.6, color=teal, spaceAfter=4),
-            Paragraph(f"&bull; {_inline_code(recs[0])}", s_body),
+        rec_els = [
+            Paragraph(
+                f'<font color="#9ca3af">–</font>  {_inline_code(item)}',
+                gp.S("mrec", fontSize=8.5, textColor=gp.INK, leading=13.5, leftIndent=10, spaceAfter=3),
+            )
+            for item in recs
         ]
-        story.append(KeepTogether(sec3_first))
-        for item in recs[1:]:
-            story.append(Paragraph(f"&bull; {_inline_code(item)}", s_body))
+        story.append(KeepTogether([
+            gp.section_num(str(sec), "Suggestions for the Author"),
+            gp.boxed(rec_els, pad=10),
+        ]))
+        sec += 1
 
-    # Section 4: Conclusion and scope (concise executive takeaway, no verbatim repeat of Section 1)
-    short_sha = ((report.get("source") or {}).get("ref_resolved") or "")[:7]
-    conclusion_lead = cert_summary.get("why") or (report.get("verdict") or {}).get("reason", "")
-    sec4: list = [
-        Paragraph("4. Conclusion and scope", s_h2),
-        HRFlowable(width="100%", thickness=0.6, color=teal, spaceAfter=4),
-        Paragraph(f"<b>Outcome:</b> {esc(status_text)} on unmodified upstream commit <font name=\"Courier\" size=\"8.5\">{esc(short_sha)}</font>.", s_body),
-        Paragraph(_inline_code(conclusion_lead), s_body),
+    # Section 4: Conclusion and scope (exact teal conclusion card from generate_pdf.py)
+    short_sha = sha[:7]
+    conclusion_lead = cert_summary.get("why") or reason_text
+    con_items: list[tuple[str, str]] = [
+        (
+            f"Outcome: {esc(status_text)} (commit {esc(short_sha)})",
+            _inline_code(conclusion_lead),
+        ),
     ]
     disclaimer = ((report.get("certificate") or {}).get("scope") or {}).get("disclaimer", "")
     if disclaimer:
-        sec4.append(Paragraph(esc(disclaimer), s_muted))
-    story.append(KeepTogether(sec4))
+        con_items.append(("Reproducibility & scope", esc(disclaimer)))
 
-    doc.build(story)
+    con_content = []
+    for c_title, c_body in con_items:
+        con_content.append(Paragraph(
+            f'<font color="#00909c">◆</font>  <b>{c_title}</b>',
+            gp.S("mct", fontSize=9, textColor=gp.INK, leading=14, fontName="Helvetica-Bold", spaceAfter=2),
+        ))
+        con_content.append(Paragraph(
+            c_body,
+            gp.S("mcb", fontSize=8.5, textColor=gp.GRAY, leading=13, leftIndent=14, spaceAfter=6),
+        ))
+    con_box = Table([[con_content]], colWidths=[gp.CW])
+    con_box.setStyle(TableStyle([
+        ("BACKGROUND",    (0, 0), (-1, -1), gp.TEAL_LIGHT),
+        ("BOX",           (0, 0), (-1, -1), 0.8, gp.TEAL_MID),
+        ("TOPPADDING",    (0, 0), (-1, -1), 12),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 12),
+        ("LEFTPADDING",   (0, 0), (-1, -1), 14),
+        ("RIGHTPADDING",  (0, 0), (-1, -1), 14),
+    ]))
+    story.append(KeepTogether([gp.section_num(str(sec), "Conclusion"), con_box]))
+
+    canvas_cfg = {"tool_display": tool_display, "ver_date": ver_date}
+    doc = SimpleDocTemplate(
+        str(out_pdf),
+        pagesize=gp.A4,
+        leftMargin=gp.ML,
+        rightMargin=gp.MR,
+        topMargin=gp.MT,
+        bottomMargin=gp.MB,
+        title=f"{tool_display} · STRhub Manual Verification",
+    )
+    doc.build(story, canvasmaker=gp._make_canvas_class(canvas_cfg))
     return out_pdf.is_file()
 
 
