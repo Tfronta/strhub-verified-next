@@ -2,7 +2,7 @@
   "schema": "strhub-verified/1",
   "instrument": "curated",
   "mode": "publish",
-  "generated": "2026-11-23T17:58:19+00:00",
+  "generated": "2026-11-23T18:28:09+00:00",
   "tool": {
     "name": "STRspy",
     "version": "v2.0",
@@ -37,19 +37,19 @@
     "files": [
       {
         "path": "STRspy_run_v2.0_Args.sh & src/STRspy_Normal_v2.0_Args.sh",
-        "replaces": "fixes src/ path check on lines 180/193, accepts single-file -i BAM input, auto-creates -o directory, and outputs STR locus names instead of GenBank accessions"
+        "replaces": "fixes `src/` path check on lines 180/193, accepts single-file `-i` BAM input, auto-creates `-o` directory, and outputs STR locus names instead of GenBank accessions"
       },
       {
         "path": "setup/STRspy_2.0_env.yml",
-        "replaces": "pins python>=3.9 and samtools>=1.12 to avoid broken OpenSSL 1.0 samtools build"
+        "replaces": "pins `python>=3.9` and `samtools>=1.12` to avoid broken OpenSSL 1.0 samtools build"
       }
     ],
     "fork_url": "https://github.com/Tfronta/strspy",
-    "proposed_fix_note": "With these targeted fixes applied in the suggested fork (Tfronta/strspy, commit 14d5494), automated verification in GitHub Actions (run 44934862541) passed all 5/5 gates and genotyped 22 forensic STR loci on the 1000 Genomes ONT hg38 CODIS reference slice. The official upstream commit (dafdee7) remains marked Manual \u00b7 Fails until updated upstream."
+    "proposed_fix_note": "With these targeted fixes applied in the suggested fork (Tfronta/strspy, commit `14d5494`), automated verification in GitHub Actions (run 44934862541) passed all 5/5 gates and genotyped 22 forensic STR loci on the 1000 Genomes ONT hg38 CODIS reference slice. The official upstream commit (`dafdee7`) remains marked Manual \u00b7 Fails until updated upstream."
   },
   "recommendations": [
-    "Fix lines 180 and 193 in STRspy_run_v2.0_Args.sh to check `[[ -f \"src/STRspy_Normal_v2.0_Args.sh\" ]]` (and `src/STRspy_Parallel_v2.0_Args.sh`) matching the `bash src/...` invocation below them.",
-    "Update README.md line 120 to include the required getopts flags (`bash ./STRspy_run_v2.0_Args.sh -i config/InputConfig.txt -t config/UserToolsConfig.txt -j normal`) and align `THREAD` vs `THREADS` in config/InputConfig.txt.",
+    "Fix lines 180 and 193 in `STRspy_run_v2.0_Args.sh` to check `[[ -f \"src/STRspy_Normal_v2.0_Args.sh\" ]]` (and `src/STRspy_Parallel_v2.0_Args.sh`) matching the `bash src/...` invocation below them.",
+    "Update `README.md` line 120 to include the required getopts flags (`bash ./STRspy_run_v2.0_Args.sh -i config/InputConfig.txt -t config/UserToolsConfig.txt -j normal`) and align `THREAD` vs `THREADS` in `config/InputConfig.txt`.",
     "Pin `python>=3.9` and `samtools>=1.12` in `setup/STRspy_2.0_env.yml` so clean Linux environments do not pull a legacy OpenSSL 1.0 samtools binary.",
     "Tag a GitHub release for STRspy v2.0 on the default branch so users and automated evaluators resolve v2.0 by default instead of v1.1.1 (2021)."
   ],
@@ -65,7 +65,7 @@
     "code": "fails",
     "title": "Fails in manual verification",
     "basis": "gates",
-    "reason": "Even after creating the Conda environment, generating config/UserToolsConfig.txt, and supplying the -i and -t flags omitted by README line 120, the unmodified upstream wrapper STRspy_run_v2.0_Args.sh fails immediately with exit code 1: lines 180 and 193 check `if [[ -f \"STRspy_Normal_v2.0_Args.sh\" ]]` in the repository root even though the script lives under `src/STRspy_Normal_v2.0_Args.sh` (which line 199 then invokes). Because the file check and invocation path disagree, the wrapper exits with `please make sure you are in the same directory of STRspy` from any working directory.",
+    "reason": "Even after creating the Conda environment, generating `config/UserToolsConfig.txt`, and supplying the `-i` and `-t` flags omitted by README line 120, the unmodified upstream wrapper `STRspy_run_v2.0_Args.sh` fails immediately with exit code 1: lines 180 and 193 check `if [[ -f \"STRspy_Normal_v2.0_Args.sh\" ]]` in the repository root even though the script lives under `src/STRspy_Normal_v2.0_Args.sh` (which line 199 then invokes). Because the file check and invocation path disagree, the wrapper exits with `please make sure you are in the same directory of STRspy` from any working directory.",
     "readme_gaps": []
   },
   "run": {
@@ -97,9 +97,9 @@
     "reached": "Installs",
     "summary": {
       "purpose": "Independent manual verification of reproducible execution on unmodified upstream source.",
-      "result": "Even after creating the Conda environment, generating config/UserToolsConfig.txt, and supplying the -i and -t flags omitted by README line 120, the unmodified upstream wrapper STRspy_run_v2.0_Args.sh fails immediately with exit code 1: lines 180 and 193 check `if [[ -f \"STRspy_Normal_v2.0_Args.sh\" ]]` in the repository root even though the script lives under `src/STRspy_Normal_v2.0_Args.sh` (which line 199 then invokes). Because the file check and invocation path disagree, the wrapper exits with `please make sure you are in the same directory of STRspy` from any working directory.",
+      "result": "Even after creating the Conda environment, generating `config/UserToolsConfig.txt`, and supplying the `-i` and `-t` flags omitted by README line 120, the unmodified upstream wrapper `STRspy_run_v2.0_Args.sh` fails immediately with exit code 1: lines 180 and 193 check `if [[ -f \"STRspy_Normal_v2.0_Args.sh\" ]]` in the repository root even though the script lives under `src/STRspy_Normal_v2.0_Args.sh` (which line 199 then invokes). Because the file check and invocation path disagree, the wrapper exits with `please make sure you are in the same directory of STRspy` from any working directory.",
       "reached": "Installs",
-      "why": "Automated verification could not run because the repository's installation instructions require an interactive Miniconda installer. In manual verification, the unmodified software failed to run due to a path bug in its own wrapper script (see Section 1 for details and Section 2 for the proposed fix).",
+      "why": "Automated verification could not run because the repository's installation instructions require an interactive Miniconda installer. In manual verification, the unmodified software failed to run due to a path bug in its own wrapper script (see Section 1 for details and Section 3 for the proposed fix).",
       "scope": "Reproducible execution only; does not evaluate genotype concordance or forensic casework fitness.",
       "not_evaluated": [
         "Genotype accuracy",
@@ -122,7 +122,7 @@
       },
       {
         "title": "Proposed fix / temporary workaround",
-        "body": "With these targeted fixes applied in the suggested fork (Tfronta/strspy, commit 14d5494), automated verification in GitHub Actions (run 44934862541) passed all 5/5 gates and genotyped 22 forensic STR loci on the 1000 Genomes ONT hg38 CODIS reference slice. The official upstream commit (dafdee7) remains marked Manual \u00b7 Fails until updated upstream."
+        "body": "With these targeted fixes applied in the suggested fork (Tfronta/strspy, commit `14d5494`), automated verification in GitHub Actions (run 44934862541) passed all 5/5 gates and genotyped 22 forensic STR loci on the 1000 Genomes ONT hg38 CODIS reference slice. The official upstream commit (`dafdee7`) remains marked Manual \u00b7 Fails until updated upstream."
       },
       {
         "title": "Repeatability of this manual run",
@@ -146,5 +146,53 @@
       "disclaimer": "Each result is a fixed, dated attestation verified on the tool's public repository at an immutable commit. It evaluates reproducible execution only, not genotype accuracy or forensic fitness."
     }
   },
-  "scope": "Manual verification of reproducible execution against unmodified upstream commit."
+  "scope": "Manual verification of reproducible execution against unmodified upstream commit.",
+  "i18n": {
+    "es": {
+      "plain_why": "La verificaci\u00f3n autom\u00e1tica no pudo ejecutarse porque las instrucciones de instalaci\u00f3n requieren un instalador interactivo de Miniconda. En verificaci\u00f3n manual, el software original fall\u00f3 al ejecutarse por un error de ruta en su propio script envoltorio (ver Secci\u00f3n 1 para el detalle y Secci\u00f3n 3 para la propuesta de correcci\u00f3n).",
+      "without_preparation": "El `README.md` de STRspy v2.0 (l\u00ednea 61) indica descargar un instalador de Miniconda con `wget` (`wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh`) y correr scripts interactivos, lo cual no puede ejecutarse literalmente en el perfil autom\u00e1tico.",
+      "reason": "Incluso despu\u00e9s de crear el entorno Conda, generar `config/UserToolsConfig.txt` y pasar los flags `-i` y `-t` omitidos en la l\u00ednea 120 del README, el script original `STRspy_run_v2.0_Args.sh` falla inmediatamente con c\u00f3digo de salida 1: las l\u00edneas 180 y 193 verifican `if [[ -f \"STRspy_Normal_v2.0_Args.sh\" ]]` en la ra\u00edz del repositorio aunque el script vive en `src/STRspy_Normal_v2.0_Args.sh` (que luego invoca la l\u00ednea 199). Como la verificaci\u00f3n y la ruta de invocaci\u00f3n se contradicen, el script sale con `please make sure you are in the same directory of STRspy` desde cualquier directorio.",
+      "base": "Ubuntu 22.04 + Miniforge (entorno Conda `strspy_env`)",
+      "proposed_fix_note": "Con estas correcciones puntuales aplicadas en el fork sugerido (`Tfronta/strspy`, commit `14d5494`), la verificaci\u00f3n autom\u00e1tica en GitHub Actions (run 44934862541) pas\u00f3 las 5/5 compuertas y genotip\u00f3 22 loci STR forenses sobre el recorte de referencia ONT hg38 CODIS de 1000 Genomes. El commit oficial (`dafdee7`) permanece marcado como Manual \u00b7 Falla hasta que se actualice en el repositorio original.",
+      "recommendations": [
+        "Corregir las l\u00edneas 180 y 193 de `STRspy_run_v2.0_Args.sh` para verificar `[[ -f \"src/STRspy_Normal_v2.0_Args.sh\" ]]` (y `src/STRspy_Parallel_v2.0_Args.sh`) en coherencia con la invocaci\u00f3n `bash src/...` que figura debajo.",
+        "Actualizar la l\u00ednea 120 de `README.md` para incluir los flags obligatorios de getopts (`bash ./STRspy_run_v2.0_Args.sh -i config/InputConfig.txt -t config/UserToolsConfig.txt -j normal`) y alinear `THREAD` vs `THREADS` en `config/InputConfig.txt`.",
+        "Fijar `python>=3.9` y `samtools>=1.12` en `setup/STRspy_2.0_env.yml` para que entornos Linux limpios no descarguen un binario antiguo de samtools dependiente de OpenSSL 1.0.",
+        "Publicar un release de GitHub para STRspy v2.0 en la rama principal para que los usuarios y evaluadores autom\u00e1ticos resuelvan v2.0 por defecto en lugar de v1.1.1 (2021)."
+      ],
+      "files": [
+        {
+          "path": "STRspy_run_v2.0_Args.sh & src/STRspy_Normal_v2.0_Args.sh",
+          "replaces": "corrige la verificaci\u00f3n de ruta `src/` en las l\u00edneas 180/193, acepta un \u00fanico BAM en `-i`, crea autom\u00e1ticamente el directorio `-o` y escribe nombres de loci STR en lugar de accesiones de GenBank"
+        },
+        {
+          "path": "setup/STRspy_2.0_env.yml",
+          "replaces": "fija `python>=3.9` y `samtools>=1.12` para evitar una compilaci\u00f3n rota de samtools con OpenSSL 1.0"
+        }
+      ]
+    },
+    "pt": {
+      "plain_why": "A verifica\u00e7\u00e3o autom\u00e1tica n\u00e3o p\u00f4de executar porque as instru\u00e7\u00f5es de instala\u00e7\u00e3o exigem um instalador interativo do Miniconda. Na verifica\u00e7\u00e3o manual, o software original falhou ao executar devido a um erro de caminho no pr\u00f3prio script wrapper (veja a Se\u00e7\u00e3o 1 para detalhes e a Se\u00e7\u00e3o 3 para a proposta de corre\u00e7\u00e3o).",
+      "without_preparation": "O `README.md` do STRspy v2.0 (linha 61) instrui baixar um instalador do Miniconda via `wget` (`wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh`) e rodar scripts interativos, o que n\u00e3o pode ser executado literalmente no perfil autom\u00e1tico.",
+      "reason": "Mesmo ap\u00f3s criar o ambiente Conda, gerar `config/UserToolsConfig.txt` e informar as flags `-i` e `-t` omitidas na linha 120 do README, o script original `STRspy_run_v2.0_Args.sh` falha imediatamente com c\u00f3digo de sa\u00edda 1: as linhas 180 e 193 verificam `if [[ -f \"STRspy_Normal_v2.0_Args.sh\" ]]` na raiz do reposit\u00f3rio, embora o script fique em `src/STRspy_Normal_v2.0_Args.sh` (invocado na linha 199). Como a verifica\u00e7\u00e3o e o caminho de chamada divergem, o script encerra com `please make sure you are in the same directory of STRspy` a partir de qualquer diret\u00f3rio.",
+      "base": "Ubuntu 22.04 + Miniforge (ambiente Conda `strspy_env`)",
+      "proposed_fix_note": "Com essas corre\u00e7\u00f5es pontuais aplicadas no fork sugerido (`Tfronta/strspy`, commit `14d5494`), a verifica\u00e7\u00e3o autom\u00e1tica no GitHub Actions (run 44934862541) passou pelos 5/5 port\u00f5es e genotipou 22 loci STR forenses no recorte de refer\u00eancia ONT hg38 CODIS do 1000 Genomes. O commit oficial (`dafdee7`) permanece marcado como Manual \u00b7 Falha at\u00e9 ser atualizado no reposit\u00f3rio original.",
+      "recommendations": [
+        "Corrigir as linhas 180 e 193 de `STRspy_run_v2.0_Args.sh` para verificar `[[ -f \"src/STRspy_Normal_v2.0_Args.sh\" ]]` (e `src/STRspy_Parallel_v2.0_Args.sh`), acompanhando a chamada `bash src/...` logo abaixo.",
+        "Atualizar a linha 120 do `README.md` para incluir as flags obrigat\u00f3rias de getopts (`bash ./STRspy_run_v2.0_Args.sh -i config/InputConfig.txt -t config/UserToolsConfig.txt -j normal`) e alinhar `THREAD` vs `THREADS` em `config/InputConfig.txt`.",
+        "Fixar `python>=3.9` e `samtools>=1.12` em `setup/STRspy_2.0_env.yml` para que ambientes Linux limpos n\u00e3o baixem um bin\u00e1rio legado do samtools com OpenSSL 1.0.",
+        "Publicar uma release no GitHub para o STRspy v2.0 na branch principal para que usu\u00e1rios e avaliadores autom\u00e1ticos resolvam a v2.0 por padr\u00e3o em vez da v1.1.1 (2021)."
+      ],
+      "files": [
+        {
+          "path": "STRspy_run_v2.0_Args.sh & src/STRspy_Normal_v2.0_Args.sh",
+          "replaces": "corrige a verifica\u00e7\u00e3o do caminho `src/` nas linhas 180/193, aceita um \u00fanico arquivo BAM em `-i`, cria automaticamente o diret\u00f3rio `-o` e grava nomes de loci STR em vez de acessos do GenBank"
+        },
+        {
+          "path": "setup/STRspy_2.0_env.yml",
+          "replaces": "fixa `python>=3.9` e `samtools>=1.12` para evitar uma compila\u00e7\u00e3o quebrada do samtools com OpenSSL 1.0"
+        }
+      ]
+    }
+  }
 }
