@@ -1,0 +1,3 @@
+2026-11-23 16:10:35 [INFO] - Running trgt-5.1.0-b21c621 [genotype]
+2026-11-23 16:10:35 [INFO] - Total execution time: 136.21ms
+2026-11-23 16:10:35 [INFO] - trgt end

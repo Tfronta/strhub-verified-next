@@ -1,6 +1,6 @@
 {
   "schema": "strhub-verified/index/3",
-  "generated": "2026-11-23T18:28:26+00:00",
+  "generated": "2026-11-23T19:11:57+00:00",
   "count": 23,
   "tools": [
     {
@@ -962,6 +962,22 @@
           "report": "trgt-hifi/b21c6217eeaef9a080205932fe29f730dc00e31f/trgt-hifi.json",
           "page": "trgt-hifi/b21c6217eeaef9a080205932fe29f730dc00e31f/trgt-hifi.html",
           "pdf": "trgt-hifi/b21c6217eeaef9a080205932fe29f730dc00e31f/trgt-hifi.pdf"
+        },
+        {
+          "sha": "b21c6217eeaef9a080205932fe29f730dc00e31f",
+          "instrument": "curated",
+          "version": "v5.1.0",
+          "variant": null,
+          "committed": "2026-06-10T09:38:26Z",
+          "generated": "2026-11-23T19:10:35+00:00",
+          "level": "content",
+          "label": "Not verified as documented",
+          "verdict": "runs",
+          "errors_reported": false,
+          "ci_run": null,
+          "report": "trgt-hifi/b21c6217eeaef9a080205932fe29f730dc00e31f-curated/trgt-hifi.json",
+          "page": "trgt-hifi/b21c6217eeaef9a080205932fe29f730dc00e31f-curated/trgt-hifi.html",
+          "pdf": "trgt-hifi/b21c6217eeaef9a080205932fe29f730dc00e31f-curated/trgt-hifi.pdf"
         }
       ]
     },

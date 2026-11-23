@@ -1,0 +1,7 @@
+$ trgt genotype -v --color never --genome /data/in/hg38.fa --repeats /data/in/regions.bed --reads /data/in/input.bam --output-prefix /data/out/sample
+
+2026-11-23 16:10:35 [INFO] - Running trgt-5.1.0-b21c621 [genotype]
+2026-11-23 16:10:35 [INFO] - Total execution time: 136.21ms
+2026-11-23 16:10:35 [INFO] - trgt end
+
+[exit 0]

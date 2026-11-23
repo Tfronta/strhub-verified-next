@@ -1,0 +1,345 @@
+{
+  "schema": "strhub-verified/1",
+  "instrument": "curated",
+  "mode": "publish",
+  "generated": "2026-11-23T19:10:35+00:00",
+  "tool": {
+    "name": "TRGT",
+    "version": "v5.1.0",
+    "contact": "https://github.com/PacificBiosciences/trgt/issues"
+  },
+  "source": {
+    "repo": "https://github.com/PacificBiosciences/trgt",
+    "ref": "b21c6217eeaef9a080205932fe29f730dc00e31f",
+    "ref_resolved": "b21c6217eeaef9a080205932fe29f730dc00e31f",
+    "committed": "2026-06-10T09:38:26Z"
+  },
+  "environment": {
+    "os": [
+      "macOS arm64 (Rust 1.100.0, compiled from unmodified upstream Cargo.toml)"
+    ],
+    "source": "prepared"
+  },
+  "preparation": {
+    "file": "trgt-v5.1.0-notes.yml",
+    "dataset": "pacbio-hifi-bam-hg38",
+    "installation": "strhub",
+    "base": "Rust toolchain (`rustc 1.100.0` + `cargo` + `pkg-config`), compiled from unmodified upstream v5.1.0 source (`Cargo.toml`)",
+    "without_preparation": "Automated verification returned `undetermined` (`install_not_copyable`) because `README.md` (line 25) and `docs/tutorial.md` (line 8) only link to the GitHub Releases page without providing a copyable shell installation block (such as `curl`/`tar`, `cargo build --release`, or `conda`). Because the automated profile transcribes installation commands literally and does not invent missing install steps, execution stopped before installation.",
+    "why": [],
+    "steps": [
+      "# Option A (Linux x86_64 official precompiled release binary):",
+      "curl -L -O https://github.com/PacificBiosciences/trgt/releases/download/v5.1.0/trgt-v5.1.0-x86_64-unknown-linux-gnu.tar.gz",
+      "tar -xzf trgt-v5.1.0-x86_64-unknown-linux-gnu.tar.gz",
+      "export PATH=\"$PWD/trgt-v5.1.0-x86_64-unknown-linux-gnu:$PATH\"",
+      "# Option B (compile unmodified v5.1.0 from source with Rust + pkg-config, verified on macOS arm64):",
+      "cargo build --release && export PATH=\"$PWD/target/release:$PATH\""
+    ],
+    "run_cmd": "trgt genotype --genome /data/in/hg38.fa --repeats /data/in/regions.bed --reads /data/in/input.bam --output-prefix /data/out/sample",
+    "files": []
+  },
+  "recommendations": [
+    "Add a fenced bash installation block in `README.md` (under `Availability`) showing the exact `curl` and `tar` commands for the Linux release tarball (`trgt-v5.1.0-x86_64-unknown-linux-gnu.tar.gz`) so new users and automated evaluators can install TRGT literally without guessing.",
+    "Document the source build command (`cargo build --release` and its `pkg-config` build dependency for `wfa2-sys` / `hts-sys`) in `README.md` so macOS and non-x86_64 Linux users can also build v5.1.0 cleanly.",
+    "Update `docs/tutorial.md` (lines 8 and 39) to align the binary invocation (`trgt` vs `./trgt`) with the extracted release directory (`trgt-v5.1.0-x86_64-unknown-linux-gnu/trgt`)."
+  ],
+  "gates": {
+    "available": true,
+    "installs": true,
+    "runs": true,
+    "io": true,
+    "content": true
+  },
+  "level": "content",
+  "verdict": {
+    "code": "runs",
+    "title": "Runs in manual verification",
+    "basis": "gates",
+    "reason": "Compiled unmodified upstream TRGT v5.1.0 (`b21c621`) from `Cargo.toml` with `cargo build --release` (Rust 1.100.0 and `pkg-config`, zero source modifications) and ran the documented `trgt genotype` command from `docs/tutorial.md` (lines 39-42) against the GIAB HG002 PacBio HiFi Revio `hg38` CODIS reference slice (`pacbio-hifi-bam-hg38`). Execution completed in under 1 second (exit 0), producing `sample.vcf.gz` with 20/20 called autosomal CODIS STR loci (852 spanning reads via `FORMAT/SD`, max depth 64 at `D8S1179`) and `sample.spanning.bam`.",
+    "readme_gaps": []
+  },
+  "run": {
+    "cmd": "trgt genotype -v --color never --genome /data/in/hg38.fa --repeats /data/in/regions.bed --reads /data/in/input.bam --output-prefix /data/out/sample",
+    "cwd": ".",
+    "step_outcome": "success"
+  },
+  "datasets": [
+    {
+      "leg": "external",
+      "label": "External data",
+      "available": true,
+      "type": "pacbio-hifi-bam-hg38",
+      "dataset": "GIAB HG002 PacBio HiFi (Revio), hg38 CODIS slice",
+      "io": true,
+      "content": true,
+      "passed": true
+    }
+  ],
+  "logs": {
+    "external": "trgt-hifi.log-external.txt"
+  },
+  "terminals": {
+    "external": "trgt-hifi.terminal-external.txt"
+  },
+  "certificate": {
+    "schema": "strhub-verified/certificate/1",
+    "label": "Manual verification: verified",
+    "reached": "Runs + Plausible output",
+    "summary": {
+      "purpose": "Independent manual verification of reproducible execution on unmodified upstream source.",
+      "result": "Compiled unmodified upstream TRGT v5.1.0 (`b21c621`) from `Cargo.toml` with `cargo build --release` (Rust 1.100.0 and `pkg-config`, zero source modifications) and ran the documented `trgt genotype` command from `docs/tutorial.md` (lines 39-42) against the GIAB HG002 PacBio HiFi Revio `hg38` CODIS reference slice (`pacbio-hifi-bam-hg38`). Execution completed in under 1 second (exit 0), producing `sample.vcf.gz` with 20/20 called autosomal CODIS STR loci (852 spanning reads via `FORMAT/SD`, max depth 64 at `D8S1179`) and `sample.spanning.bam`.",
+      "reached": "Runs + Plausible output",
+      "why": "Automated verification stopped before installing because `README.md` links to GitHub Releases without a copyable installation command. In manual verification, compiling unmodified TRGT v5.1.0 from source (`cargo build --release`) and running the documented `trgt genotype` command succeeded end-to-end, calling all 20/20 forensic CODIS STR loci on the GIAB HG002 PacBio HiFi reference slice (see Section 4 for exact steps).",
+      "scope": "Reproducible execution only; does not evaluate genotype concordance or forensic casework fitness.",
+      "not_evaluated": [
+        "Genotype accuracy",
+        "Concordance against truth",
+        "Forensic casework fitness"
+      ]
+    },
+    "conclusion": [
+      {
+        "title": "TRGT v5.1.0 executes end-to-end",
+        "body": "TRGT v5.1.0 ran to completion without code modifications in the prepared environment at unmodified upstream commit b21c621."
+      },
+      {
+        "title": "Output passes plausibility checks",
+        "body": "The run produced a structurally valid, non-empty VCF output containing 20 distinct recognizable STR loci; structural plausibility checks verify output format and locus presence, not genotype accuracy."
+      },
+      {
+        "title": "Verification used STRhub reference data",
+        "body": "Verification used open-access STRhub reference dataset GIAB HG002 PacBio HiFi (Revio), hg38 CODIS slice (pacbio-hifi-bam-hg38)."
+      },
+      {
+        "title": "Repeatability of this manual run",
+        "body": "The pinned upstream commit, prepared environment description, exact commands executed, and sanitized terminal output recorded in this report document the procedure for independent reproduction."
+      }
+    ],
+    "out_of_scope": [
+      "Genotype accuracy and concordance",
+      "Forensic casework accreditation"
+    ],
+    "limitations": [
+      "Results apply exclusively to the exact Git commit SHA and manually prepared environment recorded in this report.",
+      "Single regional reference slice per input type; low-coverage warnings on sliced BAMs do not imply defects on whole-genome data.",
+      "Plausible Output checks verify structural format and recognizable STR loci, not biological genotype truth.",
+      "Verification is a point-in-time snapshot; upstream repository changes after this commit are not covered until re-verification.",
+      "No truth-set concordance, forensic casework validation, or regulatory compliance assessment was performed."
+    ],
+    "scope": {
+      "statement": "This report records a manual execution against the pinned upstream commit.",
+      "not": "It does not establish genotype accuracy or forensic casework fitness.",
+      "disclaimer": "Each result is a fixed, dated attestation verified on the tool's public repository at an immutable commit. It evaluates reproducible execution only, not genotype accuracy or forensic fitness."
+    }
+  },
+  "scope": "Manual verification of reproducible execution against unmodified upstream commit.",
+  "io_detail": {
+    "gate": "io",
+    "passed": true,
+    "outputs": [
+      {
+        "path": "*.vcf.gz",
+        "format": "vcf",
+        "resolved": "sample.vcf.gz",
+        "validation_profile": "strhub-vcf-structure/1",
+        "validation_status": "valid",
+        "records": 20,
+        "called_records": 20,
+        "uncalled_rows": 0,
+        "records_without_gt": 0,
+        "checks": {
+          "exists": true,
+          "non_empty": true,
+          "parses_as_vcf": true,
+          "min_records": true,
+          "has_called_genotypes": true
+        },
+        "passed": true
+      }
+    ]
+  },
+  "content_detail": {
+    "gate": "content",
+    "applicable": true,
+    "passed": true,
+    "outputs": [
+      {
+        "path": "*.vcf.gz",
+        "resolved": "sample.vcf.gz",
+        "mode": "auto",
+        "checks": {
+          "records_present": true,
+          "genotypes_called": true,
+          "given_loci_recognised": true
+        },
+        "stats": {
+          "rows": 20,
+          "header_row_dropped": false,
+          "malformed_rows": 0,
+          "dna_invalid_rows": 0,
+          "count_invalid_rows": 0,
+          "distinct_loci": 20,
+          "distinct_str_loci": 20,
+          "distinct_snp_markers": 0,
+          "loci": [
+            "CSF1PO",
+            "D10S1248",
+            "D12S391",
+            "D13S317",
+            "D16S539",
+            "D18S51",
+            "D19S433",
+            "D1S1656",
+            "D21S11",
+            "D22S1045",
+            "D2S1338",
+            "D2S441",
+            "D3S1358",
+            "D5S818",
+            "D7S820",
+            "D8S1179",
+            "FGA",
+            "TH01",
+            "TPOX",
+            "vWA"
+          ],
+          "str_loci": [
+            "CSF1PO",
+            "D10S1248",
+            "D12S391",
+            "D13S317",
+            "D16S539",
+            "D18S51",
+            "D19S433",
+            "D1S1656",
+            "D21S11",
+            "D22S1045",
+            "D2S1338",
+            "D2S441",
+            "D3S1358",
+            "D5S818",
+            "D7S820",
+            "D8S1179",
+            "FGA",
+            "TH01",
+            "TPOX",
+            "vWA"
+          ],
+          "snp_markers": [],
+          "total_reads": 852,
+          "max_sequence_depth": 64,
+          "top_loci_by_depth": [
+            [
+              "D8S1179",
+              64
+            ],
+            [
+              "D13S317",
+              60
+            ],
+            [
+              "FGA",
+              57
+            ],
+            [
+              "D10S1248",
+              53
+            ],
+            [
+              "D2S441",
+              52
+            ],
+            [
+              "D3S1358",
+              48
+            ],
+            [
+              "D18S51",
+              46
+            ],
+            [
+              "vWA",
+              45
+            ],
+            [
+              "D21S11",
+              44
+            ],
+            [
+              "D22S1045",
+              44
+            ],
+            [
+              "CSF1PO",
+              41
+            ],
+            [
+              "D1S1656",
+              40
+            ],
+            [
+              "D5S818",
+              40
+            ],
+            [
+              "D7S820",
+              40
+            ],
+            [
+              "D12S391",
+              38
+            ],
+            [
+              "D16S539",
+              38
+            ],
+            [
+              "D2S1338",
+              37
+            ],
+            [
+              "TPOX",
+              24
+            ],
+            [
+              "D19S433",
+              24
+            ],
+            [
+              "TH01",
+              17
+            ]
+          ],
+          "called_genotypes": 20,
+          "regions_given": 20,
+          "regions_hit": 20,
+          "depth_source": "FORMAT/SD"
+        }
+      }
+    ]
+  },
+  "i18n": {
+    "es": {
+      "plain_why": "La verificaci\u00f3n autom\u00e1tica se detuvo antes de instalar porque `README.md` enlaza a GitHub Releases sin un comando copiable de instalaci\u00f3n. En verificaci\u00f3n manual, compilando TRGT v5.1.0 sin modificar desde c\u00f3digo fuente (`cargo build --release`) y ejecutando el comando documentado `trgt genotype`, la herramienta corri\u00f3 de principio a fin y genotip\u00f3 los 20/20 loci STR CODIS forenses sobre el recorte PacBio HiFi de GIAB HG002 (ver Secci\u00f3n 4 para los pasos exactos).",
+      "without_preparation": "La verificaci\u00f3n autom\u00e1tica devolvi\u00f3 `undetermined` (`install_not_copyable`) porque `README.md` (l\u00ednea 25) y `docs/tutorial.md` (l\u00ednea 8) solo enlazan a la p\u00e1gina de GitHub Releases sin ofrecer un bloque copiable de comandos de instalaci\u00f3n (como `curl`/`tar`, `cargo build --release` o `conda`). Como el perfil autom\u00e1tico transcribe la instalaci\u00f3n literalmente y no inventa pasos faltantes, la ejecuci\u00f3n se detuvo antes de instalar.",
+      "reason": "Se compil\u00f3 TRGT v5.1.0 original sin modificar (`b21c621`) desde `Cargo.toml` con `cargo build --release` (Rust 1.100.0 y `pkg-config`, cero cambios en el c\u00f3digo) y se ejecut\u00f3 el comando documentado `trgt genotype` de `docs/tutorial.md` (l\u00edneas 39-42) sobre el recorte de referencia PacBio HiFi Revio `hg38` de GIAB HG002 (`pacbio-hifi-bam-hg38`). La ejecuci\u00f3n finaliz\u00f3 en menos de 1 segundo (exit 0), generando `sample.vcf.gz` con los 20/20 loci STR CODIS autos\u00f3micos genotipados (852 lecturas completas en `FORMAT/SD`, profundidad m\u00e1xima de 64 en `D8S1179`) y `sample.spanning.bam`.",
+      "base": "Toolchain Rust (`rustc 1.100.0` + `cargo` + `pkg-config`), compilado desde el c\u00f3digo original sin modificar de v5.1.0 (`Cargo.toml`)",
+      "recommendations": [
+        "Agregar un bloque bash en `README.md` (bajo `Availability`) con los comandos exactos de `curl` y `tar` para el tarball oficial de Linux (`trgt-v5.1.0-x86_64-unknown-linux-gnu.tar.gz`) para que usuarios nuevos y evaluadores autom\u00e1ticos puedan instalar TRGT literalmente.",
+        "Documentar el comando de compilaci\u00f3n desde c\u00f3digo fuente (`cargo build --release` y su dependencia de compilaci\u00f3n `pkg-config` para `wfa2-sys` / `hts-sys`) en `README.md` para que usuarios de macOS y Linux no x86_64 tambi\u00e9n puedan compilar v5.1.0 sin fricci\u00f3n.",
+        "Actualizar `docs/tutorial.md` (l\u00edneas 8 y 39) para alinear la invocaci\u00f3n del binario (`trgt` vs `./trgt`) con el directorio extra\u00eddo del release (`trgt-v5.1.0-x86_64-unknown-linux-gnu/trgt`)."
+      ]
+    },
+    "pt": {
+      "plain_why": "A verifica\u00e7\u00e3o autom\u00e1tica parou antes de instalar porque o `README.md` aponta para GitHub Releases sem um comando copi\u00e1vel de instala\u00e7\u00e3o. Na verifica\u00e7\u00e3o manual, compilando o TRGT v5.1.0 original a partir do c\u00f3digo-fonte (`cargo build --release`) e rodando o comando documentado `trgt genotype`, a ferramenta executou de ponta a ponta e chamou todos os 20/20 loci STR CODIS forenses no recorte PacBio HiFi do GIAB HG002 (veja a Se\u00e7\u00e3o 4 para os passos exatos).",
+      "without_preparation": "A verifica\u00e7\u00e3o autom\u00e1tica retornou `undetermined` (`install_not_copyable`) porque `README.md` (linha 25) e `docs/tutorial.md` (linha 8) apenas apontam para a p\u00e1gina de GitHub Releases sem fornecer um bloco copi\u00e1vel de comandos de instala\u00e7\u00e3o (como `curl`/`tar`, `cargo build --release` ou `conda`). Como o perfil autom\u00e1tico transcreve a instala\u00e7\u00e3o literalmente e n\u00e3o inventa etapas ausentes, a execu\u00e7\u00e3o parou antes da instala\u00e7\u00e3o.",
+      "reason": "Compilado o TRGT v5.1.0 original sem modifica\u00e7\u00f5es (`b21c621`) a partir de `Cargo.toml` com `cargo build --release` (Rust 1.100.0 e `pkg-config`, zero edi\u00e7\u00f5es no c\u00f3digo) e executado o comando documentado `trgt genotype` de `docs/tutorial.md` (linhas 39-42) sobre o recorte de refer\u00eancia PacBio HiFi Revio `hg38` do GIAB HG002 (`pacbio-hifi-bam-hg38`). A execu\u00e7\u00e3o terminou em menos de 1 segundo (exit 0), gerando `sample.vcf.gz` com 20/20 loci STR CODIS autoss\u00f4micos genotipados (852 leituras completas em `FORMAT/SD`, profundidade m\u00e1xima de 64 em `D8S1179`) e `sample.spanning.bam`.",
+      "base": "Toolchain Rust (`rustc 1.100.0` + `cargo` + `pkg-config`), compilado a partir do c\u00f3digo-fonte original sem modifica\u00e7\u00f5es da v5.1.0 (`Cargo.toml`)",
+      "recommendations": [
+        "Adicionar um bloco bash em `README.md` (em `Availability`) com os comandos exatos de `curl` e `tar` para o tarball oficial de Linux (`trgt-v5.1.0-x86_64-unknown-linux-gnu.tar.gz`) para que novos usu\u00e1rios e avaliadores autom\u00e1ticos instalem o TRGT literalmente.",
+        "Documentar o comando de compila\u00e7\u00e3o a partir do c\u00f3digo-fonte (`cargo build --release` e sua depend\u00eancia de build `pkg-config` para `wfa2-sys` / `hts-sys`) em `README.md` para que usu\u00e1rios de macOS e Linux n\u00e3o x86_64 tamb\u00e9m compilem a v5.1.0 com facilidade.",
+        "Atualizar `docs/tutorial.md` (linhas 8 e 39) para alinhar a invoca\u00e7\u00e3o do bin\u00e1rio (`trgt` vs `./trgt`) com o diret\u00f3rio extra\u00eddo da release (`trgt-v5.1.0-x86_64-unknown-linux-gnu/trgt`)."
+      ]
+    }
+  }
+}
