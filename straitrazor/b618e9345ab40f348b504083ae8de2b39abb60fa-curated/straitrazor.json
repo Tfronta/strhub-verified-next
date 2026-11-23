@@ -2,7 +2,7 @@
   "schema": "strhub-verified/1",
   "instrument": "curated",
   "mode": "publish",
-  "generated": "2026-11-23T18:11:05+00:00",
+  "generated": "2026-11-23T18:28:17+00:00",
   "tool": {
     "name": "STRaitRazor",
     "version": "v3.0",
@@ -24,8 +24,8 @@
     "file": "straitrazor-notes.yml",
     "dataset": "illumina-str-fastq",
     "installation": "strhub",
-    "base": "C++11 toolchain (g++/clang++ + make + pthreads), compiled from unmodified upstream Makefile",
-    "without_preparation": "The STRaitRazor README focuses on Windows GUI steps (Download ZIP, 7-Zip, batchCstr8.bat) and uses HTML `<blockquote>` blocks for Linux compilation (`make`) rather than a standard fenced install code block, and leaves the kit-specific `configFile` placeholder unspecified. Because the automated profile does not invent install blocks or choose between kit configs, automated verification returned `undetermined`.",
+    "base": "C++11 toolchain (`g++`/`clang++` + `make` + pthreads), compiled from unmodified upstream `Makefile`",
+    "without_preparation": "The STRaitRazor README focuses on Windows GUI steps (Download ZIP, 7-Zip, `batchCstr8.bat`) and uses HTML `<blockquote>` blocks for Linux compilation (`make`) rather than a standard fenced install code block, and leaves the kit-specific `configFile` placeholder unspecified. Because the automated profile does not invent install blocks or choose between kit configs, automated verification returned `undetermined`.",
     "why": [],
     "steps": [
       "git clone https://github.com/Ahhgust/STRaitRazor.git",
@@ -1517,5 +1517,31 @@
         }
       }
     ]
+  },
+  "i18n": {
+    "es": {
+      "plain_why": "La verificaci\u00f3n autom\u00e1tica no pudo ejecutarse porque el README no incluye un bloque de c\u00f3digo est\u00e1ndar para compilar en Linux y requiere elegir un archivo de configuraci\u00f3n espec\u00edfico del kit. En verificaci\u00f3n manual, compilando el c\u00f3digo C++11 original con `make` y usando `ForenSeqv1.27.config`, corri\u00f3 de principio a fin y detect\u00f3 63 loci STR forenses y 157 SNPs (ver Secci\u00f3n 4 para los pasos exactos).",
+      "without_preparation": "El `README.md` de STRaitRazor se enfoca en pasos gr\u00e1ficos para Windows (Download ZIP, 7-Zip, `batchCstr8.bat`), coloca la compilaci\u00f3n en Linux (`make`) dentro de etiquetas HTML `<blockquote>` en lugar de un bloque de c\u00f3digo est\u00e1ndar, y deja sin especificar el archivo de configuraci\u00f3n del kit (`configFile`). Como el perfil autom\u00e1tico no inventa pasos de instalaci\u00f3n ni elige archivos de configuraci\u00f3n por su cuenta, la verificaci\u00f3n autom\u00e1tica result\u00f3 en `indeterminado`.",
+      "reason": "Compilado desde el c\u00f3digo fuente C++11 original (`make`) y ejecutado sobre el recorte de referencia Illumina ForenSeq FASTQ de NIST mds2-2157 (`illumina-str-fastq`) con el archivo `ForenSeqv1.27.config` incluido en el repositorio, STRaitRazor v3.0 finaliz\u00f3 en menos de 1 segundo (exit 0) y gener\u00f3 una tabla v\u00e1lida de 816 haplotipos que cubre 220 marcadores distintos (63 loci STR forenses entre autos\u00f3micos, X-STR, Y-STR y Amelogenina, m\u00e1s 157 SNPs de identidad y fenotipo).",
+      "base": "Toolchain C++11 (`g++`/`clang++` + `make` + pthreads), compilado desde el `Makefile` original sin modificaciones",
+      "recommendations": [
+        "Agregar un bloque de c\u00f3digo bash est\u00e1ndar en `README.md` mostrando `make` (y el paquete de compilador `g++`) para que evaluadores autom\u00e1ticos puedan transcribir la compilaci\u00f3n en Linux literalmente.",
+        "Incluir un ejemplo concreto de ejecuci\u00f3n en `README.md` con un archivo de configuraci\u00f3n real del repositorio (por ejemplo `ForenSeqv1.27.config`) en lugar del placeholder gen\u00e9rico `configFile`, e indicar que las opciones como `-o` deben ir antes del archivo FASTQ.",
+        "Cambiar `rm *.o` por `rm -f *.o` en `Makefile` (l\u00ednea 56) para que `make clean` no falle con error cuando todav\u00eda no existen archivos objeto.",
+        "Etiquetar releases en GitHub (por ejemplo `v3.0`) que coincidan con la versi\u00f3n documentada en `README.md`, permitiendo fijar una versi\u00f3n inmutable en lugar de `master`."
+      ]
+    },
+    "pt": {
+      "plain_why": "A verifica\u00e7\u00e3o autom\u00e1tica n\u00e3o p\u00f4de executar porque o README n\u00e3o traz um bloco de c\u00f3digo padr\u00e3o para compilar no Linux e exige selecionar um arquivo de configura\u00e7\u00e3o espec\u00edfico do kit. Na verifica\u00e7\u00e3o manual, compilando o c\u00f3digo C++11 original com `make` e informando `ForenSeqv1.27.config`, rodou de ponta a ponta e detectou 63 loci STR forenses e 157 SNPs (veja a Se\u00e7\u00e3o 4 para os passos exatos).",
+      "without_preparation": "O `README.md` do STRaitRazor foca em passos gr\u00e1ficos no Windows (Download ZIP, 7-Zip, `batchCstr8.bat`), coloca a compila\u00e7\u00e3o no Linux (`make`) dentro de tags HTML `<blockquote>` em vez de um bloco de c\u00f3digo padr\u00e3o, e deixa o arquivo de configura\u00e7\u00e3o do kit (`configFile`) sem especificar. Como o perfil autom\u00e1tico n\u00e3o inventa passos de instala\u00e7\u00e3o nem escolhe arquivos de configura\u00e7\u00e3o por conta pr\u00f3pria, a verifica\u00e7\u00e3o autom\u00e1tica retornou `indeterminado`.",
+      "reason": "Compilado a partir do c\u00f3digo-fonte C++11 original (`make`) e executado no recorte de refer\u00eancia Illumina ForenSeq FASTQ do NIST mds2-2157 (`illumina-str-fastq`) com o arquivo `ForenSeqv1.27.config` inclu\u00eddo no reposit\u00f3rio, o STRaitRazor v3.0 concluiu em menos de 1 segundo (exit 0) e produziu uma tabela v\u00e1lida de 816 hapl\u00f3tipos cobrindo 220 marcadores distintos (63 loci STR forenses entre autoss\u00f4micos, X-STR, Y-STR e Amelogenina, al\u00e9m de 157 SNPs de identidade e fen\u00f3tipo).",
+      "base": "Toolchain C++11 (`g++`/`clang++` + `make` + pthreads), compilado a partir do `Makefile` original sem modifica\u00e7\u00f5es",
+      "recommendations": [
+        "Adicionar um bloco de c\u00f3digo bash padr\u00e3o no `README.md` mostrando `make` (e o pacote de compilador `g++`) para que avaliadores autom\u00e1ticos transcrevam a compila\u00e7\u00e3o no Linux literalmente.",
+        "Fornecer um exemplo concreto de execu\u00e7\u00e3o no `README.md` usando um arquivo de configura\u00e7\u00e3o real do reposit\u00f3rio (por exemplo `ForenSeqv1.27.config`) em vez do placeholder gen\u00e9rico `configFile`, e informar que flags como `-o` devem vir antes do arquivo FASTQ.",
+        "Alterar `rm *.o` para `rm -f *.o` no `Makefile` (linha 56) para que `make clean` n\u00e3o encerre com erro quando ainda n\u00e3o houver arquivos objeto.",
+        "Criar tags de release no GitHub (por exemplo `v3.0`) correspondentes \u00e0 vers\u00e3o documentada no `README.md`, permitindo fixar uma tag imut\u00e1vel em vez de `master`."
+      ]
+    }
   }
 }
