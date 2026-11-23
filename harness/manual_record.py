@@ -157,11 +157,12 @@ def build_redactions(
 ) -> list[tuple[str, str]]:
     """Build ordered (needle, replacement) pairs to strip all local paths & machine identity."""
     pairs: list[tuple[str, str]] = []
-    pairs.append((str(checkout.resolve()), "/work"))
-    if input_dir is not None:
-        pairs.append((str(input_dir.resolve()), "/data/in"))
-    if output_dir is not None:
-        pairs.append((str(output_dir.resolve()), "/data/out"))
+    for raw_p, target in ((checkout, "/work"), (input_dir, "/data/in"), (output_dir, "/data/out")):
+        if raw_p is None:
+            continue
+        for candidate in (str(raw_p.resolve()), str(raw_p)):
+            if candidate and (candidate, target) not in pairs:
+                pairs.append((candidate, target))
 
     home = str(pathlib.Path.home().resolve())
     if home and home != "/":
@@ -623,11 +624,16 @@ def _render_manual_pdf(report: dict, terminal_text: str, out_pdf: pathlib.Path) 
         dark_terminal_box(terminal_text, max_lines=68),
     ]))
 
-    # Section 2: Step-by-step setup and proposed fix
+    # Section 2: Step-by-step setup (and proposed fix when applicable)
     sec = 2
     has_steps = bool(prep.get("steps") or prep.get("run_cmd") or prep.get("pr_url") or prep.get("fork_url"))
     if has_steps:
-        sec2_lead: list = [gp.section_num(str(sec), "Step-by-Step Setup and Proposed Fix")]
+        sec2_title = (
+            "Step-by-Step Setup and Proposed Fix"
+            if (not passed or prep.get("pr_url") or prep.get("fork_url"))
+            else "Step-by-Step Setup"
+        )
+        sec2_lead: list = [gp.section_num(str(sec), sec2_title)]
         sec += 1
         if not passed:
             sec2_lead.append(Paragraph(
