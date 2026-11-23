@@ -1,6 +1,6 @@
 {
   "schema": "strhub-verified/index/3",
-  "generated": "2026-11-22T20:20:00+00:00",
+  "generated": "2026-11-23T14:08:30+00:00",
   "count": 23,
   "tools": [
     {
@@ -748,19 +748,19 @@
     {
       "slug": "strspy-ont",
       "name": "STRspy",
-      "version": "v1.1.1",
+      "version": "v2.0",
       "variant": null,
-      "sha": "cbf650081e92f5d36eb7409d7208dbde425fdf95",
-      "committed": "2021-06-14T19:06:23Z",
+      "sha": "dafdee7e7e5672c8dc732e8577dbe153f53a12f5",
+      "committed": "2026-05-04T19:47:38Z",
       "instrument": "documented",
       "level": "available",
       "label": "Could not be determined",
       "verdict": "undetermined",
       "errors_reported": false,
-      "generated": "2026-11-22T19:11:43+00:00",
+      "generated": "2026-11-23T14:07:58+00:00",
       "source_repo": "https://github.com/unique379r/strspy",
-      "source_ref": "cbf650081e92f5d36eb7409d7208dbde425fdf95",
-      "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/45059310337",
+      "source_ref": "dafdee7e7e5672c8dc732e8577dbe153f53a12f5",
+      "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/45190720306",
       "distinct_str_loci": null,
       "distinct_snp_markers": null,
       "total_reads": null,
@@ -771,6 +771,22 @@
       "report": "strspy-ont.json",
       "page": "strspy-ont.html",
       "versions": [
+        {
+          "sha": "dafdee7e7e5672c8dc732e8577dbe153f53a12f5",
+          "instrument": "documented",
+          "version": "v2.0",
+          "variant": null,
+          "committed": "2026-05-04T19:47:38Z",
+          "generated": "2026-11-23T14:07:58+00:00",
+          "level": "available",
+          "label": "Could not be determined",
+          "verdict": "undetermined",
+          "errors_reported": false,
+          "ci_run": "https://github.com/Tfronta/strhub-verified-next/actions/runs/45190720306",
+          "report": "strspy-ont/dafdee7e7e5672c8dc732e8577dbe153f53a12f5/strspy-ont.json",
+          "page": "strspy-ont/dafdee7e7e5672c8dc732e8577dbe153f53a12f5/strspy-ont.html",
+          "pdf": "strspy-ont/dafdee7e7e5672c8dc732e8577dbe153f53a12f5/strspy-ont.pdf"
+        },
         {
           "sha": "cbf650081e92f5d36eb7409d7208dbde425fdf95",
           "instrument": "documented",
