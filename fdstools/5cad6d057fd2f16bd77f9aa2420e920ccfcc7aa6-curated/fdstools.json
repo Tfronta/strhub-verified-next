@@ -1,0 +1,1147 @@
+{
+  "schema": "strhub-verified/1",
+  "instrument": "curated",
+  "mode": "publish",
+  "generated": "2026-11-24T12:27:25+00:00",
+  "tool": {
+    "name": "FDSTools",
+    "version": "v2.2.1",
+    "contact": "https://github.com/Jerrythafast/FDSTools/issues"
+  },
+  "source": {
+    "repo": "https://github.com/Jerrythafast/FDSTools",
+    "ref": "5cad6d057fd2f16bd77f9aa2420e920ccfcc7aa6",
+    "ref_resolved": "5cad6d057fd2f16bd77f9aa2420e920ccfcc7aa6",
+    "committed": "2026-08-11T16:45:47Z"
+  },
+  "environment": {
+    "os": [
+      "macOS arm64 (Python 3.14 venv, installed from unmodified upstream commit 5cad6d0)"
+    ],
+    "source": "prepared"
+  },
+  "preparation": {
+    "file": "fdstools-v2.2.1-notes.yml",
+    "dataset": "illumina-str-fastq",
+    "installation": "strhub",
+    "base": "Python 3.9+ virtual environment (`pip install .` from unmodified upstream v2.2.1 source + `strnaming refseq-cache --use-fasta hg38.fa --global`)",
+    "without_preparation": "Automated verification returned `undetermined` (`install_not_copyable`) because `README.md` uses indented blocks without fenced bash code blocks, provides no concrete example command invoking a subtool (such as `fdstools tssv`) with one of the built-in kit libraries (e.g. `ForenSeqA`), and does not specify the output file format. In addition, `strnaming` defaults to fetching GRCh38 flanking sequences from the Ensembl REST API unless configured with a local FASTA via `strnaming refseq-cache --use-fasta`.",
+    "why": [],
+    "steps": [
+      "python3 -m venv fdstools-venv && source fdstools-venv/bin/activate",
+      "pip install fdstools==2.2.1  # or pip install . from unmodified commit 5cad6d0",
+      "strnaming refseq-cache --use-fasta /data/in/hg38.fa --global"
+    ],
+    "run_cmd": "fdstools tssv -T 4 ForenSeqA /data/in/sample.fastq /data/out/sample.tsv -R /data/out/report.tsv",
+    "files": []
+  },
+  "recommendations": [
+    "Use a fenced bash code block for `pip install -U fdstools` in `README.md` (line 23) so automated evaluators can transcribe installation literally.",
+    "Add a minimal quick-start example in `README.md` showing a concrete `fdstools tssv` invocation with a built-in library (such as `ForenSeqA` or `PowerSeq46GY`) and documenting the resulting TSV columns (`marker`, `sequence`, `total`, `forward`, `reverse`).",
+    "Mention `strnaming refseq-cache --use-fasta <hg38.fa>` in `README.md` for offline or HPC environments where Ensembl REST API access is unavailable or rate-limited."
+  ],
+  "gates": {
+    "available": true,
+    "installs": true,
+    "runs": true,
+    "io": true,
+    "content": true
+  },
+  "level": "content",
+  "verdict": {
+    "code": "runs",
+    "title": "Runs in manual verification",
+    "basis": "gates",
+    "reason": "Installed unmodified upstream FDSTools v2.2.1 (`5cad6d0`) into an isolated Python virtual environment (`pip install .`, zero source modifications), configured `strnaming` to read flanking sequences from local `hg38.fa`, and ran `fdstools tssv -T 4 ForenSeqA /data/in/sample.fastq /data/out/sample.tsv -R /data/out/report.tsv` against the NIST mds2-2157 Illumina ForenSeq FASTQ reference slice (`illumina-str-fastq`, 5,000 reads). Execution completed cleanly (exit 0), producing a valid 343-row TSV table covering 154 distinct markers (60 forensic STR loci including autosomal, X-STR, Y-STR, and Amelogenin, plus 94 identity SNPs).",
+    "readme_gaps": []
+  },
+  "run": {
+    "cmd": "fdstools --version && fdstools tssv -T 4 ForenSeqA /data/in/sample.fastq /data/out/sample.tsv -R /data/out/report.tsv",
+    "cwd": ".",
+    "step_outcome": "success"
+  },
+  "datasets": [
+    {
+      "leg": "external",
+      "label": "External data",
+      "available": true,
+      "type": "illumina-str-fastq",
+      "dataset": "NIST mds2-2157, Illumina STR (ForenSeq slice, donor NTD01)",
+      "io": true,
+      "content": true,
+      "passed": true
+    }
+  ],
+  "logs": {
+    "external": "fdstools.log-external.txt"
+  },
+  "terminals": {
+    "external": "fdstools.terminal-external.txt"
+  },
+  "certificate": {
+    "schema": "strhub-verified/certificate/1",
+    "label": "Manual verification: verified",
+    "reached": "Runs + Plausible output",
+    "summary": {
+      "purpose": "Independent manual verification of reproducible execution on unmodified upstream source.",
+      "result": "Installed unmodified upstream FDSTools v2.2.1 (`5cad6d0`) into an isolated Python virtual environment (`pip install .`, zero source modifications), configured `strnaming` to read flanking sequences from local `hg38.fa`, and ran `fdstools tssv -T 4 ForenSeqA /data/in/sample.fastq /data/out/sample.tsv -R /data/out/report.tsv` against the NIST mds2-2157 Illumina ForenSeq FASTQ reference slice (`illumina-str-fastq`, 5,000 reads). Execution completed cleanly (exit 0), producing a valid 343-row TSV table covering 154 distinct markers (60 forensic STR loci including autosomal, X-STR, Y-STR, and Amelogenin, plus 94 identity SNPs).",
+      "reached": "Runs + Plausible output",
+      "why": "Automated verification could not proceed because `README.md` lacks fenced installation/usage examples and leaves kit library selection and output format unspecified. In manual verification, installing unmodified FDSTools v2.2.1 with `pip`, pointing `strnaming` to local `hg38.fa`, and running `fdstools tssv` with the built-in `ForenSeqA` library succeeded end-to-end across 60 forensic STR loci and 94 identity SNPs (5/5 gates; see Section 4 for exact steps).",
+      "scope": "Reproducible execution only; does not evaluate genotype concordance or forensic casework fitness.",
+      "not_evaluated": [
+        "Genotype accuracy",
+        "Concordance against truth",
+        "Forensic casework fitness"
+      ]
+    },
+    "conclusion": [
+      {
+        "title": "FDSTools v2.2.1 executes end-to-end",
+        "body": "FDSTools v2.2.1 ran to completion without code modifications in the prepared environment at unmodified upstream commit 5cad6d0."
+      },
+      {
+        "title": "Output passes plausibility checks",
+        "body": "The run produced a structurally valid, non-empty TSV output containing 60 distinct recognizable STR loci; structural plausibility checks verify output format and locus presence, not genotype accuracy."
+      },
+      {
+        "title": "Verification used STRhub reference data",
+        "body": "Verification used open-access STRhub reference dataset NIST mds2-2157, Illumina STR (ForenSeq slice, donor NTD01) (illumina-str-fastq)."
+      },
+      {
+        "title": "Repeatability of this manual run",
+        "body": "The pinned upstream commit, prepared environment description, exact commands executed, and sanitized terminal output recorded in this report document the procedure for independent reproduction."
+      }
+    ],
+    "out_of_scope": [
+      "Genotype accuracy and concordance",
+      "Forensic casework accreditation"
+    ],
+    "limitations": [
+      "Results apply exclusively to the exact Git commit SHA and manually prepared environment recorded in this report.",
+      "Single regional reference slice per input type; low-coverage warnings on sliced BAMs do not imply defects on whole-genome data.",
+      "Plausible Output checks verify structural format and recognizable STR loci, not biological genotype truth.",
+      "Verification is a point-in-time snapshot; upstream repository changes after this commit are not covered until re-verification.",
+      "No truth-set concordance, forensic casework validation, or regulatory compliance assessment was performed."
+    ],
+    "scope": {
+      "statement": "This report records a manual execution against the pinned upstream commit.",
+      "not": "It does not establish genotype accuracy or forensic casework fitness.",
+      "disclaimer": "Each result is a fixed, dated attestation verified on the tool's public repository at an immutable commit. It evaluates reproducible execution only, not genotype accuracy or forensic fitness."
+    }
+  },
+  "scope": "Manual verification of reproducible execution against unmodified upstream commit.",
+  "io_detail": {
+    "gate": "io",
+    "passed": true,
+    "outputs": [
+      {
+        "path": "sample.tsv",
+        "format": "tsv",
+        "resolved": "sample.tsv",
+        "records": 343,
+        "checks": {
+          "exists": true,
+          "non_empty": true,
+          "parses_as_tsv": true,
+          "min_records": true
+        },
+        "passed": true
+      }
+    ]
+  },
+  "content_detail": {
+    "gate": "content",
+    "applicable": true,
+    "passed": true,
+    "outputs": [
+      {
+        "path": "sample.tsv",
+        "resolved": "sample.tsv",
+        "mode": "auto",
+        "checks": {
+          "records_present": true,
+          "locus_column_found": true,
+          "loci_recognised": true,
+          "calls_or_counts_present": true
+        },
+        "stats": {
+          "rows": 343,
+          "header_row_dropped": true,
+          "malformed_rows": 0,
+          "dna_invalid_rows": 0,
+          "count_invalid_rows": 0,
+          "distinct_loci": 154,
+          "distinct_str_loci": 60,
+          "distinct_snp_markers": 94,
+          "loci": [
+            "AmelogeninX",
+            "AmelogeninY",
+            "CSF1PO",
+            "D10S1248",
+            "D12S391",
+            "D13S317",
+            "D16S539",
+            "D17S1301",
+            "D18S51",
+            "D19S433",
+            "D1S1656",
+            "D20S482",
+            "D21S11",
+            "D22S1045",
+            "D2S1338",
+            "D2S441",
+            "D3S1358",
+            "D4S2408",
+            "D5S818",
+            "D6S1043",
+            "D7S820",
+            "D8S1179",
+            "D9S1122",
+            "DXS10074",
+            "DXS10103",
+            "DXS10135",
+            "DXS7132",
+            "DXS7423",
+            "DXS8378",
+            "DYF387S1",
+            "DYS19",
+            "DYS385a-b",
+            "DYS389I",
+            "DYS389II",
+            "DYS390",
+            "DYS391",
+            "DYS392",
+            "DYS437",
+            "DYS438",
+            "DYS439",
+            "DYS448",
+            "DYS461-460",
+            "DYS481",
+            "DYS505",
+            "DYS522",
+            "DYS533",
+            "DYS549",
+            "DYS570",
+            "DYS576",
+            "DYS612",
+            "DYS635",
+            "DYS643",
+            "FGA",
+            "HPRTB",
+            "PentaD",
+            "PentaE",
+            "TH01",
+            "TPOX",
+            "Y-GATA-H4",
+            "vWA",
+            "rs1005533",
+            "rs10092491",
+            "rs1015250",
+            "rs1024116",
+            "rs1028528",
+            "rs1031825",
+            "rs10488710",
+            "rs10495407",
+            "rs1058083",
+            "rs10773760",
+            "rs10776839",
+            "rs1109037",
+            "rs1294331",
+            "rs12997453",
+            "rs13182883",
+            "rs13218440",
+            "rs1335873",
+            "rs1336071",
+            "rs1355366",
+            "rs1357617",
+            "rs1360288",
+            "rs1382387",
+            "rs1413212",
+            "rs1454361",
+            "rs1463729",
+            "rs1490413",
+            "rs1493232",
+            "rs1498553",
+            "rs1523537",
+            "rs1528460",
+            "rs159606",
+            "rs1736442",
+            "rs1821380",
+            "rs1886510",
+            "rs1979255",
+            "rs2040411",
+            "rs2046361",
+            "rs2056277",
+            "rs2076848",
+            "rs2107612",
+            "rs2111980",
+            "rs214955",
+            "rs221956",
+            "rs2269355",
+            "rs2342747",
+            "rs2399332",
+            "rs251934",
+            "rs279844",
+            "rs2830795",
+            "rs2831700",
+            "rs2920816",
+            "rs321198",
+            "rs338882",
+            "rs354439",
+            "rs3780962",
+            "rs430046",
+            "rs4364205",
+            "rs445251",
+            "rs4530059",
+            "rs4606077",
+            "rs560681",
+            "rs576261",
+            "rs6444724",
+            "rs6811238",
+            "rs6955448",
+            "rs7041158",
+            "rs717302",
+            "rs719366",
+            "rs722098",
+            "rs722290",
+            "rs727811",
+            "rs729172",
+            "rs733164",
+            "rs735155",
+            "rs737681",
+            "rs740598",
+            "rs740910",
+            "rs763869",
+            "rs8037429",
+            "rs8078417",
+            "rs826472",
+            "rs873196",
+            "rs876724",
+            "rs891700",
+            "rs901398",
+            "rs907100",
+            "rs914165",
+            "rs917118",
+            "rs938283",
+            "rs964681",
+            "rs987640",
+            "rs9905977",
+            "rs993934",
+            "rs9951171"
+          ],
+          "str_loci": [
+            "AmelogeninX",
+            "AmelogeninY",
+            "CSF1PO",
+            "D10S1248",
+            "D12S391",
+            "D13S317",
+            "D16S539",
+            "D17S1301",
+            "D18S51",
+            "D19S433",
+            "D1S1656",
+            "D20S482",
+            "D21S11",
+            "D22S1045",
+            "D2S1338",
+            "D2S441",
+            "D3S1358",
+            "D4S2408",
+            "D5S818",
+            "D6S1043",
+            "D7S820",
+            "D8S1179",
+            "D9S1122",
+            "DXS10074",
+            "DXS10103",
+            "DXS10135",
+            "DXS7132",
+            "DXS7423",
+            "DXS8378",
+            "DYF387S1",
+            "DYS19",
+            "DYS385a-b",
+            "DYS389I",
+            "DYS389II",
+            "DYS390",
+            "DYS391",
+            "DYS392",
+            "DYS437",
+            "DYS438",
+            "DYS439",
+            "DYS448",
+            "DYS461-460",
+            "DYS481",
+            "DYS505",
+            "DYS522",
+            "DYS533",
+            "DYS549",
+            "DYS570",
+            "DYS576",
+            "DYS612",
+            "DYS635",
+            "DYS643",
+            "FGA",
+            "HPRTB",
+            "PentaD",
+            "PentaE",
+            "TH01",
+            "TPOX",
+            "Y-GATA-H4",
+            "vWA"
+          ],
+          "snp_markers": [
+            "rs1005533",
+            "rs10092491",
+            "rs1015250",
+            "rs1024116",
+            "rs1028528",
+            "rs1031825",
+            "rs10488710",
+            "rs10495407",
+            "rs1058083",
+            "rs10773760",
+            "rs10776839",
+            "rs1109037",
+            "rs1294331",
+            "rs12997453",
+            "rs13182883",
+            "rs13218440",
+            "rs1335873",
+            "rs1336071",
+            "rs1355366",
+            "rs1357617",
+            "rs1360288",
+            "rs1382387",
+            "rs1413212",
+            "rs1454361",
+            "rs1463729",
+            "rs1490413",
+            "rs1493232",
+            "rs1498553",
+            "rs1523537",
+            "rs1528460",
+            "rs159606",
+            "rs1736442",
+            "rs1821380",
+            "rs1886510",
+            "rs1979255",
+            "rs2040411",
+            "rs2046361",
+            "rs2056277",
+            "rs2076848",
+            "rs2107612",
+            "rs2111980",
+            "rs214955",
+            "rs221956",
+            "rs2269355",
+            "rs2342747",
+            "rs2399332",
+            "rs251934",
+            "rs279844",
+            "rs2830795",
+            "rs2831700",
+            "rs2920816",
+            "rs321198",
+            "rs338882",
+            "rs354439",
+            "rs3780962",
+            "rs430046",
+            "rs4364205",
+            "rs445251",
+            "rs4530059",
+            "rs4606077",
+            "rs560681",
+            "rs576261",
+            "rs6444724",
+            "rs6811238",
+            "rs6955448",
+            "rs7041158",
+            "rs717302",
+            "rs719366",
+            "rs722098",
+            "rs722290",
+            "rs727811",
+            "rs729172",
+            "rs733164",
+            "rs735155",
+            "rs737681",
+            "rs740598",
+            "rs740910",
+            "rs763869",
+            "rs8037429",
+            "rs8078417",
+            "rs826472",
+            "rs873196",
+            "rs876724",
+            "rs891700",
+            "rs901398",
+            "rs907100",
+            "rs914165",
+            "rs917118",
+            "rs938283",
+            "rs964681",
+            "rs987640",
+            "rs9905977",
+            "rs993934",
+            "rs9951171"
+          ],
+          "total_reads": 6424,
+          "max_sequence_depth": 178,
+          "top_loci_by_depth": [
+            [
+              "DYS392",
+              310
+            ],
+            [
+              "DYS438",
+              240
+            ],
+            [
+              "D6S1043",
+              222
+            ],
+            [
+              "TH01",
+              214
+            ],
+            [
+              "DYS389I",
+              196
+            ],
+            [
+              "DYS505",
+              196
+            ],
+            [
+              "DYS576",
+              194
+            ],
+            [
+              "D20S482",
+              176
+            ],
+            [
+              "FGA",
+              162
+            ],
+            [
+              "D3S1358",
+              142
+            ],
+            [
+              "D2S441",
+              134
+            ],
+            [
+              "DYS612",
+              130
+            ],
+            [
+              "D16S539",
+              126
+            ],
+            [
+              "DXS10074",
+              118
+            ],
+            [
+              "D19S433",
+              116
+            ],
+            [
+              "D4S2408",
+              106
+            ],
+            [
+              "DXS7132",
+              104
+            ],
+            [
+              "D18S51",
+              98
+            ],
+            [
+              "D22S1045",
+              92
+            ],
+            [
+              "DYS385a-b",
+              92
+            ],
+            [
+              "DXS8378",
+              88
+            ],
+            [
+              "rs1109037",
+              88
+            ],
+            [
+              "DXS7423",
+              86
+            ],
+            [
+              "DYS437",
+              82
+            ],
+            [
+              "D7S820",
+              80
+            ],
+            [
+              "D10S1248",
+              76
+            ],
+            [
+              "DYS448",
+              76
+            ],
+            [
+              "HPRTB",
+              76
+            ],
+            [
+              "DYS643",
+              74
+            ],
+            [
+              "DYF387S1",
+              72
+            ],
+            [
+              "rs4364205",
+              72
+            ],
+            [
+              "D8S1179",
+              68
+            ],
+            [
+              "DXS10135",
+              68
+            ],
+            [
+              "DYS390",
+              68
+            ],
+            [
+              "DYS391",
+              68
+            ],
+            [
+              "D21S11",
+              62
+            ],
+            [
+              "D12S391",
+              60
+            ],
+            [
+              "D13S317",
+              56
+            ],
+            [
+              "D17S1301",
+              52
+            ],
+            [
+              "CSF1PO",
+              48
+            ],
+            [
+              "DYS389II",
+              48
+            ],
+            [
+              "rs1454361",
+              48
+            ],
+            [
+              "DYS439",
+              46
+            ],
+            [
+              "DYS570",
+              46
+            ],
+            [
+              "rs1382387",
+              46
+            ],
+            [
+              "rs722098",
+              46
+            ],
+            [
+              "PentaD",
+              44
+            ],
+            [
+              "rs8078417",
+              44
+            ],
+            [
+              "rs876724",
+              44
+            ],
+            [
+              "rs917118",
+              42
+            ],
+            [
+              "DYS481",
+              40
+            ],
+            [
+              "rs8037429",
+              40
+            ],
+            [
+              "rs993934",
+              40
+            ],
+            [
+              "PentaE",
+              38
+            ],
+            [
+              "TPOX",
+              38
+            ],
+            [
+              "D2S1338",
+              36
+            ],
+            [
+              "rs2040411",
+              36
+            ],
+            [
+              "rs737681",
+              34
+            ],
+            [
+              "DYS522",
+              32
+            ],
+            [
+              "rs1335873",
+              32
+            ],
+            [
+              "rs251934",
+              32
+            ],
+            [
+              "rs560681",
+              32
+            ],
+            [
+              "rs1490413",
+              28
+            ],
+            [
+              "rs4530059",
+              28
+            ],
+            [
+              "rs1005533",
+              26
+            ],
+            [
+              "rs722290",
+              26
+            ],
+            [
+              "rs735155",
+              26
+            ],
+            [
+              "rs1979255",
+              24
+            ],
+            [
+              "rs2831700",
+              24
+            ],
+            [
+              "rs740910",
+              24
+            ],
+            [
+              "rs9905977",
+              24
+            ],
+            [
+              "rs430046",
+              22
+            ],
+            [
+              "D1S1656",
+              20
+            ],
+            [
+              "D5S818",
+              20
+            ],
+            [
+              "DYS549",
+              20
+            ],
+            [
+              "rs1821380",
+              20
+            ],
+            [
+              "rs2111980",
+              20
+            ],
+            [
+              "rs938283",
+              20
+            ],
+            [
+              "Y-GATA-H4",
+              18
+            ],
+            [
+              "rs1058083",
+              18
+            ],
+            [
+              "rs2399332",
+              18
+            ],
+            [
+              "rs3780962",
+              18
+            ],
+            [
+              "rs964681",
+              18
+            ],
+            [
+              "rs10776839",
+              16
+            ],
+            [
+              "rs159606",
+              16
+            ],
+            [
+              "rs214955",
+              16
+            ],
+            [
+              "rs717302",
+              16
+            ],
+            [
+              "DYS635",
+              14
+            ],
+            [
+              "rs1024116",
+              14
+            ],
+            [
+              "rs1886510",
+              14
+            ],
+            [
+              "rs2046361",
+              14
+            ],
+            [
+              "rs826472",
+              14
+            ],
+            [
+              "rs10495407",
+              12
+            ],
+            [
+              "rs279844",
+              12
+            ],
+            [
+              "rs576261",
+              12
+            ],
+            [
+              "rs727811",
+              12
+            ],
+            [
+              "rs740598",
+              12
+            ],
+            [
+              "vWA",
+              12
+            ],
+            [
+              "DYS19",
+              10
+            ],
+            [
+              "rs1015250",
+              10
+            ],
+            [
+              "rs10773760",
+              10
+            ],
+            [
+              "rs1463729",
+              10
+            ],
+            [
+              "rs2269355",
+              10
+            ],
+            [
+              "rs6955448",
+              10
+            ],
+            [
+              "rs901398",
+              10
+            ],
+            [
+              "DXS10103",
+              8
+            ],
+            [
+              "rs1028528",
+              8
+            ],
+            [
+              "rs13182883",
+              8
+            ],
+            [
+              "rs1357617",
+              8
+            ],
+            [
+              "rs873196",
+              8
+            ],
+            [
+              "rs891700",
+              8
+            ],
+            [
+              "rs907100",
+              8
+            ],
+            [
+              "rs914165",
+              8
+            ],
+            [
+              "rs987640",
+              8
+            ],
+            [
+              "AmelogeninX",
+              6
+            ],
+            [
+              "DYS461-460",
+              6
+            ],
+            [
+              "DYS533",
+              6
+            ],
+            [
+              "rs12997453",
+              6
+            ],
+            [
+              "rs13218440",
+              6
+            ],
+            [
+              "rs1360288",
+              6
+            ],
+            [
+              "rs1413212",
+              6
+            ],
+            [
+              "rs1523537",
+              6
+            ],
+            [
+              "rs2107612",
+              6
+            ],
+            [
+              "rs2830795",
+              6
+            ],
+            [
+              "rs4606077",
+              6
+            ],
+            [
+              "rs6444724",
+              6
+            ],
+            [
+              "rs733164",
+              6
+            ],
+            [
+              "rs763869",
+              6
+            ],
+            [
+              "rs9951171",
+              6
+            ],
+            [
+              "D9S1122",
+              4
+            ],
+            [
+              "rs1493232",
+              4
+            ],
+            [
+              "rs1498553",
+              4
+            ],
+            [
+              "rs2076848",
+              4
+            ],
+            [
+              "rs321198",
+              4
+            ],
+            [
+              "rs354439",
+              4
+            ],
+            [
+              "rs445251",
+              4
+            ],
+            [
+              "rs729172",
+              4
+            ],
+            [
+              "rs10092491",
+              2
+            ],
+            [
+              "rs10488710",
+              2
+            ],
+            [
+              "rs1336071",
+              2
+            ],
+            [
+              "rs1355366",
+              2
+            ],
+            [
+              "rs1528460",
+              2
+            ],
+            [
+              "rs2056277",
+              2
+            ],
+            [
+              "rs221956",
+              2
+            ],
+            [
+              "rs338882",
+              2
+            ],
+            [
+              "rs7041158",
+              2
+            ],
+            [
+              "rs719366",
+              2
+            ],
+            [
+              "AmelogeninY",
+              0
+            ],
+            [
+              "rs1031825",
+              0
+            ],
+            [
+              "rs1294331",
+              0
+            ],
+            [
+              "rs1736442",
+              0
+            ],
+            [
+              "rs2342747",
+              0
+            ],
+            [
+              "rs2920816",
+              0
+            ],
+            [
+              "rs6811238",
+              0
+            ]
+          ],
+          "locus_column_found": true,
+          "locus_column": 0,
+          "dna_columns": [],
+          "count_columns": [
+            2,
+            3,
+            4
+          ],
+          "allele_columns": []
+        }
+      }
+    ]
+  },
+  "i18n": {
+    "es": {
+      "plain_why": "La verificaci\u00f3n autom\u00e1tica no pudo continuar porque `README.md` carece de bloques copiables de instalaci\u00f3n y uso y no especifica librer\u00eda de kit ni formato de salida. En verificaci\u00f3n manual, instalando FDSTools v2.2.1 sin modificar con `pip`, apuntando `strnaming` a `hg38.fa` local y ejecutando `fdstools tssv` con la librer\u00eda incluida `ForenSeqA`, corri\u00f3 de principio a fin sobre 60 loci STR forenses y 94 SNPs de identidad (5/5 compuertas; ver Secci\u00f3n 4 para los pasos exactos).",
+      "without_preparation": "La verificaci\u00f3n autom\u00e1tica devolvi\u00f3 `undetermined` (`install_not_copyable`) porque `README.md` usa bloques indentados sin cercado bash, no incluye un comando de ejemplo concreto para ejecutar una subherramienta (como `fdstools tssv`) con una librer\u00eda de kit incluida (por ejemplo `ForenSeqA`) y no especifica el formato del archivo de salida. Adem\u00e1s, `strnaming` intenta descargar secuencias flanqueantes GRCh38 desde la API REST de Ensembl por defecto salvo que se configure un FASTA local con `strnaming refseq-cache --use-fasta`.",
+      "reason": "Se instal\u00f3 FDSTools v2.2.1 original sin modificar (`5cad6d0`) en un entorno virtual aislado de Python (`pip install .`, cero cambios al c\u00f3digo), se configur\u00f3 `strnaming` para leer secuencias flanqueantes desde `hg38.fa` local y se ejecut\u00f3 `fdstools tssv -T 4 ForenSeqA /data/in/sample.fastq /data/out/sample.tsv -R /data/out/report.tsv` sobre el recorte FASTQ Illumina ForenSeq de NIST mds2-2157 (`illumina-str-fastq`, 5.000 lecturas). La ejecuci\u00f3n termin\u00f3 limpiamente (exit 0), generando una tabla TSV v\u00e1lida de 343 filas con 154 marcadores distintos (60 loci STR forenses entre autos\u00f3micos, X-STR, Y-STR y Amelogenina, m\u00e1s 94 SNPs de identidad).",
+      "base": "Entorno virtual Python 3.9+ (`pip install .` desde el c\u00f3digo original sin modificar de v2.2.1 + `strnaming refseq-cache --use-fasta hg38.fa --global`)",
+      "recommendations": [
+        "Usar un bloque bash cercado para `pip install -U fdstools` en `README.md` (l\u00ednea 23) para que evaluadores autom\u00e1ticos puedan transcribir la instalaci\u00f3n literalmente.",
+        "Agregar un ejemplo m\u00ednimo de inicio r\u00e1pido en `README.md` con una invocaci\u00f3n concreta de `fdstools tssv` usando una librer\u00eda incluida (como `ForenSeqA` o `PowerSeq46GY`) y documentar las columnas del TSV de salida (`marker`, `sequence`, `total`, `forward`, `reverse`).",
+        "Mencionar `strnaming refseq-cache --use-fasta <hg38.fa>` en `README.md` para entornos sin conexi\u00f3n o clusters HPC donde la API REST de Ensembl no est\u00e9 disponible o limite consultas."
+      ]
+    },
+    "pt": {
+      "plain_why": "A verifica\u00e7\u00e3o autom\u00e1tica n\u00e3o p\u00f4de prosseguir porque o `README.md` n\u00e3o tem blocos copi\u00e1veis de instala\u00e7\u00e3o/uso nem especifica a biblioteca do kit ou o formato de sa\u00edda. Na verifica\u00e7\u00e3o manual, instalando o FDSTools v2.2.1 original com `pip`, apontando o `strnaming` para o `hg38.fa` local e executando `fdstools tssv` com a biblioteca integrada `ForenSeqA`, a ferramenta executou de ponta a ponta sobre 60 loci STR forenses e 94 SNPs de identidade (5/5 etapas; veja a Se\u00e7\u00e3o 4 para os passos exatos).",
+      "without_preparation": "A verifica\u00e7\u00e3o autom\u00e1tica retornou `undetermined` (`install_not_copyable`) porque o `README.md` usa blocos indentados sem cerca bash, n\u00e3o apresenta um exemplo concreto de comando invocando uma subferramenta (como `fdstools tssv`) com uma biblioteca de kit integrada (ex.: `ForenSeqA`) e n\u00e3o descreve o formato do arquivo de sa\u00edda. Al\u00e9m disso, o `strnaming` busca sequ\u00eancias flanqueadoras GRCh38 na API REST do Ensembl por padr\u00e3o, a menos que um FASTA local seja configurado com `strnaming refseq-cache --use-fasta`.",
+      "reason": "Instalado o FDSTools v2.2.1 original sem modifica\u00e7\u00f5es (`5cad6d0`) em um ambiente virtual Python isolado (`pip install .`, zero edi\u00e7\u00f5es no c\u00f3digo), configurado o `strnaming` para ler sequ\u00eancias flanqueadoras do `hg38.fa` local e executado `fdstools tssv -T 4 ForenSeqA /data/in/sample.fastq /data/out/sample.tsv -R /data/out/report.tsv` no recorte FASTQ Illumina ForenSeq do NIST mds2-2157 (`illumina-str-fastq`, 5.000 leituras). A execu\u00e7\u00e3o terminou sem erros (exit 0), gerando uma tabela TSV v\u00e1lida com 343 linhas cobrindo 154 marcadores distintos (60 loci STR forenses entre autoss\u00f4micos, X-STR, Y-STR e Amelogenina, mais 94 SNPs de identidade).",
+      "base": "Ambiente virtual Python 3.9+ (`pip install .` a partir do c\u00f3digo original sem modifica\u00e7\u00f5es da v2.2.1 + `strnaming refseq-cache --use-fasta hg38.fa --global`)",
+      "recommendations": [
+        "Usar um bloco bash cercado para `pip install -U fdstools` no `README.md` (linha 23) para que avaliadores autom\u00e1ticos transcrevam a instala\u00e7\u00e3o literalmente.",
+        "Adicionar um exemplo m\u00ednimo de in\u00edcio r\u00e1pido no `README.md` mostrando uma invoca\u00e7\u00e3o concreta de `fdstools tssv` com uma biblioteca integrada (como `ForenSeqA` ou `PowerSeq46GY`) e documentando as colunas do TSV de sa\u00edda (`marker`, `sequence`, `total`, `forward`, `reverse`).",
+        "Mencionar `strnaming refseq-cache --use-fasta <hg38.fa>` no `README.md` para ambientes offline ou HPC onde a API REST do Ensembl n\u00e3o esteja dispon\u00edvel."
+      ]
+    }
+  }
+}

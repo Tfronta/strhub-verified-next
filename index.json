@@ -1,6 +1,6 @@
 {
   "schema": "strhub-verified/index/3",
-  "generated": "2026-11-24T12:19:57+00:00",
+  "generated": "2026-11-24T12:28:35+00:00",
   "count": 23,
   "tools": [
     {
@@ -162,6 +162,22 @@
           "report": "fdstools/5cad6d057fd2f16bd77f9aa2420e920ccfcc7aa6/fdstools.json",
           "page": "fdstools/5cad6d057fd2f16bd77f9aa2420e920ccfcc7aa6/fdstools.html",
           "pdf": "fdstools/5cad6d057fd2f16bd77f9aa2420e920ccfcc7aa6/fdstools.pdf"
+        },
+        {
+          "sha": "5cad6d057fd2f16bd77f9aa2420e920ccfcc7aa6",
+          "instrument": "curated",
+          "version": "v2.2.1",
+          "variant": null,
+          "committed": "2026-08-11T16:45:47Z",
+          "generated": "2026-11-24T12:27:25+00:00",
+          "level": "content",
+          "label": "Not verified as documented",
+          "verdict": "runs",
+          "errors_reported": false,
+          "ci_run": null,
+          "report": "fdstools/5cad6d057fd2f16bd77f9aa2420e920ccfcc7aa6-curated/fdstools.json",
+          "page": "fdstools/5cad6d057fd2f16bd77f9aa2420e920ccfcc7aa6-curated/fdstools.html",
+          "pdf": "fdstools/5cad6d057fd2f16bd77f9aa2420e920ccfcc7aa6-curated/fdstools.pdf"
         }
       ]
     },

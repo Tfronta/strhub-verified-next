@@ -1,0 +1,5 @@
+$ fdstools --version && fdstools tssv -T 4 ForenSeqA /data/in/sample.fastq /data/out/sample.tsv -R /data/out/report.tsv
+
+fdstools 2.2.1
+
+[exit 0]
