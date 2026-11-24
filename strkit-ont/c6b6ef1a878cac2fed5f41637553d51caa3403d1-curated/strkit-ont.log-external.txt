@@ -1,0 +1,69 @@
+0.25.0
+strkit-main:	[INFO]	STRkit version 0.25.0
+strkit-main:	[INFO]	strkit_rust_ext version: 0.30.1
+strkit-main:	[INFO]	Starting STR genotyping with parameters:
+strkit-main:	[INFO]	                      read_file = "/data/in/sample.bam"
+strkit-main:	[INFO]	                 reference_file = "/data/in/hg38.fa"
+strkit-main:	[INFO]	                      loci_file = "/data/in/motif.bed"
+strkit-main:	[INFO]	                annotation_file = None
+strkit-main:	[INFO]	                      min_reads = 4
+strkit-main:	[INFO]	               min_allele_reads = 2
+strkit-main:	[INFO]	                      max_reads = 250
+strkit-main:	[INFO]	                  min_avg_phred = 13
+strkit-main:	[INFO]	                      rc_method = "repalign"
+strkit-main:	[INFO]	           min_read_align_score = 0.1
+strkit-main:	[INFO]	                  max_rcn_iters = 50
+strkit-main:	[INFO]	             max_terrible_reads = 3
+strkit-main:	[INFO]	                  num_bootstrap = 100
+strkit-main:	[INFO]	                force_gm_filter = False
+strkit-main:	[INFO]	               gm_filter_factor = 3
+strkit-main:	[INFO]	      gm_filter_expansion_ratio = 5.0
+strkit-main:	[INFO]	                     flank_size = 70
+strkit-main:	[INFO]	      allow_only_one_full_flank = False
+strkit-main:	[INFO]	             skip_supplementary = False
+strkit-main:	[INFO]	                 skip_secondary = False
+strkit-main:	[INFO]	                      sample_id = "HG00113"
+strkit-main:	[INFO]	                         ploidy = "diploid_autosomes"
+strkit-main:	[INFO]	                        realign = True
+strkit-main:	[INFO]	                         use_hp = False
+strkit-main:	[INFO]	                     use_methyl = False
+strkit-main:	[INFO]	                        snv_vcf = None
+strkit-main:	[INFO]	              snv_min_base_qual = 20
+strkit-main:	[INFO]	     significant_clip_threshold = 100
+strkit-main:	[INFO]	                       targeted = False
+strkit-main:	[INFO]	                    respect_ref = False
+strkit-main:	[INFO]	                    count_kmers = "none"
+strkit-main:	[INFO]	                      consensus = True
+strkit-main:	[INFO]	                            poa = "spoa"
+strkit-main:	[INFO]	         large_consensus_length = 2000
+strkit-main:	[INFO]	    max_n_large_consensus_reads = 20
+strkit-main:	[INFO]	             max_mdn_poa_length = 5000
+strkit-main:	[INFO]	                vcf_anchor_size = 5
+strkit-main:	[INFO]	                  json_read_seq = False
+strkit-main:	[INFO]	                      log_level = 20
+strkit-main:	[INFO]	                        verbose = False
+strkit-main:	[INFO]	                        profile = False
+strkit-main:	[INFO]	                           seed = 183
+strkit-main:	[INFO]	                      processes = 4
+strkit-main:	[INFO]	          log_progress_interval = 120
+strkit-main:	[INFO]	Loaded 20 loci in 0.01s (sha256 hash=1b45cdc29bdd98465f113e237db1b863773a07a5203892a6f411fcd76b2e4acc)
+strkit-main:	[INFO]	Using 4 workers
+strkit-84649:	[INFO]	HG00113: processed 20/20 loci (100.0%) in 5.3 seconds (~4 l/s; est. time remaining: 0s)
+strkit-main:	[INFO]	Finished STR genotyping in 5.4s
+strkit-main:	[INFO]	    Average read depth (called loci only): 35.1
+strkit-main:	[INFO]	    Average read depth (called loci only) for contig chr1: 30.0
+strkit-main:	[INFO]	    Average read depth (called loci only) for contig chr2: 37.3
+strkit-main:	[INFO]	    Average read depth (called loci only) for contig chr3: 35.0
+strkit-main:	[INFO]	    Average read depth (called loci only) for contig chr4: 43.0
+strkit-main:	[INFO]	    Average read depth (called loci only) for contig chr5: 35.0
+strkit-main:	[INFO]	    Average read depth (called loci only) for contig chr7: 32.0
+strkit-main:	[INFO]	    Average read depth (called loci only) for contig chr8: 30.0
+strkit-main:	[INFO]	    Average read depth (called loci only) for contig chr10: 36.0
+strkit-main:	[INFO]	    Average read depth (called loci only) for contig chr11: 25.0
+strkit-main:	[INFO]	    Average read depth (called loci only) for contig chr12: 39.5
+strkit-main:	[INFO]	    Average read depth (called loci only) for contig chr13: 27.0
+strkit-main:	[INFO]	    Average read depth (called loci only) for contig chr16: 39.0
+strkit-main:	[INFO]	    Average read depth (called loci only) for contig chr18: 37.0
+strkit-main:	[INFO]	    Average read depth (called loci only) for contig chr19: 46.0
+strkit-main:	[INFO]	    Average read depth (called loci only) for contig chr21: 31.0
+strkit-main:	[INFO]	    Average read depth (called loci only) for contig chr22: 30.0

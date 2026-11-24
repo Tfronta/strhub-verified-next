@@ -1,6 +1,6 @@
 {
   "schema": "strhub-verified/index/3",
-  "generated": "2026-11-24T12:56:46+00:00",
+  "generated": "2026-11-24T17:10:51+00:00",
   "count": 23,
   "tools": [
     {
@@ -750,6 +750,22 @@
           "report": "strkit-ont/c6b6ef1a878cac2fed5f41637553d51caa3403d1/strkit-ont.json",
           "page": "strkit-ont/c6b6ef1a878cac2fed5f41637553d51caa3403d1/strkit-ont.html",
           "pdf": "strkit-ont/c6b6ef1a878cac2fed5f41637553d51caa3403d1/strkit-ont.pdf"
+        },
+        {
+          "sha": "c6b6ef1a878cac2fed5f41637553d51caa3403d1",
+          "instrument": "curated",
+          "version": "v0.25.0",
+          "variant": null,
+          "committed": "2026-10-27T12:52:14Z",
+          "generated": "2026-11-24T17:10:16+00:00",
+          "level": "content",
+          "label": "Not verified as documented",
+          "verdict": "runs",
+          "errors_reported": false,
+          "ci_run": null,
+          "report": "strkit-ont/c6b6ef1a878cac2fed5f41637553d51caa3403d1-curated/strkit-ont.json",
+          "page": "strkit-ont/c6b6ef1a878cac2fed5f41637553d51caa3403d1-curated/strkit-ont.html",
+          "pdf": "strkit-ont/c6b6ef1a878cac2fed5f41637553d51caa3403d1-curated/strkit-ont.pdf"
         }
       ]
     },

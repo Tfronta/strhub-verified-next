@@ -1,0 +1,339 @@
+{
+  "schema": "strhub-verified/1",
+  "instrument": "curated",
+  "mode": "publish",
+  "generated": "2026-11-24T17:10:16+00:00",
+  "tool": {
+    "name": "strkit",
+    "version": "v0.25.0",
+    "contact": "https://github.com/davidlougheed/strkit/issues"
+  },
+  "source": {
+    "repo": "https://github.com/davidlougheed/strkit",
+    "ref": "c6b6ef1a878cac2fed5f41637553d51caa3403d1",
+    "ref_resolved": "c6b6ef1a878cac2fed5f41637553d51caa3403d1",
+    "committed": "2026-10-27T12:52:14Z"
+  },
+  "environment": {
+    "os": [
+      "macOS arm64 (isolated Python 3.14 virtual environment)"
+    ],
+    "source": "prepared"
+  },
+  "preparation": {
+    "file": "strkit-notes.yml",
+    "dataset": "ont-bam-hg38",
+    "installation": "strhub",
+    "base": "Isolated Python 3.14 virtualenv with unmodified upstream STRkit v0.25.0 installed from source (`pip install .`)",
+    "without_preparation": "Automated verification stopped before installation (`UNVERIFIED_INSUFFICIENT_DOCS`) because `README.md` only documents PyPI (`python -m pip install strkit`) and Docker (`ghcr.io/davidlougheed/strkit:latest`) installation rather than a copyable source install command (`pip install .`) for the cloned repository.",
+    "why": [
+      "The automated run stopped before installation (`UNVERIFIED_INSUFFICIENT_DOCS`) because `README.md` documents installing from PyPI (`python -m pip install strkit`) or running a prebuilt Docker image (`ghcr.io/davidlougheed/strkit:latest`), rather than a single copyable source-installation command (`pip install .`) targeting the cloned repository.",
+      "Additionally, `pyproject.toml` declares a local `[tool.uv.sources]` path (`../strkit_rust_ext/`) for workspace development, whereas standard `pip install .` resolves `strkit_rust_ext==0.30.1` cleanly from PyPI without requiring a sibling Rust checkout."
+    ],
+    "steps": [
+      "Cloned `https://github.com/davidlougheed/strkit` and checked out commit `c6b6ef1a878cac2fed5f41637553d51caa3403d1` without modifying any tracked or untracked files.",
+      "Created an isolated Python 3.14 virtual environment and installed the checkout from source (`pip install /src/strkit`), which installed `strkit==0.25.0` together with the prebuilt `strkit_rust_ext==0.30.1` wheel, `pysam`, `scipy`, `scikit-learn`, `statsmodels`, and `parasail`.",
+      "Staged the indexed ONT R10 SUP CODIS BAM (`HG00113.codis.bam` + `.bai`), indexed `hg38.fa` (+ `.fai`), and STRhub's 4-column `motif.bed` catalog (20 CODIS loci) in `/data/in`.",
+      "Executed `strkit call` with `--realign --seed 183 --processes 4 --vcf /data/out/sample.vcf` and verified all 20/20 CODIS loci in the resulting VCF."
+    ],
+    "run_cmd": "strkit --version && strkit call /data/in/sample.bam --ref /data/in/hg38.fa --loci /data/in/motif.bed --vcf /data/out/sample.vcf --realign --seed 183 --processes 4",
+    "files": []
+  },
+  "recommendations": [
+    "Add a short \"Install from source\" code block in `README.md` (for example `python -m pip install .` after cloning) alongside the PyPI and Docker instructions so automated verifiers and reviewers can build directly from a pinned commit.",
+    "Document a minimal, self-contained `strkit call` example without optional external catalogs (`--incorporate-snvs` dbSNP VCF and `--annotation-file` GFF3) so first-time users and automated runners can smoke-test the caller with only a BAM, reference FASTA, and 4-column BED."
+  ],
+  "gates": {
+    "available": true,
+    "installs": true,
+    "runs": true,
+    "io": true,
+    "content": true
+  },
+  "level": "content",
+  "verdict": {
+    "code": "runs",
+    "title": "Runs in manual verification",
+    "basis": "gates",
+    "reason": "Installed unmodified upstream STRkit v0.25.0 (`c6b6ef1`) into an isolated Python virtual environment (`pip install .`, zero source modifications) and ran `strkit call` with `--realign --seed 183 --processes 4` against the HG00113 Oxford Nanopore R10 SUP CODIS reference slice (`ont-bam-hg38`, 20 autosomal CODIS loci in 4-column `motif.bed` format) and local `hg38.fa`. Execution completed cleanly in ~4.4 s (exit 0), producing a valid 20-record VCF (`sample.vcf`) with 20/20 called diploid genotypes and 702 total supporting reads (`FORMAT/DP`, mean depth 35.1x).",
+    "readme_gaps": []
+  },
+  "run": {
+    "cmd": "strkit --version && strkit call /data/in/sample.bam --ref /data/in/hg38.fa --loci /data/in/motif.bed --vcf /data/out/sample.vcf --realign --seed 183 --processes 4",
+    "cwd": ".",
+    "step_outcome": "success"
+  },
+  "datasets": [
+    {
+      "leg": "external",
+      "label": "External data",
+      "available": true,
+      "type": "ont-bam-hg38",
+      "dataset": "HG00113 ONT R10 SUP CODIS slice (20 loci)",
+      "io": true,
+      "content": true,
+      "passed": true
+    }
+  ],
+  "logs": {
+    "external": "strkit-ont.log-external.txt"
+  },
+  "terminals": {
+    "external": "strkit-ont.terminal-external.txt"
+  },
+  "certificate": {
+    "schema": "strhub-verified/certificate/1",
+    "label": "Manual verification: verified",
+    "reached": "Runs + Plausible output",
+    "summary": {
+      "purpose": "Independent manual verification of reproducible execution on unmodified upstream source.",
+      "result": "Installed unmodified upstream STRkit v0.25.0 (`c6b6ef1`) into an isolated Python virtual environment (`pip install .`, zero source modifications) and ran `strkit call` with `--realign --seed 183 --processes 4` against the HG00113 Oxford Nanopore R10 SUP CODIS reference slice (`ont-bam-hg38`, 20 autosomal CODIS loci in 4-column `motif.bed` format) and local `hg38.fa`. Execution completed cleanly in ~4.4 s (exit 0), producing a valid 20-record VCF (`sample.vcf`) with 20/20 called diploid genotypes and 702 total supporting reads (`FORMAT/DP`, mean depth 35.1x).",
+      "reached": "Runs + Plausible output",
+      "why": "STRkit v0.25.0 installs cleanly from the pinned repository via `pip install .` and calls all 20/20 CODIS loci on the ONT R10 SUP reference slice with zero source modifications.",
+      "scope": "Reproducible execution only; does not evaluate genotype concordance or forensic casework fitness.",
+      "not_evaluated": [
+        "Genotype accuracy",
+        "Concordance against truth",
+        "Forensic casework fitness"
+      ]
+    },
+    "conclusion": [
+      {
+        "title": "strkit v0.25.0 executes end-to-end",
+        "body": "strkit v0.25.0 ran to completion without code modifications in the prepared environment at unmodified upstream commit c6b6ef1."
+      },
+      {
+        "title": "Output passes plausibility checks",
+        "body": "The run produced a structurally valid, non-empty VCF output containing 20 distinct recognizable STR loci; structural plausibility checks verify output format and locus presence, not genotype accuracy."
+      },
+      {
+        "title": "Verification used STRhub reference data",
+        "body": "Verification used open-access STRhub reference dataset HG00113 ONT R10 SUP CODIS slice (20 loci) (ont-bam-hg38)."
+      },
+      {
+        "title": "Repeatability of this manual run",
+        "body": "The pinned upstream commit, prepared environment description, exact commands executed, and sanitized terminal output recorded in this report document the procedure for independent reproduction."
+      }
+    ],
+    "out_of_scope": [
+      "Genotype accuracy and concordance",
+      "Forensic casework accreditation"
+    ],
+    "limitations": [
+      "Results apply exclusively to the exact Git commit SHA and manually prepared environment recorded in this report.",
+      "Single regional reference slice per input type; low-coverage warnings on sliced BAMs do not imply defects on whole-genome data.",
+      "Plausible Output checks verify structural format and recognizable STR loci, not biological genotype truth.",
+      "Verification is a point-in-time snapshot; upstream repository changes after this commit are not covered until re-verification.",
+      "No truth-set concordance, forensic casework validation, or regulatory compliance assessment was performed."
+    ],
+    "scope": {
+      "statement": "This report records a manual execution against the pinned upstream commit.",
+      "not": "It does not establish genotype accuracy or forensic casework fitness.",
+      "disclaimer": "Each result is a fixed, dated attestation verified on the tool's public repository at an immutable commit. It evaluates reproducible execution only, not genotype accuracy or forensic fitness."
+    }
+  },
+  "scope": "Manual verification of reproducible execution against unmodified upstream commit.",
+  "io_detail": {
+    "gate": "io",
+    "passed": true,
+    "outputs": [
+      {
+        "path": "sample.vcf",
+        "format": "vcf",
+        "resolved": "sample.vcf",
+        "validation_profile": "strhub-vcf-structure/1",
+        "validation_status": "valid",
+        "records": 20,
+        "called_records": 20,
+        "uncalled_rows": 0,
+        "records_without_gt": 0,
+        "checks": {
+          "exists": true,
+          "non_empty": true,
+          "parses_as_vcf": true,
+          "min_records": true,
+          "has_called_genotypes": true
+        },
+        "passed": true
+      }
+    ]
+  },
+  "content_detail": {
+    "gate": "content",
+    "applicable": true,
+    "passed": true,
+    "outputs": [
+      {
+        "path": "sample.vcf",
+        "resolved": "sample.vcf",
+        "mode": "auto",
+        "checks": {
+          "records_present": true,
+          "genotypes_called": true,
+          "given_loci_recognised": true
+        },
+        "stats": {
+          "rows": 20,
+          "header_row_dropped": false,
+          "malformed_rows": 0,
+          "dna_invalid_rows": 0,
+          "count_invalid_rows": 0,
+          "distinct_loci": 20,
+          "distinct_str_loci": 20,
+          "distinct_snp_markers": 0,
+          "loci": [
+            "CSF1PO",
+            "D10S1248",
+            "D12S391",
+            "D13S317",
+            "D16S539",
+            "D18S51",
+            "D19S433",
+            "D1S1656",
+            "D21S11",
+            "D22S1045",
+            "D2S1338",
+            "D2S441",
+            "D3S1358",
+            "D5S818",
+            "D7S820",
+            "D8S1179",
+            "FGA",
+            "TH01",
+            "TPOX",
+            "vWA"
+          ],
+          "str_loci": [
+            "CSF1PO",
+            "D10S1248",
+            "D12S391",
+            "D13S317",
+            "D16S539",
+            "D18S51",
+            "D19S433",
+            "D1S1656",
+            "D21S11",
+            "D22S1045",
+            "D2S1338",
+            "D2S441",
+            "D3S1358",
+            "D5S818",
+            "D7S820",
+            "D8S1179",
+            "FGA",
+            "TH01",
+            "TPOX",
+            "vWA"
+          ],
+          "snp_markers": [],
+          "total_reads": 702,
+          "max_sequence_depth": 46,
+          "top_loci_by_depth": [
+            [
+              "TPOX",
+              46
+            ],
+            [
+              "D19S433",
+              46
+            ],
+            [
+              "FGA",
+              43
+            ],
+            [
+              "D2S441",
+              41
+            ],
+            [
+              "vWA",
+              41
+            ],
+            [
+              "D16S539",
+              39
+            ],
+            [
+              "D12S391",
+              38
+            ],
+            [
+              "D5S818",
+              37
+            ],
+            [
+              "D18S51",
+              37
+            ],
+            [
+              "D10S1248",
+              36
+            ],
+            [
+              "D3S1358",
+              35
+            ],
+            [
+              "CSF1PO",
+              33
+            ],
+            [
+              "D7S820",
+              32
+            ],
+            [
+              "D21S11",
+              31
+            ],
+            [
+              "D1S1656",
+              30
+            ],
+            [
+              "D8S1179",
+              30
+            ],
+            [
+              "D22S1045",
+              30
+            ],
+            [
+              "D13S317",
+              27
+            ],
+            [
+              "D2S1338",
+              25
+            ],
+            [
+              "TH01",
+              25
+            ]
+          ],
+          "called_genotypes": 20,
+          "regions_given": 20,
+          "regions_hit": 20,
+          "depth_source": "FORMAT/DP"
+        }
+      }
+    ]
+  },
+  "i18n": {
+    "es": {
+      "plain_why": "STRkit v0.25.0 se instala limpiamente desde el repositorio fijado con `pip install .` y genotipifica los 20/20 loci CODIS del slice de referencia ONT R10 SUP sin modificar el c\u00f3digo fuente.",
+      "without_preparation": "La verificaci\u00f3n autom\u00e1tica se detuvo antes de la instalaci\u00f3n (`UNVERIFIED_INSUFFICIENT_DOCS`) porque `README.md` solo documenta la instalaci\u00f3n v\u00eda PyPI (`python -m pip install strkit`) o Docker (`ghcr.io/davidlougheed/strkit:latest`), sin un comando copiable de instalaci\u00f3n desde el repositorio clonado (`pip install .`).",
+      "recommendations": [
+        "Agregar un bloque breve de instalaci\u00f3n desde el c\u00f3digo fuente en `README.md` (por ejemplo `python -m pip install .` tras clonar el repositorio) junto a las instrucciones de PyPI y Docker para que los verificadores autom\u00e1ticos y revisores puedan compilar directamente desde un commit fijado.",
+        "Documentar un ejemplo m\u00ednimo autocontenido de `strkit call` sin cat\u00e1logos externos opcionales (`--incorporate-snvs` con dbSNP ni `--annotation-file` GFF3) para que nuevos usuarios y corridas autom\u00e1ticas puedan probar el caller solo con BAM, FASTA de referencia y BED de 4 columnas."
+      ]
+    },
+    "pt": {
+      "plain_why": "STRkit v0.25.0 instala-se limpamente a partir do reposit\u00f3rio fixado via `pip install .` e genotipa todos os 20/20 loci CODIS no recorte de refer\u00eancia ONT R10 SUP sem modificar o c\u00f3digo-fonte.",
+      "without_preparation": "A verifica\u00e7\u00e3o autom\u00e1tica parou antes da instala\u00e7\u00e3o (`UNVERIFIED_INSUFFICIENT_DOCS`) porque o `README.md` documenta apenas a instala\u00e7\u00e3o via PyPI (`python -m pip install strkit`) ou Docker (`ghcr.io/davidlougheed/strkit:latest`), sem um comando copi\u00e1vel de instala\u00e7\u00e3o a partir do reposit\u00f3rio clonado (`pip install .`).",
+      "recommendations": [
+        "Adicionar um bloco curto de instala\u00e7\u00e3o a partir do c\u00f3digo-fonte no `README.md` (por exemplo `python -m pip install .` ap\u00f3s clonar) ao lado das instru\u00e7\u00f5es de PyPI e Docker para que verificadores autom\u00e1ticos e revisores possam instalar diretamente de um commit fixado.",
+        "Documentar um exemplo m\u00ednimo autocontido de `strkit call` sem cat\u00e1logos externos opcionais (`--incorporate-snvs` dbSNP e `--annotation-file` GFF3) para que novos usu\u00e1rios e execu\u00e7\u00f5es autom\u00e1ticas possam testar a ferramenta apenas com BAM, FASTA de refer\u00eancia e BED de 4 colunas."
+      ]
+    }
+  }
+}
