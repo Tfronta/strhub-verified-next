@@ -1,0 +1,177 @@
+{
+  "schema": "strhub-verified/1",
+  "instrument": "curated",
+  "mode": "publish",
+  "generated": "2026-11-24T17:51:29+00:00",
+  "tool": {
+    "name": "vamos",
+    "version": "v3.1.1",
+    "contact": "https://github.com/ChaissonLab/vamos/issues"
+  },
+  "source": {
+    "repo": "https://github.com/ChaissonLab/vamos",
+    "ref": "5c4a069847fbe6ca6067de1bff6098c9403db9ec",
+    "ref_resolved": "5c4a069847fbe6ca6067de1bff6098c9403db9ec",
+    "committed": "2026-05-25T03:58:10Z"
+  },
+  "environment": {
+    "os": [
+      "macOS x86_64 via Rosetta 2 (conda osx-64 build environment)"
+    ],
+    "source": "prepared"
+  },
+  "preparation": {
+    "file": "vamos-notes.yml",
+    "dataset": "ont-bam-hg38",
+    "installation": "strhub",
+    "base": "Conda osx-64 environment (htslib, boost-cpp, libdeflate, zlib, bzip2, cmake, make, clang/clang++) building unmodified upstream vamos v3.1.1 from source",
+    "without_preparation": "Automated verification stopped before installation (`UNVERIFIED_INSUFFICIENT_DOCS`) because `README.md` uses a shell glob (`cd vamos*/src/ && make`) that the automated engine does not expand, and references an external Zenodo motif catalog not bundled in the repository.",
+    "why": [
+      "Automated verification stopped before installation (`UNVERIFIED_INSUFFICIENT_DOCS`) because `README.md` writes `cd vamos*/src/ && make` (with a wildcard path) and shows an example reading a Zenodo motif catalog not present in the repository.",
+      "`src/Makefile` compiles bundled `abPOA-1.4.1` with `sse2=true` (x86_64 SIMD) and links against `$(CONDA_PREFIX)/lib` (`htslib`, `zlib`, `bzip2`, `libdeflate`). On Apple Silicon, building in an `osx-64` conda environment with `CMAKE_POLICY_VERSION_MINIMUM=3.5` and `-Wno-error=incompatible-pointer-types` (for `parasail`'s test target under Clang 22) compiles the unmodified upstream source cleanly.",
+      "Although `vamos --read` ran to completion (exit 0) and produced 20 locus records, `src/vcf.cpp` (lines 104-122) unconditionally appends a trailing `;` to the `INFO` column and emits `GT=1/2` against a single `ALT=<VNTR>` allele, causing strict VCF structural validation (`strhub-vcf-structure/1`) to fail at line 209 (`invalid or duplicate INFO key`)."
+    ],
+    "steps": [
+      "Cloned `https://github.com/ChaissonLab/vamos` at commit `5c4a069847fbe6ca6067de1bff6098c9403db9ec` without modifying any file in the checkout.",
+      "Created an isolated `osx-64` conda environment (`htslib`, `boost-cpp`, `libdeflate`, `zlib`, `bzip2`, `cmake`, `make`, `clang_osx-64`, `clangxx_osx-64`) and built `vamos` in a separate build copy (`src/Makefile`, with `CMAKE_POLICY_VERSION_MINIMUM=3.5` and `-Wno-error=incompatible-pointer-types` for `parasail-2.6.2`).",
+      "Added the conda library rpath (`install_name_tool -add_rpath`) so macOS dyld resolves `libhts.3.dylib`, and staged the indexed ONT R10 SUP CODIS BAM (`HG00113.codis.bam` + `.bai`) and 4-column `motif.bed` in `/data/in`.",
+      "Executed `vamos --read -b /data/in/sample.bam -r /data/in/motif.bed -s HG00113 -o /data/out/sample.vcf -t 4` (exit 0, 20 records written) and ran STRhub's strict VCF structural check (`strhub-vcf-structure/1`), which rejected `sample.vcf` on line 209."
+    ],
+    "run_cmd": "vamos --read -b /data/in/sample.bam -r /data/in/motif.bed -s HG00113 -o /data/out/sample.vcf -t 4",
+    "files": []
+  },
+  "recommendations": [
+    "Remove the trailing semicolon at the end of the `INFO` field in `src/vcf.cpp` (lines 117, 121, and 129) so `INFO` entries do not end with an empty key after `;`.",
+    "Align `ALT` and `GT` in `src/vcf.cpp` (lines 104-110): when emitting heterozygous `GT=1/2`, declare two distinct `ALT` alleles (or use a VCF-conformant representation matching the number of alleles in `ALT`) so strict VCF parsers (`strhub-vcf-structure/1`, GATK, `vcf-validator`) accept the output.",
+    "Replace `cd vamos*/src/ && make` in `README.md` with an explicit relative path (`cd src && make`) and document a minimal test command using the bundled `example/demo.aln.bam` and `example/one_region_motif.bed`."
+  ],
+  "gates": {
+    "available": true,
+    "installs": true,
+    "runs": true,
+    "io": false,
+    "content": false
+  },
+  "level": "runs",
+  "verdict": {
+    "code": "fails",
+    "title": "Fails in manual verification",
+    "basis": "gates",
+    "reason": "Built unmodified upstream vamos v3.1.1 (`5c4a069`) from source in an isolated `osx-64` conda environment (zero source modifications) and ran `vamos --read` against the HG00113 Oxford Nanopore R10 SUP CODIS reference slice (`ont-bam-hg38`, 20 CODIS loci in 4-column `motif.bed` format). Execution completed cleanly in <1 s (exit 0) and emitted calls for all 20/20 loci in `sample.vcf`, but the `Expected IO` gate (`strhub-vcf-structure/1`) failed because `src/vcf.cpp` writes non-conformant VCF records: every `INFO` column ends with a trailing semicolon (`LEN_H1=...;` / `LEN_H2=...;`, creating an empty INFO key), and heterozygous loci emit `GT=1/2` while `ALT` declares only one symbolic allele (`<VNTR>`).",
+    "readme_gaps": []
+  },
+  "run": {
+    "cmd": "vamos --read -b /data/in/sample.bam -r /data/in/motif.bed -s HG00113 -o /data/out/sample.vcf -t 4",
+    "cwd": ".",
+    "step_outcome": "success"
+  },
+  "datasets": [
+    {
+      "leg": "external",
+      "label": "External data",
+      "available": true,
+      "type": "ont-bam-hg38",
+      "dataset": "HG00113 ONT R10 SUP CODIS slice (20 loci)",
+      "io": false,
+      "content": false,
+      "passed": false
+    }
+  ],
+  "logs": {
+    "external": "vamos-ont.log-external.txt"
+  },
+  "terminals": {
+    "external": "vamos-ont.terminal-external.txt"
+  },
+  "certificate": {
+    "schema": "strhub-verified/certificate/1",
+    "label": "Manual verification: fails",
+    "reached": "Runs",
+    "summary": {
+      "purpose": "Independent manual verification of reproducible execution on unmodified upstream source.",
+      "result": "Built unmodified upstream vamos v3.1.1 (`5c4a069`) from source in an isolated `osx-64` conda environment (zero source modifications) and ran `vamos --read` against the HG00113 Oxford Nanopore R10 SUP CODIS reference slice (`ont-bam-hg38`, 20 CODIS loci in 4-column `motif.bed` format). Execution completed cleanly in <1 s (exit 0) and emitted calls for all 20/20 loci in `sample.vcf`, but the `Expected IO` gate (`strhub-vcf-structure/1`) failed because `src/vcf.cpp` writes non-conformant VCF records: every `INFO` column ends with a trailing semicolon (`LEN_H1=...;` / `LEN_H2=...;`, creating an empty INFO key), and heterozygous loci emit `GT=1/2` while `ALT` declares only one symbolic allele (`<VNTR>`).",
+      "reached": "Runs",
+      "why": "vamos v3.1.1 compiles from source and runs end-to-end on all 20/20 CODIS loci (exit 0), but fails strict VCF validation (`Expected IO`) due to a trailing semicolon in `INFO` and `GT=1/2` referencing a second `ALT` allele not declared in `ALT=<VNTR>` (`src/vcf.cpp`).",
+      "scope": "Reproducible execution only; does not evaluate genotype concordance or forensic casework fitness.",
+      "not_evaluated": [
+        "Genotype accuracy",
+        "Concordance against truth",
+        "Forensic casework fitness"
+      ]
+    },
+    "conclusion": [
+      {
+        "title": "vamos v3.1.1 executes end-to-end",
+        "body": "vamos v3.1.1 ran to completion without code modifications in the prepared environment at unmodified upstream commit 5c4a069."
+      },
+      {
+        "title": "Output failed structural validation",
+        "body": "Execution completed, but the expected output file was either missing or failed structural validation for its declared format."
+      },
+      {
+        "title": "Verification used STRhub reference data",
+        "body": "Verification used open-access STRhub reference dataset HG00113 ONT R10 SUP CODIS slice (20 loci) (ont-bam-hg38)."
+      },
+      {
+        "title": "Repeatability of this manual run",
+        "body": "The pinned upstream commit, prepared environment description, exact commands executed, and sanitized terminal output recorded in this report document the procedure for independent reproduction."
+      }
+    ],
+    "out_of_scope": [
+      "Genotype accuracy and concordance",
+      "Forensic casework accreditation"
+    ],
+    "limitations": [
+      "Results apply exclusively to the exact Git commit SHA and manually prepared environment recorded in this report.",
+      "Single regional reference slice per input type; low-coverage warnings on sliced BAMs do not imply defects on whole-genome data.",
+      "Plausible Output checks verify structural format and recognizable STR loci, not biological genotype truth.",
+      "Verification is a point-in-time snapshot; upstream repository changes after this commit are not covered until re-verification.",
+      "No truth-set concordance, forensic casework validation, or regulatory compliance assessment was performed."
+    ],
+    "scope": {
+      "statement": "This report records a manual execution against the pinned upstream commit.",
+      "not": "It does not establish genotype accuracy or forensic casework fitness.",
+      "disclaimer": "Each result is a fixed, dated attestation verified on the tool's public repository at an immutable commit. It evaluates reproducible execution only, not genotype accuracy or forensic fitness."
+    }
+  },
+  "scope": "Manual verification of reproducible execution against unmodified upstream commit.",
+  "io_detail": {
+    "gate": "io",
+    "passed": false,
+    "outputs": [
+      {
+        "path": "sample.vcf",
+        "format": "vcf",
+        "resolved": "sample.vcf",
+        "validation_status": "invalid",
+        "parse_error": "line 209: invalid or duplicate INFO key",
+        "checks": {
+          "exists": true,
+          "non_empty": true,
+          "parses_as_vcf": false
+        },
+        "passed": false
+      }
+    ]
+  },
+  "i18n": {
+    "es": {
+      "plain_why": "vamos v3.1.1 compila desde el c\u00f3digo fuente y corre de punta a punta en los 20/20 loci CODIS (c\u00f3digo de salida 0), pero falla la validaci\u00f3n estricta de VCF (`Expected IO`) por un punto y coma al final de `INFO` y por emitir `GT=1/2` con un solo alelo en `ALT=<VNTR>` (`src/vcf.cpp`).",
+      "without_preparation": "La verificaci\u00f3n autom\u00e1tica se detuvo antes de la instalaci\u00f3n (`UNVERIFIED_INSUFFICIENT_DOCS`) porque `README.md` usa un comod\u00edn de shell (`cd vamos*/src/ && make`) que el motor autom\u00e1tico no expande, y referencia un cat\u00e1logo externo de Zenodo que no est\u00e1 incluido en el repositorio.",
+      "recommendations": [
+        "Quitar el punto y coma final de la columna `INFO` en `src/vcf.cpp` (l\u00edneas 117, 121 y 129) para que `INFO` no termine con una clave vac\u00eda despu\u00e9s de `;`.",
+        "Alinear `ALT` y `GT` en `src/vcf.cpp` (l\u00edneas 104-110): al emitir heterocigotas `GT=1/2`, declarar dos alelos distintos en `ALT` (o usar una representaci\u00f3n conforme al est\u00e1ndar VCF que coincida con la cantidad de alelos en `ALT`) para que parsers estrictos de VCF (`strhub-vcf-structure/1`, GATK, `vcf-validator`) acepten la salida.",
+        "Reemplazar `cd vamos*/src/ && make` en `README.md` por una ruta relativa expl\u00edcita (`cd src && make`) y documentar un comando m\u00ednimo de prueba usando los archivos ya incluidos `example/demo.aln.bam` y `example/one_region_motif.bed`."
+      ]
+    },
+    "pt": {
+      "plain_why": "vamos v3.1.1 compila a partir do c\u00f3digo-fonte e executa de ponta a ponta nos 20/20 loci CODIS (c\u00f3digo de sa\u00edda 0), mas falha na valida\u00e7\u00e3o estrita de VCF (`Expected IO`) devido a um ponto e v\u00edrgula final em `INFO` e `GT=1/2` referenciando um segundo alelo ausente em `ALT=<VNTR>` (`src/vcf.cpp`).",
+      "without_preparation": "A verifica\u00e7\u00e3o autom\u00e1tica parou antes da instala\u00e7\u00e3o (`UNVERIFIED_INSUFFICIENT_DOCS`) porque o `README.md` usa um curinga de shell (`cd vamos*/src/ && make`) que o motor autom\u00e1tico n\u00e3o expande e referencia um cat\u00e1logo externo do Zenodo n\u00e3o inclu\u00eddo no reposit\u00f3rio.",
+      "recommendations": [
+        "Remover o ponto e v\u00edrgula final do campo `INFO` em `src/vcf.cpp` (linhas 117, 121 e 129) para que `INFO` n\u00e3o termine com uma chave vazia ap\u00f3s `;`.",
+        "Alinhar `ALT` e `GT` em `src/vcf.cpp` (linhas 104-110): ao emitir heterozigotos `GT=1/2`, declarar dois alelos distintos em `ALT` (ou usar uma representa\u00e7\u00e3o conforme a especifica\u00e7\u00e3o VCF compat\u00edvel com o n\u00famero de alelos em `ALT`) para que parsers estritos de VCF (`strhub-vcf-structure/1`, GATK, `vcf-validator`) aceitem a sa\u00edda.",
+        "Substituir `cd vamos*/src/ && make` no `README.md` por um caminho relativo expl\u00edcito (`cd src && make`) e documentar um comando m\u00ednimo de teste usando os arquivos j\u00e1 inclu\u00eddos `example/demo.aln.bam` e `example/one_region_motif.bed`."
+      ]
+    }
+  }
+}

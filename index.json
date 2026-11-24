@@ -1,6 +1,6 @@
 {
   "schema": "strhub-verified/index/3",
-  "generated": "2026-11-24T17:10:51+00:00",
+  "generated": "2026-11-24T17:52:08+00:00",
   "count": 23,
   "tools": [
     {
@@ -1144,6 +1144,22 @@
           "report": "vamos-ont/5c4a069847fbe6ca6067de1bff6098c9403db9ec/vamos-ont.json",
           "page": "vamos-ont/5c4a069847fbe6ca6067de1bff6098c9403db9ec/vamos-ont.html",
           "pdf": "vamos-ont/5c4a069847fbe6ca6067de1bff6098c9403db9ec/vamos-ont.pdf"
+        },
+        {
+          "sha": "5c4a069847fbe6ca6067de1bff6098c9403db9ec",
+          "instrument": "curated",
+          "version": "v3.1.1",
+          "variant": null,
+          "committed": "2026-05-25T03:58:10Z",
+          "generated": "2026-11-24T17:51:29+00:00",
+          "level": "runs",
+          "label": "Not verified as documented",
+          "verdict": "fails",
+          "errors_reported": false,
+          "ci_run": null,
+          "report": "vamos-ont/5c4a069847fbe6ca6067de1bff6098c9403db9ec-curated/vamos-ont.json",
+          "page": "vamos-ont/5c4a069847fbe6ca6067de1bff6098c9403db9ec-curated/vamos-ont.html",
+          "pdf": "vamos-ont/5c4a069847fbe6ca6067de1bff6098c9403db9ec-curated/vamos-ont.pdf"
         }
       ]
     }

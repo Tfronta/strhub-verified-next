@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang='en'><head><meta charset='utf-8'><title>vamos v3.1.1 · STRhub Manual Verification</title><style>body{font:15px/1.6 system-ui,sans-serif;max-width:860px;margin:2rem auto;padding:0 1rem;color:#1f2937}pre{background:#111827;color:#f3f4f6;padding:1rem;border-radius:8px;overflow:auto;font-size:12px}.pill{display:inline-block;padding:2px 10px;border-radius:999px;background:#eef2ff;color:#312e81;font-weight:600;font-size:12px}</style></head><body><span class='pill'>Manual Verification · fails</span><h1>vamos v3.1.1</h1><p><strong>Commit:</strong> <code>5c4a069847fbe6ca6067de1bff6098c9403db9ec</code></p><p>Built unmodified upstream vamos v3.1.1 (`5c4a069`) from source in an isolated `osx-64` conda environment (zero source modifications) and ran `vamos --read` against the HG00113 Oxford Nanopore R10 SUP CODIS reference slice (`ont-bam-hg38`, 20 CODIS loci in 4-column `motif.bed` format). Execution completed cleanly in &lt;1 s (exit 0) and emitted calls for all 20/20 loci in `sample.vcf`, but the `Expected IO` gate (`strhub-vcf-structure/1`) failed because `src/vcf.cpp` writes non-conformant VCF records: every `INFO` column ends with a trailing semicolon (`LEN_H1=...;` / `LEN_H2=...;`, creating an empty INFO key), and heterozygous loci emit `GT=1/2` while `ALT` declares only one symbolic allele (`&lt;VNTR&gt;`).</p><h2>Recorded Terminal</h2><pre>$ vamos --read -b /data/in/sample.bam -r /data/in/motif.bed -s HG00113 -o /data/out/sample.vcf -t 4
+
+option --bam with `/data/in/sample.bam&#x27;
+option --region with `/data/in/motif.bed&#x27;
+option --sampleName with `HG00113&#x27;
+option --output with `/data/out/sample.vcf&#x27;
+option --numThreads with `4&#x27;
+Read 20 target loci
+Splitting gap on 5984044	12297020
+Splitting gap on 1489684	68011947
+Splitting gap on 68011994	218014859
+Splitting gap on 123775599	150076324
+Calling snvs: chr1:230769616-230769683
+Calling snvs: chr10:129294244-129294295
+Calling snvs: chr11:2171088-2171115
+Calling snvs: chr12:5983969-5984044
+Reads are phased. Skipping SNV calling.
+Storing TR sequences on chr10:129294244-129294295
+Reads are phased. Skipping SNV calling.
+Storing TR sequences on chr1:230769616-230769683
+Reads are phased. Skipping SNV calling.
+Storing TR sequences on chr11:2171088-2171115
+Reads are phased. Skipping SNV calling.
+Storing TR sequences on chr12:5983969-5984044
+Done processing chr11:2171088-2171115
+Storing TR sequences on chr12:12297020-12297095
+Done processing chr1:230769616-230769683
+Storing TR sequences on chr13:82148025-82148068
+Done processing chr10:129294244-129294295
+Storing TR sequences on chr16:86352702-86352745
+Done processing chr12:5983969-5984044
+Storing TR sequences on chr18:63281667-63281738
+Done processing chr13:82148025-82148068
+Storing TR sequences on chr19:29926235-29926298
+Done processing chr16:86352702-86352745
+Storing TR sequences on chr2:1489653-1489684
+Done processing chr12:12297020-12297095
+Storing TR sequences on chr2:68011947-68011994
+Done processing chr18:63281667-63281738
+Storing TR sequences on chr2:218014859-218014950
+Done processing chr2:1489653-1489684
+Storing TR sequences on chr21:19181973-19182099
+Done processing chr2:68011947-68011994
+Storing TR sequences on chr22:37140287-37140337
+Done processing chr19:29926235-29926298
+Storing TR sequences on chr3:45540739-45540802
+Done processing chr2:218014859-218014950
+Storing TR sequences on chr4:154587736-154587823
+Done processing chr22:37140287-37140337
+Storing TR sequences on chr5:123775556-123775599
+Done processing chr3:45540739-45540802
+Storing TR sequences on chr5:150076324-150076375
+Done processing chr21:19181973-19182099
+Storing TR sequences on chr7:84160226-84160277
+Done processing chr5:123775556-123775599
+Storing TR sequences on chr8:124894865-124894916
+Done processing chr4:154587736-154587823
+Done processing chr5:150076324-150076375
+Done processing chr7:84160226-84160277
+Done processing chr8:124894865-124894916
+[CPU time: 0.00 sec, RSS: 50026.55 G]
+
+[exit 0]
+</pre></body></html>

@@ -1,0 +1,63 @@
+$ vamos --read -b /data/in/sample.bam -r /data/in/motif.bed -s HG00113 -o /data/out/sample.vcf -t 4
+
+option --bam with `/data/in/sample.bam'
+option --region with `/data/in/motif.bed'
+option --sampleName with `HG00113'
+option --output with `/data/out/sample.vcf'
+option --numThreads with `4'
+Read 20 target loci
+Splitting gap on 5984044	12297020
+Splitting gap on 1489684	68011947
+Splitting gap on 68011994	218014859
+Splitting gap on 123775599	150076324
+Calling snvs: chr1:230769616-230769683
+Calling snvs: chr10:129294244-129294295
+Calling snvs: chr11:2171088-2171115
+Calling snvs: chr12:5983969-5984044
+Reads are phased. Skipping SNV calling.
+Storing TR sequences on chr10:129294244-129294295
+Reads are phased. Skipping SNV calling.
+Storing TR sequences on chr1:230769616-230769683
+Reads are phased. Skipping SNV calling.
+Storing TR sequences on chr11:2171088-2171115
+Reads are phased. Skipping SNV calling.
+Storing TR sequences on chr12:5983969-5984044
+Done processing chr11:2171088-2171115
+Storing TR sequences on chr12:12297020-12297095
+Done processing chr1:230769616-230769683
+Storing TR sequences on chr13:82148025-82148068
+Done processing chr10:129294244-129294295
+Storing TR sequences on chr16:86352702-86352745
+Done processing chr12:5983969-5984044
+Storing TR sequences on chr18:63281667-63281738
+Done processing chr13:82148025-82148068
+Storing TR sequences on chr19:29926235-29926298
+Done processing chr16:86352702-86352745
+Storing TR sequences on chr2:1489653-1489684
+Done processing chr12:12297020-12297095
+Storing TR sequences on chr2:68011947-68011994
+Done processing chr18:63281667-63281738
+Storing TR sequences on chr2:218014859-218014950
+Done processing chr2:1489653-1489684
+Storing TR sequences on chr21:19181973-19182099
+Done processing chr2:68011947-68011994
+Storing TR sequences on chr22:37140287-37140337
+Done processing chr19:29926235-29926298
+Storing TR sequences on chr3:45540739-45540802
+Done processing chr2:218014859-218014950
+Storing TR sequences on chr4:154587736-154587823
+Done processing chr22:37140287-37140337
+Storing TR sequences on chr5:123775556-123775599
+Done processing chr3:45540739-45540802
+Storing TR sequences on chr5:150076324-150076375
+Done processing chr21:19181973-19182099
+Storing TR sequences on chr7:84160226-84160277
+Done processing chr5:123775556-123775599
+Storing TR sequences on chr8:124894865-124894916
+Done processing chr4:154587736-154587823
+Done processing chr5:150076324-150076375
+Done processing chr7:84160226-84160277
+Done processing chr8:124894865-124894916
+[CPU time: 0.00 sec, RSS: 50026.55 G]
+
+[exit 0]
