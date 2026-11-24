@@ -1,6 +1,6 @@
 {
   "schema": "strhub-verified/index/3",
-  "generated": "2026-11-24T12:28:35+00:00",
+  "generated": "2026-11-24T12:56:46+00:00",
   "count": 23,
   "tools": [
     {
@@ -500,6 +500,22 @@
           "report": "nanorepeat-ont/aa5ceb4eb92bc92acc718434b2fcb9f387009084/nanorepeat-ont.json",
           "page": "nanorepeat-ont/aa5ceb4eb92bc92acc718434b2fcb9f387009084/nanorepeat-ont.html",
           "pdf": "nanorepeat-ont/aa5ceb4eb92bc92acc718434b2fcb9f387009084/nanorepeat-ont.pdf"
+        },
+        {
+          "sha": "aa5ceb4eb92bc92acc718434b2fcb9f387009084",
+          "instrument": "curated",
+          "version": "v1.8.3",
+          "variant": null,
+          "committed": "2026-01-13T06:15:20Z",
+          "generated": "2026-11-24T12:55:40+00:00",
+          "level": "content",
+          "label": "Not verified as documented",
+          "verdict": "runs",
+          "errors_reported": false,
+          "ci_run": null,
+          "report": "nanorepeat-ont/aa5ceb4eb92bc92acc718434b2fcb9f387009084-curated/nanorepeat-ont.json",
+          "page": "nanorepeat-ont/aa5ceb4eb92bc92acc718434b2fcb9f387009084-curated/nanorepeat-ont.html",
+          "pdf": "nanorepeat-ont/aa5ceb4eb92bc92acc718434b2fcb9f387009084-curated/nanorepeat-ont.pdf"
         }
       ]
     },

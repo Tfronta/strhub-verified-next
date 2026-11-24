@@ -1,0 +1,345 @@
+{
+  "schema": "strhub-verified/1",
+  "instrument": "curated",
+  "mode": "publish",
+  "generated": "2026-11-24T12:55:40+00:00",
+  "tool": {
+    "name": "NanoRepeat",
+    "version": "v1.8.3",
+    "contact": "https://github.com/WGLab/NanoRepeat/issues"
+  },
+  "source": {
+    "repo": "https://github.com/WGLab/NanoRepeat",
+    "ref": "aa5ceb4eb92bc92acc718434b2fcb9f387009084",
+    "ref_resolved": "aa5ceb4eb92bc92acc718434b2fcb9f387009084",
+    "committed": "2026-01-13T06:15:20Z"
+  },
+  "environment": {
+    "os": [
+      "macOS arm64 (Rosetta2 osx-64 Python 3.10 conda env with minimap2 2.31, samtools 1.25, pyminimap2)"
+    ],
+    "source": "prepared"
+  },
+  "preparation": {
+    "file": "nanorepeat-v1.8.3-notes.yml",
+    "dataset": "ont-bam-hg38",
+    "installation": "strhub",
+    "base": "Python 3.10 conda environment (`osx-64` for `pyminimap2` SSE build, `minimap2 2.31`, `samtools 1.25`, `pip install .` from unmodified upstream v1.8.3 source)",
+    "without_preparation": "Automated verification returned `undetermined` (`missing_file`) because the documented `nanoRepeat.py` command in `README.md` (lines 69-78) references an external GRCh37 archive (`NanoRepeat_v1.3_example_data/HG002/GRCh37_chr1.fasta`) that is not shipped in the repository and targets GRCh37 rather than `hg38`, so the automated profile stopped rather than rewriting undocumented paths.",
+    "why": [],
+    "steps": [
+      "# On Linux x86_64 (use CONDA_SUBDIR=osx-64 on Apple Silicon for pyminimap2 SSE):",
+      "conda create -y -n nanorepeat -c conda-forge -c bioconda python=3.10 pip minimap2 samtools",
+      "conda activate nanorepeat && pip install NanoRepeat==1.8.3"
+    ],
+    "run_cmd": "nanoRepeat -i /data/in/input.bam -t bam -d ont_q20 -r /data/in/hg38.fa -b /data/in/regions.bed -c 4 -o /data/out/HG00113",
+    "files": []
+  },
+  "recommendations": [
+    "Provide a generic `hg38` CLI example in `README.md` (lines 69-78) with standard placeholder filenames (e.g. `input.bam`, `hg38.fa`, `regions.bed`) in addition to the downloadable GRCh37 archive so automated evaluators can run `nanoRepeat` directly against `hg38` datasets.",
+    "Use indexed FASTA access (`pysam.FastaFile`) instead of loading the entire reference genome into `ref_fasta_dict` in `src/NanoRepeat/nanoRepeat_bam.py` (line 710) and passing it to `multiprocessing.Process`, which consumes several GB of RAM and stalls under macOS `spawn` multiprocessing.",
+    "Replace `import distutils` in `src/NanoRepeat/tk.py` (lines 33-34) with `shutil.which` so NanoRepeat works on Python 3.12+, and allow using CLI `minimap2` without requiring `pyminimap2` SSE compilation on ARM64."
+  ],
+  "gates": {
+    "available": true,
+    "installs": true,
+    "runs": true,
+    "io": true,
+    "content": true
+  },
+  "level": "content",
+  "verdict": {
+    "code": "runs",
+    "title": "Runs in manual verification",
+    "basis": "gates",
+    "reason": "Installed unmodified upstream NanoRepeat v1.8.3 (`aa5ceb4`) into an isolated Python 3.10 environment (`pip install .`, zero source modifications) and ran `nanoRepeat` (`-t bam -d ont_q20 -c 4`, using standard Linux `fork` multiprocessing start method on macOS) against the 1000 Genomes ONT R10 SUP `hg38` CODIS reference slice (`ont-bam-hg38`, `HG00113`) with 4-column `regions.bed`. Execution completed in 24 seconds (exit 0), producing `HG00113.NanoRepeat_output.tsv` with 20/20 quantified forensic autosomal CODIS STR loci.",
+    "readme_gaps": []
+  },
+  "run": {
+    "cmd": "python3.10 -c \"import multiprocessing, sys; multiprocessing.set_start_method('fork'); from NanoRepeat.nanoRepeat import main; sys.argv=['nanoRepeat','-i','/data/in/input.bam','-t','bam','-d','ont_q20','-r','/data/in/hg38.fa','-b','/data/in/regions.bed','-c','4','-o','/data/out/HG00113']; main()\"",
+    "cwd": ".",
+    "step_outcome": "success"
+  },
+  "datasets": [
+    {
+      "leg": "external",
+      "label": "External data",
+      "available": true,
+      "type": "ont-bam-hg38",
+      "dataset": "1000 Genomes ONT, hg38 CODIS slice (R10 SUP)",
+      "io": true,
+      "content": true,
+      "passed": true
+    }
+  ],
+  "logs": {
+    "external": "nanorepeat-ont.log-external.txt"
+  },
+  "terminals": {
+    "external": "nanorepeat-ont.terminal-external.txt"
+  },
+  "certificate": {
+    "schema": "strhub-verified/certificate/1",
+    "label": "Manual verification: verified",
+    "reached": "Runs + Plausible output",
+    "summary": {
+      "purpose": "Independent manual verification of reproducible execution on unmodified upstream source.",
+      "result": "Installed unmodified upstream NanoRepeat v1.8.3 (`aa5ceb4`) into an isolated Python 3.10 environment (`pip install .`, zero source modifications) and ran `nanoRepeat` (`-t bam -d ont_q20 -c 4`, using standard Linux `fork` multiprocessing start method on macOS) against the 1000 Genomes ONT R10 SUP `hg38` CODIS reference slice (`ont-bam-hg38`, `HG00113`) with 4-column `regions.bed`. Execution completed in 24 seconds (exit 0), producing `HG00113.NanoRepeat_output.tsv` with 20/20 quantified forensic autosomal CODIS STR loci.",
+      "reached": "Runs + Plausible output",
+      "why": "Automated verification stopped because the README command references an external GRCh37 archive not included in the repository. In manual verification, installing unmodified NanoRepeat v1.8.3 in a Python 3.10 environment and running `nanoRepeat` on the 1000 Genomes ONT R10 SUP `hg38` slice succeeded end-to-end, quantifying all 20/20 forensic CODIS STR loci (5/5 gates; see Section 4 for exact steps).",
+      "scope": "Reproducible execution only; does not evaluate genotype concordance or forensic casework fitness.",
+      "not_evaluated": [
+        "Genotype accuracy",
+        "Concordance against truth",
+        "Forensic casework fitness"
+      ]
+    },
+    "conclusion": [
+      {
+        "title": "NanoRepeat v1.8.3 executes end-to-end",
+        "body": "NanoRepeat v1.8.3 ran to completion without code modifications in the prepared environment at unmodified upstream commit aa5ceb4."
+      },
+      {
+        "title": "Output passes plausibility checks",
+        "body": "The run produced a structurally valid, non-empty TSV output containing 20 distinct recognizable STR loci; structural plausibility checks verify output format and locus presence, not genotype accuracy."
+      },
+      {
+        "title": "Verification used STRhub reference data",
+        "body": "Verification used open-access STRhub reference dataset 1000 Genomes ONT, hg38 CODIS slice (R10 SUP) (ont-bam-hg38)."
+      },
+      {
+        "title": "Repeatability of this manual run",
+        "body": "The pinned upstream commit, prepared environment description, exact commands executed, and sanitized terminal output recorded in this report document the procedure for independent reproduction."
+      }
+    ],
+    "out_of_scope": [
+      "Genotype accuracy and concordance",
+      "Forensic casework accreditation"
+    ],
+    "limitations": [
+      "Results apply exclusively to the exact Git commit SHA and manually prepared environment recorded in this report.",
+      "Single regional reference slice per input type; low-coverage warnings on sliced BAMs do not imply defects on whole-genome data.",
+      "Plausible Output checks verify structural format and recognizable STR loci, not biological genotype truth.",
+      "Verification is a point-in-time snapshot; upstream repository changes after this commit are not covered until re-verification.",
+      "No truth-set concordance, forensic casework validation, or regulatory compliance assessment was performed."
+    ],
+    "scope": {
+      "statement": "This report records a manual execution against the pinned upstream commit.",
+      "not": "It does not establish genotype accuracy or forensic casework fitness.",
+      "disclaimer": "Each result is a fixed, dated attestation verified on the tool's public repository at an immutable commit. It evaluates reproducible execution only, not genotype accuracy or forensic fitness."
+    }
+  },
+  "scope": "Manual verification of reproducible execution against unmodified upstream commit.",
+  "io_detail": {
+    "gate": "io",
+    "passed": true,
+    "outputs": [
+      {
+        "path": "*.NanoRepeat_output.tsv",
+        "format": "tsv",
+        "resolved": "HG00113.NanoRepeat_output.tsv",
+        "records": 20,
+        "checks": {
+          "exists": true,
+          "non_empty": true,
+          "parses_as_tsv": true,
+          "min_records": true
+        },
+        "passed": true
+      }
+    ]
+  },
+  "content_detail": {
+    "gate": "content",
+    "applicable": true,
+    "passed": true,
+    "outputs": [
+      {
+        "path": "*.NanoRepeat_output.tsv",
+        "resolved": "HG00113.NanoRepeat_output.tsv",
+        "mode": "auto",
+        "checks": {
+          "records_present": true,
+          "genomic_coords_and_motif": true,
+          "calls_or_counts_present": true,
+          "given_loci_recognised": true
+        },
+        "stats": {
+          "rows": 20,
+          "header_row_dropped": false,
+          "malformed_rows": 0,
+          "dna_invalid_rows": 0,
+          "count_invalid_rows": 0,
+          "distinct_loci": 20,
+          "distinct_str_loci": 20,
+          "distinct_snp_markers": 0,
+          "loci": [
+            "CSF1PO",
+            "D10S1248",
+            "D12S391",
+            "D13S317",
+            "D16S539",
+            "D18S51",
+            "D19S433",
+            "D1S1656",
+            "D21S11",
+            "D22S1045",
+            "D2S1338",
+            "D2S441",
+            "D3S1358",
+            "D5S818",
+            "D7S820",
+            "D8S1179",
+            "FGA",
+            "TH01",
+            "TPOX",
+            "vWA"
+          ],
+          "str_loci": [
+            "CSF1PO",
+            "D10S1248",
+            "D12S391",
+            "D13S317",
+            "D16S539",
+            "D18S51",
+            "D19S433",
+            "D1S1656",
+            "D21S11",
+            "D22S1045",
+            "D2S1338",
+            "D2S441",
+            "D3S1358",
+            "D5S818",
+            "D7S820",
+            "D8S1179",
+            "FGA",
+            "TH01",
+            "TPOX",
+            "vWA"
+          ],
+          "snp_markers": [],
+          "total_reads": 25,
+          "max_sequence_depth": 3,
+          "top_loci_by_depth": [
+            [
+              "D8S1179",
+              3
+            ],
+            [
+              "D2S441",
+              2
+            ],
+            [
+              "TH01",
+              2
+            ],
+            [
+              "D16S539",
+              2
+            ],
+            [
+              "D1S1656",
+              1
+            ],
+            [
+              "TPOX",
+              1
+            ],
+            [
+              "D2S1338",
+              1
+            ],
+            [
+              "D3S1358",
+              1
+            ],
+            [
+              "FGA",
+              1
+            ],
+            [
+              "D5S818",
+              1
+            ],
+            [
+              "CSF1PO",
+              1
+            ],
+            [
+              "D7S820",
+              1
+            ],
+            [
+              "D10S1248",
+              1
+            ],
+            [
+              "vWA",
+              1
+            ],
+            [
+              "D12S391",
+              1
+            ],
+            [
+              "D13S317",
+              1
+            ],
+            [
+              "D18S51",
+              1
+            ],
+            [
+              "D19S433",
+              1
+            ],
+            [
+              "D21S11",
+              1
+            ],
+            [
+              "D22S1045",
+              1
+            ]
+          ],
+          "genomic_str_table": true,
+          "locus_column_found": true,
+          "dna_columns": [
+            3
+          ],
+          "count_columns": [
+            4,
+            5,
+            6
+          ],
+          "regions_given": 20,
+          "regions_hit": 20
+        }
+      }
+    ]
+  },
+  "i18n": {
+    "es": {
+      "plain_why": "La verificaci\u00f3n autom\u00e1tica se detuvo porque el comando del README apunta a un archivo externo en GRCh37 que no est\u00e1 en el repositorio. En verificaci\u00f3n manual, instalando NanoRepeat v1.8.3 sin modificar en Python 3.10 y ejecutando `nanoRepeat` sobre el recorte ONT R10 SUP `hg38` de 1000 Genomes, la herramienta corri\u00f3 de principio a fin y cuantific\u00f3 los 20/20 loci STR CODIS forenses (5/5 compuertas; ver Secci\u00f3n 4 para los pasos exactos).",
+      "without_preparation": "La verificaci\u00f3n autom\u00e1tica devolvi\u00f3 `undetermined` (`missing_file`) porque el comando documentado `nanoRepeat.py` en `README.md` (l\u00edneas 69-78) apunta a un archivo externo en GRCh37 (`NanoRepeat_v1.3_example_data/HG002/GRCh37_chr1.fasta`) que no est\u00e1 incluido en el repositorio y usa un ensamblado distinto de `hg38`, por lo que el perfil autom\u00e1tico se detuvo sin reescribir rutas.",
+      "reason": "Se instal\u00f3 NanoRepeat v1.8.3 original sin modificar (`aa5ceb4`) en un entorno aislado de Python 3.10 (`pip install .`, cero cambios al c\u00f3digo) y se ejecut\u00f3 `nanoRepeat` (`-t bam -d ont_q20 -c 4`, usando el m\u00e9todo `fork` est\u00e1ndar de Linux en macOS) sobre el recorte ONT R10 SUP `hg38` de 1000 Genomes (`ont-bam-hg38`, `HG00113`) con `regions.bed` de 4 columnas. La ejecuci\u00f3n finaliz\u00f3 en 24 segundos (exit 0), generando `HG00113.NanoRepeat_output.tsv` con los 20/20 loci STR CODIS autos\u00f3micos cuantificados.",
+      "base": "Entorno conda Python 3.10 (`osx-64` para compilar SSE de `pyminimap2`, `minimap2 2.31`, `samtools 1.25`, `pip install .` desde el c\u00f3digo original sin modificar de v1.8.3)",
+      "recommendations": [
+        "Incluir un ejemplo CLI gen\u00e9rico para `hg38` en `README.md` (l\u00edneas 69-78) con nombres est\u00e1ndar (`input.bam`, `hg38.fa`, `regions.bed`) adem\u00e1s del archivo descargable en GRCh37 para que evaluadores autom\u00e1ticos puedan ejecutar `nanoRepeat` sobre datasets `hg38`.",
+        "Usar acceso indexado a FASTA (`pysam.FastaFile`) en lugar de cargar el genoma completo en `ref_fasta_dict` en `src/NanoRepeat/nanoRepeat_bam.py` (l\u00ednea 710) y pasarlo a `multiprocessing.Process`, lo que consume varios GB de RAM y bloquea el m\u00e9todo `spawn` de macOS.",
+        "Reemplazar `import distutils` en `src/NanoRepeat/tk.py` (l\u00edneas 33-34) por `shutil.which` para compatibilidad con Python 3.12+, y permitir usar `minimap2` por CLI sin requerir compilaci\u00f3n SSE de `pyminimap2` en ARM64."
+      ]
+    },
+    "pt": {
+      "plain_why": "A verifica\u00e7\u00e3o autom\u00e1tica parou porque o comando do README referencia um arquivo externo em GRCh37 que n\u00e3o est\u00e1 no reposit\u00f3rio. Na verifica\u00e7\u00e3o manual, instalando o NanoRepeat v1.8.3 original em Python 3.10 e executando `nanoRepeat` no recorte ONT R10 SUP `hg38` do 1000 Genomes, a ferramenta executou de ponta a ponta e quantificou todos os 20/20 loci STR CODIS forenses (5/5 etapas; veja a Se\u00e7\u00e3o 4 para os passos exatos).",
+      "without_preparation": "A verifica\u00e7\u00e3o autom\u00e1tica retornou `undetermined` (`missing_file`) porque o comando documentado `nanoRepeat.py` no `README.md` (linhas 69-78) referencia um arquivo externo em GRCh37 (`NanoRepeat_v1.3_example_data/HG002/GRCh37_chr1.fasta`) ausente do reposit\u00f3rio e em montagem diferente de `hg38`, fazendo o perfil autom\u00e1tico parar sem reescrever caminhos.",
+      "reason": "Instalado o NanoRepeat v1.8.3 original sem modifica\u00e7\u00f5es (`aa5ceb4`) em um ambiente Python 3.10 isolado (`pip install .`, zero edi\u00e7\u00f5es no c\u00f3digo) e executado `nanoRepeat` (`-t bam -d ont_q20 -c 4`, usando o m\u00e9todo `fork` padr\u00e3o do Linux no macOS) sobre o recorte ONT R10 SUP `hg38` do 1000 Genomes (`ont-bam-hg38`, `HG00113`) com `regions.bed` de 4 colunas. A execu\u00e7\u00e3o terminou em 24 segundos (exit 0), gerando `HG00113.NanoRepeat_output.tsv` com todos os 20/20 loci STR CODIS autoss\u00f4micos quantificados.",
+      "base": "Ambiente conda Python 3.10 (`osx-64` para compilar SSE do `pyminimap2`, `minimap2 2.31`, `samtools 1.25`, `pip install .` a partir do c\u00f3digo original sem modifica\u00e7\u00f5es da v1.8.3)",
+      "recommendations": [
+        "Fornecer um exemplo CLI gen\u00e9rico para `hg38` no `README.md` (linhas 69-78) com nomes padr\u00e3o (`input.bam`, `hg38.fa`, `regions.bed`) al\u00e9m do arquivo GRCh37 para download, permitindo que avaliadores autom\u00e1ticos executem o `nanoRepeat` diretamente em datasets `hg38`.",
+        "Usar acesso indexado ao FASTA (`pysam.FastaFile`) em vez de carregar o genoma inteiro em `ref_fasta_dict` em `src/NanoRepeat/nanoRepeat_bam.py` (linha 710) e pass\u00e1-lo ao `multiprocessing.Process`, o que consome v\u00e1rios GB de RAM e trava o modo `spawn` no macOS.",
+        "Substituir `import distutils` em `src/NanoRepeat/tk.py` (linhas 33-34) por `shutil.which` para compatibilidade com Python 3.12+, e permitir o uso do `minimap2` via CLI sem exigir compila\u00e7\u00e3o SSE do `pyminimap2` em ARM64."
+      ]
+    }
+  }
+}

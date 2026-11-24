@@ -1,0 +1,113 @@
+$ python3.10 -c "import multiprocessing, sys; multiprocessing.set_start_method('fork'); from NanoRepeat.nanoRepeat import main; sys.argv=['nanoRepeat','-i','/data/in/input.bam','-t','bam','-d','ont_q20','-r','/data/in/hg38.fa','-b','/data/in/regions.bed','-c','4','-o','/data/out/HG00113']; main()"
+
+[11/24/2026 09:55:13] NOTICE: Running command: nanoRepeat -i /data/in/input.bam -t bam -d ont_q20 -r /data/in/hg38.fa -b /data/in/regions.bed -c 4 -o /data/out/HG00113
+[11/24/2026 09:55:13] NOTICE: Input file is: /data/in/input.bam
+[11/24/2026 09:55:13] NOTICE: Input type is: bam
+[11/24/2026 09:55:13] NOTICE: Referece fasta file is: /data/in/hg38.fa
+[11/24/2026 09:55:13] NOTICE: Output prefix is: /data/out/HG00113
+[11/24/2026 09:55:13] NOTICE: Repeat region bed file is: /data/in/regions.bed
+[11/24/2026 09:55:13] NOTICE: Reading repeat region file: /data/in/regions.bed
+[11/24/2026 09:55:13] NOTICE: Reading reference fasta file: /data/in/hg38.fa
+[11/24/2026 09:55:34] NOTICE: [Process 00] Quantifying repeat: chr1-230769616-230769683-CTAT
+[11/24/2026 09:55:34] NOTICE: [Process 01] Quantifying repeat: chr2-1489653-1489684-AATG
+[11/24/2026 09:55:34] NOTICE: [Process 00] Step 1: finding anchor location in reads
+[11/24/2026 09:55:34] NOTICE: [Process 02] Quantifying repeat: chr2-68011947-68011994-TCTA
+[11/24/2026 09:55:35] NOTICE: [Process 00] Step 2: round 1 and round 2 estimation
+[11/24/2026 09:55:35] NOTICE: [Process 00] Step 3: round 3 estimation
+[11/24/2026 09:55:35] NOTICE: [Process 03] Quantifying repeat: chr2-218014859-218014950-GGAA
+[11/24/2026 09:55:35] NOTICE: [Process 01] Step 1: finding anchor location in reads
+[11/24/2026 09:55:35] NOTICE: [Process 03] Step 1: finding anchor location in reads
+[11/24/2026 09:55:35] NOTICE: [Process 02] Step 1: finding anchor location in reads
+[11/24/2026 09:55:35] NOTICE: [Process 03] Step 2: round 1 and round 2 estimation
+[11/24/2026 09:55:35] NOTICE: [Process 03] Step 3: round 3 estimation
+[11/24/2026 09:55:35] NOTICE: [Process 01] Step 2: round 1 and round 2 estimation
+[11/24/2026 09:55:35] NOTICE: [Process 01] Step 3: round 3 estimation
+[11/24/2026 09:55:35] NOTICE: [Process 02] Step 2: round 1 and round 2 estimation
+[11/24/2026 09:55:35] NOTICE: [Process 00] Step 4: phasing reads using GMM
+[11/24/2026 09:55:35] NOTICE: [Process 02] Step 3: round 3 estimation
+[11/24/2026 09:55:35] NOTICE: [Process 03] Step 4: phasing reads using GMM
+[11/24/2026 09:55:35] NOTICE: [Process 01] Step 4: phasing reads using GMM
+[11/24/2026 09:55:35] NOTICE: [Process 02] Step 4: phasing reads using GMM
+[11/24/2026 09:55:35] NOTICE: [Process 00] Quantifying repeat: chr3-45540739-45540802-TCTA
+[11/24/2026 09:55:35] NOTICE: [Process 00] Step 1: finding anchor location in reads
+[11/24/2026 09:55:35] NOTICE: [Process 03] Quantifying repeat: chr5-150076324-150076375-ATCT
+[11/24/2026 09:55:35] NOTICE: [Process 01] Quantifying repeat: chr4-154587736-154587823-AGAA
+[11/24/2026 09:55:35] NOTICE: [Process 03] Step 1: finding anchor location in reads
+[11/24/2026 09:55:35] NOTICE: [Process 00] Step 2: round 1 and round 2 estimation
+[11/24/2026 09:55:35] NOTICE: [Process 03] Step 2: round 1 and round 2 estimation
+[11/24/2026 09:55:35] NOTICE: [Process 00] Step 3: round 3 estimation
+[11/24/2026 09:55:35] NOTICE: [Process 03] Step 3: round 3 estimation
+[11/24/2026 09:55:35] NOTICE: [Process 02] Quantifying repeat: chr5-123775556-123775599-ATCT
+[11/24/2026 09:55:35] NOTICE: [Process 01] Step 1: finding anchor location in reads
+[11/24/2026 09:55:35] NOTICE: [Process 01] Step 2: round 1 and round 2 estimation
+[11/24/2026 09:55:35] NOTICE: [Process 02] Step 1: finding anchor location in reads
+[11/24/2026 09:55:35] NOTICE: [Process 01] Step 3: round 3 estimation
+[11/24/2026 09:55:35] NOTICE: [Process 02] Step 2: round 1 and round 2 estimation
+[11/24/2026 09:55:35] NOTICE: [Process 02] Step 3: round 3 estimation
+[11/24/2026 09:55:36] NOTICE: [Process 00] Step 4: phasing reads using GMM
+[11/24/2026 09:55:36] NOTICE: [Process 03] Step 4: phasing reads using GMM
+[11/24/2026 09:55:36] NOTICE: [Process 00] Quantifying repeat: chr7-84160226-84160277-TATC
+[11/24/2026 09:55:36] NOTICE: [Process 03] Quantifying repeat: chr11-2171088-2171115-AATG
+[11/24/2026 09:55:36] NOTICE: [Process 00] Step 1: finding anchor location in reads
+[11/24/2026 09:55:36] NOTICE: [Process 02] Step 4: phasing reads using GMM
+[11/24/2026 09:55:36] NOTICE: [Process 03] Step 1: finding anchor location in reads
+[11/24/2026 09:55:36] NOTICE: [Process 03] Step 2: round 1 and round 2 estimation
+[11/24/2026 09:55:36] NOTICE: [Process 03] Step 3: round 3 estimation
+[11/24/2026 09:55:36] NOTICE: [Process 03] Step 4: phasing reads using GMM
+[11/24/2026 09:55:36] NOTICE: [Process 00] Step 2: round 1 and round 2 estimation
+[11/24/2026 09:55:36] NOTICE: [Process 00] Step 3: round 3 estimation
+[11/24/2026 09:55:36] NOTICE: [Process 02] Quantifying repeat: chr10-129294244-129294295-GGAA
+[11/24/2026 09:55:36] NOTICE: [Process 01] Step 4: phasing reads using GMM
+[11/24/2026 09:55:36] NOTICE: [Process 02] Step 1: finding anchor location in reads
+[11/24/2026 09:55:36] NOTICE: [Process 02] Step 2: round 1 and round 2 estimation
+[11/24/2026 09:55:36] NOTICE: [Process 00] Step 4: phasing reads using GMM
+[11/24/2026 09:55:36] NOTICE: [Process 02] Step 3: round 3 estimation
+[11/24/2026 09:55:36] NOTICE: [Process 03] Quantifying repeat: chr16-86352702-86352745-GATA
+[11/24/2026 09:55:36] NOTICE: [Process 01] Quantifying repeat: chr8-124894865-124894916-TCTA
+[11/24/2026 09:55:36] NOTICE: [Process 03] Step 1: finding anchor location in reads
+[11/24/2026 09:55:36] NOTICE: [Process 01] Step 1: finding anchor location in reads
+[11/24/2026 09:55:36] NOTICE: [Process 00] Quantifying repeat: chr12-5983969-5984044-TAGA
+[11/24/2026 09:55:36] NOTICE: [Process 03] Step 2: round 1 and round 2 estimation
+[11/24/2026 09:55:36] NOTICE: [Process 03] Step 3: round 3 estimation
+[11/24/2026 09:55:36] NOTICE: [Process 00] Step 1: finding anchor location in reads
+[11/24/2026 09:55:36] NOTICE: [Process 02] Step 4: phasing reads using GMM
+[11/24/2026 09:55:36] NOTICE: [Process 00] Step 2: round 1 and round 2 estimation
+[11/24/2026 09:55:36] NOTICE: [Process 00] Step 3: round 3 estimation
+[11/24/2026 09:55:36] NOTICE: [Process 01] Step 2: round 1 and round 2 estimation
+[11/24/2026 09:55:36] NOTICE: [Process 01] Step 3: round 3 estimation
+[11/24/2026 09:55:37] NOTICE: [Process 03] Step 4: phasing reads using GMM
+[11/24/2026 09:55:37] NOTICE: [Process 02] Quantifying repeat: chr13-82148025-82148068-TATC
+[11/24/2026 09:55:37] NOTICE: [Process 01] Step 4: phasing reads using GMM
+[11/24/2026 09:55:37] NOTICE: [Process 02] Step 1: finding anchor location in reads
+[11/24/2026 09:55:37] NOTICE: [Process 02] Step 2: round 1 and round 2 estimation
+[11/24/2026 09:55:37] NOTICE: [Process 02] Step 3: round 3 estimation
+[11/24/2026 09:55:37] NOTICE: [Process 00] Step 4: phasing reads using GMM
+[11/24/2026 09:55:37] NOTICE: [Process 03] Quantifying repeat: chr22-37140287-37140337-ATT
+[11/24/2026 09:55:37] NOTICE: [Process 02] Step 4: phasing reads using GMM
+[11/24/2026 09:55:37] NOTICE: [Process 00] Quantifying repeat: chr18-63281667-63281738-AGAA
+[11/24/2026 09:55:37] NOTICE: [Process 03] Step 1: finding anchor location in reads
+[11/24/2026 09:55:37] NOTICE: [Process 01] Quantifying repeat: chr12-12297020-12297095-AGAT
+[11/24/2026 09:55:37] NOTICE: [Process 03] Step 2: round 1 and round 2 estimation
+[11/24/2026 09:55:37] NOTICE: [Process 03] Step 3: round 3 estimation
+[11/24/2026 09:55:37] NOTICE: [Process 01] Step 1: finding anchor location in reads
+[11/24/2026 09:55:37] NOTICE: [Process 00] Step 1: finding anchor location in reads
+[11/24/2026 09:55:37] NOTICE: [Process 02] Quantifying repeat: chr21-19181973-19182099-TCTA
+[11/24/2026 09:55:37] NOTICE: [Process 00] Step 2: round 1 and round 2 estimation
+[11/24/2026 09:55:37] NOTICE: [Process 00] Step 3: round 3 estimation
+[11/24/2026 09:55:37] NOTICE: [Process 02] Step 1: finding anchor location in reads
+[11/24/2026 09:55:37] NOTICE: [Process 03] Step 4: phasing reads using GMM
+[11/24/2026 09:55:37] NOTICE: [Process 02] Step 2: round 1 and round 2 estimation
+[11/24/2026 09:55:37] NOTICE: [Process 02] Step 3: round 3 estimation
+[11/24/2026 09:55:38] NOTICE: [Process 00] Step 4: phasing reads using GMM
+[11/24/2026 09:55:38] NOTICE: [Process 01] Step 2: round 1 and round 2 estimation
+[11/24/2026 09:55:38] NOTICE: [Process 01] Step 3: round 3 estimation
+[11/24/2026 09:55:38] NOTICE: [Process 02] Step 4: phasing reads using GMM
+[11/24/2026 09:55:38] NOTICE: [Process 01] Step 4: phasing reads using GMM
+[11/24/2026 09:55:38] NOTICE: [Process 01] Quantifying repeat: chr19-29926235-29926298-CCTT
+[11/24/2026 09:55:38] NOTICE: [Process 01] Step 1: finding anchor location in reads
+[11/24/2026 09:55:39] NOTICE: [Process 01] Step 2: round 1 and round 2 estimation
+[11/24/2026 09:55:39] NOTICE: [Process 01] Step 3: round 3 estimation
+[11/24/2026 09:55:39] NOTICE: [Process 01] Step 4: phasing reads using GMM
+[11/24/2026 09:55:39] NOTICE: Program finished.
+
+[exit 0]
