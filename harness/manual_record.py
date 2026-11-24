@@ -514,10 +514,10 @@ def _render_manual_pdf(report: dict, terminal_text: str, out_pdf: pathlib.Path) 
     meta_rows.append(("STRhub", gp.link("https://strhub.app")))
 
     story.append(gp.kv_table(meta_rows))
-    story.append(gp.HR(spaceB=8, spaceA=8))
+    story.append(gp.HR(spaceB=5, spaceA=5))
 
     story.append(gp.section_title("SCOPE OF THIS REPORT"))
-    story.append(gp.vspace(1))
+    story.append(gp.vspace(0.5))
     scope_text = (
         "Independent manual verification of reproducible execution on the tool's unmodified public "
         "repository at the pinned commit. It confirms whether the software installs, runs end-to-end, "
@@ -525,19 +525,19 @@ def _render_manual_pdf(report: dict, terminal_text: str, out_pdf: pathlib.Path) 
         "This is <b>not</b> an analytical validation. Genotype accuracy, concordance, forensic "
         "suitability, and regulatory compliance are out of scope."
     )
-    story.append(gp.boxed([Paragraph(scope_text, gp.ST["body"])], pad=10))
-    story.append(gp.vspace(3))
+    story.append(gp.boxed([Paragraph(scope_text, gp.ST["body"])], pad=8))
+    story.append(gp.vspace(2))
 
     def col_block(items: list[str], title_col, label: str) -> list:
         dash_hex = f"#{gp.GRAY.hexval()[2:]}"
         out = [Paragraph(label, gp.S(
             "mbl", fontName="Helvetica-Bold", fontSize=8,
-            textColor=title_col, leading=12, spaceAfter=5,
+            textColor=title_col, leading=11, spaceAfter=3.5,
         ))]
         for item in items:
             out.append(Paragraph(
                 f'<font color="{dash_hex}">–</font>  {item}',
-                gp.S("mbi", fontSize=8.5, textColor=gp.INK, leading=13.5, leftIndent=8, spaceAfter=2),
+                gp.S("mbi", fontSize=8.3, textColor=gp.INK, leading=12, leftIndent=8, spaceAfter=1.2),
             ))
         return out
 
@@ -558,8 +558,8 @@ def _render_manual_pdf(report: dict, terminal_text: str, out_pdf: pathlib.Path) 
         ("BACKGROUND",    (1, 0), (1, 0),   gp.GRAY_LIGHT),
         ("BOX",           (0, 0), (0, 0),   0.5, gp.TEAL_MID),
         ("BOX",           (1, 0), (1, 0),   0.5, gp.BORDER),
-        ("TOPPADDING",    (0, 0), (-1, -1), 10),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 10),
+        ("TOPPADDING",    (0, 0), (-1, -1), 7),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 7),
         ("LEFTPADDING",   (0, 0), (-1, -1), 14),
         ("RIGHTPADDING",  (0, 0), (-1, -1), 14),
     ]))
