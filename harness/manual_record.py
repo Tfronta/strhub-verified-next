@@ -188,8 +188,23 @@ def build_redactions(
 
     for item in extra_redact:
         item = (item or "").strip()
-        if item:
-            pairs.append((item, "<redacted>"))
+        if not item:
+            continue
+        if "=" in item:
+            src, dst = item.split("=", 1)
+            src = src.strip()
+            dst = dst.strip() or "<redacted>"
+        else:
+            src, dst = item, "<redacted>"
+        if src:
+            if src.startswith("/"):
+                try:
+                    resolved = str(pathlib.Path(src).resolve())
+                    if resolved and resolved != src:
+                        pairs.append((resolved, dst))
+                except Exception:
+                    pass
+            pairs.append((src, dst))
 
     # Longest needles first so /Users/tfronta/project becomes /work before /Users/tfronta -> <HOME>.
     seen: set[str] = set()
