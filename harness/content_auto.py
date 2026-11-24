@@ -311,9 +311,125 @@ def analyze_vcf(path: pathlib.Path, regions: list[tuple[str, int, int, str]]) ->
     return stats
 
 
-def analyze_table(path: pathlib.Path, fmt: str, panel_names: set[str] | None = None) -> dict:
+CHROM_RE = re.compile(r"^(?:chr)?(?:[1-9]|1\d|2[0-2]|X|Y|M|MT)$", re.I)
+MOTIF_RE = re.compile(r"^[ACGTN]{1,60}(?:,[ACGTN]{1,60})*$", re.I)
+NUM_RE = re.compile(r"^-?\d+(?:\.\d+)?$")
+
+
+def _analyze_genomic_str_table(
+    body: list[list[str]],
+    width: int,
+    regions: list[tuple[str, int, int, str]] | None,
+) -> dict | None:
+    """Recognise coordinate-based STR tables (e.g. ExpansionHunterDenovo, STRling, STRetch):
+    chrom + integer start/end + repeat motif + numeric count/score column."""
+    if width < 4 or not body:
+        return None
+    header_dropped = False
+    data = body
+    # Drop header row when row 0 has non-integer start/end while subsequent rows are integer.
+    if len(body) > 1 and not (INT_RE.match(body[0][1].strip()) and INT_RE.match(body[0][2].strip())):
+        if INT_RE.match(body[1][1].strip()) and INT_RE.match(body[1][2].strip()):
+            data = body[1:]
+            header_dropped = True
+    if not data:
+        return None
+
+    # Locate (chrom, start, end) triple (usually columns 0, 1, 2).
+    coord_col = None
+    region_chroms = {c.removeprefix("chr").lower() for c, _, _, _ in (regions or [])}
+    for c in range(width - 2):
+        ok = 0
+        for r in data:
+            ch = r[c].strip()
+            s, e = r[c + 1].strip(), r[c + 2].strip()
+            if (CHROM_RE.match(ch) or ch.removeprefix("chr").lower() in region_chroms) and INT_RE.match(s) and INT_RE.match(e) and int(e) > int(s):
+                ok += 1
+        if ok >= 0.8 * len(data) and ok > 0:
+            coord_col = c
+            break
+    if coord_col is None:
+        return None
+
+    coord_set = {coord_col, coord_col + 1, coord_col + 2}
+    motif_cols = [
+        i for i in range(width)
+        if i not in coord_set and sum(1 for r in data if MOTIF_RE.match(r[i].strip())) >= 0.8 * len(data)
+    ]
+    num_cols = [
+        i for i in range(width)
+        if i not in coord_set and i not in motif_cols and sum(1 for r in data if NUM_RE.match(r[i].strip())) >= 0.8 * len(data)
+    ]
+    if not motif_cols or not num_cols:
+        return None
+
+    by_chrom: dict[str, list[tuple[int, int, str]]] = collections.defaultdict(list)
+    for chrom, start, end, name in (regions or []):
+        bare = chrom.removeprefix("chr").lower()
+        by_chrom[bare].append((start, end, name))
+
+    int_count_cols = [i for i in num_cols if sum(1 for r in data if INT_RE.match(r[i].strip())) >= 0.8 * len(data)]
+    primary_count_col = int_count_cols[0] if int_count_cols else num_cols[0]
+
+    locus_rows: collections.Counter = collections.Counter()
+    locus_reads: collections.Counter = collections.Counter()
+    regions_matched: set[str] = set()
+    total = 0
+    max_depth = 0
+    for r in data:
+        ch = r[coord_col].strip()
+        s = int(r[coord_col + 1].strip())
+        e = int(r[coord_col + 2].strip())
+        bare = ch.removeprefix("chr").lower()
+        matched_name = None
+        for rs, re_, rname in by_chrom.get(bare, ()):
+            if s <= re_ + POS_SLACK and e >= rs - POS_SLACK:
+                matched_name = rname
+                regions_matched.add(rname)
+                break
+        label = matched_name or f"{ch}:{s}-{e}"
+        try:
+            cnt = int(round(float(r[primary_count_col].strip())))
+        except ValueError:
+            cnt = 0
+        locus_rows[label] += 1
+        locus_reads[label] += cnt
+        total += cnt
+        max_depth = max(max_depth, cnt)
+
+    strs = sorted(locus_rows)
+    stats = _empty_stats()
+    stats.update({
+        "rows": len(data),
+        "header_row_dropped": header_dropped,
+        "genomic_str_table": True,
+        "locus_column_found": True,
+        "dna_columns": motif_cols,
+        "count_columns": int_count_cols or num_cols,
+        "distinct_loci": len(strs),
+        "distinct_str_loci": len(strs),
+        "distinct_snp_markers": 0,
+        "loci": strs,
+        "str_loci": strs,
+        "snp_markers": [],
+        "total_reads": total,
+        "max_sequence_depth": max_depth,
+        "top_loci_by_depth": locus_reads.most_common(),
+        "regions_given": len(regions or []),
+        "regions_hit": len(regions_matched) if regions else len(strs),
+    })
+    return stats
+
+
+def analyze_table(
+    path: pathlib.Path,
+    fmt: str,
+    panel_names: set[str] | None = None,
+    regions: list[tuple[str, int, int, str]] | None = None,
+) -> dict:
     """Find the locus column (and sequence / count columns) of a table by what
-    its values look like, then count what the manifest-driven analysis counts."""
+    its values look like, or recognise genomic coordinate STR tables, then
+    count what the manifest-driven analysis counts."""
     text = _read_text(path)
     delim = "\t" if fmt in ("tsv", "text") else ","
     lines = [ln for ln in text.splitlines() if ln.strip() and not ln.startswith("#")]
@@ -360,6 +476,9 @@ def analyze_table(path: pathlib.Path, fmt: str, panel_names: set[str] | None = N
             body = body[1:]
             header_dropped = True
     if best_score < 0.5:
+        genomic = _analyze_genomic_str_table(body, width, regions)
+        if genomic is not None:
+            return genomic
         stats.update({"rows": len(body), "header_row_dropped": header_dropped, "locus_column_found": False})
         return stats
 
@@ -415,6 +534,13 @@ def judge(stats: dict, fmt: str, regions_given: int) -> dict:
             checks["given_loci_recognised"] = stats.get("regions_hit", 0) >= need
         else:
             checks["loci_recognised"] = stats.get("distinct_loci", 0) >= 3
+    elif stats.get("genomic_str_table"):
+        checks["genomic_coords_and_motif"] = True
+        checks["calls_or_counts_present"] = bool(stats.get("count_columns") or stats.get("dna_columns"))
+        if regions_given:
+            checks["given_loci_recognised"] = stats.get("regions_hit", 0) >= 1
+        else:
+            checks["loci_recognised"] = stats.get("distinct_loci", 0) >= 1
     else:
         checks["locus_column_found"] = bool(stats.get("locus_column_found"))
         checks["loci_recognised"] = stats.get("distinct_loci", 0) >= 3

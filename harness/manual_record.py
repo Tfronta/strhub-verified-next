@@ -290,7 +290,9 @@ def _validate_outputs(
             return False, False, {"gate": "io", "passed": False, "outputs": [io_entry]}, None
 
     # Tabular output (TSV/CSV/TXT)
-    stats = content_auto.analyze_table(target, fmt=fmt, panel_names=set())
+    regions = content_auto.read_regions(regions_file) if regions_file else []
+    panel_names = {r[3] for r in regions} if regions else set()
+    stats = content_auto.analyze_table(target, fmt=fmt, panel_names=panel_names, regions=regions)
     records = int(stats.get("rows", 0))
     io_passed = records > 0
     io_entry = {
@@ -301,7 +303,7 @@ def _validate_outputs(
         "checks": {"exists": True, "non_empty": True, f"parses_as_{fmt}": True, "min_records": io_passed},
         "passed": io_passed,
     }
-    checks = content_auto.judge(stats, fmt, 0)
+    checks = content_auto.judge(stats, fmt, len(regions))
     content_passed = io_passed and all(checks.values())
     content_detail = {
         "gate": "content",

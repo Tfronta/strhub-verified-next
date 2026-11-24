@@ -122,7 +122,7 @@ def display_name(m: dict) -> str:
 
 
 def stage_states(gates: dict | None, *, execution_established: bool | None = True) -> list[dict]:
-    """Single source of truth for the four cover verification capabilities.
+    """Single source of truth for the five cover verification capabilities.
 
     A stage downstream of a failed or unestablished gate is always
     `NOT ATTEMPTED` (never `PASS` and never `FAIL`), preventing the cover or
@@ -132,7 +132,8 @@ def stage_states(gates: dict | None, *, execution_established: bool | None = Tru
     avail = bool(g.get("available"))
     inst = bool(g.get("installs"))
     runs = bool(g.get("runs"))
-    out = bool(g.get("io") or g.get("content"))
+    io = bool(g.get("io"))
+    content = bool(g.get("content"))
 
     if execution_established is False:
         return [
@@ -140,7 +141,9 @@ def stage_states(gates: dict | None, *, execution_established: bool | None = Tru
             {"key": "installs", "label": "Installation", "status": "PASS" if inst else "NOT ATTEMPTED"},
             {"key": "runs", "label": "End-to-end execution", "status": "PASS" if runs else "NOT ATTEMPTED"},
             {"key": "output", "label": "Output generated",
-             "status": "PASS" if out else ("NOT ESTABLISHED" if runs else "NOT ATTEMPTED")},
+             "status": "PASS" if io else ("NOT ESTABLISHED" if runs else "NOT ATTEMPTED")},
+            {"key": "content", "label": "Plausible output",
+             "status": "PASS" if content else ("NOT ESTABLISHED" if io else "NOT ATTEMPTED")},
         ]
 
     return [
@@ -150,7 +153,9 @@ def stage_states(gates: dict | None, *, execution_established: bool | None = Tru
         {"key": "runs", "label": "End-to-end execution",
          "status": "NOT ATTEMPTED" if not inst else ("PASS" if runs else "FAIL")},
         {"key": "output", "label": "Output generated",
-         "status": "NOT ATTEMPTED" if not runs else ("PASS" if out else "FAIL")},
+         "status": "NOT ATTEMPTED" if not runs else ("PASS" if io else "FAIL")},
+        {"key": "content", "label": "Plausible output",
+         "status": "NOT ATTEMPTED" if not io else ("PASS" if content else "FAIL")},
     ]
 
 

@@ -45,7 +45,7 @@ def test_1_repository_unavailable():
     rep, cfg = _base_report(gates, level="none", verdict_code="fails", verdict_reason="Source could not be fetched.")
     cert = ct.certificate_for(rep, cfg)
     stages = {s["key"]: s["status"] for s in cert["stages"]}
-    assert stages == {"available": "FAIL", "installs": "NOT ATTEMPTED", "runs": "NOT ATTEMPTED", "output": "NOT ATTEMPTED"}
+    assert stages == {"available": "FAIL", "installs": "NOT ATTEMPTED", "runs": "NOT ATTEMPTED", "output": "NOT ATTEMPTED", "content": "NOT ATTEMPTED"}
     assert "checks whether" in cert["scope"]["statement"].lower()
     assert "confirms the tool installs" not in cert["scope"]["statement"].lower()
 
@@ -56,7 +56,7 @@ def test_2_installation_failed_never_claims_dataset_ran_or_exact_reproducibility
                             verdict_reason="The environment did not build from the declared install steps.")
     cert = ct.certificate_for(rep, cfg)
     stages = {s["key"]: s["status"] for s in cert["stages"]}
-    assert stages == {"available": "PASS", "installs": "FAIL", "runs": "NOT ATTEMPTED", "output": "NOT ATTEMPTED"}
+    assert stages == {"available": "PASS", "installs": "FAIL", "runs": "NOT ATTEMPTED", "output": "NOT ATTEMPTED", "content": "NOT ATTEMPTED"}
     full_text = " ".join(c["title"] + " " + c["body"] for c in cert["conclusion"])
     assert "ran on STRhub's reference dataset" not in full_text
     assert "not processed because the installation did not complete" in full_text
@@ -71,7 +71,7 @@ def test_3_install_succeeded_and_execution_failed():
                             verdict_reason="The tool exited with an error before producing its documented output.")
     cert = ct.certificate_for(rep, cfg)
     stages = {s["key"]: s["status"] for s in cert["stages"]}
-    assert stages == {"available": "PASS", "installs": "PASS", "runs": "FAIL", "output": "NOT ATTEMPTED"}
+    assert stages == {"available": "PASS", "installs": "PASS", "runs": "FAIL", "output": "NOT ATTEMPTED", "content": "NOT ATTEMPTED"}
     titles = [c["title"] for c in cert["conclusion"]]
     assert "Does not run end-to-end" in titles
     assert "Repeatability of this verification run" in titles
@@ -83,7 +83,7 @@ def test_4_execution_succeeded_without_output_files():
                             verdict_reason="The tool ran to completion but produced no output in the documented format.")
     cert = ct.certificate_for(rep, cfg)
     stages = {s["key"]: s["status"] for s in cert["stages"]}
-    assert stages == {"available": "PASS", "installs": "PASS", "runs": "PASS", "output": "FAIL"}
+    assert stages == {"available": "PASS", "installs": "PASS", "runs": "PASS", "output": "FAIL", "content": "NOT ATTEMPTED"}
     titles = [c["title"] for c in cert["conclusion"]]
     assert "Runs end-to-end" in titles
     assert "No output produced" in titles
@@ -95,7 +95,7 @@ def test_5_execution_succeeded_with_structurally_invalid_or_unplausible_output()
                             verdict_reason="The tool installed and its run produced its documented output.")
     cert = ct.certificate_for(rep, cfg)
     stages = {s["key"]: s["status"] for s in cert["stages"]}
-    assert stages == {"available": "PASS", "installs": "PASS", "runs": "PASS", "output": "PASS"}
+    assert stages == {"available": "PASS", "installs": "PASS", "runs": "PASS", "output": "PASS", "content": "FAIL"}
     titles = [c["title"] for c in cert["conclusion"]]
     assert "Produces output in the declared format" in titles
     assert "Produces plausible output" not in titles
@@ -107,7 +107,7 @@ def test_6_all_five_gates_passed():
                             verdict_reason="The tool installed and its run produced its documented output.")
     cert = ct.certificate_for(rep, cfg)
     stages = {s["key"]: s["status"] for s in cert["stages"]}
-    assert stages == {"available": "PASS", "installs": "PASS", "runs": "PASS", "output": "PASS"}
+    assert stages == {"available": "PASS", "installs": "PASS", "runs": "PASS", "output": "PASS", "content": "PASS"}
     titles = [c["title"] for c in cert["conclusion"]]
     assert "Runs end-to-end" in titles
     assert "Produces plausible output" in titles
@@ -120,7 +120,7 @@ def test_7_insufficient_evidence_marks_downstream_not_attempted_and_neutral_faul
                             verdict_reason="No copyable installation.", execution_established=False)
     cert = ct.certificate_for(rep, cfg)
     stages = {s["key"]: s["status"] for s in cert["stages"]}
-    assert stages == {"available": "PASS", "installs": "NOT ATTEMPTED", "runs": "NOT ATTEMPTED", "output": "NOT ATTEMPTED"}
+    assert stages == {"available": "PASS", "installs": "NOT ATTEMPTED", "runs": "NOT ATTEMPTED", "output": "NOT ATTEMPTED", "content": "NOT ATTEMPTED"}
     # Neutral attribution sentence never blames software or author categorically.
     sent = dl.install_fault_sentence(["author"])
     assert "Observed in the build log" in sent
@@ -153,6 +153,7 @@ def test_9_undetermined_after_install_and_run_preserves_passed_stages():
         "installs": "PASS",
         "runs": "PASS",
         "output": "NOT ESTABLISHED",
+        "content": "NOT ATTEMPTED",
     }
 
 

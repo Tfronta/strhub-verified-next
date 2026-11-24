@@ -221,3 +221,24 @@ def test_records_optional_i18n_editorial_translations(tmp_path):
     assert report["i18n"]["es"]["plain_why"] == "Corrió sin cambios."
     assert report["i18n"]["es"]["reason"] == "El código original corrió sin errores."
     assert report["i18n"]["es"]["recommendations"] == ["Agregar bloque `make` en el README."]
+
+
+def test_genomic_coordinate_tsv_passes_plausible_output_by_coordinates(tmp_path):
+    out_dir = tmp_path / "out"
+    out_dir.mkdir()
+    (out_dir / "sample.locus.tsv").write_text(
+        "contig\tstart\tend\tmotif\tnum_anc_irrs\tnorm_num_anc_irrs\thet_str_size\n"
+        "chr16\t17470284\t17470669\tCCG\t5\t15684.29\t51633\n",
+        encoding="utf-8",
+    )
+    panel = tmp_path / "loci.bed"
+    panel.write_text("chr16\t17469908\t17471922\tXYLT1\t52\n", encoding="utf-8")
+    io_ok, content_ok, io_detail, content_detail = mr._validate_outputs(
+        out_dir, "*.locus.tsv", regions_file=panel
+    )
+    assert io_ok is True
+    assert content_ok is True
+    stats = content_detail["outputs"][0]["stats"]
+    assert stats["genomic_str_table"] is True
+    assert stats["str_loci"] == ["XYLT1"]
+    assert stats["regions_hit"] == 1
