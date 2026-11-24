@@ -1073,6 +1073,14 @@ def record_manual_run(
             "title": "Output file produced; plausibility check not passed",
             "body": "A non-empty output file was written, but it did not pass the STR plausibility check.",
         })
+    elif gates["runs"]:
+        manual_conclusion.append({
+            "title": "Output failed structural validation",
+            "body": (
+                "Execution completed, but the expected output file was either missing "
+                "or failed structural validation for its declared format."
+            ),
+        })
     else:
         manual_conclusion.append({
             "title": "No expected output produced",
