@@ -1,6 +1,6 @@
 {
   "schema": "strhub-verified/index/3",
-  "generated": "2026-11-23T19:24:18+00:00",
+  "generated": "2026-11-24T12:03:55+00:00",
   "count": 23,
   "tools": [
     {
@@ -102,6 +102,22 @@
           "report": "expansionhunterdenovo/5a48ed8b6dceb8d772f702e239c5afede9d5108c/expansionhunterdenovo.json",
           "page": "expansionhunterdenovo/5a48ed8b6dceb8d772f702e239c5afede9d5108c/expansionhunterdenovo.html",
           "pdf": "expansionhunterdenovo/5a48ed8b6dceb8d772f702e239c5afede9d5108c/expansionhunterdenovo.pdf"
+        },
+        {
+          "sha": "5a48ed8b6dceb8d772f702e239c5afede9d5108c",
+          "instrument": "curated",
+          "version": "v0.9.0",
+          "variant": null,
+          "committed": "2020-03-04T04:44:07Z",
+          "generated": "2026-11-24T12:03:11+00:00",
+          "level": "io",
+          "label": "Not verified as documented",
+          "verdict": "runs",
+          "errors_reported": false,
+          "ci_run": null,
+          "report": "expansionhunterdenovo/5a48ed8b6dceb8d772f702e239c5afede9d5108c-curated/expansionhunterdenovo.json",
+          "page": "expansionhunterdenovo/5a48ed8b6dceb8d772f702e239c5afede9d5108c-curated/expansionhunterdenovo.html",
+          "pdf": "expansionhunterdenovo/5a48ed8b6dceb8d772f702e239c5afede9d5108c-curated/expansionhunterdenovo.pdf"
         }
       ]
     },

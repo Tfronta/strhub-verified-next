@@ -1,0 +1,213 @@
+{
+  "schema": "strhub-verified/1",
+  "instrument": "curated",
+  "mode": "publish",
+  "generated": "2026-11-24T12:03:11+00:00",
+  "tool": {
+    "name": "ExpansionHunterDenovo",
+    "version": "v0.9.0",
+    "contact": "https://github.com/Illumina/ExpansionHunterDenovo/issues"
+  },
+  "source": {
+    "repo": "https://github.com/Illumina/ExpansionHunterDenovo",
+    "ref": "5a48ed8b6dceb8d772f702e239c5afede9d5108c",
+    "ref_resolved": "5a48ed8b6dceb8d772f702e239c5afede9d5108c",
+    "committed": "2020-03-04T04:44:07Z"
+  },
+  "environment": {
+    "os": [
+      "macOS arm64 (AppleClang + CMake + Boost 1.67.0 from archives.boost.io, compiled from unmodified upstream source)"
+    ],
+    "source": "prepared"
+  },
+  "preparation": {
+    "file": "ehdn-v0.9.0-notes.yml",
+    "dataset": "illumina-bam-hg38-med",
+    "installation": "strhub",
+    "base": "C++11 toolchain (`clang++`/`g++`, `cmake`, `make`, `zlib`, `bzip2`, `liblzma`) with `-DBOOST_URL=https://archives.boost.io/release/1.67.0/source/boost_1_67_0.tar.bz2`, compiled from unmodified upstream v0.9.0 source (official Linux x86_64 release binary also available on GitHub Releases)",
+    "without_preparation": "Automated verification failed during compilation (`build_download_failed`) because `source/thirdparty/boost-cmake-1.67.0/CMakeLists.txt` (line 5) hardcodes the retired `https://dl.bintray.com/boostorg/release/1.67.0/source/boost_1_67_0.tar.bz2` URL (Bintray shut down in May 2021), which returns HTTP 404.",
+    "why": [],
+    "steps": [
+      "# Option A (Linux x86_64 official precompiled binary or Bioconda):",
+      "curl -L -O https://github.com/Illumina/ExpansionHunterDenovo/releases/download/v0.9.0/ExpansionHunterDenovo-v0.9.0-linux_x86_64.tar.gz",
+      "tar -xzf ExpansionHunterDenovo-v0.9.0-linux_x86_64.tar.gz && export PATH=\"$PWD/ExpansionHunterDenovo-v0.9.0-linux_x86_64/bin:$PATH\"",
+      "# Option B (compile unmodified v0.9.0 from source using official Boost archive):",
+      "mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DBOOST_URL=https://archives.boost.io/release/1.67.0/source/boost_1_67_0.tar.bz2 ../source && make -j4"
+    ],
+    "run_cmd": "ExpansionHunterDenovo profile --reads /data/in/input.bam --reference /data/in/hg38.fa --output-prefix /data/out/sample --min-anchor-mapq 50 --max-irr-mapq 40",
+    "files": []
+  },
+  "recommendations": [
+    "In `source/thirdparty/boost-cmake-1.67.0/CMakeLists.txt` (line 5), replace the retired `https://dl.bintray.com/boostorg/release/1.67.0/source/boost_1_67_0.tar.bz2` URL with `https://archives.boost.io/release/1.67.0/source/boost_1_67_0.tar.bz2` so clean source builds succeed again.",
+    "Add a copyable installation block directly in `README.md` for the official Linux release tarball or Bioconda (`conda install -c bioconda expansionhunterdenovo=0.9.0`) so automated evaluators can run v0.9.0 without compiling Boost 1.67.0 from source.",
+    "Update `cmake_minimum_required` in `source/thirdparty/boost-cmake-1.67.0/CMakeLists.txt` (line 1) from `3.0.0` to `3.10` for compatibility with CMake 4.x."
+  ],
+  "gates": {
+    "available": true,
+    "installs": true,
+    "runs": true,
+    "io": true,
+    "content": false
+  },
+  "level": "io",
+  "verdict": {
+    "code": "runs",
+    "title": "Runs in manual verification",
+    "basis": "gates",
+    "reason": "Compiled unmodified upstream ExpansionHunterDenovo v0.9.0 (`5a48ed8`) by passing `-DBOOST_URL=https://archives.boost.io/release/1.67.0/source/boost_1_67_0.tar.bz2` to CMake (zero edits to upstream source) and executed the documented `ExpansionHunterDenovo profile` command from `documentation/05_Computing_profiles.md` (lines 35-40) against the GIAB NA12878 medical Illumina BAM slice (`illumina-bam-hg38-med`). Execution completed in under 1 second (exit 0), generating valid `sample.locus.tsv` (1 anchored in-repeat region at `chr16:17470284-17470669`, motif `CCG`, 5 anchored IRRs), `sample.motif.tsv`, and `sample.str_profile.json`. Reached 4/5 gates (`Runs + Expected IO`) because ExpansionHunterDenovo outputs de novo genomic coordinates and motifs rather than named forensic STR genotypes; also reproduced the repository's bundled `examples/case-control/bamlets/sample1.bam` output (`StrA` `AGC` and `StrB` `CCG`).",
+    "readme_gaps": []
+  },
+  "run": {
+    "cmd": "ExpansionHunterDenovo profile --reads /data/in/input.bam --reference /data/in/hg38.fa --output-prefix /data/out/sample --min-anchor-mapq 50 --max-irr-mapq 40",
+    "cwd": ".",
+    "step_outcome": "success"
+  },
+  "datasets": [
+    {
+      "leg": "external",
+      "label": "External data",
+      "available": true,
+      "type": "illumina-bam-hg38-med",
+      "dataset": "Illumina BAM (hg38), NA12878, medical STR slice (female)",
+      "io": true,
+      "content": false,
+      "passed": true
+    }
+  ],
+  "logs": {
+    "external": "expansionhunterdenovo.log-external.txt"
+  },
+  "terminals": {
+    "external": "expansionhunterdenovo.terminal-external.txt"
+  },
+  "certificate": {
+    "schema": "strhub-verified/certificate/1",
+    "label": "Manual verification: verified",
+    "reached": "Runs + Expected IO",
+    "summary": {
+      "purpose": "Independent manual verification of reproducible execution on unmodified upstream source.",
+      "result": "Compiled unmodified upstream ExpansionHunterDenovo v0.9.0 (`5a48ed8`) by passing `-DBOOST_URL=https://archives.boost.io/release/1.67.0/source/boost_1_67_0.tar.bz2` to CMake (zero edits to upstream source) and executed the documented `ExpansionHunterDenovo profile` command from `documentation/05_Computing_profiles.md` (lines 35-40) against the GIAB NA12878 medical Illumina BAM slice (`illumina-bam-hg38-med`). Execution completed in under 1 second (exit 0), generating valid `sample.locus.tsv` (1 anchored in-repeat region at `chr16:17470284-17470669`, motif `CCG`, 5 anchored IRRs), `sample.motif.tsv`, and `sample.str_profile.json`. Reached 4/5 gates (`Runs + Expected IO`) because ExpansionHunterDenovo outputs de novo genomic coordinates and motifs rather than named forensic STR genotypes; also reproduced the repository's bundled `examples/case-control/bamlets/sample1.bam` output (`StrA` `AGC` and `StrB` `CCG`).",
+      "reached": "Runs + Expected IO",
+      "why": "Automated verification failed to compile because CMake points to a retired Bintray URL for Boost 1.67.0. In manual verification, overriding `BOOST_URL` to `archives.boost.io` (without editing any source code) compiled v0.9.0 cleanly and ran `ExpansionHunterDenovo profile` end-to-end on the GIAB NA12878 medical Illumina slice, producing valid locus/motif TSV and JSON profiles (4/5 gates; de novo profiler without named STR genotype columns; see Section 4 for exact steps).",
+      "scope": "Reproducible execution only; does not evaluate genotype concordance or forensic casework fitness.",
+      "not_evaluated": [
+        "Genotype accuracy",
+        "Concordance against truth",
+        "Forensic casework fitness"
+      ]
+    },
+    "conclusion": [
+      {
+        "title": "ExpansionHunterDenovo v0.9.0 executes end-to-end",
+        "body": "ExpansionHunterDenovo v0.9.0 ran to completion without code modifications in the prepared environment at unmodified upstream commit 5a48ed8."
+      },
+      {
+        "title": "Output file produced; plausibility check not passed",
+        "body": "A non-empty output file was written, but it did not pass the STR plausibility check."
+      },
+      {
+        "title": "Verification used STRhub reference data",
+        "body": "Verification used open-access STRhub reference dataset Illumina BAM (hg38), NA12878, medical STR slice (female) (illumina-bam-hg38-med)."
+      },
+      {
+        "title": "Repeatability of this manual run",
+        "body": "The pinned upstream commit, prepared environment description, exact commands executed, and sanitized terminal output recorded in this report document the procedure for independent reproduction."
+      }
+    ],
+    "out_of_scope": [
+      "Genotype accuracy and concordance",
+      "Forensic casework accreditation"
+    ],
+    "limitations": [
+      "Results apply exclusively to the exact Git commit SHA and manually prepared environment recorded in this report.",
+      "Single regional reference slice per input type; low-coverage warnings on sliced BAMs do not imply defects on whole-genome data.",
+      "Plausible Output checks verify structural format and recognizable STR loci, not biological genotype truth.",
+      "Verification is a point-in-time snapshot; upstream repository changes after this commit are not covered until re-verification.",
+      "No truth-set concordance, forensic casework validation, or regulatory compliance assessment was performed."
+    ],
+    "scope": {
+      "statement": "This report records a manual execution against the pinned upstream commit.",
+      "not": "It does not establish genotype accuracy or forensic casework fitness.",
+      "disclaimer": "Each result is a fixed, dated attestation verified on the tool's public repository at an immutable commit. It evaluates reproducible execution only, not genotype accuracy or forensic fitness."
+    }
+  },
+  "scope": "Manual verification of reproducible execution against unmodified upstream commit.",
+  "io_detail": {
+    "gate": "io",
+    "passed": true,
+    "outputs": [
+      {
+        "path": "*.locus.tsv",
+        "format": "tsv",
+        "resolved": "sample.locus.tsv",
+        "records": 2,
+        "checks": {
+          "exists": true,
+          "non_empty": true,
+          "parses_as_tsv": true,
+          "min_records": true
+        },
+        "passed": true
+      }
+    ]
+  },
+  "content_detail": {
+    "gate": "content",
+    "applicable": true,
+    "passed": false,
+    "outputs": [
+      {
+        "path": "*.locus.tsv",
+        "resolved": "sample.locus.tsv",
+        "mode": "auto",
+        "checks": {
+          "records_present": true,
+          "locus_column_found": false,
+          "loci_recognised": false,
+          "calls_or_counts_present": false
+        },
+        "stats": {
+          "rows": 2,
+          "header_row_dropped": false,
+          "malformed_rows": 0,
+          "dna_invalid_rows": 0,
+          "count_invalid_rows": 0,
+          "distinct_loci": 0,
+          "distinct_str_loci": 0,
+          "distinct_snp_markers": 0,
+          "loci": [],
+          "str_loci": [],
+          "snp_markers": [],
+          "total_reads": 0,
+          "max_sequence_depth": 0,
+          "top_loci_by_depth": [],
+          "locus_column_found": false
+        }
+      }
+    ]
+  },
+  "i18n": {
+    "es": {
+      "plain_why": "La verificaci\u00f3n autom\u00e1tica fall\u00f3 al compilar porque CMake apunta a una URL retirada de Bintray para Boost 1.67.0. En verificaci\u00f3n manual, redirigiendo `BOOST_URL` a `archives.boost.io` (sin modificar el c\u00f3digo), v0.9.0 compil\u00f3 limpiamente y ejecut\u00f3 `ExpansionHunterDenovo profile` de principio a fin sobre el recorte m\u00e9dico Illumina de GIAB NA12878, generando perfiles TSV y JSON v\u00e1lidos (4/5 compuertas; perfilador de novo sin columnas de genotipos STR nombrados; ver Secci\u00f3n 4 para los pasos exactos).",
+      "without_preparation": "La verificaci\u00f3n autom\u00e1tica fall\u00f3 durante la compilaci\u00f3n (`build_download_failed`) porque `source/thirdparty/boost-cmake-1.67.0/CMakeLists.txt` (l\u00ednea 5) apunta a la URL retirada `https://dl.bintray.com/boostorg/release/1.67.0/source/boost_1_67_0.tar.bz2` (Bintray cerr\u00f3 en mayo de 2021), que devuelve HTTP 404.",
+      "reason": "Se compil\u00f3 ExpansionHunterDenovo v0.9.0 original sin modificar (`5a48ed8`) pasando `-DBOOST_URL=https://archives.boost.io/release/1.67.0/source/boost_1_67_0.tar.bz2` a CMake (cero cambios al c\u00f3digo original) y se ejecut\u00f3 el comando documentado `ExpansionHunterDenovo profile` de `documentation/05_Computing_profiles.md` (l\u00edneas 35-40) sobre el recorte m\u00e9dico Illumina BAM de GIAB NA12878 (`illumina-bam-hg38-med`). La ejecuci\u00f3n finaliz\u00f3 en menos de 1 segundo (exit 0), generando `sample.locus.tsv` v\u00e1lido (1 regi\u00f3n con lecturas in-repeat ancladas en `chr16:17470284-17470669`, motivo `CCG`, 5 IRRs ancladas), `sample.motif.tsv` y `sample.str_profile.json`. Alcanz\u00f3 4/5 compuertas (`Runs + Expected IO`) porque ExpansionHunterDenovo reporta coordenadas gen\u00f3micas y motivos de novo en lugar de genotipos nombrados de loci STR forenses; tambi\u00e9n se reprodujo el ejemplo incluido `examples/case-control/bamlets/sample1.bam` (`StrA` `AGC` y `StrB` `CCG`).",
+      "base": "Toolchain C++11 (`clang++`/`g++`, `cmake`, `make`, `zlib`, `bzip2`, `liblzma`) con `-DBOOST_URL=https://archives.boost.io/release/1.67.0/source/boost_1_67_0.tar.bz2`, compilado desde el c\u00f3digo original sin modificar de v0.9.0 (tambi\u00e9n existe binario oficial precompilado para Linux x86_64 en GitHub Releases)",
+      "recommendations": [
+        "En `source/thirdparty/boost-cmake-1.67.0/CMakeLists.txt` (l\u00ednea 5), reemplazar la URL retirada `https://dl.bintray.com/boostorg/release/1.67.0/source/boost_1_67_0.tar.bz2` por `https://archives.boost.io/release/1.67.0/source/boost_1_67_0.tar.bz2` para restaurar la compilaci\u00f3n limpia desde fuente.",
+        "Agregar un bloque copiable de instalaci\u00f3n directamente en `README.md` para el tarball oficial de Linux o Bioconda (`conda install -c bioconda expansionhunterdenovo=0.9.0`) para que evaluadores autom\u00e1ticos puedan ejecutar v0.9.0 sin compilar Boost 1.67.0.",
+        "Actualizar `cmake_minimum_required` en `source/thirdparty/boost-cmake-1.67.0/CMakeLists.txt` (l\u00ednea 1) de `3.0.0` a `3.10` para compatibilidad con CMake 4.x."
+      ]
+    },
+    "pt": {
+      "plain_why": "A verifica\u00e7\u00e3o autom\u00e1tica falhou na compila\u00e7\u00e3o porque o CMake aponta para uma URL desativada do Bintray para o Boost 1.67.0. Na verifica\u00e7\u00e3o manual, sobrescrevendo `BOOST_URL` para `archives.boost.io` (sem editar o c\u00f3digo), a v0.9.0 compilou de forma limpa e executou `ExpansionHunterDenovo profile` de ponta a ponta no recorte m\u00e9dico Illumina do GIAB NA12878, gerando perfis TSV e JSON v\u00e1lidos (4/5 etapas; perfilador de novo sem colunas de gen\u00f3tipos STR nomeados; veja a Se\u00e7\u00e3o 4 para os passos exatos).",
+      "without_preparation": "A verifica\u00e7\u00e3o autom\u00e1tica falhou durante a compila\u00e7\u00e3o (`build_download_failed`) porque `source/thirdparty/boost-cmake-1.67.0/CMakeLists.txt` (linha 5) aponta para a URL desativada `https://dl.bintray.com/boostorg/release/1.67.0/source/boost_1_67_0.tar.bz2` (o Bintray foi encerrado em maio de 2021), retornando HTTP 404.",
+      "reason": "Compilado o ExpansionHunterDenovo v0.9.0 original sem modifica\u00e7\u00f5es (`5a48ed8`) passando `-DBOOST_URL=https://archives.boost.io/release/1.67.0/source/boost_1_67_0.tar.bz2` ao CMake (zero edi\u00e7\u00f5es no c\u00f3digo) e executado o comando documentado `ExpansionHunterDenovo profile` de `documentation/05_Computing_profiles.md` (linhas 35-40) no recorte m\u00e9dico Illumina BAM do GIAB NA12878 (`illumina-bam-hg38-med`). A execu\u00e7\u00e3o terminou em menos de 1 segundo (exit 0), gerando `sample.locus.tsv` v\u00e1lido (1 regi\u00e3o com leituras in-repeat ancoradas em `chr16:17470284-17470669`, motivo `CCG`, 5 IRRs ancoradas), `sample.motif.tsv` e `sample.str_profile.json`. Atingiu 4/5 etapas (`Runs + Expected IO`) porque o ExpansionHunterDenovo reporta coordenadas gen\u00f4micas e motivos de novo em vez de gen\u00f3tipos nomeados de loci STR forenses; tamb\u00e9m foi reproduzido o exemplo inclu\u00eddo `examples/case-control/bamlets/sample1.bam` (`StrA` `AGC` e `StrB` `CCG`).",
+      "base": "Toolchain C++11 (`clang++`/`g++`, `cmake`, `make`, `zlib`, `bzip2`, `liblzma`) com `-DBOOST_URL=https://archives.boost.io/release/1.67.0/source/boost_1_67_0.tar.bz2`, compilado a partir do c\u00f3digo original sem modifica\u00e7\u00f5es da v0.9.0 (tamb\u00e9m h\u00e1 bin\u00e1rio oficial pr\u00e9-compilado para Linux x86_64 no GitHub Releases)",
+      "recommendations": [
+        "Em `source/thirdparty/boost-cmake-1.67.0/CMakeLists.txt` (linha 5), substituir a URL desativada `https://dl.bintray.com/boostorg/release/1.67.0/source/boost_1_67_0.tar.bz2` por `https://archives.boost.io/release/1.67.0/source/boost_1_67_0.tar.bz2` para restaurar a compila\u00e7\u00e3o limpa.",
+        "Adicionar um bloco copi\u00e1vel de instala\u00e7\u00e3o diretamente no `README.md` para o tarball oficial do Linux ou Bioconda (`conda install -c bioconda expansionhunterdenovo=0.9.0`) para que avaliadores autom\u00e1ticos executem a v0.9.0 sem compilar o Boost 1.67.0.",
+        "Atualizar `cmake_minimum_required` em `source/thirdparty/boost-cmake-1.67.0/CMakeLists.txt` (linha 1) de `3.0.0` para `3.10` para compatibilidade com CMake 4.x."
+      ]
+    }
+  }
+}
