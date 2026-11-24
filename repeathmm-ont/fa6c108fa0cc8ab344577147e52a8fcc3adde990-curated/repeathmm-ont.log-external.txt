@@ -1,0 +1,103 @@
+The following options are used (included default):
+       BWAMEMOptions	( -k8 -W8 -r7 );
+             CompRep	(0);
+           MatchInfo	([3, -2, -2, -15, -1]);
+              MaxRep	(4000);
+              MinSup	(5);
+         Patternfile	(['/data/in/codis.pa']);
+          RepeatTime	(5);
+             SeqTech	(Nanopore);
+     SplitAndReAlign	(0);
+          TRFOptions	(2_7_4_80_10_100);
+   Tolerate_mismatch	(None);
+   UserDefinedUniqID	(None);
+               align	(/data/out/align/);
+           emissionm	(None);
+                  hg	(hg38);
+              hgfile	(/data/in/hg38.fa);
+        hmm_del_rate	(0.05);
+     hmm_insert_rate	(0.1);
+        hmm_sub_rate	(0.05);
+     isGapCorrection	(1);
+       minRepBWTSize	(70);
+         minTailSize	(70);
+              outlog	(2);
+   repeatFlankLength	(30);
+          repeatName	(all);
+ specifiedRepeatInfo	(///////);
+      stsBasedFolder	(/opt/repeathmm-env/lib/python2.7/site-packages/RepeatHMM/reference_sts/);
+         transitionm	(None);
+
+          Onebamfile	(/data/in/sample.bam);
+      SepbamfileTemp	(None);
+               align	(/data/out/align/);
+    analysis_file_id	(_GapCorrection1_FlankLength30_hg38_comp_Nanopore_I0.120_D0.020_S0.020);
+             bamfile	(/data/in/sample.bam);
+      unique_file_id	(.gmm_GapCorrection1_FlankLength30_hg38_comp_Nanopore_I0.120_D0.020_S0.020);
+
+p2bamhmm end---running time1 mem68040
+p2bamhmm end---running time1 mem69324
+p2bamhmm end---running time1 mem71684
+p2bamhmm end---running time1 mem73788
+p2bamhmm end---running time1 mem74344
+p2bamhmm end---running time1 mem93148
+p2bamhmm end---running time1 mem93148
+p2bamhmm end---running time1 mem93148
+p2bamhmm end---running time1 mem93148
+p2bamhmm end---running time1 mem93148
+p2bamhmm end---running time1 mem93148
+p2bamhmm end---running time1 mem93148
+p2bamhmm end---running time1 mem93220
+p2bamhmm end---running time1 mem93264
+p2bamhmm end---running time1 mem93884
+p2bamhmm end---running time1 mem93892
+Warning!!!! could not find optimized model
+p2bamhmm end---running time1 mem94516
+p2bamhmm end---running time1 mem94536
+p2bamhmm end---running time1 mem94604
+p2bamhmm end---running time1 mem95724
+
+  p2bamhmm ['csf1po', 19.25, [17, 17], 'allocr:15:1, 16:15, 17:4, 18:14,', 34, 20]
+  p2bamhmm ['d10s1248', 13.25, [13, 13], 'allocr:13:22, 14:1, 15:12, 16:1,', 36, 15]
+  p2bamhmm ['d12s391', 20.5, [22, 22], 'allocr:20:1, 21:14, 22:21, 23:2,', 38, 13]
+  p2bamhmm ['d13s317', 16.25, [15, 17], 'allocr:14:1, 15:12, 17:14, 20:1,', 28, 9]
+  p2bamhmm ['d16s539', 11.25, [11, 11], 'allocr:8:16, 11:23, 12:1,', 40, 15]
+  p2bamhmm ['d18s51', 27.0, [22, 22], 'allocr:20:1, 21:4, 22:17, 23:12, 24:3, 206:1,', 38, 17]
+  p2bamhmm ['d19s433', 16.75, [15, 15], 'allocr:13:1, 14:18, 15:3, 16:23, 17:1, 6441:1,', 47, 9]
+  p2bamhmm ['d1s1656', 17.0, [11, 11], 'allocr:11:16, 13:14, 14:1,', 31, 10]
+  p2bamhmm ['d21s11', 38.0, [39, 39], 'allocr:36:1, 37:10, 38:1, 39:21,', 33, 7]
+  p2bamhmm ['d22s1045', 19.0, [18, 18], 'allocr:17:2, 18:29,', 31, 12]
+  p2bamhmm ['d2s1338', 24.5, [21, 21], 'allocr:18:7, 19:1, 21:17,', 25, 20]
+  p2bamhmm ['d2s441', 12.5, [11, 14], 'allocr:3:1, 10:3, 11:17, 14:23, 19:1,', 45, 14]
+  p2bamhmm ['d3s1358', 17.0, [15, 15], 'allocr:13:1, 14:2, 15:34,', 37, 9]
+  p2bamhmm ['d5s818', 12.0, [12, 12], 'allocr:12:18, 13:3, 14:15, 28:1,', 37, 24]
+  p2bamhmm ['d7s820', 16.5, [13, 13], 'allocr:11:15, 13:17,', 32, 12]
+  p2bamhmm ['d8s1179', 14.0, [14, 14], 'allocr:11:15, 14:15,', 30, 14]
+  p2bamhmm ['fga', 22.0, [23, 24], 'allocr:16:1, 18:1, 19:2, 20:15, 21:3, 22:1, 23:20, 24:2, 25:1,', 46, 15]
+  p2bamhmm ['th01', 8.0, [11, 11], 'allocr:8:11, 11:14,', 25, 12]
+  p2bamhmm ['tpox', 8.75, [9, 9], 'allocr:9:24, 11:21, 12:1,', 46, 10]
+  p2bamhmm ['vwa', 19.0, [16, 18], 'allocr:15:1, 16:20, 17:1, 18:17, 19:1, 20:1,', 41, 14]
+
+ 	p2bamhmm
+csf1po	 17 17;
+d10s1248	 13 13;
+d12s391	 22 22;
+d13s317	 15 17;
+d16s539	 11 11;
+d18s51	 22 22;
+d19s433	 15 15;
+d1s1656	 11 11;
+d21s11	 39 39;
+d22s1045	 18 18;
+d2s1338	 21 21;
+d2s441	 11 14;
+d3s1358	 15 15;
+d5s818	 12 12;
+d7s820	 13 13;
+d8s1179	 14 14;
+fga	 23 24;
+th01	 11 11;
+tpox	 9 9;
+vwa	 16 18;
+
+('The result is in', 'logbam/RepBAM_all.gmm_GapCorrection1_FlankLength30_hg38_comp_Nanopore_I0.120_D0.020_S0.020.log')

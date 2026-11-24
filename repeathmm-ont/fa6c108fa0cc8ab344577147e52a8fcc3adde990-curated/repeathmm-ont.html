@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang='en'><head><meta charset='utf-8'><title>RepeatHMM v2.0.3 · STRhub Manual Verification</title><style>body{font:15px/1.6 system-ui,sans-serif;max-width:860px;margin:2rem auto;padding:0 1rem;color:#1f2937}pre{background:#111827;color:#f3f4f6;padding:1rem;border-radius:8px;overflow:auto;font-size:12px}.pill{display:inline-block;padding:2px 10px;border-radius:999px;background:#eef2ff;color:#312e81;font-weight:600;font-size:12px}</style></head><body><span class='pill'>Manual Verification · runs</span><h1>RepeatHMM v2.0.3</h1><p><strong>Commit:</strong> <code>fa6c108fa0cc8ab344577147e52a8fcc3adde990</code></p><p>Built unmodified upstream RepeatHMM v2.0.3 (`fa6c108`) in an isolated `osx-64` Python 2.7 conda environment (compiling the SWIG C extension `_UnsymmetricPairAlignment.so` in a separate build copy with zero upstream source modifications) and ran `repeatHMM.py BAMinput --SeqTech Nanopore --SplitAndReAlign 0 --repeatName all` against the HG00113 Oxford Nanopore R10 SUP CODIS reference slice (`ont-bam-hg38`, 20 autosomal CODIS loci in RepeatHMM `.pa` pattern format) and local `hg38.fa`. Execution completed cleanly in ~18 s (exit 0), producing `logbam/RepBAM_all*.log` with diploid repeat-count calls across all 20/20 CODIS loci (720 total supporting reads).</p><h2>Recorded Terminal</h2><pre>$ cd /data/out &amp;&amp; /opt/repeathmm-env/bin/python /src/RepeatHMM/bin/repeatHMM.py BAMinput --Onebamfile /data/in/sample.bam --hg hg38 --hgfile /data/in/hg38.fa --Patternfile /data/in/codis.pa --SeqTech Nanopore --SplitAndReAlign 0 --repeatName all --outFolder /data/out/align
+
+The following options are used (included default):
+       BWAMEMOptions	( -k8 -W8 -r7 );
+             CompRep	(0);
+           MatchInfo	([3, -2, -2, -15, -1]);
+              MaxRep	(4000);
+              MinSup	(5);
+         Patternfile	([&#x27;/data/in/codis.pa&#x27;]);
+          RepeatTime	(5);
+             SeqTech	(Nanopore);
+     SplitAndReAlign	(0);
+          TRFOptions	(2_7_4_80_10_100);
+   Tolerate_mismatch	(None);
+   UserDefinedUniqID	(None);
+               align	(/data/out/align/);
+           emissionm	(None);
+                  hg	(hg38);
+              hgfile	(/data/in/hg38.fa);
+        hmm_del_rate	(0.05);
+     hmm_insert_rate	(0.1);
+        hmm_sub_rate	(0.05);
+     isGapCorrection	(1);
+       minRepBWTSize	(70);
+         minTailSize	(70);
+              outlog	(2);
+   repeatFlankLength	(30);
+          repeatName	(all);
+ specifiedRepeatInfo	(///////);
+      stsBasedFolder	(/opt/repeathmm-env/lib/python2.7/site-packages/RepeatHMM/reference_sts/);
+         transitionm	(None);
+
+          Onebamfile	(/data/in/sample.bam);
+      SepbamfileTemp	(None);
+               align	(/data/out/align/);
+    analysis_file_id	(_GapCorrection1_FlankLength30_hg38_comp_Nanopore_I0.120_D0.020_S0.020);
+             bamfile	(/data/in/sample.bam);
+      unique_file_id	(.gmm_GapCorrection1_FlankLength30_hg38_comp_Nanopore_I0.120_D0.020_S0.020);
+
+p2bamhmm end---running time1 mem68040
+p2bamhmm end---running time1 mem69324
+p2bamhmm end---running time1 mem71684
+p2bamhmm end---running time1 mem73788
+p2bamhmm end---running time1 mem74344
+p2bamhmm end---running time1 mem93148
+p2bamhmm end---running time1 mem93148
+p2bamhmm end---running time1 mem93148
+p2bamhmm end---running time1 mem93148
+p2bamhmm end---running time1 mem93148
+p2bamhmm end---running time1 mem93148
+p2bamhmm end---running time1 mem93148
+p2bamhmm end---running time1 mem93220
+p2bamhmm end---running time1 mem93264
+p2bamhmm end---running time1 mem93884
+p2bamhmm end---running time1 mem93892
+Warning!!!! could not find optimized model
+p2bamhmm end---running time1 mem94516
+p2bamhmm end---running time1 mem94536
+p2bamhmm end---running time1 mem94604
+p2bamhmm end---running time1 mem95724
+
+  p2bamhmm [&#x27;csf1po&#x27;, 19.25, [17, 17], &#x27;allocr:15:1, 16:15, 17:4, 18:14,&#x27;, 34, 20]
+  p2bamhmm [&#x27;d10s1248&#x27;, 13.25, [13, 13], &#x27;allocr:13:22, 14:1, 15:12, 16:1,&#x27;, 36, 15]
+  p2bamhmm [&#x27;d12s391&#x27;, 20.5, [22, 22], &#x27;allocr:20:1, 21:14, 22:21, 23:2,&#x27;, 38, 13]
+  p2bamhmm [&#x27;d13s317&#x27;, 16.25, [15, 17], &#x27;allocr:14:1, 15:12, 17:14, 20:1,&#x27;, 28, 9]
+  p2bamhmm [&#x27;d16s539&#x27;, 11.25, [11, 11], &#x27;allocr:8:16, 11:23, 12:1,&#x27;, 40, 15]
+  p2bamhmm [&#x27;d18s51&#x27;, 27.0, [22, 22], &#x27;allocr:20:1, 21:4, 22:17, 23:12, 24:3, 206:1,&#x27;, 38, 17]
+  p2bamhmm [&#x27;d19s433&#x27;, 16.75, [15, 15], &#x27;allocr:13:1, 14:18, 15:3, 16:23, 17:1, 6441:1,&#x27;, 47, 9]
+  p2bamhmm [&#x27;d1s1656&#x27;, 17.0, [11, 11], &#x27;allocr:11:16, 13:14, 14:1,&#x27;, 31, 10]
+  p2bamhmm [&#x27;d21s11&#x27;, 38.0, [39, 39], &#x27;allocr:36:1, 37:10, 38:1, 39:21,&#x27;, 33, 7]
+  p2bamhmm [&#x27;d22s1045&#x27;, 19.0, [18, 18], &#x27;allocr:17:2, 18:29,&#x27;, 31, 12]
+  p2bamhmm [&#x27;d2s1338&#x27;, 24.5, [21, 21], &#x27;allocr:18:7, 19:1, 21:17,&#x27;, 25, 20]
+  p2bamhmm [&#x27;d2s441&#x27;, 12.5, [11, 14], &#x27;allocr:3:1, 10:3, 11:17, 14:23, 19:1,&#x27;, 45, 14]
+  p2bamhmm [&#x27;d3s1358&#x27;, 17.0, [15, 15], &#x27;allocr:13:1, 14:2, 15:34,&#x27;, 37, 9]
+  p2bamhmm [&#x27;d5s818&#x27;, 12.0, [12, 12], &#x27;allocr:12:18, 13:3, 14:15, 28:1,&#x27;, 37, 24]
+  p2bamhmm [&#x27;d7s820&#x27;, 16.5, [13, 13], &#x27;allocr:11:15, 13:17,&#x27;, 32, 12]
+  p2bamhmm [&#x27;d8s1179&#x27;, 14.0, [14, 14], &#x27;allocr:11:15, 14:15,&#x27;, 30, 14]
+  p2bamhmm [&#x27;fga&#x27;, 22.0, [23, 24], &#x27;allocr:16:1, 18:1, 19:2, 20:15, 21:3, 22:1, 23:20, 24:2, 25:1,&#x27;, 46, 15]
+  p2bamhmm [&#x27;th01&#x27;, 8.0, [11, 11], &#x27;allocr:8:11, 11:14,&#x27;, 25, 12]
+  p2bamhmm [&#x27;tpox&#x27;, 8.75, [9, 9], &#x27;allocr:9:24, 11:21, 12:1,&#x27;, 46, 10]
+  p2bamhmm [&#x27;vwa&#x27;, 19.0, [16, 18], &#x27;allocr:15:1, 16:20, 17:1, 18:17, 19:1, 20:1,&#x27;, 41, 14]
+
+ 	p2bamhmm
+csf1po	 17 17;
+d10s1248	 13 13;
+d12s391	 22 22;
+d13s317	 15 17;
+d16s539	 11 11;
+d18s51	 22 22;
+d19s433	 15 15;
+d1s1656	 11 11;
+d21s11	 39 39;
+d22s1045	 18 18;
+d2s1338	 21 21;
+d2s441	 11 14;
+d3s1358	 15 15;
+d5s818	 12 12;
+d7s820	 13 13;
+d8s1179	 14 14;
+fga	 23 24;
+th01	 11 11;
+tpox	 9 9;
+vwa	 16 18;
+
+(&#x27;The result is in&#x27;, &#x27;logbam/RepBAM_all.gmm_GapCorrection1_FlankLength30_hg38_comp_Nanopore_I0.120_D0.020_S0.020.log&#x27;)
+
+[exit 0]
+</pre></body></html>

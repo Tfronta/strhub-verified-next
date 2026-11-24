@@ -1,0 +1,367 @@
+{
+  "schema": "strhub-verified/1",
+  "instrument": "curated",
+  "mode": "publish",
+  "generated": "2026-11-24T18:35:14+00:00",
+  "tool": {
+    "name": "RepeatHMM",
+    "version": "v2.0.3",
+    "contact": "https://github.com/WGLab/RepeatHMM/issues"
+  },
+  "source": {
+    "repo": "https://github.com/WGLab/RepeatHMM",
+    "ref": "fa6c108fa0cc8ab344577147e52a8fcc3adde990",
+    "ref_resolved": "fa6c108fa0cc8ab344577147e52a8fcc3adde990",
+    "committed": "2020-12-03T17:30:50Z"
+  },
+  "environment": {
+    "os": [
+      "macOS x86_64 via Rosetta 2 (conda osx-64 Python 2.7.15 environment)"
+    ],
+    "source": "prepared"
+  },
+  "preparation": {
+    "file": "repeathmm-notes.yml",
+    "dataset": "ont-bam-hg38",
+    "installation": "strhub",
+    "base": "Conda osx-64 Python 2.7 environment (biopython 1.76, numpy 1.16.5, scipy 1.2.1, scikit-learn 0.19.2, hmmlearn 0.2.1, peakutils 1.1.0, swig 4.0.2, samtools 1.18, bwa 0.7.18, trf 4.10) with compiled SWIG C extension `_UnsymmetricPairAlignment.so`",
+    "without_preparation": "Automated verification stopped before installation (`UNVERIFIED_INSUFFICIENT_DOCS`) because `README.md` delegates installation to `docs/Install.md`, where the documented build path contains a directory typo (`cd bin/scripts/UnsymmetricPairAlignment` instead of `bin/RepeatHMM_scripts/UnsymmetricPairAlignment`) and `environment.yml` pins Linux-only glibc package build hashes (`_libgcc_mutex`, `libgcc-ng`) for Python 2.7.",
+    "why": [
+      "Automated verification stopped before installation (`UNVERIFIED_INSUFFICIENT_DOCS`) because `README.md` contains no installation commands, and `docs/Install.md` references a non-existent directory path (`bin/scripts/UnsymmetricPairAlignment` instead of `bin/RepeatHMM_scripts/UnsymmetricPairAlignment`).",
+      "`environment.yml` pins Linux-specific conda build strings (`h7b6447c_0`, `_libgcc_mutex`, `libgcc-ng`) and Python 2.7 (`dict.has_key`, `string.strip`), which cannot be created verbatim on modern platforms without relaxing platform build hashes and pinning `scikit-learn=0.19.2` and `libcxx<15`.",
+      "Although `docs/Usage.md` states `Default=0: not use SplitAndReAlign` for `--SplitAndReAlign`, `bin/repeatHMM.py` sets the parser default to `1` (which invokes `bwa mem` and requires a full BWA index alongside `hg38.fa`); passing `--SplitAndReAlign 0` runs the direct BAM + unsymmetric alignment + HMM/GMM caller cleanly on the indexed BAM and `hg38.fa`."
+    ],
+    "steps": [
+      "Cloned `https://github.com/WGLab/RepeatHMM` at commit `fa6c108fa0cc8ab344577147e52a8fcc3adde990` without modifying any file in the checkout.",
+      "Created an isolated `osx-64` conda environment with `python=2.7`, `numpy`, `scipy`, `scikit-learn=0.19.2`, `biopython`, `hmmlearn==0.2.1`, `peakutils==1.1.0`, `libcxx<15`, `swig`, `samtools`, `bwa`, `trf`, and `make`.",
+      "Built the SWIG C extension (`make` inside `bin/RepeatHMM_scripts/UnsymmetricPairAlignment` in a separate build copy `/src/RepeatHMM`) to produce `_UnsymmetricPairAlignment.so` while keeping the upstream checkout untouched.",
+      "Prepared `/data/in/codis.pa` with the 20 CODIS loci in RepeatHMM's 8-column `.pa` format (18 predefined CODIS entries from `bin/reference_sts/hg38/hg38.predefined.pa` plus `fga` and `vwa`), staged `HG00113.codis.bam` (+ `.bai`) and `hg38.fa` (+ `.fai`), and ran `repeatHMM.py BAMinput --SeqTech Nanopore --SplitAndReAlign 0 --repeatName all`."
+    ],
+    "run_cmd": "cd /data/out && python /src/RepeatHMM/bin/repeatHMM.py BAMinput --Onebamfile /data/in/sample.bam --hg hg38 --hgfile /data/in/hg38.fa --Patternfile /data/in/codis.pa --SeqTech Nanopore --SplitAndReAlign 0 --repeatName all --outFolder /data/out/align",
+    "files": []
+  },
+  "recommendations": [
+    "Fix the directory path in `docs/Install.md` (line 12) from `cd bin/scripts/UnsymmetricPairAlignment` to `cd bin/RepeatHMM_scripts/UnsymmetricPairAlignment`, and include the installation block directly in `README.md`.",
+    "Remove OS-specific conda build hashes and `_libgcc_mutex` / `libgcc-ng` from `environment.yml` (keeping only portable package version constraints such as `python=2.7`, `scikit-learn=0.19.2`, `hmmlearn=0.2.1`, `peakutils=1.1.0`, `biopython`, `swig`, `samtools`, `bwa`, `trf`), or migrate the codebase to Python 3 (`dict.has_key` and `string.strip`).",
+    "Align the `--SplitAndReAlign` default in `bin/repeatHMM.py` with `docs/Usage.md` (`default=0` for pre-aligned BAMs) so `BAMinput` runs out of the box without requiring a BWA index when a coordinate-sorted BAM and `hg38.fa` are provided."
+  ],
+  "gates": {
+    "available": true,
+    "installs": true,
+    "runs": true,
+    "io": true,
+    "content": true
+  },
+  "level": "content",
+  "verdict": {
+    "code": "runs",
+    "title": "Runs in manual verification",
+    "basis": "gates",
+    "reason": "Built unmodified upstream RepeatHMM v2.0.3 (`fa6c108`) in an isolated `osx-64` Python 2.7 conda environment (compiling the SWIG C extension `_UnsymmetricPairAlignment.so` in a separate build copy with zero upstream source modifications) and ran `repeatHMM.py BAMinput --SeqTech Nanopore --SplitAndReAlign 0 --repeatName all` against the HG00113 Oxford Nanopore R10 SUP CODIS reference slice (`ont-bam-hg38`, 20 autosomal CODIS loci in RepeatHMM `.pa` pattern format) and local `hg38.fa`. Execution completed cleanly in ~18 s (exit 0), producing `logbam/RepBAM_all*.log` with diploid repeat-count calls across all 20/20 CODIS loci (720 total supporting reads).",
+    "readme_gaps": []
+  },
+  "run": {
+    "cmd": "cd /data/out && /opt/repeathmm-env/bin/python /src/RepeatHMM/bin/repeatHMM.py BAMinput --Onebamfile /data/in/sample.bam --hg hg38 --hgfile /data/in/hg38.fa --Patternfile /data/in/codis.pa --SeqTech Nanopore --SplitAndReAlign 0 --repeatName all --outFolder /data/out/align",
+    "cwd": ".",
+    "step_outcome": "success"
+  },
+  "datasets": [
+    {
+      "leg": "external",
+      "label": "External data",
+      "available": true,
+      "type": "ont-bam-hg38",
+      "dataset": "HG00113 ONT R10 SUP CODIS slice (20 loci)",
+      "io": true,
+      "content": true,
+      "passed": true
+    }
+  ],
+  "logs": {
+    "external": "repeathmm-ont.log-external.txt"
+  },
+  "terminals": {
+    "external": "repeathmm-ont.terminal-external.txt"
+  },
+  "certificate": {
+    "schema": "strhub-verified/certificate/1",
+    "label": "Manual verification: verified",
+    "reached": "Runs + Plausible output",
+    "summary": {
+      "purpose": "Independent manual verification of reproducible execution on unmodified upstream source.",
+      "result": "Built unmodified upstream RepeatHMM v2.0.3 (`fa6c108`) in an isolated `osx-64` Python 2.7 conda environment (compiling the SWIG C extension `_UnsymmetricPairAlignment.so` in a separate build copy with zero upstream source modifications) and ran `repeatHMM.py BAMinput --SeqTech Nanopore --SplitAndReAlign 0 --repeatName all` against the HG00113 Oxford Nanopore R10 SUP CODIS reference slice (`ont-bam-hg38`, 20 autosomal CODIS loci in RepeatHMM `.pa` pattern format) and local `hg38.fa`. Execution completed cleanly in ~18 s (exit 0), producing `logbam/RepBAM_all*.log` with diploid repeat-count calls across all 20/20 CODIS loci (720 total supporting reads).",
+      "reached": "Runs + Plausible output",
+      "why": "RepeatHMM v2.0.3 compiles its SWIG alignment extension cleanly in a Python 2.7 conda environment and calls all 20/20 CODIS loci on the ONT R10 SUP reference slice with zero source modifications.",
+      "scope": "Reproducible execution only; does not evaluate genotype concordance or forensic casework fitness.",
+      "not_evaluated": [
+        "Genotype accuracy",
+        "Concordance against truth",
+        "Forensic casework fitness"
+      ]
+    },
+    "conclusion": [
+      {
+        "title": "RepeatHMM v2.0.3 executes end-to-end",
+        "body": "RepeatHMM v2.0.3 ran to completion without code modifications in the prepared environment at unmodified upstream commit fa6c108."
+      },
+      {
+        "title": "Output passes plausibility checks",
+        "body": "The run produced a structurally valid, non-empty TSV output containing 20 distinct recognizable STR loci; structural plausibility checks verify output format and locus presence, not genotype accuracy."
+      },
+      {
+        "title": "Verification used STRhub reference data",
+        "body": "Verification used open-access STRhub reference dataset HG00113 ONT R10 SUP CODIS slice (20 loci) (ont-bam-hg38)."
+      },
+      {
+        "title": "Repeatability of this manual run",
+        "body": "The pinned upstream commit, prepared environment description, exact commands executed, and sanitized terminal output recorded in this report document the procedure for independent reproduction."
+      }
+    ],
+    "out_of_scope": [
+      "Genotype accuracy and concordance",
+      "Forensic casework accreditation"
+    ],
+    "limitations": [
+      "Results apply exclusively to the exact Git commit SHA and manually prepared environment recorded in this report.",
+      "Single regional reference slice per input type; low-coverage warnings on sliced BAMs do not imply defects on whole-genome data.",
+      "Plausible Output checks verify structural format and recognizable STR loci, not biological genotype truth.",
+      "Verification is a point-in-time snapshot; upstream repository changes after this commit are not covered until re-verification.",
+      "No truth-set concordance, forensic casework validation, or regulatory compliance assessment was performed."
+    ],
+    "scope": {
+      "statement": "This report records a manual execution against the pinned upstream commit.",
+      "not": "It does not establish genotype accuracy or forensic casework fitness.",
+      "disclaimer": "Each result is a fixed, dated attestation verified on the tool's public repository at an immutable commit. It evaluates reproducible execution only, not genotype accuracy or forensic fitness."
+    }
+  },
+  "scope": "Manual verification of reproducible execution against unmodified upstream commit.",
+  "io_detail": {
+    "gate": "io",
+    "passed": true,
+    "outputs": [
+      {
+        "path": "logbam/RepBAM_*.log",
+        "format": "tsv",
+        "resolved": "logbam/RepBAM_all.gmm_GapCorrection1_FlankLength30_hg38_comp_Nanopore_I0.120_D0.020_S0.020.log",
+        "records": 20,
+        "checks": {
+          "exists": true,
+          "non_empty": true,
+          "parses_as_tsv": true,
+          "min_records": true
+        },
+        "passed": true
+      }
+    ]
+  },
+  "content_detail": {
+    "gate": "content",
+    "applicable": true,
+    "passed": true,
+    "outputs": [
+      {
+        "path": "logbam/RepBAM_*.log",
+        "resolved": "logbam/RepBAM_all.gmm_GapCorrection1_FlankLength30_hg38_comp_Nanopore_I0.120_D0.020_S0.020.log",
+        "mode": "auto",
+        "checks": {
+          "records_present": true,
+          "locus_column_found": true,
+          "loci_recognised": true,
+          "calls_or_counts_present": true
+        },
+        "stats": {
+          "rows": 20,
+          "header_row_dropped": true,
+          "malformed_rows": 0,
+          "dna_invalid_rows": 0,
+          "count_invalid_rows": 0,
+          "distinct_loci": 20,
+          "distinct_str_loci": 20,
+          "distinct_snp_markers": 0,
+          "loci": [
+            "CSF1PO",
+            "D10S1248",
+            "D12S391",
+            "D13S317",
+            "D16S539",
+            "D18S51",
+            "D19S433",
+            "D1S1656",
+            "D21S11",
+            "D22S1045",
+            "D2S1338",
+            "D2S441",
+            "D3S1358",
+            "D5S818",
+            "D7S820",
+            "D8S1179",
+            "FGA",
+            "TH01",
+            "TPOX",
+            "vWA"
+          ],
+          "str_loci": [
+            "CSF1PO",
+            "D10S1248",
+            "D12S391",
+            "D13S317",
+            "D16S539",
+            "D18S51",
+            "D19S433",
+            "D1S1656",
+            "D21S11",
+            "D22S1045",
+            "D2S1338",
+            "D2S441",
+            "D3S1358",
+            "D5S818",
+            "D7S820",
+            "D8S1179",
+            "FGA",
+            "TH01",
+            "TPOX",
+            "vWA"
+          ],
+          "snp_markers": [],
+          "total_reads": 720,
+          "max_sequence_depth": 47,
+          "top_loci_by_depth": [
+            [
+              "D19S433",
+              47
+            ],
+            [
+              "FGA",
+              46
+            ],
+            [
+              "TPOX",
+              46
+            ],
+            [
+              "D2S441",
+              45
+            ],
+            [
+              "vWA",
+              41
+            ],
+            [
+              "D16S539",
+              40
+            ],
+            [
+              "D12S391",
+              38
+            ],
+            [
+              "D18S51",
+              38
+            ],
+            [
+              "D3S1358",
+              37
+            ],
+            [
+              "D5S818",
+              37
+            ],
+            [
+              "D10S1248",
+              36
+            ],
+            [
+              "CSF1PO",
+              34
+            ],
+            [
+              "D21S11",
+              33
+            ],
+            [
+              "D7S820",
+              32
+            ],
+            [
+              "D1S1656",
+              31
+            ],
+            [
+              "D22S1045",
+              31
+            ],
+            [
+              "D8S1179",
+              30
+            ],
+            [
+              "D13S317",
+              28
+            ],
+            [
+              "D2S1338",
+              25
+            ],
+            [
+              "TH01",
+              25
+            ]
+          ],
+          "locus_column_found": true,
+          "locus_column": 0,
+          "allele_columns": [
+            1,
+            2
+          ],
+          "count_columns": [
+            3
+          ],
+          "regions_given": 20,
+          "regions_hit": 20,
+          "panel_loci_present": [
+            "CSF1PO",
+            "D10S1248",
+            "D12S391",
+            "D13S317",
+            "D16S539",
+            "D18S51",
+            "D19S433",
+            "D1S1656",
+            "D21S11",
+            "D22S1045",
+            "D2S1338",
+            "D2S441",
+            "D3S1358",
+            "D5S818",
+            "D7S820",
+            "D8S1179",
+            "FGA",
+            "TH01",
+            "TPOX",
+            "vWA"
+          ]
+        }
+      }
+    ]
+  },
+  "i18n": {
+    "es": {
+      "plain_why": "RepeatHMM v2.0.3 compila limpiamente su extensi\u00f3n SWIG de alineamiento en un entorno conda con Python 2.7 y genotipifica los 20/20 loci CODIS del slice de referencia ONT R10 SUP sin modificaciones al c\u00f3digo fuente.",
+      "without_preparation": "La verificaci\u00f3n autom\u00e1tica se detuvo antes de la instalaci\u00f3n (`UNVERIFIED_INSUFFICIENT_DOCS`) porque `README.md` delega la instalaci\u00f3n a `docs/Install.md`, donde la ruta de compilaci\u00f3n tiene un error tipogr\u00e1fico (`cd bin/scripts/UnsymmetricPairAlignment` en lugar de `bin/RepeatHMM_scripts/UnsymmetricPairAlignment`) y `environment.yml` fija hashes de paquetes exclusivos de Linux (`_libgcc_mutex`, `libgcc-ng`) para Python 2.7.",
+      "recommendations": [
+        "Corregir la ruta en `docs/Install.md` (l\u00ednea 12) de `cd bin/scripts/UnsymmetricPairAlignment` a `cd bin/RepeatHMM_scripts/UnsymmetricPairAlignment` e incluir el bloque de instalaci\u00f3n directamente en `README.md`.",
+        "Quitar los hashes de compilaci\u00f3n espec\u00edficos de sistema operativo y `_libgcc_mutex` / `libgcc-ng` de `environment.yml` (dejando solo versiones portables como `python=2.7`, `scikit-learn=0.19.2`, `hmmlearn=0.2.1`, `peakutils=1.1.0`, `biopython`, `swig`, `samtools`, `bwa`, `trf`), o migrar el c\u00f3digo a Python 3 (`dict.has_key` y `string.strip`).",
+        "Alinear el valor por defecto de `--SplitAndReAlign` en `bin/repeatHMM.py` con `docs/Usage.md` (`default=0` para BAMs ya alineados) para que `BAMinput` corra sin exigir un \u00edndice BWA cuando se proveen un BAM ordenado y `hg38.fa`."
+      ]
+    },
+    "pt": {
+      "plain_why": "RepeatHMM v2.0.3 compila limpamente sua extens\u00e3o SWIG de alinhamento em um ambiente conda Python 2.7 e genotipa todos os 20/20 loci CODIS no recorte de refer\u00eancia ONT R10 SUP sem modifica\u00e7\u00f5es no c\u00f3digo-fonte.",
+      "without_preparation": "A verifica\u00e7\u00e3o autom\u00e1tica parou antes da instala\u00e7\u00e3o (`UNVERIFIED_INSUFFICIENT_DOCS`) porque o `README.md` delega a instala\u00e7\u00e3o para `docs/Install.md`, onde o caminho de compila\u00e7\u00e3o cont\u00e9m um erro de diret\u00f3rio (`cd bin/scripts/UnsymmetricPairAlignment` em vez de `bin/RepeatHMM_scripts/UnsymmetricPairAlignment`) e `environment.yml` fixa hashes de pacotes exclusivos de Linux (`_libgcc_mutex`, `libgcc-ng`) para Python 2.7.",
+      "recommendations": [
+        "Corrigir o caminho em `docs/Install.md` (linha 12) de `cd bin/scripts/UnsymmetricPairAlignment` para `cd bin/RepeatHMM_scripts/UnsymmetricPairAlignment` e incluir o bloco de instala\u00e7\u00e3o diretamente no `README.md`.",
+        "Remover hashes de build espec\u00edficos de sistema operacional e `_libgcc_mutex` / `libgcc-ng` do `environment.yml` (mantendo apenas restri\u00e7\u00f5es port\u00e1teis como `python=2.7`, `scikit-learn=0.19.2`, `hmmlearn=0.2.1`, `peakutils=1.1.0`, `biopython`, `swig`, `samtools`, `bwa`, `trf`), ou migrar o c\u00f3digo para Python 3 (`dict.has_key` e `string.strip`).",
+        "Alinhar o padr\u00e3o de `--SplitAndReAlign` em `bin/repeatHMM.py` com `docs/Usage.md` (`default=0` para BAMs j\u00e1 alinhados) para que `BAMinput` funcione diretamente sem exigir um \u00edndice BWA quando um BAM ordenado e `hg38.fa` s\u00e3o fornecidos."
+      ]
+    }
+  }
+}

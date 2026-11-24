@@ -1,6 +1,6 @@
 {
   "schema": "strhub-verified/index/3",
-  "generated": "2026-11-24T17:52:08+00:00",
+  "generated": "2026-11-24T18:36:41+00:00",
   "count": 23,
   "tools": [
     {
@@ -560,6 +560,22 @@
           "report": "repeathmm-ont/fa6c108fa0cc8ab344577147e52a8fcc3adde990/repeathmm-ont.json",
           "page": "repeathmm-ont/fa6c108fa0cc8ab344577147e52a8fcc3adde990/repeathmm-ont.html",
           "pdf": "repeathmm-ont/fa6c108fa0cc8ab344577147e52a8fcc3adde990/repeathmm-ont.pdf"
+        },
+        {
+          "sha": "fa6c108fa0cc8ab344577147e52a8fcc3adde990",
+          "instrument": "curated",
+          "version": "v2.0.3",
+          "variant": null,
+          "committed": "2020-12-03T17:30:50Z",
+          "generated": "2026-11-24T18:35:14+00:00",
+          "level": "content",
+          "label": "Not verified as documented",
+          "verdict": "runs",
+          "errors_reported": false,
+          "ci_run": null,
+          "report": "repeathmm-ont/fa6c108fa0cc8ab344577147e52a8fcc3adde990-curated/repeathmm-ont.json",
+          "page": "repeathmm-ont/fa6c108fa0cc8ab344577147e52a8fcc3adde990-curated/repeathmm-ont.html",
+          "pdf": "repeathmm-ont/fa6c108fa0cc8ab344577147e52a8fcc3adde990-curated/repeathmm-ont.pdf"
         }
       ]
     },
