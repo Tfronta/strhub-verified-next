@@ -39,7 +39,10 @@ def test_the_documented_commands_are_transcribed_unchanged_and_in_order():
     assert [c["text"] for c in plan["commands"]] == ["conda env create -f environment.yml", "conda activate tool", "pip install ."]
     assert [c["line"] for c in plan["commands"]] == [6, 7, 8] and plan["citation"]["line"] == 6
     carrier = plan["carrier_dockerfile"]
-    assert carrier.startswith("# Evaluator carrier: strhub-documented-install/1; not an upstream Dockerfile.\nFROM ubuntu:22.04\n")
+    assert carrier.startswith(f"# Evaluator carrier: strhub-documented-install/1; not an upstream Dockerfile.\nFROM {di.BASE_IMAGE}\n")
+    assert "@sha256:" in di.BASE_IMAGE
+    assert di.MINIFORGE_VERSION in di.MINIFORGE_URL and "latest" not in di.MINIFORGE_URL
+    assert f"{di.MINIFORGE_SHA256}  /tmp/miniforge.sh' | sha256sum -c -" in carrier
     # The three lines, as written, in one shell that stops at the first failure.
     assert "set -eo pipefail\\nconda env create -f environment.yml\\nconda activate tool\\npip install .\\n" in carrier
     # The environment the block activates stays active for the documented command.
@@ -54,7 +57,10 @@ def test_a_plain_build_gets_a_plain_base_and_nothing_it_did_not_ask_for():
     # `sudo` is dropped (the build runs as root); the packages are the README's.
     assert [c["text"] for c in plan["commands"]] == ["apt install make g++ zlib1g-dev", "make"]
     carrier = plan["carrier_dockerfile"]
-    assert "miniforge" not in carrier.lower() and "build-essential" not in carrier
+    assert "miniforge" not in carrier.lower()
+    assert plan["base_condition"]["added_packages"] == list(di.BASELINE_PACKAGES)
+    for forbidden in ("cmake", "pkg-config", "python-is-python3", "cargo", "autoconf", "automake", "libtool"):
+        assert forbidden not in carrier and forbidden not in plan["base_condition"]["added_packages"]
     assert "Miniforge" not in plan["base_condition"]["description"]
 
 
@@ -108,27 +114,65 @@ def test_evidence_that_is_not_a_pinned_plain_repository_document_admits_nothing(
 
 
 def test_submodules_autotools_cargo_and_cleaner_doc_filtering():
-    # Submodules (.gitmodules) are now supported and declared in base_condition.
+    # Undocumented .gitmodules in the tree NEVER triggers automatic submodule rescue.
     p_sub = proposal(CONDA)
     p_sub["tree_paths"].append(".gitmodules")
     plan_sub = di.discover(p_sub)
     assert plan_sub["ready"]
-    assert plan_sub["base_condition"]["submodules"] is True
-    assert "git submodules initialized" in plan_sub["base_condition"]["description"]
+    assert plan_sub["base_condition"]["submodules"] is False
+    assert "submodules" not in plan_sub["base_condition"]["description"]
 
-    # Autotools (./configure) adds build-essential + autotools + git + ca-certificates.
+    # Documented `git clone --recursive` / `--recurse-submodules` and `git submodule update` ARE accepted.
+    for clone_line in (
+        "git clone --recursive https://github.com/example/tool.git",
+        "git clone --recurse-submodules https://github.com/example/tool",
+        "git clone -b v1.0 --recursive --depth 1 git@github.com:someone/Tool.git",
+    ):
+        p_rec = proposal(block(clone_line, "cd tool", "make"))
+        p_rec["tree_paths"].append(".gitmodules")
+        plan_rec = di.discover(p_rec)
+        assert plan_rec["ready"], clone_line
+        assert [c["text"] for c in plan_rec["commands"]] == ["make"]
+        assert plan_rec["base_condition"]["submodules"] is True
+        assert "git submodules" in plan_rec["base_condition"]["description"]
+
+    for sub_cmds in (
+        ["git clone https://github.com/example/tool.git", "cd tool", "git submodule update --init --recursive", "make"],
+        ["git submodule init && git submodule update", "make"],
+        ["git submodule update --recursive --init", "make"],
+    ):
+        p_exp = proposal(block(*sub_cmds))
+        p_exp["tree_paths"].append(".gitmodules")
+        plan_exp = di.discover(p_exp)
+        assert plan_exp["ready"], sub_cmds
+        assert plan_exp["base_condition"]["submodules"] is True
+
+    # Autotools (./configure) and Cargo NEVER inject hidden adaptive packages (`autoconf`, `cargo`, `pkg-config`).
     plan_auto = di.discover(proposal(block("autoreconf -fi", "./configure", "make")))
     assert plan_auto["ready"]
-    assert plan_auto["base_condition"]["added_packages"] == [
-        "build-essential", "autoconf", "automake", "libtool", "pkg-config", "git", "ca-certificates"
-    ]
+    assert plan_auto["base_condition"]["added_packages"] == list(di.BASELINE_PACKAGES)
+    for pkg in ("autoconf", "automake", "libtool", "pkg-config", "cargo", "python-is-python3", "cmake"):
+        assert pkg not in plan_auto["carrier_dockerfile"]
+        assert pkg not in plan_auto["base_condition"]["added_packages"]
 
-    # Cargo adds cargo + ca-certificates (no build-essential needed).
     plan_cargo = di.discover(proposal(block("cargo build --release")))
     assert plan_cargo["ready"]
-    assert plan_cargo["base_condition"]["added_packages"] == ["cargo", "ca-certificates"]
+    assert plan_cargo["base_condition"]["added_packages"] == list(di.BASELINE_PACKAGES)
+    assert "apt-get install" in plan_cargo["carrier_dockerfile"]
+    for pkg in ("cargo", "rustc", "autoconf", "automake", "libtool", "python-is-python3", "cmake", "pkg-config"):
+        # `cargo` appears only in the literal author command `cargo build --release`, never in `apt-get install`.
+        apt_line = next(l for l in plan_cargo["carrier_dockerfile"].splitlines() if "apt-get install" in l)
+        assert pkg not in apt_line
+        assert pkg not in plan_cargo["base_condition"]["added_packages"]
 
-    # Tab-indented prose paragraph mentioning apt-get is ignored, not rejected.
+    # Non-Ubuntu package managers (`brew`, `yum`, `dnf`) are NEVER silently discarded as "given".
+    for pm_cmd in ("brew install htslib", "yum install zlib-devel", "dnf install zlib-devel"):
+        assert di._kind(pm_cmd, "example/tool") != "given"
+        plan_pm_only = di.discover(proposal(block(pm_cmd, "make")))
+        assert not plan_pm_only["ready"], pm_cmd
+        assert "no documented apt equivalent" in plan_pm_only["reason"]
+
+    # Tab-indented prose paragraph mentioning apt-get or yum is ignored, not rejected.
     prose = "\tIf you are on Linux you can use apt-get or yum to get g++.\n\n" + block("make")
     plan_prose = di.discover(proposal(prose))
     assert plan_prose["ready"] and [c["text"] for c in plan_prose["commands"]] == ["make"]
@@ -168,12 +212,12 @@ def test_submodules_autotools_cargo_and_cleaner_doc_filtering():
     ]
     assert [a["text"] for a in plan_venv["published_alternatives"]] == ["pip install ./tool-1.0.0-py3-none-any.whl"]
     assert "source /opt/tool/tool-env/bin/activate' >> /etc/profile.d/zz-strhub-env.sh" in plan_venv["carrier_dockerfile"]
-    # Plain venv/pip without Conda uses Ubuntu 22.04 native python3 (3.10), not Miniforge.
+    # Plain venv/pip without Conda uses Ubuntu 22.04 native python3 (3.10), not Miniforge, and NEVER python-is-python3.
     assert plan_venv["base_condition"]["miniforge"] is False
     assert "miniforge" not in plan_venv["carrier_dockerfile"].lower()
-    assert plan_venv["base_condition"]["added_packages"] == [
-        "python3", "python3-venv", "python3-pip", "python-is-python3", "ca-certificates"
-    ]
+    assert plan_venv["base_condition"]["added_packages"] == list(di.BASELINE_PACKAGES)
+    assert "python-is-python3" not in plan_venv["carrier_dockerfile"]
+    assert "python-is-python3" not in plan_venv["base_condition"]["added_packages"]
 
 
 def test_prose_lists_and_usage_blocks_are_not_installation():

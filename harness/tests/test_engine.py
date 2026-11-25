@@ -349,3 +349,40 @@ def test_a_local_trial_with_docker_runs_the_engine_and_keeps_stdout_for_the_web(
     assert report["gates"]["available"] and report["gates"]["installs"] and report["gates"]["runs"]
     assert (out_dir / "report.json").is_file() and (out_dir / "recipe.json").is_file()
     assert not (ROOT / "matrix.json").exists() and not (ROOT / "io_external.json").exists()
+
+
+def test_stages_installs_never_rescues_undocumented_gitmodules_and_runs_when_documented(tmp_path):
+    """`.gitmodules` in the checkout NEVER triggers `git submodule update` unless
+    `procedure_review.json` establishes `installation.base_condition.submodules == True`."""
+    def run_with_review(sub_dir: pathlib.Path, submodules_flag: bool):
+        sub_dir.mkdir(parents=True, exist_ok=True)
+        work = sub_dir / "work"
+        work.mkdir(exist_ok=True)
+        (work / "procedure_review.json").write_text(
+            json.dumps({"installation": {"base_condition": {"submodules": submodules_flag}}})
+        )
+
+        def on_clone(argv, _log):
+            dst = sub_dir / argv[-1]
+            dst.mkdir(parents=True, exist_ok=True)
+            (dst / ".gitmodules").write_text('[submodule "ext"]\n\tpath = ext\n\turl = https://github.com/o/ext.git\n')
+            return 0
+
+        fake = Fake(sub_dir, git_clone=on_clone)
+        ctx = stages.Ctx(
+            plan=base_plan(installation_profile=stages.DOCUMENTED_INSTALL_PROFILE),
+            work=pathlib.Path("work"),
+            root=sub_dir,
+            exe=fake,
+        )
+        res = stages.installs(ctx, StageResult(stage="available", status="passed", exit_code=0))
+        assert res.status == "passed"
+        return fake.kinds()
+
+    # 1. `.gitmodules` exists, README did NOT document submodules -> no `git_submodule` call.
+    kinds_undoc = run_with_review(tmp_path / "undoc", False)
+    assert "git_submodule" not in kinds_undoc
+
+    # 2. `.gitmodules` exists AND README documented submodules -> `git_submodule` runs once.
+    kinds_doc = run_with_review(tmp_path / "doc", True)
+    assert kinds_doc.count("git_submodule") == 1

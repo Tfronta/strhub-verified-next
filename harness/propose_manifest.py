@@ -118,28 +118,14 @@ def tool_name_as_written(repo: str, proposal: dict) -> str:
 
 def build(proposal: dict, slug: str, submitted_by: str = "third_party",
           ref_label: str = "") -> dict:
-    """Two steps, always in this order. First the repository as it is: its
-    own installation, its own command, nothing of STRhub's but the sample.
-    Only when that cannot be run does STRhub's preparation for the repository
-    apply, if one is committed: the environment is then STRhub's, declared in
-    full, and the command is still the README's. The result says which it
-    was, and why the first step was not enough."""
-    literal = _build(proposal, slug, submitted_by, ref_label)
-    review = literal["procedure"]
-    if review.get("may_say_runs") or review.get("example_ready"):
-        return literal
-    import preparation
-    plan = preparation.discover(proposal)
-    if not plan.get("ready"):
-        return literal
-    prepared = _build(proposal, slug, submitted_by, ref_label, prepared=plan)
-    prepared["without_preparation"] = {"blocker": review.get("blocker"), "basis": review.get("basis"),
-                                       "reason": review.get("reason")}
-    return prepared
+    """Evaluate the repository strictly as documented: its own installation,
+    its own command, and nothing of STRhub's beyond the declared constant
+    baseline and shared reference sample. Never fall back to a preparation."""
+    return _build(proposal, slug, submitted_by, ref_label)
 
 
 def _build(proposal: dict, slug: str, submitted_by: str = "third_party",
-           ref_label: str = "", prepared: dict | None = None) -> dict:
+           ref_label: str = "") -> dict:
     """Return {"manifest": dict, "manifest_yml": str, "dockerfile": str,
     "limitations": [...], "readme_gaps": [...]}.
 
@@ -155,9 +141,6 @@ def _build(proposal: dict, slug: str, submitted_by: str = "third_party",
     build_info = proposal.get("build") or {}
     commands = proposal.get("commands") or []
     input_type = (proposal.get("input_type") or {}).get("best")
-    if prepared:
-        # The sample is the one STRhub's preparation names, by hand.
-        input_type = prepared["dataset"]
     out_fmt = (proposal.get("output") or {}).get("format")
     limitations: list[str] = []
     it = proposal.get("input_type") or {}
@@ -168,10 +151,7 @@ def _build(proposal: dict, slug: str, submitted_by: str = "third_party",
     # read the caveat says the type was guessed — which is a limitation the
     # verdict weighs, not a fact about the tool.
     input_note = None
-    if prepared:
-        input_note = (f"Input: STRhub's preparation selects its {input_type} reference data"
-                      + (f" and its loci in the {prepared['regions']} layout." if prepared.get("regions") else "."))
-    elif input_type:
+    if input_type:
         if it.get("how") == "command" and commands:
             top = commands[0]
             kind = "BAM" if "bam" in input_type else "FASTQ"
@@ -203,24 +183,12 @@ def _build(proposal: dict, slug: str, submitted_by: str = "third_party",
     source_plan = fidelity.install_plan(proposal)
 
     # --- environment
-    if prepared:
-        import preparation
-        source_plan = prepared
-        dockerfile_text = prepared["carrier_dockerfile"]
-        env = dict(preparation.ENVIRONMENT)
-        cwd = "."
-        if prepared.get("installed_by") == "repository":
-            caveat_items.append("Environment: STRhub transcribed the documented installation commands unchanged into its "
-                                f"own carrier; its preparation ({prepared['file']}) supplies the inputs only.")
-        else:
-            caveat_items.append(f"Environment: prepared by STRhub by hand ({prepared['file']}); every step is listed in "
-                                "the report. The command is the repository's own.")
-    elif source_plan["ready"]:
+    if source_plan["ready"]:
         # One generic transcript: no tool names, prior results or package guesses.
         dockerfile_text = source_plan["carrier_dockerfile"]
         env = {"dockerfile": "Dockerfile", "os": ["ubuntu-22.04"], "source": "documented"}
         cwd = "."
-        caveat_items.append("Environment: STRhub transcribed the documented installation commands unchanged into its own carrier ("
+        caveat_items.append("Environment: documented install transcribed unchanged into STRhub's carrier ("
                             + source_plan["base_condition"].get("description", source_plan["base_condition"]["image"]) + ").")
     else:
         # Non-runnable: never infer dependencies, interpreters or library paths.
@@ -234,15 +202,13 @@ def _build(proposal: dict, slug: str, submitted_by: str = "third_party",
 
     # --- the command
     best = commands[0]["cmd"] if commands else ""
-    doc_regions = None if prepared else fidelity.documented_regions(proposal)
-    doc_one_sample = False if prepared else fidelity.documented_single_sample(proposal, best)
-    eff_regions = (prepared or {}).get("regions") or doc_regions
-    eff_one_sample = bool(prepared) or doc_one_sample
-    used_regions = (prepared or {}).get("regions")
+    doc_regions = fidelity.documented_regions(proposal)
+    doc_one_sample = fidelity.documented_single_sample(proposal, best)
+    used_regions = None
     if input_note:
         caveat_items.append(input_note)
     pm = (proposal.get("input_type") or {}).get("panel_match")
-    if pm and not prepared:
+    if pm:
         caveat_items.append(
             f"Panel: the shipped loci catalog ({pm['catalog_file']}) overlaps "
             f"{pm['medical_overlap']} loci in STRhub's medical STR slice and 0 in the "
@@ -252,9 +218,9 @@ def _build(proposal: dict, slug: str, submitted_by: str = "third_party",
         limitations.append("no_command")
         run_cmd = "true  # no command found in the README; nothing to run"
     else:
-        rewritten, notes = rewrite_for_strhub(best, input_type, regions=eff_regions,
-                                              one_sample=eff_one_sample)
-        if not prepared and doc_regions and "/data/in/regions." in rewritten:
+        rewritten, notes = rewrite_for_strhub(best, input_type, regions=doc_regions,
+                                              one_sample=doc_one_sample)
+        if doc_regions and "/data/in/regions." in rewritten:
             used_regions = doc_regions
         pre = commands[0].get("prerequisite")
         if pre:
@@ -389,9 +355,6 @@ def main() -> int:
     # can read them alongside the README gaps.
     proposal["limitations"] = r["limitations"]
     proposal["procedure"] = r["procedure"]
-    if r.get("without_preparation"):
-        # Why the repository's own instructions were not enough, for the report.
-        proposal["without_preparation"] = r["without_preparation"]
     pathlib.Path(args.proposal).write_text(json.dumps(proposal, indent=2))
     if args.out_dir:
         d = pathlib.Path(args.out_dir)

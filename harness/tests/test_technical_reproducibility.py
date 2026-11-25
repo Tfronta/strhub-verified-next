@@ -256,6 +256,14 @@ def test_minimal_toolchain_for_make_and_cmake_only_and_declared_in_report(tmp_pa
     import json
     import sys
     import yaml
+    import documented_install as di
+    import source_install as si
+
+    assert di.BASE_IMAGE == si.BASE_IMAGE and "@sha256:" in di.BASE_IMAGE
+    expected_baseline = [
+        "ca-certificates", "curl", "git", "build-essential", "python3", "python3-pip", "python3-venv"
+    ]
+    assert list(di.BASELINE_PACKAGES) == expected_baseline
 
     readme_make = (
         "# MakeOnly\n\nDesigned for Illumina sequencing data.\n\n"
@@ -266,45 +274,37 @@ def test_minimal_toolchain_for_make_and_cmake_only_and_declared_in_report(tmp_pa
     built_make = pm.build(prop_make, "make-only")
     inst = built_make["procedure"]["installation"]
     assert inst["ready"] is True
-    assert inst["base_condition"]["added_packages"] == ["build-essential", "git", "ca-certificates"]
+    assert inst["base_condition"]["added_packages"] == expected_baseline
     assert inst["base_condition"]["miniforge"] is False
-    assert "build-essential" in inst["base_condition"]["description"]
-    assert "no tool-specific libraries" in inst["base_condition"]["description"]
-    assert "apt-get install --no-install-recommends build-essential git ca-certificates" in built_make["dockerfile"]
-    for lib in ("zlib1g-dev", "libhts-dev", "libbz2-dev", "liblzma-dev", "libgtest-dev", "cmake"):
-        assert lib not in built_make["dockerfile"]
+    assert "constant baseline" in inst["base_condition"]["description"]
+    assert "apt-get install --no-install-recommends " + " ".join(expected_baseline) in built_make["dockerfile"]
+    for pkg in ("zlib1g-dev", "libhts-dev", "libbz2-dev", "liblzma-dev", "libgtest-dev",
+                "cmake", "pkg-config", "python-is-python3", "cargo", "autoconf", "automake", "libtool"):
+        assert pkg not in built_make["dockerfile"]
 
-    # Provenance declares base_environment explicitly.
+    # Manifest caveats record the exact Constant Baseline for traceability.
+    env_caveat = next(c for c in built_make["manifest"]["caveats"]["items"] if c.startswith("Environment:"))
+    assert "constant baseline" in env_caveat and "build-essential" in env_caveat and "python3-venv" in env_caveat
+
+    # Provenance declares base_environment explicitly with pinned image digest.
     prov = built_make["procedure"]["provenance"]
     be = prov["harness_choices"]["base_environment"]
-    assert be["image"] == "ubuntu:22.04"
-    assert be["added_packages"] == ["build-essential", "git", "ca-certificates"]
+    assert be["image"] == di.BASE_IMAGE
+    assert be["added_packages"] == expected_baseline
     assert be["miniforge"] is False
 
-    # cmake + make without apt gets build-essential + cmake + git + ca-certificates (still zero libs).
+    # cmake + make WITHOUT apt does NOT adaptively inject `cmake` or `pkg-config`.
     readme_cmake = readme_make.replace("```\nmake\n```", "```\ncmake .\nmake\n```")
     built_cmake = pm.build(_synthetic_repo(readme_cmake), "cmake-make")
-    assert built_cmake["procedure"]["installation"]["base_condition"]["added_packages"] == [
-        "build-essential", "cmake", "git", "ca-certificates"
-    ]
-    assert "apt-get install --no-install-recommends build-essential cmake git ca-certificates" in built_cmake["dockerfile"]
+    assert built_cmake["procedure"]["installation"]["base_condition"]["added_packages"] == expected_baseline
+    apt_line = next(l for l in built_cmake["dockerfile"].splitlines() if "apt-get install" in l)
+    assert "cmake" not in apt_line and "pkg-config" not in apt_line
 
-    # apt install make g++ + cmake .. + make gets cmake + git + ca-certificates (no redundant build-essential).
-    readme_apt_cmake = readme_make.replace(
-        "```\nmake\n```",
-        "```\napt install make g++\nmkdir build\ncd build\ncmake ..\nmake\n```",
-    )
-    built_apt_cmake = pm.build(_synthetic_repo(readme_apt_cmake), "apt-cmake")
-    assert built_apt_cmake["procedure"]["installation"]["base_condition"]["added_packages"] == [
-        "cmake", "git", "ca-certificates"
-    ]
-
-    # HipSTR already installs make + g++ via apt: no build-essential or cmake injected.
+    # HipSTR gets the exact same constant baseline (zero adaptive branching).
     built_hip = pm.build(_hipstr_proposal(), "hipstr-check")
-    assert built_hip["procedure"]["installation"]["base_condition"]["added_packages"] == ["git", "ca-certificates"]
-    assert "build-essential" not in built_hip["dockerfile"]
+    assert built_hip["procedure"]["installation"]["base_condition"]["added_packages"] == expected_baseline
 
-    # Report renders the exact minimal toolchain in needed_beyond_repo, summary.md, and summary.html.
+    # Report renders the declared baseline packages in needed_beyond_repo, summary.md, and summary.html.
     manifest_data = yaml.safe_load(built_make["manifest_yml"])
     (tmp_path / "review.json").write_text(json.dumps(built_make["procedure"]))
     (tmp_path / "manifest.yml").write_text(built_make["manifest_yml"])
@@ -326,12 +326,13 @@ def test_minimal_toolchain_for_make_and_cmake_only_and_declared_in_report(tmp_pa
     )
     assert report.main() == 0
     rep = json.loads(capsys.readouterr().out)
-    assert any("build-essential" in item and "no tool-specific libraries" in item
+    assert any("build-essential" in item and "python3-venv" in item
                for item in rep.get("needed_beyond_repo") or [])
     md = (tmp_path / "reports" / f"{manifest_data['report']['slug']}.summary.md").read_text()
     html = (tmp_path / "reports" / f"{manifest_data['report']['slug']}.html").read_text()
-    assert "minimal build toolchain: build-essential, git, ca-certificates (no tool-specific libraries)" in md
-    assert "minimal build toolchain: build-essential, git, ca-certificates (no tool-specific libraries)" in html
+    expected_summary = "minimal build toolchain: " + ", ".join(expected_baseline) + " (no tool-specific libraries)"
+    assert expected_summary in md
+    assert expected_summary in html
 
 
 def test_paired_sample_and_library_lists_reduce_consistently_with_evidence():

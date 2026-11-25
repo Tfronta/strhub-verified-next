@@ -201,7 +201,9 @@ def installs(ctx: Ctx, available_result: StageResult) -> StageResult:
             outputs["failed_check"] = os.path.basename(argv[1])
             return st.finish(rc, argv, **outputs)
     outputs["source_evidence"] = "verified"
-    if (ctx.root / src / ".gitmodules").exists():
+    rev_doc = _load(ctx.work_abs / "procedure_review.json") or {}
+    submodules_documented = bool(((rev_doc.get("installation") or {}).get("base_condition") or {}).get("submodules"))
+    if submodules_documented and (ctx.work_abs / "ctx" / name / ".gitmodules").exists():
         argv_sub = ["git", "-C", str(src), "submodule", "update", "--init", "--recursive"]
         rc = ctx.exe.run(argv_sub, log=log, cwd=ctx.root)
         if rc != 0:

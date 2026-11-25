@@ -3,32 +3,31 @@
 Profile `strhub-documented-install/1` admits the install commands a repository
 document shows in its own code blocks, when every one of them is a plain,
 whole command of a closed list: apt, conda/mamba, pip, setup.py, make, cmake,
-configure, cargo, mkdir and cd. They are executed in the order written, in a
-fixed base environment the evaluator declares, and nothing is added to them:
-no package, option, compiler flag, environment variable or second attempt.
+configure, cargo, git submodule, mkdir and cd. They are executed in the order
+written, in a constant base environment the evaluator declares upfront, and
+nothing adaptive is added to them: no inferred package, option, compiler flag,
+environment variable or second attempt.
 
-What the evaluator does around them, and says it does:
+What the evaluator provides as its constant baseline, and declares in full:
 
-  - the base is Ubuntu 22.04 with its package lists refreshed and apt set to
-    answer yes; Miniforge (conda, python, pip) is added only when a command
-    uses conda, pip or python; a minimal generic build toolchain
-    (build-essential, git/ca-certificates, cmake, autotools/pkg-config, or
-    cargo, each only when invoked without already being installed via apt)
-    never includes tool-specific libraries;
-  - when the repository declares `.gitmodules`, its pinned submodules are
-    initialized during checkout;
+  - pinned Ubuntu 22.04 (`ubuntu:22.04@sha256:...`) with `DEBIAN_FRONTEND=noninteractive`,
+    `APT::Get::Assume-Yes "true"`, `apt-get update`, and the fixed baseline
+    packages `ca-certificates`, `curl`, `git`, `build-essential`, `python3`,
+    `python3-pip`, `python3-venv` (no `cmake`, `pkg-config`, `python-is-python3`,
+    `cargo`, `autoconf`, `automake`, `libtool` or tool-specific libraries);
+  - pinned Miniforge (`Miniforge3-Linux-x86_64.sh` at a fixed version and
+    verified SHA-256) added only when a documented command invokes conda/mamba;
+  - git submodules are initialized ONLY when the documented procedure
+    explicitly declares `git clone --recursive`/`--recurse-submodules` or
+    `git submodule update`;
+  - non-Debian/Ubuntu package managers (`yum`, `dnf`, `brew`) block automatic
+    execution unless an explicit `apt`/`apt-get install` equivalent is
+    documented alongside them;
   - a leading `sudo` is dropped (the build runs as root), and so are the
     `git clone` of this very repository and the `cd` into it: the build
     already stands in a checkout of the pinned commit;
-  - the conda environment the block activates last stays active for the
-    documented command.
-
-What stays outside, and makes the plan not ready rather than approximate: a
-command with shell operators, globs, variables or placeholders; a download; a
-file the command names that the commit does not hold; and two
-installations of which STRhub would have to pick one. A block that installs a
-PUBLISHED copy of the tool (PyPI, Bioconda, a Docker image) is an alternative
-to building this commit and is left out, by name, in the plan.
+  - the conda environment or virtualenv the block activates last stays active
+    for the documented command.
 """
 from __future__ import annotations
 
@@ -38,11 +37,29 @@ import pathlib
 import re
 
 PROFILE = "strhub-documented-install/1"
-BASE_IMAGE = "ubuntu:22.04"
-MINIFORGE_URL = "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh"
+BASE_IMAGE = "ubuntu:22.04@sha256:b000e69a50ff940390233025e7a337fb8469b509e2334fa4d018ac30f3e18cdb"
+MINIFORGE_VERSION = "26.9.4-2"
+MINIFORGE_SHA256 = "bbaf16b3897da24c4be50315934ba74848f617b4495982841d6a0a60e0edbbdf"
+MINIFORGE_URL = (
+    f"https://github.com/conda-forge/miniforge/releases/download/"
+    f"{MINIFORGE_VERSION}/Miniforge3-Linux-x86_64.sh"
+)
+BASELINE_PACKAGES = (
+    "ca-certificates",
+    "curl",
+    "git",
+    "build-essential",
+    "python3",
+    "python3-pip",
+    "python3-venv",
+)
 ENVIRONMENT = {"source": "documented", "dockerfile": "Dockerfile", "os": ["ubuntu-22.04"]}
-BASE_PLAIN = "Ubuntu 22.04, package lists refreshed, apt answering yes"
-BASE_CONDA = BASE_PLAIN + ", plus Miniforge (conda, python, pip)"
+_IMG_SHORT = f"{BASE_IMAGE.split('@')[0]}@{BASE_IMAGE.split(':', 2)[2][:12]}"
+BASE_PLAIN = (
+    f"constant baseline {_IMG_SHORT}, noninteractive apt-get update, "
+    + ", ".join(BASELINE_PACKAGES)
+)
+BASE_CONDA = BASE_PLAIN + f"; Miniforge {MINIFORGE_VERSION} ({MINIFORGE_SHA256[:12]})"
 
 #: Headings under which a code block is read as installation.
 SECTION = re.compile(r"install|build|compil|set ?up|requirement|prerequisite|dependenc|getting started|quick ?start|environment\b", re.I)
@@ -50,13 +67,13 @@ SECTION = re.compile(r"install|build|compil|set ?up|requirement|prerequisite|dep
 _NON_INSTALL_HEADING = re.compile(r"\b(?:verif(?:y|ying|ication)|test(?:ing)?|uninstall|remov(?:e|ing)|troubleshoot|notes?|faq)\b", re.I)
 #: A code line that is an installation step of some kind, admitted or not.
 LOOKS_LIKE_INSTALL = re.compile(
-    r"(?:^|[\s;&|=])(?:apt|apt-get|conda|mamba|pip3?|python3? -m pip|python3? -m venv|python3? setup\.py|make|cmake|\./configure|autoreconf|cargo|"
-    r"wget|curl|tar|unzip|docker|git clone|bash|sh|Rscript|nimble|go|source activate|(?:source|\.) \S+/bin/activate)(?:\s|$)")
+    r"(?:^|[\s;&|=])(?:apt|apt-get|yum|dnf|brew|conda|mamba|pip3?|python3? -m pip|python3? -m venv|python3? setup\.py|make|cmake|\./configure|autoreconf|cargo|"
+    r"wget|curl|tar|unzip|docker|git clone|git submodule|bash|sh|Rscript|nimble|go|source activate|(?:source|\.) \S+/bin/activate)(?:\s|$)")
 #: Indented (non-fenced) blocks must start with an install command so tab-indented
 #: prose paragraphs mentioning `apt-get` or `make` are not misread as shell blocks.
 _LEADING_INSTALL = re.compile(
-    r"^(?:apt|apt-get|conda|mamba|pip3?|python3? -m pip|python3? -m venv|python3? setup\.py|make|cmake|\./configure|autoreconf|cargo|"
-    r"wget|curl|tar|unzip|docker|git clone|bash|sh|Rscript|nimble|go|source activate|(?:source|\.) \S+/bin/activate)(?:\s|$)")
+    r"^(?:apt|apt-get|yum|dnf|brew|conda|mamba|pip3?|python3? -m pip|python3? -m venv|python3? setup\.py|make|cmake|\./configure|autoreconf|cargo|"
+    r"wget|curl|tar|unzip|docker|git clone|git submodule|bash|sh|Rscript|nimble|go|source activate|(?:source|\.) \S+/bin/activate)(?:\s|$)")
 #: Documents whose filename identifies them as the repository's main or
 #: installation documentation (checked before auxiliary docs like annotation guides).
 _PRIMARY_INSTALL_DOC = re.compile(
@@ -91,15 +108,13 @@ PATTERNS = [
     rf"\./configure(?: --{WORD})*",
     r"cargo build(?: --release)?(?: --locked)?",
     r"cargo install(?: --locked)? --path \.",
+    rf"git submodule init(?: {WORD})*",
+    rf"git submodule sync(?: --recursive)?(?: {WORD})*",
+    rf"git submodule update(?: (?:--init|--recursive|-N|--depth \d+))*(?: --)?(?: {WORD})*",
 ]
 ADMITTED = re.compile("|".join(f"(?:{p})" for p in PATTERNS))
 USES_CONDA = re.compile(r"^(?:conda|mamba|source activate)\b")
-_USES_PYTHON = re.compile(r"^(?:pip3?|python3?)\b")
-_USES_BUILD_ESSENTIAL = re.compile(r"^(?:make|\./configure|autoreconf|cmake)\b")
-_USES_CMAKE = re.compile(r"^cmake\b")
-_USES_AUTOTOOLS = re.compile(r"^(?:\./configure|autoreconf)\b")
-_USES_CARGO = re.compile(r"^cargo\b")
-_APT_INSTALL = re.compile(r"^apt(?:-get)? install\b(.*)$")
+_NON_UBUNTU_INSTALL = re.compile(rf"(?:yum|dnf|brew) install(?: (?:-y|--yes))*(?: {WORD})+")
 #: A file a command reads, by the option that names it.
 FILE_OPTION = re.compile(r"(?:^| )(?:-f|--file|-r)[ =](\S+)")
 
@@ -160,24 +175,84 @@ def _plain(row: str) -> str:
     return " ".join(text.split())
 
 
+_GITHUB_URL_RE = re.compile(
+    r"^(?:https?://(?:www\.)?github\.com/|git@github\.com:)[\w.-]+/([\w.-]+?)(?:\.git)?/?$"
+)
+_TOK_RE = re.compile(rf"^{TOK}$")
+
+
+def _classify_git_clone(command: str, name: str) -> str | None:
+    """Classify a `git clone` command with closed safe flags.
+
+    Returns `"given_submodules"` when cloning this repository with
+    `--recursive` or `--recurse-submodules`, `"given"` when cloning it
+    without submodule flags, `"outside"` when cloning another repository or
+    using unsupported options, or `None` when `command` is not `git clone`.
+    """
+    tokens = command.split()
+    if tokens[:2] != ["git", "clone"]:
+        return None
+    recursive = False
+    positional: list[str] = []
+    i = 2
+    while i < len(tokens):
+        tok = tokens[i]
+        if tok in ("--recursive", "--recurse-submodules"):
+            recursive = True
+            i += 1
+        elif tok in ("--shallow-submodules", "--single-branch", "-q", "--quiet"):
+            i += 1
+        elif tok in ("--branch", "-b"):
+            if i + 1 >= len(tokens) or not _TOK_RE.fullmatch(tokens[i + 1]):
+                return "outside"
+            i += 2
+        elif tok.startswith("--branch="):
+            if not _TOK_RE.fullmatch(tok.split("=", 1)[1]):
+                return "outside"
+            i += 1
+        elif tok == "--depth":
+            if i + 1 >= len(tokens) or not tokens[i + 1].isdigit():
+                return "outside"
+            i += 2
+        elif tok.startswith("--depth="):
+            if not tok.split("=", 1)[1].isdigit():
+                return "outside"
+            i += 1
+        elif tok.startswith("-"):
+            return "outside"
+        else:
+            positional.append(tok)
+            i += 1
+    if not (1 <= len(positional) <= 2):
+        return "outside"
+    if len(positional) == 2 and not _TOK_RE.fullmatch(positional[1]):
+        return "outside"
+    m = _GITHUB_URL_RE.fullmatch(positional[0])
+    if not m or m.group(1).lower() != name:
+        return "outside"
+    return "given_submodules" if recursive else "given"
+
+
 def _kind(command: str, repo_slug: str) -> str:
-    """`step` (admitted), `given` (already true of the checkout), `published`
-    (installs a released copy, not this commit) or `outside`."""
+    """`step` (admitted), `given` / `given_submodules` (already true of the
+    checkout), `non_ubuntu_pkg` (`yum`/`dnf`/`brew` install requiring an
+    explicit Debian/Ubuntu `apt` equivalent), `published` (installs a released
+    copy, not this commit) or `outside`."""
     owner, name = repo_slug.lower().split("/")
     lowered = command.lower()
     # Cloning this project, over HTTPS or SSH, from wherever it lives today
     # (repositories move between owners and keep their name): the build
     # already stands in a checkout of the pinned commit.
-    clone = re.fullmatch(rf"git clone(?: (?:--branch|-b) {TOK})?(?: --single-branch)?(?: --depth \d+)? "
-                         rf"(?:https://github\.com/|git@github\.com:)[\w.-]+/([\w.-]+?)(?:\.git)?/?(?: {TOK})?", command)
-    if clone:
-        return "given" if clone[1].lower() == name else "outside"
+    clone_kind = _classify_git_clone(command, name)
+    if clone_kind is not None:
+        return clone_kind
     if re.fullmatch(rf"cd {re.escape(name)}/?", lowered):
         return "given"
-    # Non-Ubuntu OS package managers (CentOS yum/dnf, macOS brew) listed alongside
-    # Ubuntu instructions do not apply to the declared Ubuntu 22.04 base image.
-    if re.match(r"(?:yum|dnf|brew)\s+install\b", lowered):
-        return "given"
+    # Non-Ubuntu OS package managers (CentOS yum/dnf, macOS brew) are never
+    # silently discarded as "given": they block unless the document explicitly
+    # provides an `apt` / `apt-get install` equivalent alongside them.
+    if _NON_UBUNTU_INSTALL.fullmatch(command):
+        return "non_ubuntu_pkg"
     # A bare self-invocation of the tool's own binary/script (with no args or
     # --help/--version) inside an install block is a usage check, not a build step.
     if re.fullmatch(
@@ -216,84 +291,14 @@ def _documents(proposal: dict) -> list[dict]:
             and "<!--" not in d["text"] and "-->" not in d["text"]]
 
 
-def _has_compiler_and_make(apt_pkgs: set[str]) -> bool:
-    if "build-essential" in apt_pkgs:
-        return True
-    has_make = "make" in apt_pkgs
-    has_compiler = any(
-        p in ("gcc", "g++", "clang") or p.startswith(("gcc-", "g++-", "clang-"))
-        for p in apt_pkgs
-    )
-    return has_make and has_compiler
-
-
-def _minimal_toolchain(commands: list[dict], uses_conda: bool = False) -> list[str]:
-    """Generic compiler/build-system and system Python packages supplied only
-    when a documented command invokes them without an earlier apt install.
-    Never includes tool-specific libraries."""
-    apt_pkgs: set[str] = set()
-    need_build_essential = False
-    need_git = False
-    need_ca = False
-    need_cmake = False
-    need_autotools = False
-    need_cargo = False
-    need_python = False
-    for cmd in commands:
-        text = cmd["text"]
-        apt_match = _APT_INSTALL.match(text)
-        if apt_match:
-            for tok in apt_match[1].split():
-                if not tok.startswith("-"):
-                    apt_pkgs.add(tok)
-            continue
-        if _USES_BUILD_ESSENTIAL.match(text):
-            if not _has_compiler_and_make(apt_pkgs):
-                need_build_essential = True
-            if "git" not in apt_pkgs:
-                need_git = True
-            if "ca-certificates" not in apt_pkgs:
-                need_ca = True
-        if _USES_CMAKE.match(text) and "cmake" not in apt_pkgs:
-            need_cmake = True
-        if _USES_AUTOTOOLS.match(text):
-            need_autotools = True
-        if _USES_CARGO.match(text):
-            if "cargo" not in apt_pkgs and "rustc" not in apt_pkgs:
-                need_cargo = True
-            if "ca-certificates" not in apt_pkgs:
-                need_ca = True
-        if not uses_conda and _USES_PYTHON.match(text):
-            need_python = True
-            if "ca-certificates" not in apt_pkgs:
-                need_ca = True
-    out: list[str] = []
-    if need_build_essential:
-        out.append("build-essential")
-    if need_cmake:
-        out.append("cmake")
-    if need_autotools:
-        for pkg in ("autoconf", "automake", "libtool", "pkg-config"):
-            if pkg not in apt_pkgs:
-                out.append(pkg)
-    if need_cargo:
-        out.append("cargo")
-    if need_python:
-        for pkg in ("python3", "python3-venv", "python3-pip", "python-is-python3"):
-            if pkg not in apt_pkgs:
-                out.append(pkg)
-    if need_git:
-        out.append("git")
-    if need_ca:
-        out.append("ca-certificates")
-    return out
-
-
-def _scan_docs(docs: list[dict], slug: str) -> tuple[list[dict], list[dict], list[dict], str | None]:
+def _scan_docs(docs: list[dict], slug: str) -> tuple[list[dict], list[dict], list[dict], bool, str | None]:
     """Scan a group of documents for installation blocks."""
     commands, published, scanned = [], [], []
+    clone_submodules = False
     for doc in docs:
         scanned.append({"path": doc["file"], "sha256": digest(doc["text"])})
+        doc_commands: list[dict] = []
+        doc_non_ubuntu: list[tuple[int, str]] = []
         for block in _blocks(doc["text"]):
             if not SECTION.search(block["heading"]) or _NON_INSTALL_HEADING.search(block["heading"]):
                 continue
@@ -312,13 +317,23 @@ def _scan_docs(docs: list[dict], slug: str) -> tuple[list[dict], list[dict], lis
                 continue
             if "outside" in kinds:
                 n, c = next((row for row, k in zip(rows, kinds) if k == "outside"))
-                return commands, published, scanned, (
+                return commands, published, scanned, clone_submodules, (
                     f"An installation step is outside this profile ({doc['file']}, line {n}: `{c}`); "
                     "STRhub does not interpret, complete or skip it."
                 )
-            commands += [{"file": doc["file"], "line": n, "text": c, "argv": c.split()}
-                         for (n, c), k in zip(rows, kinds) if k == "step"]
-    return commands, published, scanned, None
+            if "given_submodules" in kinds:
+                clone_submodules = True
+            doc_non_ubuntu += [(n, c) for (n, c), k in zip(rows, kinds) if k == "non_ubuntu_pkg"]
+            doc_commands += [{"file": doc["file"], "line": n, "text": c, "argv": c.split()}
+                             for (n, c), k in zip(rows, kinds) if k == "step"]
+        if doc_non_ubuntu and not any(re.match(r"apt(?:-get)? install\b", c["text"]) for c in doc_commands):
+            n, c = doc_non_ubuntu[0]
+            return commands, published, scanned, clone_submodules, (
+                f"An installation step uses a non-Debian/Ubuntu package manager with no documented apt equivalent "
+                f"({doc['file']}, line {n}: `{c}`); STRhub does not translate or skip it."
+            )
+        commands += doc_commands
+    return commands, published, scanned, clone_submodules, None
 
 
 def discover(proposal: dict) -> dict:
@@ -336,7 +351,6 @@ def discover(proposal: dict) -> dict:
         return result
     slug = match[1]
     files = set(proposal.get("tree_paths") or [])
-    has_submodules = ".gitmodules" in files
     if ".dockerignore" in files:
         # The carrier copies the checkout whole; a .dockerignore would decide what it copies.
         result["reason"] = "The repository ships a .dockerignore, which would change what the evaluator's carrier copies."
@@ -352,12 +366,12 @@ def discover(proposal: dict) -> dict:
     primary_docs = [d for d in all_docs if _PRIMARY_INSTALL_DOC.search(d["file"])]
     other_docs = [d for d in all_docs if not _PRIMARY_INSTALL_DOC.search(d["file"])]
 
-    commands, published, documents, err = _scan_docs(primary_docs, slug)
+    commands, published, documents, clone_submodules, err = _scan_docs(primary_docs, slug)
     if err:
         result["reason"] = err
         return result
     if not commands and not published and other_docs:
-        commands, published, other_scanned, err = _scan_docs(other_docs, slug)
+        commands, published, other_scanned, clone_submodules, err = _scan_docs(other_docs, slug)
         documents += other_scanned
         if err:
             result["reason"] = err
@@ -366,7 +380,11 @@ def discover(proposal: dict) -> dict:
         return result
     builders = [
         c["text"] for c in commands
-        if not re.match(r"(?:cd|mkdir|conda activate|source activate|(?:source|\.) \S+/bin/activate|(?:python3? -m )?pip3? --version|python3? --version)\b", c["text"])
+        if not re.match(
+            r"(?:cd|mkdir|conda activate|source activate|(?:source|\.) \S+/bin/activate|"
+            r"(?:python3? -m )?pip3? --version|python3? --version|git submodule (?:init|sync|update))\b",
+            c["text"],
+        )
     ]
     if len(set(builders)) != len(builders):
         result["reason"] = ("More than one installation is documented with the same steps; "
@@ -422,31 +440,44 @@ def discover(proposal: dict) -> dict:
                 return result
 
     uses_conda = any(USES_CONDA.match(c["text"]) for c in commands)
-    toolchain = _minimal_toolchain(commands, uses_conda=uses_conda)
+    submodules_documented = bool(
+        clone_submodules or any(re.match(r"git submodule update\b", c["text"]) for c in commands)
+    )
     activated = [c["argv"][-1] for c in commands if re.match(r"(?:conda|source) activate\b", c["text"])]
     environment = activated[-1] if activated else None
-    dockerfile = carrier(commands, uses_conda, environment, toolchain, venv_activate)
+    dockerfile = carrier(commands, uses_conda, environment, venv_activate)
     base_desc = BASE_CONDA if uses_conda else BASE_PLAIN
-    if toolchain:
-        base_desc += f", plus minimal build toolchain ({', '.join(toolchain)}; no tool-specific libraries)"
-    if has_submodules:
-        base_desc += ", with git submodules initialized"
+    if submodules_documented:
+        base_desc += "; git submodules"
     first = commands[0]
     result.pop("gap")
     result.update(
         ready=True, repo=repo, ref=ref, documents=documents, commands=commands,
         published_alternatives=published, conda_environment=environment,
-        base_condition={"image": BASE_IMAGE, "description": base_desc,
-                        "role": "evaluator base environment",
-                        "added_packages": list(toolchain),
-                        "miniforge": uses_conda,
-                        "submodules": has_submodules},
+        base_condition={
+            "image": BASE_IMAGE,
+            "description": base_desc,
+            "role": "constant evaluator baseline",
+            "baseline": {
+                "env": {"DEBIAN_FRONTEND": "noninteractive"},
+                "apt_assume_yes": True,
+                "apt_update": True,
+                "packages": list(BASELINE_PACKAGES),
+                "miniforge": (
+                    {"version": MINIFORGE_VERSION, "url": MINIFORGE_URL, "sha256": MINIFORGE_SHA256}
+                    if uses_conda else None
+                ),
+            },
+            "added_packages": list(BASELINE_PACKAGES),
+            "miniforge": uses_conda,
+            "submodules": submodules_documented,
+        },
         citation={"repo": repo, "ref": ref, "path": first["file"], "line": first["line"],
                   "end_line": commands[-1]["line"], "verified": True,
                   "document_sha256": next(d["sha256"] for d in documents if d["path"] == first["file"])},
         carrier_dockerfile=dockerfile, carrier_sha256=digest(dockerfile),
         reason="Transcribe the installation commands the repository documents, unchanged and in order, "
-               "into a fixed evaluator carrier; no step, dependency, option or choice was added.")
+               "into a constant evaluator baseline carrier; no adaptive step, dependency, option or choice was added.")
     return result
 
 
@@ -466,12 +497,11 @@ def _resolve(here: pathlib.PurePosixPath, name: str) -> pathlib.PurePosixPath | 
 
 
 def carrier(commands: list[dict], uses_conda: bool, environment: str | None,
-            toolchain: list[str] | tuple[str, ...] = (),
             venv_activate: str | None = None) -> str:
     """The evaluator's envelope around the literal commands. Everything that
-    is not one of them is the declared base environment."""
+    is not one of them is the upfront-declared constant baseline."""
     lines = ["# Evaluator carrier: strhub-documented-install/1; not an upstream Dockerfile."]
-    lines += base_lines(uses_conda, toolchain)
+    lines += base_lines(uses_conda)
     lines += ['COPY [".", "/opt/tool"]', "WORKDIR /opt/tool"]
     # One shell, so `cd`, `conda activate` and `source .../bin/activate` carry
     # from one documented line to the next as they would in the reader's
@@ -486,22 +516,31 @@ def carrier(commands: list[dict], uses_conda: bool, environment: str | None,
     return "\n".join(lines) + "\n"
 
 
-def base_lines(uses_conda: bool, toolchain: list[str] | tuple[str, ...] = ()) -> list[str]:
-    """The declared base environment every carrier starts from."""
-    lines = ["FROM " + BASE_IMAGE,
-             "ENV DEBIAN_FRONTEND=noninteractive",
-             "RUN " + json.dumps(["bash", "-c", "echo 'APT::Get::Assume-Yes \"true\";' > /etc/apt/apt.conf.d/90strhub "
-                                              "&& apt-get update"])]
-    if toolchain:
-        lines.append("RUN " + json.dumps(["bash", "-c", "apt-get install --no-install-recommends " + " ".join(toolchain)]))
+def base_lines(uses_conda: bool) -> list[str]:
+    """The constant, upfront-declared base environment every carrier starts from."""
+    lines = [
+        "FROM " + BASE_IMAGE,
+        "ENV DEBIAN_FRONTEND=noninteractive",
+        "RUN " + json.dumps([
+            "bash", "-c",
+            "echo 'APT::Get::Assume-Yes \"true\";' > /etc/apt/apt.conf.d/90strhub "
+            "&& apt-get update "
+            "&& apt-get install --no-install-recommends " + " ".join(BASELINE_PACKAGES),
+        ]),
+    ]
     if uses_conda:
-        lines += ["RUN " + json.dumps(["bash", "-c", "apt-get install curl ca-certificates bzip2 && "
-                                       f"curl -fsSL {MINIFORGE_URL} -o /tmp/miniforge.sh && "
-                                       "bash /tmp/miniforge.sh -b -p /opt/conda && rm /tmp/miniforge.sh && "
-                                       # A login shell may reset PATH; conda stays on it either way.
-                                       "echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/00-strhub-conda.sh && "
-                                       "ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh"]),
-                  "ENV PATH=/opt/conda/bin:$PATH"]
+        lines += [
+            "RUN " + json.dumps([
+                "bash", "-c",
+                f"curl -fsSL {MINIFORGE_URL} -o /tmp/miniforge.sh && "
+                f"echo '{MINIFORGE_SHA256}  /tmp/miniforge.sh' | sha256sum -c - && "
+                "bash /tmp/miniforge.sh -b -p /opt/conda && rm /tmp/miniforge.sh && "
+                # A login shell may reset PATH; conda stays on it either way.
+                "echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/00-strhub-conda.sh && "
+                "ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh",
+            ]),
+            "ENV PATH=/opt/conda/bin:$PATH",
+        ]
     return lines
 
 

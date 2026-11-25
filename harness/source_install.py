@@ -12,7 +12,7 @@ import json
 import re
 
 PROFILE = "strhub-source-install/1"
-BASE_IMAGE = "ubuntu:22.04"
+BASE_IMAGE = "ubuntu:22.04@sha256:b000e69a50ff940390233025e7a337fb8469b509e2334fa4d018ac30f3e18cdb"
 HEADING = re.compile(r"^(#{1,6})\s+(?:Install(?:ation)?|Build|Compilation)\s+"
                      r"(?:(?:on|for)\s+)?\(?Ubuntu 22\.04\)?\s*:?\s*$", re.I)
 PACKAGE = re.compile(r"[a-z0-9][a-z0-9.+-]*(?::[a-z0-9]+)?(?:=[A-Za-z0-9.+:~_-]+)?\Z")
