@@ -38,7 +38,7 @@ class Fake:
     kind (an int, or a callable given the argv and the log path)."""
 
     def __init__(self, root: pathlib.Path, **rc):
-        self.root, self.rc, self.calls = root, rc, []
+        self.root, self.rc, self.calls, self.timeouts = root, rc, [], []
 
     @staticmethod
     def kind(argv):
@@ -63,6 +63,7 @@ class Fake:
         return h(argv, log) if callable(h) else h
 
     def run(self, argv, *, log=None, timeout=None, cwd=None, env=None):
+        self.timeouts.append((self.kind(argv), timeout))
         rc = self._answer(argv, log)
         if self.kind(argv).startswith("run_"):
             # run_container.sh records into the log it is given.
@@ -125,8 +126,10 @@ def test_the_order_the_conditions_and_the_commands_are_the_workflows(tmp_path):
     assert fid[2:] == ["--checkout", "work/ctx/Tool", "--review", "work/procedure_review.json",
                        "--manifest", "work/proposal/manifest.yml", "--source-install-dockerfile", carrier]
     build = next(c for c in fake.calls if c[0] == "bash" and c[1].endswith("record_terminal.sh"))
-    assert build[2:] == ["work/log_build.txt", "docker", "build", "-f", carrier,
+    assert build[2:] == ["work/log_build.txt", "docker", "build", *stages.BUILD_LIMITS, "-f", carrier,
                          "-t", "toolimg:ci", "work/ctx/Tool"]
+    assert ("docker_build", stages.BUILD_TIMEOUT_MINUTES * 60) in fake.timeouts
+    assert "--ulimit" in stages.HARDENING and "--tmpfs" in stages.HARDENING
     assert not build[build.index("-f") + 1].startswith("work/ctx/")
     assert "--build-arg" not in build and "submodule" not in " ".join(fake.kinds())
     assert stage(rec, "installs")["outputs"] == {"source_evidence": "verified", "environment": "primary"}

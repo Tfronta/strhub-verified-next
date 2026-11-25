@@ -27,14 +27,24 @@ from .executor import Executor
 from .record import StageResult
 
 #: The container runs with every capability dropped, no network, and ceilings
-#: on memory, CPU and processes.
+#: on memory, CPU, processes, per-file size and ephemeral /tmp scratch.
 HARDENING = [
     "--network", "none",
     "--memory", "6g", "--memory-swap", "6g",
     "--cpus", "2",
     "--pids-limit", "512",
+    "--ulimit", "fsize=1073741824:1073741824",
+    "--tmpfs", "/tmp:rw,nosuid,nodev,size=512m",
     "--cap-drop", "ALL",
     "--security-opt", "no-new-privileges",
+]
+#: Explicit build time ceiling (20 minutes, below the 45-minute CI job cap)
+#: and resource flags supported by Buildx/BuildKit (`--shm-size`, `--ulimit`).
+BUILD_TIMEOUT_MINUTES = 20
+BUILD_LIMITS = [
+    "--shm-size=1g",
+    "--ulimit", "fsize=2147483648:2147483648",
+    "--ulimit", "nofile=4096:4096",
 ]
 IMAGE = "toolimg:ci"
 #: The profiles whose carrier the engine builds: the literal source transcript
@@ -211,8 +221,10 @@ def installs(ctx: Ctx, available_result: StageResult) -> StageResult:
     # record_terminal.sh keeps the exact argv and the build's output in
     # work/log_build.txt.terminal, and the output alone in work/log_build.txt.
     argv = ["bash", ctx.harness("record_terminal.sh"), str(ctx.work / "log_build.txt"),
-            "docker", "build", "-f", str(docker_dir / docker_file), "-t", ctx.image, str(context)]
-    rc = ctx.exe.run(argv, cwd=ctx.root)
+            "docker", "build", *BUILD_LIMITS, "-f", str(docker_dir / docker_file), "-t", ctx.image, str(context)]
+    rc = ctx.exe.run(argv, timeout=BUILD_TIMEOUT_MINUTES * 60, cwd=ctx.root)
+    if rc == 124:
+        _say(log, f"STRhub: the build was stopped at the time limit of {BUILD_TIMEOUT_MINUTES} minutes.")
     return st.finish(rc, argv, **outputs, **({"environment": "primary"} if rc == 0 else {}))
 
 

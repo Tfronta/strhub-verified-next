@@ -119,7 +119,7 @@ def test_output_left_by_a_crashed_run_is_not_runs():
 def test_a_crash_does_not_confirm_a_guessed_input_type():
     proposal = {**PROPOSAL_OK, "limitations": ["input_type_guessed"]}
     v = decide(G_CRASH_LEFT_A_FILE, recipe_proposal=proposal)
-    assert v["code"] == "undetermined" and v["basis"] == "strhub"
+    assert v["code"] == "undetermined" and v["basis"] == "recipe"
 
 
 # --- A fault of STRhub's is never the tool's ---------------------------------
@@ -127,7 +127,7 @@ def test_a_crash_does_not_confirm_a_guessed_input_type():
 def test_strhub_fault_is_undetermined_and_asks_nothing_of_the_owner():
     v = decide(G_INSTALL_FAIL, strhub_fault="the reference genome download")
     assert v["code"] == "undetermined"
-    assert v["basis"] == "strhub"
+    assert v["basis"] == "strhub_infra"
     assert "reference genome download" in v["reason"]
     assert v["blockers"] == []
 
@@ -169,3 +169,60 @@ def test_a_run_stopped_at_the_limit_without_an_exception_says_only_that():
     assert "raised" not in v["blockers"][0]["ask_owner"]["body"]
     # The table is not edited in place: the next verdict gets the plain text.
     assert "raised" not in verdict.BLOCKERS["run_failed"]["ask_owner"]["body"]
+
+
+def test_io_only_vs_content_verified_is_explicit_and_never_silent():
+    g_io_only = {"available": True, "installs": True, "runs": True, "io": True, "content": False}
+    v_io = decide(g_io_only)
+    v_full = decide(G_OK)
+    assert v_io["code"] == "runs" and v_full["code"] == "runs"
+    assert v_io["content_verified"] is False
+    assert v_io["output_status"] == "output_only_content_unverified"
+    assert "Output generated; STR content not verified automatically." in v_io["reason"]
+    assert v_full["content_verified"] is True
+    assert v_full["output_status"] == "content_verified"
+    assert v_io["reason"] != v_full["reason"]
+
+
+def test_authorized_external_run_is_not_masked_by_passing_own_example():
+    import authorization
+    from procedure_context import context
+
+    ex_cmd = "./tool --reads test/demo.bam --output demo.vcf"
+    doc_text = (
+        "# Tool\n\n## Installation (Ubuntu 22.04)\n\n```sh\n"
+        "apt-get update\napt-get install -y make g++\nmake\n```\n\n"
+        "## Usage\n\n```sh\ntool --reads sample.bam --output result.vcf\n```\n\n"
+        f"## Example\n\n```sh\n{ex_cmd}\n```\n"
+    )
+    doc_lines = doc_text.splitlines()
+    line_of = lambda target: next(i for i, ln in enumerate(doc_lines, 1) if ln == target)
+    p, m, _ = context(
+        proposal_fields={
+            "source_documents": [{"file": "README.md", "origin": "readme", "text": doc_text}],
+            "tree_paths": ["Makefile", "README.md", "test/demo.bam"],
+            "commands": [
+                {"cmd": "tool --reads sample.bam --output result.vcf", "file": "README.md",
+                 "line": line_of("tool --reads sample.bam --output result.vcf"), "origin": "readme"},
+                {"cmd": ex_cmd, "file": "README.md", "line": line_of(ex_cmd), "origin": "readme"},
+            ],
+            "example": {"cmd": ex_cmd, "file": "README.md", "line": line_of(ex_cmd)},
+        },
+        manifest_fields={"example": {"cmd": ex_cmd, "cwd": ".", "source": "detected"}},
+    )
+    reviewed = authorization.prepare_review(p, m, [], [])
+    assert reviewed["may_say_runs"] is True and reviewed["example_ready"] is True
+
+    # External failed while own example passed -> verdict MUST reflect external failure, not mask it as 'runs'
+    v_fail = verdict.decide({**G_RUN_FAIL, "example": True}, procedure=reviewed, manifest=m)
+    assert v_fail["code"] == "fails" and v_fail["basis"] == "gates"
+    assert v_fail["failure_phase"] == "runtime"
+    assert "installed as documented, then exited with an error" in v_fail["reason"]
+    assert "own documented example ran on its shipped data" in v_fail["reason"]
+
+    # External passed IO but content=False while own example passed -> content_verified stays False
+    v_unver = verdict.decide({"available": True, "installs": True, "runs": True, "io": True, "content": False, "example": True},
+                             procedure=reviewed, manifest=m)
+    assert v_unver["code"] == "runs" and v_unver["basis"] == "gates"
+    assert v_unver["content_verified"] is False
+    assert v_unver["output_status"] == "output_only_content_unverified"

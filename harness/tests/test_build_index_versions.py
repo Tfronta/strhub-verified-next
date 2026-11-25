@@ -62,3 +62,31 @@ def test_manual_curated_runs_are_preserved_in_versions_without_changing_alias(tm
     curated = next(v for v in entry["versions"] if v["instrument"] == "curated")
     assert curated["sha"] == NEW
     assert curated["report"] == f"{SLUG}/{NEW}-curated/{SLUG}.json"
+
+
+def test_manual_curated_only_tool_without_root_alias_is_indexed_without_404(tmp_path):
+    """When a tool has ONLY `<slug>/<sha>-curated/<slug>.json` and no `<slug>.json`
+    at the site root, `build_catalogue` and `render` must still list it and point
+    its `report` and `page` fields at the existing `-curated` files."""
+    site = tmp_path / "site"; site.mkdir()
+    manual_src = _run(tmp_path, NEW, "2026-02-01T00:00:00Z", "2026-09-02T00:00:00+00:00",
+                      name="manual_only", instrument="curated")
+    manual_dst = site / SLUG / f"{NEW}-curated"
+    pl._copy_set(pl.report_files(manual_src, SLUG), manual_dst)
+    assert not (site / f"{SLUG}.json").exists()
+
+    cat = build_index.build_catalogue(site)
+    assert cat["count"] == 1
+    (entry,) = cat["tools"]
+    assert entry["slug"] == SLUG
+    assert entry["instrument"] == "curated"
+    assert entry["report"] == f"{SLUG}/{NEW}-curated/{SLUG}.json"
+    assert entry["page"] == f"{SLUG}/{NEW}-curated/{SLUG}.html"
+    assert (site / entry["report"]).is_file()
+    assert (site / entry["page"]).is_file()
+    assert len(entry["versions"]) == 1
+    assert entry["versions"][0]["report"] == f"{SLUG}/{NEW}-curated/{SLUG}.json"
+    assert entry["versions"][0]["instrument"] == "curated"
+
+    rendered_html = build_index.render(site)
+    assert f'href="{SLUG}/{NEW}-curated/{SLUG}.html"' in rendered_html

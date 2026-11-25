@@ -39,6 +39,139 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 SCOPE = ("Assessment of documented execution in the stated environment and "
          "output format. Concerns reproducible execution only; no claim of "
          "accuracy, casework fitness, or regulatory validation.")
+SLICE_SCOPE_NOTE = (
+    "Reference sample scope: STRhub's standard reference dataset is a bounded genomic "
+    "slice on GRCh38/hg38 covering a defined subset of STR panel loci rather than a "
+    "whole-genome alignment. Programs targeting loci outside that slice, or requiring "
+    "genome-wide background depth distributions, may emit zero calls or unverified "
+    "content on this sample without implying a software defect."
+)
+OUTPUT_PREVIEW_MAX_LINES = 18
+OUTPUT_PREVIEW_MAX_BYTES = 4096
+OUTPUT_PREVIEW_READ_CAP = 16384
+_ANSI_CSI_RE = re.compile(r"\x1b\[[0-9;?]*[A-Za-z]")
+
+
+def _sanitize_preview_line(line: str, max_chars: int = 240) -> str:
+    cleaned = _ANSI_CSI_RE.sub("", line)
+    cleaned = "".join(ch for ch in cleaned if ch == "\t" or (ord(ch) >= 32 and ord(ch) != 127))
+    if len(cleaned) > max_chars:
+        return cleaned[:max_chars] + "…"
+    return cleaned
+
+
+def build_output_preview(
+    out_dir: pathlib.Path | None,
+    preferred_rel: list[str] | None = None,
+    *,
+    leg: str = "external",
+    max_lines: int = OUTPUT_PREVIEW_MAX_LINES,
+    max_bytes: int = OUTPUT_PREVIEW_MAX_BYTES,
+) -> dict | None:
+    """Return a bounded, sanitized preview of the first ~15-20 lines of output
+    produced under `out_dir`, rejecting symlinks/traversal and binary payloads."""
+    if out_dir is None or not out_dir.is_dir():
+        return None
+    confined, _ = _manifest.safe_glob(out_dir, "**/*")
+    candidates = [
+        p for p in sorted(confined)
+        if p.is_file()
+        and p.stat().st_size > 0
+        and "_expected" not in p.relative_to(out_dir).parts
+        and "__pycache__" not in p.relative_to(out_dir).parts
+        and p.suffix.lower() not in (".pyc", ".pyo")
+    ]
+    if not candidates:
+        return None
+    by_rel = {str(p.relative_to(out_dir)): p for p in candidates}
+    chosen: pathlib.Path | None = None
+    for rel in (preferred_rel or []):
+        if rel in by_rel:
+            chosen = by_rel[rel]
+            break
+    if chosen is None:
+        chosen = candidates[0]
+    rel_name = str(chosen.relative_to(out_dir))
+    size_bytes = chosen.stat().st_size
+    import gzip as _gzip
+    try:
+        if chosen.name.lower().endswith(".gz"):
+            with _gzip.open(chosen, "rb") as gz:
+                raw = gz.read(OUTPUT_PREVIEW_READ_CAP + 1)
+        else:
+            with open(chosen, "rb") as fh:
+                raw = fh.read(OUTPUT_PREVIEW_READ_CAP + 1)
+    except OSError:
+        return None
+    if not raw:
+        return None
+    byte_capped = len(raw) > OUTPUT_PREVIEW_READ_CAP
+    sample = raw[:OUTPUT_PREVIEW_READ_CAP]
+    non_text = sum(1 for b in sample if b < 9 or (13 < b < 32) or b == 127)
+    if b"\x00" in sample or (sample and non_text / len(sample) > 0.10):
+        return {
+            "leg": leg,
+            "file": rel_name,
+            "size_bytes": size_bytes,
+            "binary": True,
+            "truncated": True,
+            "lines": [],
+        }
+    decoded = sample.decode("utf-8", errors="replace")
+    raw_lines = decoded.splitlines()
+    # If byte_capped cut the last line mid-way, drop the trailing partial line
+    # when we already have plenty of lines.
+    if byte_capped and len(raw_lines) > max_lines:
+        raw_lines = raw_lines[:-1]
+    out_lines: list[str] = []
+    used_bytes = 0
+    truncated = byte_capped or len(raw_lines) > max_lines
+    for idx, ln in enumerate(raw_lines):
+        if idx >= max_lines:
+            truncated = True
+            break
+        san = _sanitize_preview_line(ln)
+        encoded_len = len(san.encode("utf-8")) + 1
+        if used_bytes + encoded_len > max_bytes:
+            truncated = True
+            break
+        out_lines.append(san)
+        used_bytes += encoded_len
+    return {
+        "leg": leg,
+        "file": rel_name,
+        "size_bytes": size_bytes,
+        "binary": False,
+        "truncated": truncated,
+        "lines": out_lines,
+    }
+
+
+def _output_verification_block(gates: dict, verdict: dict) -> dict:
+    status = verdict.get("output_status") or "no_output"
+    content_ok = bool(verdict.get("content_verified"))
+    io_ok = bool(gates.get("io"))
+    if status == "content_verified":
+        note = "Output generated and STR locus content verified automatically against the reference panel."
+        note_es = "Salida generada y contenido STR verificado automáticamente frente al panel de referencia."
+    elif status == "output_only_content_unverified":
+        note = "Output generated; STR content not verified automatically."
+        note_es = "Salida generada; contenido STR no verificado automáticamente."
+    elif status == "example_only_content_unverified":
+        note = ("Output generated on shipped example data; STR content on the standard "
+                "reference sample not verified automatically.")
+        note_es = ("Salida generada con datos de ejemplo del repositorio; contenido STR "
+                   "no verificado automáticamente sobre la muestra estándar.")
+    else:
+        note = "No verified output file produced in this run."
+        note_es = "No se generó archivo de salida verificado en esta corrida."
+    return {
+        "io_passed": io_ok,
+        "content_verified": content_ok,
+        "status": status,
+        "note": note,
+        "note_es": note_es,
+    }
 
 # Highest gate cleared, in order. The badge reflects the furthest green gate.
 LADDER = ["available", "installs", "runs", "io", "content"]
@@ -150,6 +283,16 @@ def recommendations_for(report: dict, proposal: dict | None) -> list[dict]:
                     "The documented command reads a reference genome and the README does not say "
                     "which assembly it expects. STRhub mounted hg38; stating the assembly would "
                     "remove the guess."})
+    regions_layout = (report.get("input_contract") or {}).get("regions")
+    if regions_layout and not report.get("preparation"):
+        out.append({
+            "code": "ship_regions_catalog",
+            "text": (
+                f"The documented command reads an external target-regions or variant-catalog file "
+                f"({regions_layout} schema). Shipping a small default or example catalog alongside "
+                "the code would make the documented command self-contained."
+            ),
+        })
     return [r for r in out if r["text"]]
 
 
@@ -440,6 +583,14 @@ def _summary_md(report: dict, slug: str) -> str:
         lines.append(f"- CI run: {report['ci_run']}")
 
     # Content highlights (the genotype-plausibility evidence), if available.
+    ov = report.get("output_verification") or {}
+    if ov.get("status") in ("output_only_content_unverified", "example_only_content_unverified"):
+        lines += [
+            "",
+            "## Output verification",
+            "",
+            f"- **{ov.get('note')}** ({ov.get('note_es')})",
+        ]
     outs = report.get("content_detail", {}).get("outputs", [])
     stats = outs[0].get("stats") if outs and isinstance(outs[0], dict) else None
     if stats:
@@ -464,6 +615,17 @@ def _summary_md(report: dict, slug: str) -> str:
             f"- STR loci: {sample}" if str_loci else "",
             f"- Top markers by read depth: {top}" if top else "",
         ]
+    preview = report.get("output_preview")
+    if isinstance(preview, dict) and preview.get("file"):
+        lines += ["", "## Output preview", ""]
+        trunc_note = " (first lines; truncated)" if preview.get("truncated") else ""
+        lines.append(f"- File (`{preview.get('leg', 'external')}`): `{preview['file']}` ({preview.get('size_bytes', 0)} bytes){trunc_note}")
+        if preview.get("binary"):
+            lines.append("- Binary output payload omitted from text preview.")
+        elif preview.get("lines"):
+            lines += ["", "```text", *preview["lines"], "```"]
+    if report.get("slice_scope_note"):
+        lines += ["", "## Reference sample scope", "", report["slice_scope_note"]]
 
     # Verification matrix (external and example legs), if present.
     # Which legs reported errors — the matrix flags THAT, the section below says what.
@@ -654,6 +816,37 @@ def _summary_html(report: dict, slug: str) -> str:
         f"<h3>{esc(command_heading)}</h3><p>{esc(command_lead)}</p>"
         f"<pre><code>{esc(run.get('effective_cmd', run['cmd']))}</code></pre>"
         if run.get("cmd") else ""
+    )
+
+    ov = report.get("output_verification") or {}
+    output_verification_block = ""
+    if ov.get("status") in ("output_only_content_unverified", "example_only_content_unverified"):
+        output_verification_block = (
+            "<h2>Output verification</h2>"
+            f"<p class=\"warn\">{esc(ov.get('note', ''))}</p>"
+            f"<p>{esc(ov.get('note_es', ''))}</p>"
+        )
+
+    preview_block = ""
+    preview = report.get("output_preview")
+    if isinstance(preview, dict) and preview.get("file"):
+        trunc_txt = " (first lines; truncated)" if preview.get("truncated") else ""
+        if preview.get("binary"):
+            body_html = "<p>Binary output payload omitted from text preview.</p>"
+        elif preview.get("lines"):
+            body_html = "<pre><code>" + "\n".join(esc(ln) for ln in preview["lines"]) + "</code></pre>"
+        else:
+            body_html = ""
+        preview_block = (
+            "<h2>Output preview</h2>"
+            f"<p>File (<code>{esc(preview.get('leg', 'external'))}</code>): "
+            f"<code>{esc(preview['file'])}</code> ({esc(preview.get('size_bytes', 0))} bytes){esc(trunc_txt)}</p>"
+            f"{body_html}"
+        )
+
+    slice_scope_block = (
+        f"<h2>Reference sample scope</h2><p>{esc(report['slice_scope_note'])}</p>"
+        if report.get("slice_scope_note") else ""
     )
 
     content_block = ""
@@ -880,7 +1073,10 @@ def _summary_html(report: dict, slug: str) -> str:
   {upstream_li}
   {f'<li>{ci}</li>' if ci else ''}
 </ul>
+{output_verification_block}
 {content_block}
+{preview_block}
+{slice_scope_block}
 {matrix_block}
 {evidence_block}
 {provenance_block}
@@ -1004,6 +1200,8 @@ def main() -> int:
                     help="outcome of the own-example step (success/failure/skipped)")
     ap.add_argument("--example", default="example.json", help="path to check_example.py output")
     ap.add_argument("--log-example", default="", help="log of the own-example leg")
+    ap.add_argument("--out-external", default="", help="directory holding external-leg /data/out files")
+    ap.add_argument("--out-example", default="", help="directory holding own-example /data/out files")
     ap.add_argument("--procedure-review", default="", help="recomputed pre-execution procedure review")
     ap.add_argument("--mounted-inputs", default="", help="verified provenance of the external runtime mount")
     ap.add_argument("--recipe-proposal", default="",
@@ -1286,6 +1484,7 @@ def main() -> int:
     # tool's. Only ever from a closed list: a step of ours that failed, or a
     # log line whose class is ours (diagnose_log.STRHUB_FIXABLE).
     strhub_fault = args.infra_failure.strip() or None
+    scope_limit = None
     if not strhub_fault and install_detail and not gates["installs"] \
             and "strhub" in (install_detail.get("faults") or []):
         strhub_fault = "the environment's build could not fetch what STRhub supplies"
@@ -1299,12 +1498,14 @@ def main() -> int:
         files = [f for o in outputs for f in o.get("files", [o])]
         if files and all(f.get("passed") or f.get("validation_status") == "unsupported" for f in files) \
                 and any(f.get("validation_status") == "unsupported" for f in files):
-            strhub_fault = "the evaluator does not support a declared VCF version or feature; format validity was not established"
+            scope_limit = "the evaluator does not support a declared VCF version or feature; format validity was not established"
         elif outputs and all(o.get("format") == "vcf" and o.get("checks", {}).get("parses_as_vcf")
                              and int(o.get("uncalled_rows") or 0) > 0
                              and int(o.get("called_records", o.get("records", 0)) or 0) == 0
                              and int(o.get("records_without_gt") or 0) == 0 for o in outputs):
-            strhub_fault = "the structurally valid output VCF contains no called genotypes; this run does not establish why"
+            scope_limit = "the structurally valid output VCF contains no called genotypes on this reference slice; this run does not establish why"
+    if scope_limit:
+        report["scope_limit"] = scope_limit
     import authorization
     procedure = authorization.refusal("The mandatory pre-execution procedure review was not supplied.")
     review_validation = authorization.Validation(False, procedure["reason"])
@@ -1359,12 +1560,51 @@ def main() -> int:
         report.setdefault("needed_beyond_repo", []).append(
             f"A reference genome ({mounted_reference.get('assembly') or 'as documented'}): the command "
             f"names one, and STRhub mounted the public copy at {mounted_reference['mount_path']}.")
+    regions_layout = (m.get("inputs") or {}).get("regions")
+    if regions_layout and env_source != "prepared":
+        report.setdefault("needed_beyond_repo", []).append(
+            f"A target-regions catalog ({regions_layout} layout): the documented command "
+            "reads a locus definition file, and STRhub mounted its shared reference panel "
+            "catalog matching the documented schema."
+        )
     report["verdict"] = verdict_lib.decide(
         gates, diagnostics, proposal, m.get("compatibility"),
         strhub_fault=strhub_fault,
         procedure=procedure,
         manifest=m,
+        scope_limit=scope_limit,
     )
+    report["output_verification"] = _output_verification_block(gates, report["verdict"])
+
+    if (m.get("inputs") or {}).get("type") or any(d.get("leg") == "external" and d.get("available") for d in (datasets or [])):
+        report["slice_scope_note"] = SLICE_SCOPE_NOTE
+
+    # Bounded, sanitized preview of generated output in /data/out when present.
+    ext_out_dir = (
+        pathlib.Path(args.out_external) if args.out_external
+        else (pathlib.Path(args.log_external).parent / "out_external" if args.log_external
+              else ROOT / "work" / "out_external")
+    )
+    ex_out_dir = (
+        pathlib.Path(args.out_example) if args.out_example
+        else (pathlib.Path(args.log_example).parent / "out_example" if args.log_example
+              else ROOT / "work" / "out_example")
+    )
+    io_outs = (io_detail or {}).get("outputs") or []
+    preferred_ext: list[str] = []
+    for o in io_outs:
+        if isinstance(o, dict):
+            if o.get("resolved"):
+                preferred_ext.append(str(o["resolved"]))
+            for f in o.get("files") or []:
+                if isinstance(f, dict) and f.get("resolved"):
+                    preferred_ext.append(str(f["resolved"]))
+    preview = build_output_preview(ext_out_dir, preferred_ext, leg="external")
+    if preview is None:
+        preferred_ex = [str(x) for x in (example_detail.get("produced") or []) if isinstance(x, str)]
+        preview = build_output_preview(ex_out_dir, preferred_ex, leg="example")
+    if preview is not None:
+        report["output_preview"] = preview
 
     # What STRhub did to get the tool ready, when the repository's own
     # instructions were not enough: every step, every file, every input.

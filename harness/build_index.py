@@ -32,7 +32,7 @@ COLOR = {"content": "#16a34a", "io": "#22a722", "runs": "#22a722",
          "installs": "#d4a017", "available": "#d4a017", "none": "#c33"}
 
 
-def _load(reports: pathlib.Path) -> list[dict]:
+def _load(reports: pathlib.Path) -> list[tuple[str, dict]]:
     items = []
     for p in sorted(reports.glob("*.json")):
         if p.name.endswith(".badge.json") or p.name == "index.json":
@@ -49,6 +49,45 @@ def _load(reports: pathlib.Path) -> list[dict]:
         if r.get("schema") == "strhub-verified/1":
             items.append((p.stem, r))
     return items
+
+
+def _discover_entries(reports: pathlib.Path) -> list[tuple[str, dict, str]]:
+    """Discover every tool card: root `<slug>.json` aliases first, plus any
+    `<slug>/` directory that holds only `*-curated` or `<sha>/` runs without a
+    root alias (preventing HTTP 404 on manual-only verifications)."""
+    out: list[tuple[str, dict, str]] = []
+    seen: set[str] = set()
+    for slug, r in _load(reports):
+        seen.add(slug)
+        out.append((slug, r, ""))
+    if not reports.is_dir():
+        return out
+    for sub in sorted(d for d in reports.iterdir() if d.is_dir() and not d.name.startswith(".")):
+        slug = sub.name
+        if slug in seen:
+            continue
+        doc_runs = publish_layout.scan(reports, slug)
+        manual_runs = _scan_manual(reports, slug)
+        active_doc = [(sha, r) for sha, r in doc_runs if not r.get("retired")]
+        active_man = [(folder, sha, r) for folder, sha, r in manual_runs if not r.get("retired")]
+        if active_doc:
+            sha, r = active_doc[0]
+            out.append((slug, r, f"{slug}/{sha}/"))
+            seen.add(slug)
+        elif active_man:
+            folder, _, r = active_man[0]
+            out.append((slug, r, f"{slug}/{folder}/"))
+            seen.add(slug)
+        elif doc_runs:
+            sha, r = doc_runs[0]
+            out.append((slug, r, f"{slug}/{sha}/"))
+            seen.add(slug)
+        elif manual_runs:
+            folder, _, r = manual_runs[0]
+            out.append((slug, r, f"{slug}/{folder}/"))
+            seen.add(slug)
+    out.sort(key=lambda item: item[0])
+    return out
 
 
 def _stats(r: dict) -> dict | None:
@@ -80,7 +119,7 @@ def _dataset_types(datasets: list) -> list[str]:
     return out
 
 
-def _summary_entry(slug: str, r: dict) -> dict:
+def _summary_entry(slug: str, r: dict, prefix: str = "") -> dict:
     """Compact, stable summary for index.json — what the web dashboard lists."""
     level = r.get("level", "none")
     stats = _stats(r) or {}
@@ -95,6 +134,13 @@ def _summary_entry(slug: str, r: dict) -> dict:
     )
     tool = r.get("tool", {})
     ref = r.get("source", {}).get("ref_resolved")
+    verdict_obj = r.get("verdict") or {}
+    gates_obj = r.get("gates") or {}
+    content_verified = bool(
+        verdict_obj["content_verified"]
+        if "content_verified" in verdict_obj
+        else gates_obj.get("content", False)
+    )
     return {
         "slug": slug,
         "name": tool.get("name", slug),
@@ -120,7 +166,9 @@ def _summary_entry(slug: str, r: dict) -> dict:
         # deploy (out_of_scope never does); carried so the catalogue can lead
         # an undetermined entry with the verdict rather than a level, without
         # re-deriving it from the gates.
-        "verdict": (r.get("verdict") or {}).get("code"),
+        "verdict": verdict_obj.get("code"),
+        "verdict_basis": verdict_obj.get("basis"),
+        "content_verified": content_verified,
         "errors_reported": errors_reported,
         "generated": r.get("generated"),
         "source_repo": r.get("source", {}).get("repo"),
@@ -131,8 +179,8 @@ def _summary_entry(slug: str, r: dict) -> dict:
         "total_reads": stats.get("total_reads"),
         "external_state": _leg_state(datasets, "external"),
         "dataset_types": _dataset_types(datasets),
-        "report": f"{slug}.json",
-        "page": f"{slug}.html",
+        "report": f"{prefix}{slug}.json",
+        "page": f"{prefix}{slug}.html",
     }
 
 
@@ -141,7 +189,7 @@ def _version_entry(slug: str, sha: str | None, r: dict, prefix: str, reports: pa
     the result, and where its files are. `prefix` is the directory the set
     lives in, or "" for a set that only exists at the root (published before
     the layout)."""
-    e = _summary_entry(slug, r)
+    e = _summary_entry(slug, r, prefix)
     pdf_rel = f"{prefix}{slug}.pdf"
     has_pdf = True if reports is None else (reports / pdf_rel).is_file()
     return {
@@ -154,6 +202,8 @@ def _version_entry(slug: str, sha: str | None, r: dict, prefix: str, reports: pa
         "level": e["level"],
         "label": e["label"],
         "verdict": e["verdict"],
+        "verdict_basis": e["verdict_basis"],
+        "content_verified": e["content_verified"],
         "errors_reported": e["errors_reported"],
         "ci_run": e["ci_run"],
         "report": f"{prefix}{slug}.json",
@@ -189,11 +239,13 @@ def versions_of(reports: pathlib.Path, slug: str, root: dict) -> list[dict]:
     """Every commit verified for `slug`, newest commit first. A slug with no
     directory yet is its own single version, at the root."""
     found = publish_layout.scan(reports, slug)
-    entries = (
-        [_version_entry(slug, sha, r, f"{slug}/{sha}/", reports) for sha, r in found]
-        if found
-        else [_version_entry(slug, root.get("source", {}).get("ref_resolved"), root, "", reports)]
-    )
+    has_root = (reports / f"{slug}.json").is_file()
+    if found:
+        entries = [_version_entry(slug, sha, r, f"{slug}/{sha}/", reports) for sha, r in found]
+    elif has_root:
+        entries = [_version_entry(slug, root.get("source", {}).get("ref_resolved"), root, "", reports)]
+    else:
+        entries = []
     for folder_name, sha, r in _scan_manual(reports, slug):
         entries.append(_version_entry(slug, sha, r, f"{slug}/{folder_name}/", reports))
     return entries
@@ -201,10 +253,10 @@ def versions_of(reports: pathlib.Path, slug: str, root: dict) -> list[dict]:
 
 def build_catalogue(reports: pathlib.Path) -> dict:
     """The index.json payload: a versioned list of tool summaries."""
-    items = _load(reports)
+    items = _discover_entries(reports)
     tools = []
-    for slug, r in items:
-        entry = _summary_entry(slug, r)
+    for slug, r, prefix in items:
+        entry = _summary_entry(slug, r, prefix)
         entry["versions"] = versions_of(reports, slug, r)
         tools.append(entry)
     return {
@@ -217,7 +269,7 @@ def build_catalogue(reports: pathlib.Path) -> dict:
     }
 
 
-def _card(slug: str, r: dict) -> str:
+def _card(slug: str, r: dict, prefix: str = "") -> str:
     tool = r.get("tool", {})
     label, shade = headline(r)
     color = COLOR_HEX.get(shade, "#c33")
@@ -232,7 +284,7 @@ def _card(slug: str, r: dict) -> str:
         extra = (f'<p class="stat">{markers} · '
                  f'{stats.get("total_reads", 0)} reads</p>')
     return f"""
-  <a class="card" href="{html.escape(slug)}.html">
+  <a class="card" href="{html.escape(prefix + slug)}.html">
     <span class="badge" style="background:{color}">{html.escape(label)}</span>
     <h2>{html.escape(tool.get('name', slug))}</h2>
     <p class="slug">{html.escape(slug)}</p>
@@ -242,8 +294,8 @@ def _card(slug: str, r: dict) -> str:
 
 
 def render(reports: pathlib.Path) -> str:
-    items = _load(reports)
-    cards = "".join(_card(slug, r) for slug, r in items) or \
+    items = _discover_entries(reports)
+    cards = "".join(_card(slug, r, prefix) for slug, r, prefix in items) or \
         "<p>No attestations yet.</p>"
     now = dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")
     return f"""<!doctype html>

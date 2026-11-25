@@ -366,7 +366,7 @@ def test_report_cannot_promote_green_gates_over_a_missing_or_rejected_review(tmp
     assert report_module.main() == 0
     report = json.loads(capsys.readouterr().out)
     assert report["verdict"]["code"] == "undetermined"
-    assert report["verdict"]["basis"] == "strhub"
+    assert report["verdict"]["basis"] == "strhub_infra"
     assert not report["procedure_review"]["may_say_runs"]
 
 

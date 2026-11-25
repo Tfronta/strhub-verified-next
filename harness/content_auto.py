@@ -314,86 +314,6 @@ def analyze_vcf(path: pathlib.Path, regions: list[tuple[str, int, int, str]]) ->
 CHROM_RE = re.compile(r"^(?:chr)?(?:[1-9]|1\d|2[0-2]|X|Y|M|MT)$", re.I)
 MOTIF_RE = re.compile(r"^[ACGTN]{1,60}(?:,[ACGTN]{1,60})*$", re.I)
 NUM_RE = re.compile(r"^-?\d+(?:\.\d+)?$")
-REPEATHMM_DETAIL_RE = re.compile(
-    r"^(?:INFO:\s+)?(?:p2bamhmm|p2sp|p2fqhmm)\s+\['([A-Za-z0-9_.-]+)',\s*([0-9.]+),\s*\[([0-9,\s]+)\],\s*'allocr:[^']*',\s*(\d+),\s*(\d+)\]"
-)
-REPEATHMM_ROW_RE = re.compile(
-    r"^(?:INFO:\s+)?([A-Za-z0-9_.-]+)\t\s*(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?);$"
-)
-
-
-def _analyze_repeathmm_log(
-    lines: list[str],
-    panel_names: set[str] | None,
-    regions: list[tuple[str, int, int, str]] | None,
-) -> dict | None:
-    """Recognise RepeatHMM native RepBAM_*.log / RepFQ_*.log output records."""
-    canon_by_lower: dict[str, str] = {}
-    for n in (panel_names or set()):
-        canon_by_lower[n.lower()] = n
-    for _, _, _, n in (regions or []):
-        canon_by_lower[n.lower()] = n
-
-    locus_rows: collections.Counter = collections.Counter()
-    locus_reads: collections.Counter = collections.Counter()
-    regions_matched: set[str] = set()
-    total_reads = 0
-    max_depth = 0
-    detail_hits = 0
-
-    for ln in lines:
-        m = REPEATHMM_DETAIL_RE.match(ln.strip())
-        if m:
-            raw_locus = m.group(1).strip()
-            reads = int(m.group(4))
-            canon = canon_by_lower.get(raw_locus.lower(), raw_locus)
-            if raw_locus.lower() in canon_by_lower:
-                regions_matched.add(canon)
-            locus_rows[canon] += 1
-            locus_reads[canon] += reads
-            total_reads += reads
-            max_depth = max(max_depth, reads)
-            detail_hits += 1
-
-    if detail_hits == 0:
-        for ln in lines:
-            m = REPEATHMM_ROW_RE.match(ln.strip())
-            if m:
-                raw_locus = m.group(1).strip()
-                if not (STRICT_LOCUS_RE.match(raw_locus) or raw_locus.lower() in canon_by_lower):
-                    continue
-                canon = canon_by_lower.get(raw_locus.lower(), raw_locus)
-                if raw_locus.lower() in canon_by_lower:
-                    regions_matched.add(canon)
-                locus_rows[canon] += 1
-
-    if not locus_rows:
-        return None
-
-    strs = sorted(locus_rows)
-    stats = _empty_stats()
-    stats.update({
-        "rows": sum(locus_rows.values()),
-        "header_row_dropped": True,
-        "locus_column_found": True,
-        "locus_column": 0,
-        "allele_columns": [1, 2],
-        "count_columns": [3] if detail_hits > 0 else [],
-        "distinct_loci": len(strs),
-        "distinct_str_loci": len(strs),
-        "distinct_snp_markers": 0,
-        "loci": strs,
-        "str_loci": strs,
-        "snp_markers": [],
-        "total_reads": total_reads,
-        "max_sequence_depth": max_depth,
-        "top_loci_by_depth": locus_reads.most_common(),
-        "regions_given": len(regions or []),
-        "regions_hit": len(regions_matched) if regions else len(strs),
-    })
-    if canon_by_lower:
-        stats["panel_loci_present"] = sorted(regions_matched)
-    return stats
 
 
 def _analyze_genomic_str_table(
@@ -556,9 +476,6 @@ def analyze_table(
             body = body[1:]
             header_dropped = True
     if best_score < 0.5:
-        rhmm = _analyze_repeathmm_log(lines, panel_names, regions)
-        if rhmm is not None:
-            return rhmm
         genomic = _analyze_genomic_str_table(body, width, regions)
         if genomic is not None:
             return genomic

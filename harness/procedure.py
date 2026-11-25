@@ -352,28 +352,34 @@ def classify(proposal: dict, manifest: dict, limitations: list[str],
 
     # One lead, in the order a reviewer should read it. The first match is
     # why we will not call a red result the tool's.
-    if not proposal:
-        blocker, basis = "procedure_evidence_missing", "strhub"
+    doc_amendment_codes = {
+        "synopsis_trimmed", "output_unnamed", "input_guessed",
+        "input_platform_unproven", "input_assembly_mismatch", "unbacked_inference",
+        "install_not_copyable", "no_install_procedure", "ambiguous_regions_schema",
+    }
+    if not proposal or proposal.get("source_documents") == []:
+        blocker, basis = "procedure_evidence_missing", "strhub_infra"
     elif "no_reference_dataset" in limitations:
         blocker, basis = "missing_input", "recipe"
     elif not installation["ready"] and method != "unknown" and install_gap == "commit":
         blocker, basis = "install_not_copyable", "recipe"
     elif not installation["ready"] and method != "unknown":
-        blocker, basis = "install_profile_unsupported", "strhub"
+        blocker, basis = "install_profile_unsupported", "scope"
     elif any(a["code"] == "ambiguous_regions_schema" for a in amendments):
         blocker, basis = "ambiguous_regions_schema", "recipe"
     elif "documented_file_missing" in limitations:
         blocker, basis = "missing_file", "recipe"
     elif any(a["code"] == "input_not_substituted" for a in amendments):
-        blocker, basis = "input_not_substituted", "strhub"
+        blocker, basis = "input_not_substituted", "scope"
     elif "no_command" in limitations:
         blocker, basis = "no_command", "recipe"
     elif any(a["code"] == "no_install_procedure" for a in amendments):
         blocker, basis = "no_install_procedure", "recipe"
     elif any(a["code"] == "published_image" for a in amendments):
-        blocker, basis = "published_image", "strhub"
+        blocker, basis = "published_image", "scope"
     elif amendments:
-        blocker, basis = amendments[0]["code"], "strhub"
+        blocker = amendments[0]["code"]
+        basis = "recipe" if blocker in doc_amendment_codes else "scope"
     else:
         blocker, basis = "ready", "gates"
 
@@ -404,11 +410,15 @@ def classify(proposal: dict, manifest: dict, limitations: list[str],
                 "no_command": "No command line invoking the tool was found in the commit, so nothing was run.",
             }.get(blocker, "STRhub could not complete a procedure stated at this commit.")
         attribution = "strhub"
+    elif basis == "strhub_infra":
+        reason = "Source documents from the pinned upstream commit were missing or unreadable before review."
+        attribution = "strhub"
     else:
         # What stopped it first, then everything else the review found, each
         # as a sentence of its own: a reader gets the lead before the list.
         ordered = sorted(amendments, key=lambda a: a["code"] != blocker)
-        reason = " ".join(dict.fromkeys(_sentence(a["what"]) for a in ordered))
+        lead_sentences = " ".join(dict.fromkeys(_sentence(a["what"]) for a in ordered))
+        reason = (lead_sentences + " Automatic verification stopped at this scope boundary without executing or faulting the software.").strip()
         attribution = "strhub"
 
     asm_declared = asm.get("declared")

@@ -25,8 +25,41 @@ def test_a_failure_of_the_tool_is_published():
 
 
 def test_strhub_fault_is_not_published():
-    ok, why = decide(report("undetermined", basis="strhub"))
+    ok, why = decide(report("undetermined", basis="strhub_infra"))
     assert not ok and "infrastructure" in why
+
+
+def test_evaluator_scope_limit_with_valid_review_publishes_as_undetermined():
+    import authorization
+    from test_documented_install import proposal, block, _manifest as di_manifest
+    import certificate_text
+    import prepare
+    import verdict
+
+    p = proposal(block("pip install ."))
+    p["tree_paths"].append(".dockerignore")
+    m = di_manifest(p)
+    m["environment"] = {"dockerfile": "Dockerfile", "os": ["ubuntu-22.04"], "source": "generated"}
+    reviewed = authorization.prepare_review(p, m, [], [])
+    gates = {"available": True, "installs": False, "runs": False, "io": False, "content": False}
+    inner, cwd = prepare.unwrap_example(m["run"]["cmd"])
+    rep = {
+        "schema": "strhub-verified/1",
+        "tool": m["tool"],
+        "source": {**m["source"], "ref_resolved": m["source"]["ref"]},
+        "environment": m["environment"],
+        "input_contract": m["inputs"],
+        "gates": gates,
+        "instrument": certificate_text.INSTRUMENT,
+        "recipe": {"origin": "proposed"},
+        "procedure_review": reviewed,
+        "run": {"cmd": inner, "effective_cmd": m["run"]["cmd"], "cwd": cwd, "step_outcome": "skipped"},
+        "verdict": verdict.decide(gates, procedure=reviewed, manifest=m),
+    }
+    assert rep["verdict"]["code"] == "undetermined"
+    assert rep["verdict"]["basis"] == "scope"
+    ok, why = publish_gate.decide(rep, slug="example-tool", publish_requested=True, index={"tools": []})
+    assert ok and why == "published"
 
 
 def test_out_of_scope_is_not_published():

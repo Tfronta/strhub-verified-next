@@ -223,20 +223,34 @@ GUIDE_BLOCKS = {
 #: it. `strhub` is ours: our sample shelf, or our own reader rewriting the
 #: command. A gap of ours is never told as a gap of theirs.
 STEP1_BLOCKERS = {
-    "no_install_procedure":  ("install", "commit"),
-    "install_not_copyable":  ("install", "commit"),
-    "published_image":       ("install", "commit"),
-    "no_command":            ("command", "commit"),
-    "synopsis_trimmed":      ("command", "commit"),
-    "output_unnamed":        ("output", "commit"),
-    "input_guessed":         ("input", "commit"),
-    "missing_file":          ("input", "commit"),
-    "flag_injected":         ("command", "strhub"),
-    "flag_dropped":          ("command", "strhub"),
-    "input_swapped":         ("input", "strhub"),
-    "input_not_substituted": ("input", "strhub"),
-    "missing_input":         ("input", "strhub"),
-    "ssh_rewritten":         ("install", "strhub"),
+    "no_install_procedure":             ("install", "commit"),
+    "install_not_copyable":             ("install", "commit"),
+    "published_image":                  ("install", "commit"),
+    "no_command":                       ("command", "commit"),
+    "synopsis_trimmed":                 ("command", "commit"),
+    "output_unnamed":                   ("output", "commit"),
+    "input_guessed":                    ("input", "commit"),
+    "missing_file":                     ("input", "commit"),
+    "ambiguous_regions_schema":         ("input", "commit"),
+    "input_platform_unproven":          ("input", "commit"),
+    "input_assembly_mismatch":          ("input", "commit"),
+    "unbacked_inference":               ("command", "commit"),
+    "install_profile_unsupported":      ("install", "strhub"),
+    "command_profile_unsupported":      ("command", "strhub"),
+    "prerequisite_profile_unsupported": ("command", "strhub"),
+    "working_directory_changed":        ("command", "strhub"),
+    "image_invocation_unsupported":     ("install", "strhub"),
+    "command_changed":                  ("command", "strhub"),
+    "capture_wrapper_missing":          ("command", "strhub"),
+    "capture_wrapper_changed":          ("command", "strhub"),
+    "flag_injected":                    ("command", "strhub"),
+    "flag_dropped":                     ("command", "strhub"),
+    "input_swapped":                    ("input", "strhub"),
+    "input_not_substituted":            ("input", "strhub"),
+    "missing_input":                    ("input", "strhub"),
+    "ssh_rewritten":                    ("install", "strhub"),
+    "procedure_evidence_missing":       (None, "strhub"),
+    "procedure_evidence_invalid":       (None, "strhub"),
 }
 
 #: The three sentences of step 1, and the fourth case that is ours. None of
@@ -285,7 +299,7 @@ def step1_says(report: dict) -> dict:
     # owed the block of the guide, not a sentence about our machinery
     # (docs/PLAN-Paso-1.md).
     block, whose = STEP1_BLOCKERS.get(blocker, (None, "")) if blocker in STEP1_BLOCKERS \
-        else (None, "strhub" if verdict.get("basis") == "strhub" else "commit")
+        else (None, "strhub" if verdict.get("basis") in ("strhub_infra", "scope", "strhub") else "commit")
 
     def said(code, headline, body, missing=()):
         return {"code": code, "headline": headline, "body": body, "missing": list(missing),
@@ -423,7 +437,8 @@ def execution_finding_established(report: dict) -> bool | None:
     reviewed = (review.get("may_say_runs") is True
                 or (review.get("example_ready") is True and verdict.get("basis") == "example"))
     return bool((report.get("procedure_validation") or {}).get("valid") and reviewed
-                and verdict.get("code") in ("runs", "fails") and verdict.get("basis") != "strhub")
+                and verdict.get("code") in ("runs", "fails")
+                and verdict.get("basis") not in ("strhub_infra", "scope", "strhub"))
 
 
 def conclusion_items_for(cfg: dict) -> list[tuple[str, str]]:
@@ -507,8 +522,8 @@ def conclusion_items_for(cfg: dict) -> list[tuple[str, str]]:
                     f"completeness across every listed locus.")
     elif gates.get("io"):
         produced = ("Produces output in the declared format",
-                    f"The tool wrote a non-empty {fmt_label}file. Whether its contents look like "
-                    "genotype data was not established at this level.")
+                    f"The tool wrote a non-empty {fmt_label}file. Output generated; STR content "
+                    "not verified automatically.")
     else:
         produced = ("No output produced",
                     "No file in the declared format was written, so nothing could be checked "

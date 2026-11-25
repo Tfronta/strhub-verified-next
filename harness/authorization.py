@@ -80,7 +80,7 @@ def validate(review, manifest) -> Validation:
 
 
 def refusal(reason: str) -> dict:
-    return {"may_say_runs": False, "install_ready": False, "example_ready": False, "basis": "strhub", "attribution": "strhub",
+    return {"may_say_runs": False, "install_ready": False, "example_ready": False, "basis": "strhub_infra", "attribution": "strhub",
             "blocker": "procedure_evidence_invalid", "reason": reason}
 
 
@@ -146,6 +146,7 @@ def report_validation(report: dict) -> Validation:
     import verdict
     expected = verdict.decide(gates, report.get("diagnostics"),
                               declared_compatibility=manifest.get("compatibility"),
+                              scope_limit=report.get("scope_limit"),
                               procedure=result.review, manifest=manifest)
     supplied = report.get("verdict") or {}
     if not isinstance(supplied, dict):

@@ -23,7 +23,7 @@ def decided(install, change=None):
 def test_a_download_piped_to_a_shell_is_asked_of_the_author_with_its_line():
     review, v = decided(block("curl https://example.org/install.sh | sh"))
     assert (review["blocker"], review["basis"]) == ("install_not_copyable", "recipe")
-    assert v["code"] == "undetermined" and v["basis"] != "strhub"
+    assert v["code"] == "undetermined" and v["basis"] == "recipe"
     (lead, *_rest) = v["blockers"]
     assert lead["code"] == "install_not_copyable"
     assert "README.md, line 6: `curl https://example.org/install.sh | sh`" in lead["what"]
@@ -37,6 +37,6 @@ def test_a_download_piped_to_a_shell_is_asked_of_the_author_with_its_line():
 
 def test_a_limit_of_the_evaluator_s_asks_nothing_of_the_author():
     review, v = decided(block("pip install ."), change=lambda p: p["tree_paths"].append(".dockerignore"))
-    assert (review["blocker"], review["basis"]) == ("install_profile_unsupported", "strhub")
-    assert v["basis"] == "strhub" and v["blockers"] == []
+    assert (review["blocker"], review["basis"]) == ("install_profile_unsupported", "scope")
+    assert v["basis"] == "scope" and v["blockers"] == []
     assert ct.step1_says({"verdict": v, "procedure_review": review})["code"] == "ours"

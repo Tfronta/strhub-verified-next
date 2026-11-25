@@ -243,4 +243,21 @@ def test_multi_file_glob_selects_genotype_table_over_auxiliary_files(tmp_path):
     assert c_res["outputs"][0]["stats"]["distinct_str_loci"] == 4
 
 
+def test_repeathmm_bespoke_log_parser_is_removed_under_non_forcing(tmp_path):
+    """RepeatHMM's custom log format must NOT have a bespoke parser in content_auto."""
+    assert not hasattr(ca, "_analyze_repeathmm_log")
+    assert not hasattr(ca, "REPEATHMM_DETAIL_RE")
+    assert not hasattr(ca, "REPEATHMM_ROW_RE")
+    p = tmp_path / "RepBAM_sample.log"
+    p.write_text(
+        "INFO: p2bamhmm ['TH01', 9.3, [6, 9], 'allocr:1', 42, 10]\n"
+        "INFO: TPOX\t8 11;\n"
+        "INFO: vWA\t16 17;\n"
+        "INFO: FGA\t21 24;\n"
+    )
+    st = ca.analyze_table(p, "text")
+    assert st.get("locus_column_found") is False
+    assert ca.judge(st, "text", 0)["locus_column_found"] is False
+
+
 

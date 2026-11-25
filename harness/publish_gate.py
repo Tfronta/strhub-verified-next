@@ -31,6 +31,7 @@ import re
 import sys
 
 PUBLISHED_VERDICTS = ("runs", "fails", "undetermined")
+INFRA_BASES = ("strhub_infra", "strhub")
 
 
 def normalize_repo(url: str) -> str:
@@ -61,7 +62,7 @@ def validated_finding(report: dict):
     if not checked.valid:
         return checked
     verdict = report.get("verdict") or {}
-    if verdict.get("code") not in PUBLISHED_VERDICTS or verdict.get("basis") == "strhub":
+    if verdict.get("code") not in PUBLISHED_VERDICTS or verdict.get("basis") in INFRA_BASES:
         return authorization.Validation(False, "The report is not an attributable publication finding.")
     return checked
 
@@ -75,7 +76,7 @@ def decide(report: dict, *, slug: str, publish_requested: bool, index: dict | No
         return False, "the dispatch did not ask for this run to be published"
     if code not in PUBLISHED_VERDICTS:
         return False, f"verdict '{code or 'none'}' is not a finding about the tool"
-    if verdict.get("basis") == "strhub":
+    if verdict.get("basis") in INFRA_BASES:
         return False, "STRhub's own infrastructure failed; the run has to be repeated"
     checked = validated_finding(report)
     if not checked.valid:

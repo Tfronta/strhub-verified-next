@@ -118,7 +118,7 @@ def test_uncalled_vcf_on_slice_is_strhub_limitation_not_runs_or_fails(tmp_path):
         ], cwd=str(root), check=True, capture_output=True, text=True)
         report = json.loads(res.stdout)
         assert report["verdict"]["code"] == "undetermined"
-        assert report["verdict"]["basis"] == "strhub"
+        assert report["verdict"]["basis"] == "strhub_infra"
         assert report["step1"]["code"] == "ours"
     finally:
         for p in (root / "reports").glob("test-uncalled-vcf.*"):

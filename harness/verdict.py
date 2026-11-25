@@ -212,12 +212,13 @@ def _decide(gates: dict, diagnostics: dict[str, list[dict]] | None = None,
             recipe_proposal: dict | None = None,
             declared_compatibility: dict | None = None,
             strhub_fault: str | None = None, procedure: dict | None = None,
-            manifest: dict | None = None) -> dict:
+            manifest: dict | None = None,
+            scope_limit: str | None = None) -> dict:
     """Return {code, title, reason, readme_gaps, basis}."""
     import authorization
     checked = authorization.validate(procedure, manifest)
     if not checked.valid:
-        return {"code": "undetermined", "title": TITLES["undetermined"], "basis": "strhub",
+        return {"code": "undetermined", "title": TITLES["undetermined"], "basis": "strhub_infra",
                 "reason": checked.reason, "readme_gaps": []}
     procedure = checked.review
     recipe_proposal = procedure["evidence"]["proposal"]
@@ -225,10 +226,10 @@ def _decide(gates: dict, diagnostics: dict[str, list[dict]] | None = None,
     declared_compatibility = manifest.get("compatibility")
     gates = gates or {}
     if any(type(gates.get(key)) is not bool for key in ("available", "installs", "runs", "io", "content")):
-        return {"code": "undetermined", "title": TITLES["undetermined"], "basis": "strhub",
+        return {"code": "undetermined", "title": TITLES["undetermined"], "basis": "strhub_infra",
                 "reason": "The execution gate observations are missing or malformed.", "readme_gaps": []}
     if gates["runs"] and not (gates["available"] and gates["installs"]):
-        return {"code": "undetermined", "title": TITLES["undetermined"], "basis": "strhub",
+        return {"code": "undetermined", "title": TITLES["undetermined"], "basis": "strhub_infra",
                 "reason": "The execution gate observations contradict the installation or source availability.", "readme_gaps": []}
     proposal = recipe_proposal or {}
     gaps = [g for g in (proposal.get("readme") or {}).get("gaps", []) if g.get("item") != "example_data"]
@@ -242,11 +243,14 @@ def _decide(gates: dict, diagnostics: dict[str, list[dict]] | None = None,
     ran = bool(gates.get("runs")) and bool(gates.get("io"))
     produced = ran
 
-    # The repository's own example decides when there is one: its documented
-    # command, on its own data, in the documented installation, with nothing
-    # of STRhub's. What happened on STRhub's sample is a second observation,
-    # kept in the matrix and never set against this one.
-    if procedure.get("example_ready") is True and gates["installs"] and type(gates.get("example")) is bool:
+    # The repository's own example decides ONLY when the standard reference-sample
+    # run could not be authorized (`may_say_runs` is False). When the standard
+    # sample run WAS authorized, its outcome and content verification govern so a
+    # passing demo never masks a failure or unverified content on the standard sample.
+    if (procedure.get("may_say_runs") is not True
+            and procedure.get("example_ready") is True
+            and gates["installs"]
+            and type(gates.get("example")) is bool):
         if gates["example"]:
             return {"code": "runs", "title": TITLES["runs"], "basis": "example",
                     "reason": "The tool installed with the commands its repository documents, and its "
@@ -288,8 +292,14 @@ def _decide(gates: dict, diagnostics: dict[str, list[dict]] | None = None,
                 "readme_gaps": gaps}
 
     if produced:
+        if gates.get("content"):
+            return {"code": "runs", "title": TITLES["runs"], "basis": "gates",
+                    "reason": "The tool installed and its run produced its documented output. "
+                              "STR locus content verified automatically.",
+                    "readme_gaps": []}
         return {"code": "runs", "title": TITLES["runs"], "basis": "gates",
-                "reason": "The tool installed and its run produced its documented output.",
+                "reason": "The tool installed and its run produced its documented output. "
+                          "Output generated; STR content not verified automatically.",
                 "readme_gaps": []}
 
     # STRhub's own machinery broke before the tool had its turn: the reference
@@ -298,10 +308,16 @@ def _decide(gates: dict, diagnostics: dict[str, list[dict]] | None = None,
     # of the TOOL is the finding a reviewer, a stuck user and the owner all
     # came for; this one is ours, says so, and is not published.
     if strhub_fault:
-        return {"code": "undetermined", "title": TITLES["undetermined"], "basis": "strhub",
+        return {"code": "undetermined", "title": TITLES["undetermined"], "basis": "strhub_infra",
                 "reason": "STRhub's own infrastructure failed before the tool could be tested ("
                           + strhub_fault + "). Nothing here is a finding about the software; "
                           "the run has to be repeated.",
+                "readme_gaps": []}
+
+    if scope_limit:
+        return {"code": "undetermined", "title": TITLES["undetermined"], "basis": "scope",
+                "reason": "Automatic verification reached an evaluator scope boundary ("
+                          + scope_limit + "); this run does not fault the software.",
                 "readme_gaps": []}
 
     declared = {k for k, v in (declared_compatibility or {}).items() if v}
@@ -338,7 +354,7 @@ def _decide(gates: dict, diagnostics: dict[str, list[dict]] | None = None,
         # as STRspy's wrapper does when its self-check fails.
         raised = _raised(diagnostics)
         reason = (f"The tool raised {raised} before producing its documented output." if raised else
-                  "The tool exited with an error before producing its documented output.")
+                  "The tool installed as documented, then exited with an error before producing its documented output.")
     else:
         reason = "The tool ran to completion but produced no output in the documented format."
     return {"code": "fails", "title": TITLES["fails"], "basis": "gates", "reason": reason,
@@ -359,24 +375,51 @@ def _status_code(verdict_dict: dict, procedure: dict | None) -> str:
     return "UNVERIFIED_INSUFFICIENT_DOCS"
 
 
+def _failure_phase(verdict_dict: dict, gates: dict) -> str | None:
+    code = verdict_dict.get("code")
+    if code in ("runs", "out_of_scope"):
+        return None
+    if code == "undetermined":
+        return "pre_execution"
+    if not gates.get("available") or not gates.get("installs"):
+        return "build"
+    if not gates.get("runs"):
+        return "runtime"
+    return "output"
+
+
 def decide(gates: dict, diagnostics: dict[str, list[dict]] | None = None,
            recipe_proposal: dict | None = None,
            declared_compatibility: dict | None = None,
            strhub_fault: str | None = None, procedure: dict | None = None,
-           manifest: dict | None = None) -> dict:
-    """The verdict, plus the blockers a reader can act on when it is not 'runs'."""
+           manifest: dict | None = None,
+           scope_limit: str | None = None) -> dict:
+    """The verdict, plus explicit content-verification state and blockers."""
     v = _decide(gates, diagnostics, recipe_proposal, declared_compatibility,
-                strhub_fault, procedure, manifest)
+                strhub_fault, procedure, manifest, scope_limit=scope_limit)
+    g = gates or {}
     v["status_code"] = _status_code(v, procedure)
-    if v.get("basis") == "strhub":
+    v["failure_phase"] = _failure_phase(v, g)
+    if v["code"] == "runs" and v.get("basis") == "gates":
+        v["content_verified"] = bool(g.get("content"))
+        v["output_status"] = "content_verified" if g.get("content") else "output_only_content_unverified"
+    elif v["code"] == "runs" and v.get("basis") == "example":
+        v["content_verified"] = False
+        v["output_status"] = "example_only_content_unverified"
+    else:
+        v["content_verified"] = False
+        v["output_status"] = "no_output"
+
+    if v.get("basis") in ("strhub_infra", "strhub"):
         v["blockers"] = []
         return v
-    g = gates or {}
     if v["code"] == "undetermined" and g.get("example"):
         v["reason"] += " The repository's own documented example ran and produced its output."
-    # No blockers for a fault of ours: every blocker carries an issue to open
-    # on the author's tracker, and there is nothing to ask them.
-    if v["code"] in ("runs", "out_of_scope") or v.get("basis") == "strhub":
+    elif v["code"] == "fails" and v.get("basis") == "gates" and g.get("example"):
+        v["reason"] += " The repository's own documented example ran on its shipped data."
+    # No blockers for a fault or scope boundary of ours: every blocker carries
+    # an issue to open on the author's tracker, and there is nothing to ask them.
+    if v["code"] in ("runs", "out_of_scope") or v.get("basis") == "scope":
         v["blockers"] = []
         return v
     evidence = (procedure or {}).get("evidence") or {}

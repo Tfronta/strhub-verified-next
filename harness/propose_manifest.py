@@ -13,12 +13,13 @@ Two legs come out of one proposal:
             dataset's canonical mount (/data/in/input.bam,
             /data/in/sample.fastq), and the reference genome the README
             names becomes the one that dataset is aligned to
-            (/data/ref/hg38.fa, a public file no repository ships). Nothing
-            else is supplied: no regions or catalog file. A command that
-            reads one the repository does not ship is recorded as a
-            limitation and is not run. Outputs are not rewritten: the command runs in the clone
-            and whatever it creates is captured, so the tool's own output
-            layout is kept.
+            (/data/ref/hg38.fa, a public file no repository ships). A shared
+            reference regions/catalog file from datasets/*/regions/ is mounted
+            ONLY when the upstream documentation unambiguously declares that
+            exact schema (fidelity.documented_regions); ambiguous or undocumented
+            catalog schemas are refused and recorded as limitations. Outputs are
+            not rewritten: the command runs in the clone and whatever it creates
+            is captured, so the tool's own output layout is kept.
 
 Everything uncertain is written down: the manifest carries `caveats` with the
 substitutions made and the warnings detect_recipe raised, so the report says
@@ -222,6 +223,10 @@ def _build(proposal: dict, slug: str, submitted_by: str = "third_party",
                                               one_sample=doc_one_sample)
         if doc_regions and "/data/in/regions." in rewritten:
             used_regions = doc_regions
+            caveat_items.append(
+                f"Regions catalog: STRhub supplied its shared '{used_regions}' locus catalog "
+                "(/data/in/regions.*) matching the schema documented by upstream."
+            )
         pre = commands[0].get("prerequisite")
         if pre:
             notes.append("Evaluator limitation: a possible prerequisite was discovered but was not automatically chained.")

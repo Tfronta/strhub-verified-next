@@ -28,6 +28,30 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import _manifest  # noqa: E402
 
 
+TRIVIAL_EXAMPLE_SUFFIXES = (
+    ".pyc", ".pyo", ".log", ".err", ".tmp", ".temp", ".bak",
+    ".pid", ".lock", ".status", ".swp", ".cache",
+)
+TRIVIAL_EXAMPLE_NAMES = {
+    "status.txt", "log.txt", "stdout.txt", "stderr.txt",
+    "debug.txt", "progress.txt", "exit_code", "done", "done.txt",
+}
+TRIVIAL_EXAMPLE_DIRS = {
+    "__pycache__", "logs", "log", "tmp", ".cache", ".git", ".pytest_cache",
+}
+
+
+def _is_trivial_artifact(rel_path: pathlib.PurePosixPath) -> bool:
+    """True for runtime logs, lock/pid markers, and temp/cache artifacts that
+    must not count as substantive scientific output when no outputs glob is declared."""
+    if any(part.lower() in TRIVIAL_EXAMPLE_DIRS or part.startswith(".") for part in rel_path.parts[:-1]):
+        return True
+    name = rel_path.name
+    if name.startswith(".") or name.lower() in TRIVIAL_EXAMPLE_NAMES:
+        return True
+    return rel_path.suffix.lower() in TRIVIAL_EXAMPLE_SUFFIXES
+
+
 def _normalised(path: pathlib.Path) -> list[str]:
     return [" ".join(ln.split()) for ln in path.read_text(errors="replace").splitlines()
             if ln.strip() and not ln.startswith("#")]
@@ -63,8 +87,13 @@ def check(manifest_path: str, out_dir: str) -> dict:
         result["outputs_detail"] = per_glob
         result["passed"] = result["checks"]["declared_outputs_present"]
     else:
-        result["checks"]["created_non_empty_file"] = bool(produced)
-        result["passed"] = bool(produced)
+        substantive = [rel for rel in produced if not _is_trivial_artifact(pathlib.PurePosixPath(rel))]
+        trivial = [rel for rel in produced if _is_trivial_artifact(pathlib.PurePosixPath(rel))]
+        if trivial:
+            result["ignored_trivial"] = trivial[:50]
+        result["checks"]["created_non_empty_file"] = bool(substantive)
+        result["checks"]["created_substantive_output"] = bool(substantive)
+        result["passed"] = bool(substantive)
 
     expected = spec.get("expected")
     if expected and declared:

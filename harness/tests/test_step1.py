@@ -73,20 +73,19 @@ def test_a_limitation_of_ours_is_not_told_as_a_gap_of_theirs():
 
 
 def test_a_synopsis_or_an_unnamed_output_is_the_commits_gap_not_ours():
-    """The classifier calls trimming a synopsis, or accepting an unnamed
-    output, an amendment of ours, because performing it would be. What the
-    author can act on is still that the commit states no command and names no
-    output, so the reader gets the block of the guide and not a sentence about
-    STRhub's machinery. The blocker decides, not the verdict's basis."""
+    """The classifier marks trimming a synopsis, or accepting an unnamed
+    output, as a documentation gap (`recipe`), and even if paired with `scope`
+    the blocker decides so the reader gets the block of the guide."""
     for blocker, block in (("synopsis_trimmed", "command"), ("output_unnamed", "output")):
-        s = ct.step1_says(_report("undetermined", blocker=blocker, reason=".", basis="strhub"))
+        s = ct.step1_says(_report("undetermined", blocker=blocker, reason=".", basis="scope"))
         assert s["code"] == "cannot_tell", blocker
         assert s["missing"] == [block], blocker
 
 
 def test_an_unknown_blocker_falls_back_to_the_verdicts_basis():
-    ours = ct.step1_says(_report("undetermined", blocker="something_new", reason=".", basis="strhub"))
-    assert ours["code"] == "ours"
+    ours_infra = ct.step1_says(_report("undetermined", blocker="something_new", reason=".", basis="strhub_infra"))
+    ours_scope = ct.step1_says(_report("undetermined", blocker="something_new", reason=".", basis="scope"))
+    assert ours_infra["code"] == "ours" and ours_scope["code"] == "ours"
     theirs = ct.step1_says(_report("undetermined", blocker="something_new", reason=".", basis="readme"))
     assert theirs["code"] == "cannot_tell"
 
@@ -108,7 +107,7 @@ def test_an_amended_procedure_is_not_published_as_the_tool_failing():
     """The gate ladder came back green on a procedure STRhub had to amend. The
     headline may not be `runs`, and a red is not attributed to the tool
     either: the verdict is undetermined, and step 1 calls the limitation ours."""
-    review = {"may_say_runs": False, "basis": "strhub", "blocker": "flag_injected",
+    review = {"may_say_runs": False, "basis": "scope", "blocker": "flag_injected",
               "reason": "Flags were added that the cited command does not carry."}
     v = verdict.decide(G_OK, procedure=review)
     assert v["code"] == "undetermined"

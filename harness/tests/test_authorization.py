@@ -38,7 +38,7 @@ def test_absent_or_legacy_decision_cannot_claim_success_or_tool_failure(reviewed
     _, manifest, _ = context()
     for decide in (verdict.decide, verdict._decide):
         result = decide(gates, procedure=reviewed, manifest=manifest)
-        assert result["code"] == "undetermined" and result["basis"] == "strhub"
+        assert result["code"] == "undetermined" and result["basis"] == "strhub_infra"
 
 
 def test_a_full_review_without_the_effective_manifest_is_not_an_authorization():
@@ -203,7 +203,7 @@ def test_evaluator_limits_are_not_publishable_through_the_layout_writer(tmp_path
     report = bound_report()
     report["procedure_review"] = reviewed
     report["verdict"] = verdict.decide(GREEN, procedure=reviewed, manifest=manifest)
-    assert report["verdict"]["basis"] == "strhub"
+    assert report["verdict"]["basis"] == "strhub_infra"
     assert authorization.report_validation(report).valid
     assert not publish_gate.validated_finding(report).valid
     site, reports = tmp_path / "site", tmp_path / "reports"

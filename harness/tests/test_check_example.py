@@ -77,3 +77,23 @@ def test_pycache_and_pyc_files_do_not_count_as_example_output(tmp_path):
     r = check_example.check(_manifest(tmp_path, {"cmd": "'python3 pipeline.py'"}), str(out))
     assert r["passed"] is False
     assert r["produced"] == []
+
+
+def test_trivial_log_and_status_files_do_not_short_circuit_example_gate(tmp_path):
+    out = tmp_path / "out"
+    (out / "logs").mkdir(parents=True)
+    (out / "run.log").write_text("INFO starting\n")
+    (out / "stderr.err").write_text("warn\n")
+    (out / "status.txt").write_text("done\n")
+    (out / ".marker").write_text("1\n")
+    (out / "logs" / "summary.tsv").write_text("TH01\t9.3\n")
+    r = check_example.check(_manifest(tmp_path, {"cmd": "'python3 pipeline.py'"}), str(out))
+    assert r["passed"] is False
+    assert r["checks"]["created_substantive_output"] is False
+    assert "run.log" in r.get("ignored_trivial", [])
+
+    # Once a substantive output file outside trivial dirs/suffixes appears, it passes.
+    (out / "calls.tsv").write_text("TH01\t9.3\n")
+    r2 = check_example.check(_manifest(tmp_path, {"cmd": "'python3 pipeline.py'"}), str(out))
+    assert r2["passed"] is True
+    assert r2["checks"]["created_substantive_output"] is True
