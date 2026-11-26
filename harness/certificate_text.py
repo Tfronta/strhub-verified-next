@@ -524,20 +524,33 @@ def conclusion_items_for(cfg: dict) -> list[tuple[str, str]]:
     gates = dict(cfg.get("gates") or {})
     verdict = cfg.get("verdict") or {}
 
+    a_passed = assisted.get("passed") is True
+
     if gates.get("runs"):
         ran = ("Runs end-to-end",
                f"{cfg['tool_display']} installs and executes without error in {where}.")
     elif gates.get("installs"):
-        ran = ("Does not run end-to-end",
-               f"{cfg['tool_display']} installs in {where}, but the documented command "
-               "stopped with an error before finishing. The messages it printed are in "
-               "the execution log; Section 4 shows how far it got.")
+        if a_passed:
+            ran = ("Literal command stopped before completion",
+                   f"{cfg['tool_display']} installs in {where}, and the literal command as written "
+                   "in the repository stopped before finishing; STRhub then executed the automated "
+                   "run with suggested adjustments reported above.")
+        else:
+            ran = ("Does not run end-to-end",
+                   f"{cfg['tool_display']} installs in {where}, but the documented command "
+                   "stopped with an error before finishing. The messages it printed are in "
+                   "the execution log; Section 4 shows how far it got.")
     else:
-        ran = ("Does not install",
-               f"The environment for {cfg['tool_display']} could not be built from the "
-               "declared install steps, so nothing further was attempted.")
+        if a_passed:
+            ran = ("Literal installation stopped before completion",
+                   f"The environment for {cfg['tool_display']} did not finish building from the "
+                   "literal steps in the repository alone; STRhub then executed the automated run "
+                   "with suggested documentation adjustments reported above.")
+        else:
+            ran = ("Does not install",
+                   f"The environment for {cfg['tool_display']} could not be built from the "
+                   "declared install steps, so nothing further was attempted.")
 
-    a_passed = assisted.get("passed") is True
     a_gates = dict(assisted.get("gates") or {}) if a_passed else {}
     a_outs = ((assisted.get("content_detail") or {}).get("outputs") or []) if a_passed else []
     a_stats = a_outs[0].get("stats") or {} if a_outs and isinstance(a_outs[0], dict) else {}

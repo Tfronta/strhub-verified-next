@@ -586,7 +586,7 @@ def _summary_md(report: dict, slug: str) -> str:
     assisted = report.get("assisted_run") or {}
     if assisted.get("attempted"):
         status_str = (
-            "PASS — Runs with adjustments"
+            "PASS: Runs with adjustments"
             if assisted.get("passed")
             else f"Stopped at {LABELS.get(assisted.get('level', 'none'), 'not run')}"
         )
@@ -595,7 +595,7 @@ def _summary_md(report: dict, slug: str) -> str:
             "## 2. Automated run with suggested documentation adjustments",
             "",
             f"- Outcome: **{status_str}** (`{assisted.get('level', 'none')}`)",
-            "- Source code modified: **No** (upstream checkout mounted read-only at `/app:ro`).",
+            "- Source code modified: **No** (the verified commit was executed read-only without modifying any source files).",
         ]
         adjs = assisted.get("adjustments") or []
         if adjs:
@@ -608,9 +608,9 @@ def _summary_md(report: dict, slug: str) -> str:
                 "|---|---|---|",
             ]
             for a in adjs:
-                w = str(a.get("what_failed_strict", "—")).replace("\n", " ")
-                ap_txt = str(a.get("adjustment_applied", "—")).replace("\n", " ")
-                fx = str(a.get("author_fix", "—")).replace("\n", " ")
+                w = str(a.get("what_failed_strict", "-")).replace("\n", " ")
+                ap_txt = str(a.get("adjustment_applied", "-")).replace("\n", " ")
+                fx = str(a.get("author_fix", "-")).replace("\n", " ")
                 lines.append(f"| {w} | {ap_txt} | {fx} |")
         if assisted.get("passed"):
             vc = assisted.get("verified_commands") or {}
@@ -1084,14 +1084,14 @@ def _summary_html(report: dict, slug: str) -> str:
     assisted = report.get("assisted_run") or {}
     if assisted.get("attempted"):
         a_status = (
-            '<span class="warn">PASS — Runs with adjustments</span>'
+            '<span class="warn">PASS: Runs with adjustments</span>'
             if assisted.get("passed")
             else f'<span class="no">Stopped at {esc(LABELS.get(assisted.get("level", "none"), "not run"))}</span>'
         )
         adj_rows = "".join(
-            f"<tr><td>{esc(a.get('what_failed_strict', '—'))}</td>"
-            f"<td>{esc(a.get('adjustment_applied', '—'))}</td>"
-            f"<td>{esc(a.get('author_fix', '—'))}</td></tr>"
+            f"<tr><td>{esc(a.get('what_failed_strict', '-'))}</td>"
+            f"<td>{esc(a.get('adjustment_applied', '-'))}</td>"
+            f"<td>{esc(a.get('author_fix', '-'))}</td></tr>"
             for a in (assisted.get("adjustments") or [])
         )
         adj_heading = "Adjustments applied" if assisted.get("passed") else "Adjustments attempted"
@@ -1130,7 +1130,7 @@ def _summary_html(report: dict, slug: str) -> str:
             )
         assisted_block = (
             "<h2>2. Automated run with suggested documentation adjustments</h2>"
-            f"<p>Outcome: {a_status} &middot; Source code modified: <b>No</b> (<code>/app:ro</code>).</p>"
+            f"<p>Outcome: {a_status} &middot; Source code modified: <b>No</b> (verified commit executed read-only without source edits).</p>"
             f"{adj_table}{cmd_html}{readme_html}"
         )
 
@@ -1809,6 +1809,76 @@ def main() -> int:
             **({"logs": a_logs} if a_logs else {}),
             **({"terminals": a_terms} if a_terms else {}),
         }
+
+        if report["assisted_run"]["passed"]:
+            import datasets as datasets_lib
+            vc = report["assisted_run"].get("verified_commands") or {}
+            cur_needed = list(report.get("needed_beyond_repo") or [])
+            updated_needed: list[str] = []
+            has_test_data = False
+            has_base_env = False
+            for item in cur_needed:
+                if item.startswith("Test data:"):
+                    has_test_data = True
+                    updated_needed.append(
+                        "Test data: no sample from the repository was used, so a public "
+                        "reference sample stood in."
+                    )
+                elif item.startswith("A base environment for the documented installation:"):
+                    has_base_env = True
+                    extra_bits: list[str] = []
+                    if vc.get("uses_conda"):
+                        extra_bits.append("Miniforge (conda/mamba)")
+                    if vc.get("extra_apt"):
+                        extra_bits.append("Ubuntu build packages (" + ", ".join(vc["extra_apt"]) + ")")
+                    if vc.get("git_https_rewrite"):
+                        extra_bits.append("HTTPS Git URL rewrite for public GitHub dependencies")
+                    if vc.get("init_submodules"):
+                        extra_bits.append("initialized Git submodules")
+                    if any("pip install" in str(c) for c in (vc.get("install") or [])):
+                        extra_bits.append("Python package installation in the active environment")
+                    env_detail = ", ".join(extra_bits) if extra_bits else (base_desc or "Ubuntu 22.04 baseline tools")
+                    updated_needed.append(
+                        f"Base environment and assisted adjustments: STRhub ran the assisted verification on "
+                        f"Ubuntu 22.04 with {env_detail}. Unpinned system and package versions can vary over time."
+                    )
+                else:
+                    updated_needed.append(item)
+            if not has_test_data and (
+                (m.get("inputs") or {}).get("type")
+                or any(d.get("leg") == "external" for d in (datasets or []))
+            ):
+                updated_needed.insert(
+                    0,
+                    "Test data: no sample from the repository was used, so a public "
+                    "reference sample stood in.",
+                )
+            if not has_base_env:
+                extra_bits = []
+                if vc.get("uses_conda"):
+                    extra_bits.append("Miniforge (conda/mamba)")
+                if vc.get("extra_apt"):
+                    extra_bits.append("Ubuntu build packages (" + ", ".join(vc["extra_apt"]) + ")")
+                if vc.get("git_https_rewrite"):
+                    extra_bits.append("HTTPS Git URL rewrite for public GitHub dependencies")
+                if vc.get("init_submodules"):
+                    extra_bits.append("initialized Git submodules")
+                env_detail = ", ".join(extra_bits) if extra_bits else "Ubuntu 22.04 baseline tools"
+                updated_needed.append(
+                    f"Base environment and assisted adjustments: STRhub ran the assisted verification on "
+                    f"Ubuntu 22.04 with {env_detail}. Unpinned system and package versions can vary over time."
+                )
+            run_str = str(vc.get("run") or "")
+            if "/data/ref/" in run_str and not any("reference genome" in x.lower() for x in updated_needed):
+                ds_info = datasets_lib.resolve((m.get("inputs") or {}).get("type") or "") or {}
+                ref_g = ds_info.get("reference_genome") or {}
+                assembly = ref_g.get("assembly") or ds_info.get("reference") or "GRCh38 / hg38"
+                mount_p = f"/data/ref/{ref_g.get('filename') or 'hg38.fa'}"
+                updated_needed.append(
+                    f"A reference genome ({assembly}): the command names one, and STRhub mounted "
+                    f"the public copy at {mount_p}."
+                )
+            report["needed_beyond_repo"] = updated_needed
 
     # What STRhub did to get the tool ready, when the repository's own
     # instructions were not enough: every step, every file, every input.

@@ -376,19 +376,42 @@ def build_cover(cfg):
         res_color = "#ef4444"
     else:
         res_color = "#00909c"
+    ver_time = cfg.get("ver_time", "")
+    ver_dt_str = (cfg["ver_date"] + ("  " + ver_time if ver_time else "")).strip()
+    commit_display = link(cfg["commit_url"], cfg["commit"])
+    if cfg.get("upstream_note"):
+        commit_display += f'  <font color="#6b7280" size="7.5">({esc(cfg["upstream_note"])})</font>'
+    n_lit = sum(1 for k, _, _ in GATE_DISPLAY if (cfg.get("gates") or {}).get(k))
+    lit_summary = f'{esc(LEVEL_LABEL.get(cfg["level"], "Not run"))} ({n_lit}/5 gates passed)'
     meta_rows = [
-        ("Verification date",  cfg["ver_date"]),
-        ("Repository commit",  link(cfg["commit_url"], cfg["commit"])),
+        ("Verification date",  ver_dt_str),
+        ("Repository",         link(cfg["repo_url"]) if cfg.get("repo_url") else "-"),
+        ("Repository commit",  commit_display),
+        ("Environment",        f'{esc(cfg.get("container_os", "ubuntu-22.04"))}  ·  {esc(cfg.get("panel", "STR"))}'),
         ("Result",             f'<font color="{res_color}"><b>{esc(result_label)}</b></font>'),
-        ("Reached (literal)",  LEVEL_LABEL.get(cfg["level"], "Not run")),
+        ("1. As documented",   lit_summary),
     ]
-    if assisted_cover.get("passed"):
+    if assisted_cover.get("attempted"):
         n_adj = len(assisted_cover.get("adjustments") or [])
-        a_lvl = LEVEL_LABEL.get(assisted_cover.get("level", "io"), "Runs + Expected IO")
-        meta_rows.append(("Assisted track", f'<font color="#b45309"><b>{esc(a_lvl)}</b></font> ({n_adj} standard adjustment(s); no code changes)'))
+        a_lvl = LEVEL_LABEL.get(assisted_cover.get("level", "none"), "Not run")
+        a_gates = assisted_cover.get("gates") or {}
+        a_n = sum(1 for k, _, _ in GATE_DISPLAY if a_gates.get(k))
+        if assisted_cover.get("passed"):
+            meta_rows.append((
+                "2. With adjustments",
+                f'<font color="#b45309"><b>Runs with adjustments · {esc(a_lvl)}</b></font> '
+                f'({n_adj} adjustment(s); 0 source-code files modified)',
+            ))
+        else:
+            meta_rows.append((
+                "2. With adjustments",
+                f'Stopped at {esc(a_lvl)} ({a_n}/5 gates; {n_adj} adjustment(s) tried; 0 source-code files modified)',
+            ))
+    if cfg.get("ci_run"):
+        meta_rows.append(("CI workflow run", link(cfg["ci_run"])))
     meta_rows += [
         ("Permalink",          link(cfg["permalink"]) if cfg.get("permalink")
-                               else "Not published — this is a test run"),
+                               else "Not published (test run)"),
         ("STRhub",             link("https://strhub.app")),
     ]
     tdata = [[Paragraph(k, ST["meta_label"]),
@@ -398,12 +421,12 @@ def build_cover(cfg):
         ("VALIGN",       (0,0),(-1,-1), "TOP"),
         ("LEFTPADDING",  (0,0),(-1,-1), 0),
         ("RIGHTPADDING", (0,0),(-1,-1), 0),
-        ("TOPPADDING",   (0,0),(-1,-1), 4),
-        ("BOTTOMPADDING",(0,0),(-1,-1), 4),
+        ("TOPPADDING",   (0,0),(-1,-1), 3.5),
+        ("BOTTOMPADDING",(0,0),(-1,-1), 3.5),
         ("LINEBELOW",    (0,0),(-1,-2), 0.3, BORDER),
     ]))
     els.append(mt)
-    els.append(HR(spaceB=10, spaceA=10))
+    els.append(HR(spaceB=8, spaceA=8))
 
     scope_text = SCOPE_STATEMENT + "<br/><br/>" + SCOPE_NOT.replace("This is not", "This is <b>not</b>", 1)
     els.append(section_title("SCOPE OF THIS REPORT"))
@@ -417,7 +440,7 @@ def build_cover(cfg):
         for item in items:
             out.append(Paragraph(
                 f'<font color="{dash_hex}">–</font>  {item}',
-                S("bi", fontSize=8.5, textColor=INK, leading=14,
+                S("bi", fontSize=8.2, textColor=INK, leading=13,
                   leftIndent=8, spaceAfter=2)))
         return out
 
@@ -429,11 +452,28 @@ def build_cover(cfg):
         "PASS": "#00909c",
         "FAIL": "#dc2626",
         "NOT ATTEMPTED": "#6b7280",
+        "NOT ESTABLISHED": "#6b7280",
     }
-    status_items = [
-        f'{st["label"]}: <font color="{status_colors.get(st["status"], "#6b7280")}"><b>{st["status"]}</b></font>'
-        for st in stages
-    ]
+    if assisted_cover.get("attempted"):
+        a_stages = stage_states(assisted_cover.get("gates"), execution_established=True)
+        status_items = []
+        for st_lit, st_ass in zip(stages, a_stages):
+            c1 = status_colors.get(st_lit["status"], "#6b7280")
+            c2 = "#b45309" if st_ass["status"] == "PASS" and st_lit["status"] != "PASS" else status_colors.get(st_ass["status"], "#6b7280")
+            if st_lit["status"] == st_ass["status"]:
+                status_items.append(
+                    f'{st_lit["label"]}: <font color="{c1}"><b>{st_lit["status"]}</b></font>'
+                )
+            else:
+                status_items.append(
+                    f'{st_lit["label"]}: <font color="{c1}"><b>{st_lit["status"]}</b></font> (doc) / '
+                    f'<font color="{c2}"><b>{st_ass["status"]}</b></font> (adjusted)'
+                )
+    else:
+        status_items = [
+            f'{st["label"]}: <font color="{status_colors.get(st["status"], "#6b7280")}"><b>{st["status"]}</b></font>'
+            for st in stages
+        ]
 
     v_col = col_block(status_items, TEAL, "VERIFICATION STATUS")
     nv_col = col_block(list(NOT_EVALUATED), GRAY, "NOT EVALUATED")
@@ -466,95 +506,81 @@ def esc(text) -> str:
     return (str(text).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;"))
 
 
-# ── Body ──────────────────────────────────────────────────────────────────────
-def build_body(cfg):
-    els = []
-    els.append(build_header_inner(cfg))
-    els.append(HR(TEAL, thickness=1.2, spaceB=4, spaceA=8))
+_ANSI_RE = re.compile(r"\x1b\[[0-9;?]*[A-Za-z]|\x1b\][^\x07]*\x07")
 
-    # §1 Executive Summary: the result in words, then the rung and the why.
-    result_label = cfg.get("headline") or LEVEL_LABEL.get(cfg["level"], "Not verified")
-    attest_label = LEVEL_LABEL.get(cfg["level"], "Not verified")
-    gates_dict = dict(cfg["gates"])
-    n_pass = sum(1 for ok in gates_dict.values() if ok)
-    n_total = len(gates_dict)
-    verdict = cfg.get("verdict") or {}
-    assisted_exec = cfg.get("assisted_run") or {}
-    if assisted_exec.get("passed"):
-        res_color = "#b45309"
-    elif verdict.get("code") == "fails":
-        res_color = "#ef4444"
-    else:
-        res_color = "#00909c"
-    els.append(section_num("1", "Executive Summary"))
-    exec_rows = [
-        ("PURPOSE",           PURPOSE),
-        ("RESULT",            f'<font color="{res_color}"><b>{esc(result_label)}</b></font>'),
-        ("REACHED (LITERAL)", f'{esc(attest_label)}, {n_pass}/{n_total} gates passed'),
-    ]
-    if assisted_exec.get("attempted"):
-        a_lvl = LEVEL_LABEL.get(assisted_exec.get("level", "none"), "Not run")
-        a_gates = assisted_exec.get("gates") or {}
-        a_n = sum(1 for k, _, _ in GATE_DISPLAY if a_gates.get(k))
-        a_txt = (
-            f'<font color="#b45309"><b>PASS — {esc(a_lvl)}</b></font> ({a_n}/5 gates; no source-code edits)'
-            if assisted_exec.get("passed")
-            else f'Stopped at {esc(a_lvl)} ({a_n}/5 gates)'
-        )
-        exec_rows.append(("ASSISTED TRACK", a_txt))
-    if verdict.get("reason"):
-        exec_rows.append(("WHY", esc(verdict["reason"])))
-    exec_rows += [
-        ("SCOPE",             EXEC_SCOPE),
-        ("NOT EVALUATED",     " · ".join(NOT_EVALUATED)),
-    ]
-    tdata = [[Paragraph(k, ST["tbl_header"]),
-              Paragraph(v, ST["tbl_cell"])] for k, v in exec_rows]
-    et = Table(tdata, colWidths=[44*mm, CW - 44*mm])
-    et.setStyle(TableStyle([
-        ("VALIGN",        (0,0),(-1,-1), "MIDDLE"),
+
+def _to_local_user_cmd(raw_cmd: str) -> str:
+    s = re.sub(r"\s+", " ", (raw_cmd or "")).strip()
+    for pat, repl in (
+        (r"/data/in/input\.bam\b", "sample.bam"),
+        (r"/data/in/input\.cram\b", "sample.cram"),
+        (r"/data/in/input\.fastq\.gz\b", "sample.fastq.gz"),
+        (r"/data/in/input\.fastq\b", "sample.fastq"),
+        (r"/data/ref/hg38\.fa\b", "hg38.fa"),
+        (r"/data/in/regions\.bed\b", "regions.bed"),
+        (r"/data/in/regions\.json\b", "variant_catalog.json"),
+        (r"/data/in/regions\.tsv\b", "regions.tsv"),
+    ):
+        s = re.sub(pat, repl, s)
+    return s
+
+
+def _clean_terminal_lines(raw_text: str, *, limit: int = 34) -> list[str]:
+    if not raw_text:
+        return []
+    cleaned = _ANSI_RE.sub("", raw_text.replace("\r\n", "\n").replace("\r", "\n"))
+    out: list[str] = []
+    for ln in cleaned.splitlines():
+        s = ln.rstrip()
+        if not s.strip():
+            continue
+        if s.startswith("Script started on ") or s.startswith("Script done on "):
+            continue
+        if len(s) > 118:
+            s = s[:115] + "..."
+        out.append(s)
+    if len(out) > limit:
+        return [f"... (showing last {limit} lines of {len(out)} recorded lines)"] + out[-limit:]
+    return out
+
+
+def _mono_rows_table(lines: list[str], *, dark: bool = False) -> Table:
+    if not lines:
+        lines = ["# (no output recorded)"]
+    fg = colors.HexColor("#e2e8f0") if dark else INK
+    bg = colors.HexColor("#0f172a") if dark else WHITE
+    bdr = colors.HexColor("#334155") if dark else BORDER
+    st = S("mr_d" if dark else "mr_l", fontName="Courier", fontSize=7, textColor=fg, leading=9.5)
+    rows = [[Paragraph(esc(ln) if ln.strip() else "&nbsp;", st)] for ln in lines]
+    n = len(rows)
+    tbl = Table(rows, colWidths=[CW], repeatRows=0)
+    style_cmds = [
+        ("BACKGROUND",    (0,0),(-1,-1), bg),
+        ("BOX",           (0,0),(-1,-1), 0.5, bdr),
         ("LEFTPADDING",   (0,0),(-1,-1), 10),
         ("RIGHTPADDING",  (0,0),(-1,-1), 10),
-        ("TOPPADDING",    (0,0),(-1,-1), 6),
-        ("BOTTOMPADDING", (0,0),(-1,-1), 6),
-        ("ROWBACKGROUNDS",(0,0),(-1,-1), [WHITE, GRAY_LIGHT]),
-        ("LINEBELOW",     (0,0),(-1,-2), 0.3, BORDER),
-        ("BOX",           (0,0),(-1,-1), 0.5, BORDER),
-    ]))
-    els.append(et)
+        ("TOPPADDING",    (0,0),(-1,-1), 1),
+        ("BOTTOMPADDING", (0,0),(-1,-1), 1),
+    ]
+    style_cmds.append(("TOPPADDING", (0,0), (-1,0), 7))
+    style_cmds.append(("BOTTOMPADDING", (0,n-1), (-1,n-1), 7))
+    tbl.setStyle(TableStyle(style_cmds))
+    return tbl
 
-    sec = 2
-    # Step 1: the documented run, in the three sentences a maintainer or
-    # reviewer is owed, plus the missing block of docs/GUIA-PASO-1.md when one
-    # is missing.
-    step1 = cfg.get("step1") or {}
-    if step1.get("headline"):
-        s1_els = [
-            Paragraph(f"<b>{esc(step1['headline'])}</b>", ST["tbl_cell"]),
-            vspace(2),
-            Paragraph(esc(step1.get("body", "")), ST["body"]),
-        ]
-        if step1.get("missing_text"):
-            s1_els.append(vspace(2))
-            s1_els.append(Paragraph(
-                f"Missing from the commit ({esc(step1.get('guide', 'docs/GUIA-PASO-1.md'))}):",
-                ST["meta_label"]))
-            for mb in step1["missing_text"]:
-                s1_els.append(Paragraph(
-                    f'<font color="#9ca3af">–</font>  {esc(mb)}',
-                    S("s1m", fontSize=8.5, textColor=INK, leading=14, leftIndent=10, spaceAfter=1)))
-        els.append(section_num(str(sec), "Step 1: The Documented Run"))
-        sec += 1
-        els.append(boxed(s1_els))
 
-    # §4 Verification Gates
-    els.append(section_num(str(sec), f"{AS_IS_HEADING}: Verification Gates"))
-    sec += 1
+def _subsection(title: str) -> Paragraph:
+    return Paragraph(
+        f"<b>{esc(title)}</b>",
+        S("subh", fontSize=9.2, fontName="Helvetica-Bold", textColor=INK,
+          leading=13, spaceBefore=7, spaceAfter=3, keepWithNext=1),
+    )
+
+
+def _gates_table(gates_dict: dict, *, exec_established: bool | None = True, log_fname: str = "") -> Table:
     gdata = []
     stopped_found = False
-    exec_established = cfg.get("execution_finding_established", True)
     for key, gate_name, gate_desc in GATE_DISPLAY:
-        ok = gates_dict.get(key, False)
+        ok = bool(gates_dict.get(key, False))
         if ok:
             st = "pass"
             desc_text = gate_desc
@@ -579,80 +605,258 @@ def build_body(cfg):
         gdata.append([Paragraph(gate_name, ST["gate_name"]),
                       Paragraph(desc_text, ST["gate_desc"]),
                       pass_badge(st)])
-    # A real link, not teal text that looks like one. This row was styled as a
-    # link and wasn't clickable — in a document whose whole purpose is to be
-    # attached to a review, where the reader cannot reach the log any other way.
-    log_fname = cfg.get("log_filename", "")
-    log_url = f"{REPORTS_BASE}/{log_fname}" if log_fname else ""
-    gdata.append([
-        Paragraph("Execution log", ST["meta_label"]),
-        Paragraph(link(log_url, log_fname) if log_fname else "—", ST["tbl_cell"]),
-        ""])
+    if log_fname:
+        log_url = f"{REPORTS_BASE}/{log_fname}"
+        gdata.append([
+            Paragraph("Execution log", ST["meta_label"]),
+            Paragraph(link(log_url, log_fname), ST["tbl_cell"]),
+            "",
+        ])
     gt = Table(gdata, colWidths=[52*mm, CW - 52*mm - 18*mm, 18*mm])
-    gt.setStyle(TableStyle([
+    styles = [
         ("VALIGN",        (0,0),(-1,-1), "MIDDLE"),
         ("LEFTPADDING",   (0,0),(-1,-1), 10),
         ("RIGHTPADDING",  (0,0),(-1,-1), 8),
-        ("TOPPADDING",    (0,0),(-1,-1), 7),
-        ("BOTTOMPADDING", (0,0),(-1,-1), 7),
-        ("ROWBACKGROUNDS",(0,0),(-1,-2), [WHITE, GRAY_LIGHT]),
+        ("TOPPADDING",    (0,0),(-1,-1), 6),
+        ("BOTTOMPADDING", (0,0),(-1,-1), 6),
+        ("BOX",           (0,0),(-1,-1), 0.5, BORDER),
+    ]
+    if log_fname:
+        styles += [
+            ("ROWBACKGROUNDS",(0,0),(-1,-2), [WHITE, GRAY_LIGHT]),
+            ("LINEBELOW",     (0,0),(-1,-2), 0.3, BORDER),
+            ("BACKGROUND",    (0,-1),(-1,-1), GRAY_LIGHT),
+            ("LINEABOVE",     (0,-1),(-1,-1), 0.3, BORDER),
+        ]
+    else:
+        styles += [
+            ("ROWBACKGROUNDS",(0,0),(-1,-1), [WHITE, GRAY_LIGHT]),
+            ("LINEBELOW",     (0,0),(-1,-2), 0.3, BORDER),
+        ]
+    gt.setStyle(TableStyle(styles))
+    return gt
+
+
+def _output_evidence_elements(cfg: dict, stats: dict, io_detail: dict, content_detail: dict, preview: dict | None) -> list:
+    out_els: list = []
+    io_outputs = (io_detail or {}).get("outputs") or []
+    io0 = io_outputs[0] if io_outputs and isinstance(io_outputs[0], dict) else {}
+    io_files = io0.get("files") or []
+    io_file0 = io_files[0] if io_files and isinstance(io_files[0], dict) else {}
+    cd_outputs = (content_detail or {}).get("outputs") or []
+    cd0 = cd_outputs[0] if cd_outputs and isinstance(cd_outputs[0], dict) else {}
+
+    if not stats and not io0 and not (preview or {}).get("file"):
+        return out_els
+
+    called_loci = stats.get("str_loci") or stats.get("loci") or []
+    loci_str = " · ".join(called_loci) if called_loci else "-"
+    fmt_val = stats.get("format") or io0.get("format") or cfg.get("declared_format", "-")
+    vcf_ver = io_file0.get("version")
+    fmt_display = f"VCF {vcf_ver}" if (vcf_ver and str(fmt_val).upper() == "VCF") else str(fmt_val).upper()
+
+    total_rows = stats.get("rows", io0.get("records", 0))
+    called_rec = io0.get("called_records")
+    uncalled_rec = io0.get("uncalled_rows")
+    malformed_rows = stats.get("malformed_rows")
+    if isinstance(called_rec, int) and isinstance(uncalled_rec, int):
+        rec_display = f"{total_rows} total ({called_rec} with called genotypes, {uncalled_rec} uncalled"
+        if isinstance(malformed_rows, int):
+            rec_display += f", {malformed_rows} malformed"
+        rec_display += ")"
+    elif isinstance(malformed_rows, int):
+        rec_display = f"{total_rows} ({malformed_rows} malformed)"
+    else:
+        rec_display = str(total_rows)
+
+    io_checks = io0.get("checks") or {}
+    cd_checks = cd0.get("checks") or {}
+    profile = io0.get("validation_profile")
+    check_labels: list[str] = []
+    if io_checks.get("exists"):
+        check_labels.append("file exists")
+    if io_checks.get("non_empty"):
+        check_labels.append("non-empty")
+    if io_checks.get("confined"):
+        check_labels.append("confined to output directory")
+    for ck, ok in io_checks.items():
+        if ok and ck.startswith("parses_as_"):
+            kind = ck.removeprefix("parses_as_").upper()
+            label = f"parses as {fmt_display if kind == 'VCF' else kind}"
+            if profile:
+                label += f" ({profile})"
+            check_labels.append(label)
+    if io_checks.get("min_records"):
+        check_labels.append("minimum record count met")
+    if io_checks.get("has_called_genotypes") or cd_checks.get("genotypes_called"):
+        check_labels.append("non-missing genotype fields present")
+    if cd_checks.get("given_loci_recognised"):
+        check_labels.append("reference panel loci recognised")
+    if isinstance(malformed_rows, int) and malformed_rows == 0:
+        check_labels.append("0 malformed rows")
+
+    ev_rows = [
+        ("Output file",             esc(stats.get("output_file") or io0.get("resolved") or (preview or {}).get("file") or cfg.get("declared_output", "-"))),
+        ("Format",                  esc(fmt_display)),
+        ("Records",                 esc(rec_display)),
+    ]
+    if stats:
+        ev_rows.append(("Distinct loci in output", str(stats.get("distinct_str_loci", 0))))
+    regions_given = stats.get("regions_given")
+    regions_hit = stats.get("regions_hit")
+    if isinstance(regions_given, int) and regions_given > 0 and isinstance(regions_hit, int):
+        ev_rows.append(("Reference panel coverage", f"{regions_hit} / {regions_given} reference panel loci hit"))
+    total_reads = stats.get("total_reads")
+    if isinstance(total_reads, int) and total_reads > 0:
+        depth_txt = f"{total_reads:,} total reads"
+        max_d = stats.get("max_sequence_depth")
+        d_src = stats.get("depth_source")
+        if isinstance(max_d, int) and max_d > 0:
+            depth_txt += f" (max {max_d}" + (f", via {esc(d_src)}" if d_src else "") + ")"
+        ev_rows.append(("Reported read depth", depth_txt))
+    if check_labels:
+        ev_rows.append(("Checks verified", esc(" · ".join(check_labels))))
+    if called_loci:
+        ev_rows.append(("STR loci detected", esc(loci_str)))
+
+    tdata = [[Paragraph(k, ST["meta_label"]), Paragraph(v, ST["tbl_cell"])] for k, v in ev_rows]
+    evt = Table(tdata, colWidths=[56*mm, CW - 56*mm])
+    evt.setStyle(TableStyle([
+        ("VALIGN",        (0,0),(-1,-1), "TOP"),
+        ("LEFTPADDING",   (0,0),(-1,-1), 10),
+        ("RIGHTPADDING",  (0,0),(-1,-1), 10),
+        ("TOPPADDING",    (0,0),(-1,-1), 5),
+        ("BOTTOMPADDING", (0,0),(-1,-1), 5),
+        ("ROWBACKGROUNDS",(0,0),(-1,-1), [WHITE, GRAY_LIGHT]),
         ("LINEBELOW",     (0,0),(-1,-2), 0.3, BORDER),
         ("BOX",           (0,0),(-1,-1), 0.5, BORDER),
-        ("BACKGROUND",    (0,-1),(-1,-1), GRAY_LIGHT),
-        ("LINEABOVE",     (0,-1),(-1,-1), 0.3, BORDER),
     ]))
-    els.append(gt)
+    out_els.append(evt)
 
-    # A run that stopped short says nothing here unless we say it. The ladder is
-    # the first thing a reviewer reads and, unqualified, it reads as a verdict on
-    # the software. It is not one: it records how far this attempt got. Kept to
-    # one paragraph inside this section on purpose — the report already carries
-    # Out of Scope, Limitations, Scope and Disclaimers, and Conclusion, and
-    # another standalone section would bury the point it is making.
+    if isinstance(preview, dict) and preview.get("lines"):
+        shown = list(preview["lines"][:12])
+        trunc_note = f" (showing first {len(shown)} lines; {preview.get('size_bytes', 0):,} bytes)"
+        out_els.append(vspace(2.5))
+        out_els.append(Paragraph(
+            f"<b>Generated output preview:</b> <font name=\"Courier\">{esc(preview.get('file', ''))}</font>{esc(trunc_note)}",
+            ST["body"],
+        ))
+        out_els.append(vspace(1.5))
+        out_els.append(_mono_rows_table(shown, dark=False))
+    return out_els
+
+
+# ── Body ──────────────────────────────────────────────────────────────────────
+def build_body(cfg):
+    els = []
+    els.append(build_header_inner(cfg))
+    els.append(HR(TEAL, thickness=1.2, spaceB=4, spaceA=8))
+
+    # Top compact Executive Summary (unnumbered so numbered sections 1..4 match Web UI)
+    result_label = cfg.get("headline") or LEVEL_LABEL.get(cfg["level"], "Not verified")
+    attest_label = LEVEL_LABEL.get(cfg["level"], "Not verified")
+    gates_dict = dict(cfg["gates"])
+    n_pass = sum(1 for ok in gates_dict.values() if ok)
+    n_total = len(gates_dict)
+    verdict = cfg.get("verdict") or {}
+    assisted = cfg.get("assisted_run") or {}
+    if assisted.get("passed"):
+        res_color = "#b45309"
+    elif verdict.get("code") == "fails":
+        res_color = "#ef4444"
+    else:
+        res_color = "#00909c"
+
+    els.append(section_title("EXECUTIVE SUMMARY"))
+    exec_rows = [
+        ("PURPOSE",           PURPOSE),
+        ("RESULT",            f'<font color="{res_color}"><b>{esc(result_label)}</b></font>'),
+        ("1. AS DOCUMENTED",  f'{esc(attest_label)}, {n_pass}/{n_total} gates passed'),
+    ]
+    if assisted.get("attempted"):
+        a_lvl = LEVEL_LABEL.get(assisted.get("level", "none"), "Not run")
+        a_gates = assisted.get("gates") or {}
+        a_n = sum(1 for k, _, _ in GATE_DISPLAY if a_gates.get(k))
+        a_txt = (
+            f'<font color="#b45309"><b>PASS: Runs with adjustments · {esc(a_lvl)}</b></font> '
+            f'({a_n}/5 gates; 0 source-code files modified)'
+            if assisted.get("passed")
+            else f'Stopped at {esc(a_lvl)} ({a_n}/5 gates; 0 source-code files modified)'
+        )
+        exec_rows.append(("2. WITH ADJUSTMENTS", a_txt))
+    if verdict.get("reason"):
+        exec_rows.append(("WHY (RUN 1)", esc(verdict["reason"])))
+    exec_rows += [
+        ("SCOPE",             EXEC_SCOPE),
+        ("NOT EVALUATED",     " · ".join(NOT_EVALUATED)),
+    ]
+    tdata = [[Paragraph(k, ST["tbl_header"]),
+              Paragraph(v, ST["tbl_cell"])] for k, v in exec_rows]
+    et = Table(tdata, colWidths=[44*mm, CW - 44*mm])
+    et.setStyle(TableStyle([
+        ("VALIGN",        (0,0),(-1,-1), "MIDDLE"),
+        ("LEFTPADDING",   (0,0),(-1,-1), 10),
+        ("RIGHTPADDING",  (0,0),(-1,-1), 10),
+        ("TOPPADDING",    (0,0),(-1,-1), 5),
+        ("BOTTOMPADDING", (0,0),(-1,-1), 5),
+        ("ROWBACKGROUNDS",(0,0),(-1,-1), [WHITE, GRAY_LIGHT]),
+        ("LINEBELOW",     (0,0),(-1,-2), 0.3, BORDER),
+        ("BOX",           (0,0),(-1,-1), 0.5, BORDER),
+    ]))
+    els.append(et)
+    els.append(vspace(2))
+    els.append(Paragraph(RECORD_NOTE, ST["body"]))
+
+    sec = 1
+    # ── Section 1: Automated Run Strictly as Documented in the Repository ─────
+    els.append(section_num(str(sec), "Automated Run Strictly as Documented in the Repository"))
+    sec += 1
+
+    step1 = cfg.get("step1") or {}
+    if step1.get("headline"):
+        s1_els = [
+            Paragraph(f"<b>{esc(step1['headline'])}</b>", ST["tbl_cell"]),
+            vspace(1.5),
+            Paragraph(esc(step1.get("body", "")), ST["body"]),
+        ]
+        if step1.get("missing_text"):
+            s1_els.append(vspace(2))
+            s1_els.append(Paragraph(
+                f"Missing from the commit ({esc(step1.get('guide', 'docs/GUIA-PASO-1.md'))}):",
+                ST["meta_label"]))
+            for mb in step1["missing_text"]:
+                s1_els.append(Paragraph(
+                    f'<font color="#9ca3af">–</font>  {esc(mb)}',
+                    S("s1m", fontSize=8.5, textColor=INK, leading=14, leftIndent=10, spaceAfter=1)))
+        els.append(boxed(s1_els))
+        els.append(vspace(3))
+
+    els.append(_gates_table(
+        gates_dict,
+        exec_established=cfg.get("execution_finding_established", True),
+        log_fname=cfg.get("log_filename", ""),
+    ))
+
     if not all(gates_dict.get(key, False) for key, _, _ in GATE_DISPLAY):
+        els.append(vspace(2.5))
         els.append(boxed([Paragraph(
-            "Stopping at a step is not a finding that the software is faulty. It "
-            "records how far this particular attempt got. Software can stop early "
-            "because a dependency it names is no longer available, because it "
-            "expects input arranged differently from the reference sample, or "
-            "because the automated environment cannot supply something it needs, "
-            "such as commercially licensed components. The messages on screen when "
-            "it stopped are reported below.",
-            ST["body"])]))
+            "Stopping at a step in Run 1 is not a finding that the software is defective; it "
+            "records how far the literal repository instructions got in a clean Ubuntu 22.04 "
+            "environment. The exact command and recorded terminal output for this run are "
+            "printed in the <b>Technical Annex</b> at the end of this report.",
+            ST["body"],
+        )]))
 
-    # Why the build failed, when it did. A certificate that says "Installs — not
-    # passed" and stops there tells a reviewer nothing they can act on, and tells
-    # the tool's author nothing they can fix. It also has to name the side: the
-    # base image of a generated container is our choice, so a failure there is
-    # ours, and printing it without saying so turns our bug into a finding about
-    # their software.
     inst = cfg.get("install_detail") or {}
     if inst.get("diagnostics"):
-        tried = ("STRhub tried to build the tool from its source at the pinned commit, "
-                 "following the build steps the repository declares, and the build failed.")
-        els.append(section_num(str(sec), "Not Built From Source"))
-        lead = f"{tried} Nothing below the Installs gate ran."
-        sec += 1
-        els.append(Paragraph(lead, ST["body"]))
-        els.append(vspace(2))
-        # In the reader's own terms, before the table of causes: what it means
-        # for someone running it, a reviewer holding a manuscript, its maintainer.
-        meaning_els = [Paragraph("<b>What this means</b>", ST["body"])]
-        for who, what in install_meaning(inst.get("faults") or []):
-            meaning_els.append(Paragraph(
-                f'<font color="#9ca3af">–</font>  <b>{esc(who)}:</b> {esc(what)}',
-                S("im", fontSize=8.5, textColor=GRAY, leading=14, leftIndent=10, spaceAfter=1)))
-        els.append(boxed(meaning_els))
-        els.append(vspace(3))
-        els.append(Paragraph("<b>What failed</b>", ST["body"]))
-        els.append(vspace(2))
+        els.append(_subsection("Build diagnostics observed in Run 1"))
         ihead = [Paragraph(f"<b>{h}</b>", ST["tbl_cell"])
-                 for h in ("What happened", "What the log establishes")]
+                 for h in ("What happened", "What the build log establishes")]
         irows = [ihead]
         for issue in inst["diagnostics"]:
             irows.append([
-                Paragraph(issue["title"], ST["tbl_cell"]),
-                Paragraph(issue.get("suggestion", "—"),
+                Paragraph(esc(issue["title"]), ST["tbl_cell"]),
+                Paragraph(esc(issue.get("suggestion", "-")),
                           S("ifix", fontSize=8, textColor=GRAY, leading=12)),
             ])
         IC = CW * 0.38
@@ -672,28 +876,21 @@ def build_body(cfg):
     errs = diagnose_log.summarize(cfg.get("diagnostics") or {})
     if errs:
         n_items = sum(len(e["items"]) for e in errs) or len(errs)
-        els.append(section_num(str(sec), "Errors Reported During the Run"))
-        sec += 1
-        els.append(Paragraph(
-            f"The tool reported errors on {n_items} item(s) during the run. "
-            "This does not assess whether the results produced are correct.",
-            ST["body"]))
-        els.append(vspace(3))
-
+        els.append(_subsection(f"Messages reported during Run 1 ({n_items} item(s))"))
         head = [Paragraph(f"<b>{h}</b>", ST["tbl_cell"])
                 for h in ("What happened", "Times", "Affected")]
         erows = [head]
         for e in errs:
-            items = ", ".join(e["items"]) if e["items"] else "—"
+            items = ", ".join(e["items"]) if e["items"] else "-"
             erows.append([
-                Paragraph(e["title"], ST["tbl_cell"]),
+                Paragraph(esc(e["title"]), ST["tbl_cell"]),
                 Paragraph(str(e["count"]), ST["tbl_cell"]),
-                Paragraph(items, S("erritems", fontSize=8, textColor=GRAY, leading=12)),
+                Paragraph(esc(items), S("erritems", fontSize=8, textColor=GRAY, leading=12)),
             ])
         C1 = CW * 0.34
         C2 = CW * 0.10
-        et = Table(erows, colWidths=[C1, C2, CW - C1 - C2])
-        et.setStyle(TableStyle([
+        et_diag = Table(erows, colWidths=[C1, C2, CW - C1 - C2])
+        et_diag.setStyle(TableStyle([
             ("VALIGN",        (0,0),(-1,-1), "TOP"),
             ("LEFTPADDING",   (0,0),(-1,-1), 10),
             ("RIGHTPADDING",  (0,0),(-1,-1), 10),
@@ -703,39 +900,13 @@ def build_body(cfg):
             ("LINEBELOW",     (0,0),(-1,0), 0.5, BORDER),
             ("BOX",           (0,0),(-1,-1), 0.5, BORDER),
         ]))
-        els.append(et)
+        els.append(et_diag)
         for note in diagnose_log.external_leg_notes(cfg.get("diagnostics") or {}):
-            els.append(vspace(3))
-            els.append(Paragraph(note, ST["body"]))
+            els.append(vspace(2))
+            els.append(Paragraph(esc(note), ST["body"]))
 
-    # Terminal failure excerpt from log when the run stopped
-    failure_excerpt = cfg.get("failure_excerpt")
-    if failure_excerpt and not all(gates_dict.get(key, False) for key, _, _ in GATE_DISPLAY):
-        els.append(section_num(str(sec), "Terminal Error Output"))
-        sec += 1
-        els.append(Paragraph(
-            "Excerpt from the execution log when the run stopped:",
-            ST["body"]))
-        els.append(vspace(2))
-        f_lines = [Paragraph(esc(line), S("tmono", fontName="Courier", fontSize=7, textColor=colors.HexColor("#e2e8f0"), leading=9))
-                   for line in failure_excerpt.splitlines()]
-        t_box = Table([[f_lines]], colWidths=[CW])
-        t_box.setStyle(TableStyle([
-            ("BACKGROUND",    (0,0),(-1,-1), colors.HexColor("#0f172a")),
-            ("BOX",           (0,0),(-1,-1), 0.5, colors.HexColor("#334155")),
-            ("TOPPADDING",    (0,0),(-1,-1), 8),
-            ("BOTTOMPADDING", (0,0),(-1,-1), 8),
-            ("LEFTPADDING",   (0,0),(-1,-1), 10),
-            ("RIGHTPADDING",  (0,0),(-1,-1), 10),
-        ]))
-        els.append(t_box)
-
-    # The author's own note about their own software, before STRhub's findings:
-    # a run that stops where the README says it stops is not news.
     known = cfg.get("author_known_issues") or []
     if known:
-        # Skip a parent section quote whose body only starts with the immediately
-        # following child subsection heading (avoids duplicate adjacent boxes).
         deduped = []
         for idx, k in enumerate(known):
             nxt = known[idx + 1] if idx + 1 < len(known) else None
@@ -743,30 +914,20 @@ def build_body(cfg):
             if nxt and re.match(rf"^#+\s*{re.escape(nxt.get('heading') or '')}\b", txt_clean, re.I):
                 continue
             deduped.append(k)
-        els.append(section_num(str(sec), "Author-Documented Warnings and Limitations"))
-        sec += 1
-        els.append(Paragraph(
-            "Quoted from the repository's README at the verified commit. STRhub did not "
-            "establish any of this by running the tool; these are the author's own notes.",
-            ST["body"]))
-        els.append(vspace(3))
+        els.append(_subsection("Author-documented notes in official README"))
         q_style = S("kiq", fontSize=8, textColor=GRAY, leading=12, spaceAfter=2)
         q_bullet = S("kiqb", fontSize=8, textColor=GRAY, leading=12, leftIndent=10, firstLineIndent=-8, spaceAfter=2)
         for k in deduped:
             heading_p = Paragraph(f"<b>{esc(k['heading'])}</b> (Official README line {k['line']})",
                                   S("kih", fontSize=8.5, textColor=INK, leading=12, spaceAfter=2))
             raw = k.get("text") or ""
-            # Strip raw markdown table tails if present in older saved JSONs.
             raw = re.split(r"\|\s*[-:]{3,}\s*\|", raw)[0]
             raw = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", raw)
             raw = re.sub(r"\s*#{2,4}\s+", "\n", raw)
-            # Split into readable lines (both newline-delimited and legacy inline "- " lists).
             if "\n" in raw:
                 raw_lines = [ln.strip() for ln in raw.splitlines() if ln.strip()]
             else:
-                # Split compressed markdown list items (" - Item") onto separate bullets.
                 raw_lines = [p.strip() for p in re.split(r"(?:^|\s+)(?=-\s+[A-Z`])", raw) if p.strip()]
-            # Drop trailing incomplete markdown table header or tiny stub bullet from truncation.
             while raw_lines and (raw_lines[-1].count("|") >= 2
                                  or len(re.sub(r"^[-*•\s]+", "", raw_lines[-1])) <= 3):
                 raw_lines.pop()
@@ -774,79 +935,89 @@ def build_body(cfg):
                 raw_lines = [raw.strip()]
             q_els = []
             for idx_ln, ln in enumerate(raw_lines):
-                suffix = "…" if (k.get("truncated") and idx_ln == len(raw_lines) - 1) else ""
+                suffix = "..." if (k.get("truncated") and idx_ln == len(raw_lines) - 1) else ""
                 is_bullet = bool(re.match(r"^[-*•]\s+", ln))
                 body_txt = re.sub(r"^[-*•]\s+", "", ln) if is_bullet else ln
                 body_txt = re.sub(r"^#+\s*", "", body_txt)
-                # Render inline backticks cleanly in monospace without raw "`" noise.
                 escaped = esc(body_txt)
                 escaped = re.sub(r"`([^`]+)`", r'<font name="Courier">\1</font>', escaped)
                 if is_bullet:
                     q_els.append(Paragraph(f'<font color="#9ca3af">–</font>  {escaped}{suffix}', q_bullet))
                 else:
                     q_els.append(Paragraph(f"{escaped}{suffix}", q_style))
-            els.append(KeepTogether([heading_p, boxed(q_els), vspace(3)]))
+            els.append(KeepTogether([heading_p, boxed(q_els), vspace(2.5)]))
 
+    # When Run 1 itself produced output (no Run 2 needed), show Output Content Evidence inside Section 1
+    if not assisted.get("attempted"):
+        out_els_1 = _output_evidence_elements(
+            cfg,
+            cfg.get("stats") or {},
+            cfg.get("io_detail") or {},
+            cfg.get("content_detail") or {},
+            cfg.get("output_preview"),
+        )
+        if out_els_1:
+            els.append(_subsection("Generated and verified output"))
+            els.extend(out_els_1)
+        recs_only = cfg.get("recommendations") or []
+        if recs_only:
+            els.append(_subsection("Optional repository improvements"))
+            rec_ps = [Paragraph(
+                f'<font color="#9ca3af">–</font>  {esc(r.get("text", ""))}',
+                S("rc1", fontSize=8.3, textColor=GRAY, leading=13, leftIndent=10, spaceAfter=1.5),
+            ) for r in recs_only if r.get("text")]
+            if rec_ps:
+                els.append(boxed(rec_ps))
 
-    # §3 Run command
-    command_heading, command_lead = cfg.get("command_presentation") or command_presentation(None)
-    els.append(section_num(str(sec), command_heading))
-    sec += 1
-    # The wording follows recorded step evidence, never command presence alone.
-    els.append(Paragraph(
-        command_lead,
-        ST["body"]))
-    els.append(vspace(3))
-    cmd_content = [Paragraph(line, ST["mono"]) for line in cfg.get("cmd_lines", ["# Command not available"])]
-    cmd_box = Table([[cmd_content]], colWidths=[CW])
-    cmd_box.setStyle(TableStyle([
-        ("BACKGROUND",    (0,0),(-1,-1), WHITE),
-        ("BOX",           (0,0),(-1,-1), 0.5, BORDER),
-        ("TOPPADDING",    (0,0),(-1,-1), 12),
-        ("BOTTOMPADDING", (0,0),(-1,-1), 12),
-        ("LEFTPADDING",   (0,0),(-1,-1), 16),
-        ("RIGHTPADDING",  (0,0),(-1,-1), 16),
-    ]))
-    els.append(cmd_box)
-
-    # Automated Verification with Adjustments (Track 2 — canonical for reviewers, users & authors)
-    assisted = cfg.get("assisted_run") or {}
+    # ── Section 2: Automated Run with Suggested Documentation Adjustments ─────
     if assisted.get("attempted"):
         els.append(section_num(str(sec), "Automated Run with Suggested Documentation Adjustments"))
         sec += 1
         if assisted.get("passed"):
             lead_txt = (
-                "Because the literal procedure stopped before end-to-end output verification, STRhub "
-                "automatically executed one isolated assisted run on the same pinned commit using only "
-                "standard environment/CLI adjustments (zero source-code modifications; repository mounted "
-                "read-only at <font name=\"Courier\">/app:ro</font>). <b>The assisted run succeeded and produced "
-                "structurally valid output.</b>"
+                "Because the literal procedure in Run 1 stopped before end-to-end output verification, "
+                "STRhub automatically executed one isolated second pass on the exact same pinned commit "
+                "applying only standard environment or CLI adjustments, <b>without modifying any source-code "
+                "files in the repository</b>. <b>Run 2 succeeded end-to-end and produced structurally valid output.</b>"
             )
         else:
             lead_txt = (
-                "STRhub automatically attempted one isolated assisted run with standard environment/CLI "
-                f"adjustments (no source-code modifications), which stopped at "
-                f"<b>{esc(LEVEL_LABEL.get(assisted.get('level', 'none'), 'Not run'))}</b>."
+                "STRhub automatically executed one isolated second pass on the same pinned commit applying "
+                "standard environment or CLI adjustments (zero source-code files modified), which stopped at "
+                f"<b>{esc(LEVEL_LABEL.get(assisted.get('level', 'none'), 'Not run'))}</b>. "
+                "See the recorded terminal output in the <b>Technical Annex</b>."
             )
-        els.append(Paragraph(lead_txt, ST["body"]))
-        els.append(vspace(3))
+        els.append(boxed(
+            [Paragraph(lead_txt, ST["body"])],
+            bg=colors.HexColor("#fffbeb") if assisted.get("passed") else GRAY_LIGHT,
+            border_color=colors.HexColor("#f59e0b") if assisted.get("passed") else BORDER,
+        ))
 
         adjs = assisted.get("adjustments") or []
         if adjs:
+            els.append(_subsection(
+                "Documentation / invocation adjustments applied"
+                if assisted.get("passed")
+                else "Documentation / invocation adjustments tried"
+            ))
             ahead = [
                 Paragraph(f"<b>{h}</b>", ST["tbl_cell"])
-                for h in ("What stopped literal run", "Adjustment applied", "Suggested repository change")
+                for h in (
+                    "What was missing in current documentation",
+                    "Adjustment applied in Run 2",
+                    "Suggested repository change",
+                )
             ]
             arows = [ahead]
             cell_st = S("adjc", fontSize=7.8, textColor=INK, leading=11.5)
             for a in adjs:
                 def _fmt_bt(val: str) -> str:
-                    s = esc(val or "—")
+                    s = esc(val or "-")
                     return re.sub(r"`([^`]+)`", r'<font name="Courier">\1</font>', s)
                 arows.append([
-                    Paragraph(_fmt_bt(a.get("what_failed_strict", "—")), cell_st),
-                    Paragraph(_fmt_bt(a.get("adjustment_applied", "—")), cell_st),
-                    Paragraph(_fmt_bt(a.get("author_fix", "—")), cell_st),
+                    Paragraph(_fmt_bt(a.get("what_failed_strict", "-")), cell_st),
+                    Paragraph(_fmt_bt(a.get("adjustment_applied", "-")), cell_st),
+                    Paragraph(_fmt_bt(a.get("author_fix", "-")), cell_st),
                 ])
             c_w = CW / 3.0
             atbl = Table(arows, colWidths=[c_w, c_w, c_w])
@@ -863,208 +1034,91 @@ def build_body(cfg):
                 ("BOX",           (0,0),(-1,-1), 0.5, BORDER),
             ]))
             els.append(atbl)
-            els.append(vspace(4))
+
+        recs_extra = cfg.get("recommendations") or []
+        if recs_extra:
+            els.append(_subsection("Additional repository recommendations"))
+            rec_ps = [Paragraph(
+                f'<font color="#9ca3af">–</font>  {esc(r.get("text", ""))}',
+                S("rc2", fontSize=8.2, textColor=GRAY, leading=13, leftIndent=10, spaceAfter=1.5),
+            ) for r in recs_extra if r.get("text")]
+            if rec_ps:
+                els.append(boxed(rec_ps))
 
         if assisted.get("passed"):
             vc = assisted.get("verified_commands") or {}
-            v_lines: list[str] = ["# Verified commands to reproduce this commit today:"]
+            els.append(_subsection("Step-by-step commands to run on your machine (from git clone)"))
+            step_idx = 1
+            prereqs: list[str] = []
             if vc.get("extra_apt"):
-                v_lines.append("$ sudo apt-get update && sudo apt-get install -y " + " ".join(vc["extra_apt"]))
+                prereqs.append("sudo apt-get update && sudo apt-get install -y " + " ".join(vc["extra_apt"]))
             if vc.get("git_https_rewrite"):
-                v_lines.append('$ git config --global url."https://github.com/".insteadOf "git@github.com:"')
-            if vc.get("init_submodules"):
-                v_lines.append("$ git submodule update --init --recursive")
-            for ic in vc.get("install") or []:
-                v_lines.append(f"$ {ic}")
-            for md in vc.get("mkdir_dirs") or []:
-                v_lines.append(f"$ mkdir -p {md}")
+                prereqs.append('git config --global url."https://github.com/".insteadOf "git@github.com:"')
+            if prereqs:
+                els.append(Paragraph(f"<b>Step {step_idx}: Install prerequisite system packages</b>", ST["tbl_cell"]))
+                els.append(vspace(1))
+                els.append(_mono_rows_table(prereqs))
+                els.append(vspace(2.5))
+                step_idx += 1
+
+            repo_clean = (cfg.get("repo_url") or "https://github.com/owner/tool").rstrip("/")
+            repo_dir = repo_clean.rsplit("/", 1)[-1].removesuffix(".git") or "tool"
+            clone_flag = "--recursive " if vc.get("init_submodules") else ""
+            clone_lines = [f"git clone {clone_flag}{repo_clean}", f"cd {repo_dir}"]
+            if cfg.get("commit"):
+                clone_lines.append(f"git checkout {cfg['commit']}")
+            clone_lines.extend(vc.get("install") or [])
+            els.append(Paragraph(f"<b>Step {step_idx}: Clone repository (at verified commit) and install</b>", ST["tbl_cell"]))
+            els.append(vspace(1))
+            els.append(_mono_rows_table(clone_lines))
+            els.append(vspace(2.5))
+            step_idx += 1
+
             if vc.get("run"):
-                v_lines.extend(_format_cmd(vc["run"]))
-            if len(v_lines) > 1:
-                v_pars = [Paragraph(esc(ln), ST["mono"]) for ln in v_lines]
-                vbox = Table([[v_pars]], colWidths=[CW])
-                vbox.setStyle(TableStyle([
-                    ("BACKGROUND",    (0,0),(-1,-1), WHITE),
-                    ("BOX",           (0,0),(-1,-1), 0.5, BORDER),
-                    ("TOPPADDING",    (0,0),(-1,-1), 10),
-                    ("BOTTOMPADDING", (0,0),(-1,-1), 10),
-                    ("LEFTPADDING",   (0,0),(-1,-1), 14),
-                    ("RIGHTPADDING",  (0,0),(-1,-1), 14),
-                ]))
-                els.append(vbox)
+                run_step_lines: list[str] = [f"mkdir -p {d}" for d in (vc.get("mkdir_dirs") or [])]
+                run_step_lines.append(_to_local_user_cmd(vc["run"]))
+                els.append(Paragraph(f"<b>Step {step_idx}: Run the tool on your data</b>", ST["tbl_cell"]))
+                els.append(vspace(1))
+                els.append(_mono_rows_table(run_step_lines))
+                els.append(vspace(1))
+                els.append(Paragraph(
+                    "<i>Replace sample.bam / hg38.fa / regions.bed with the file paths on your machine. "
+                    "The exact container command executed by STRhub is included in the Technical Annex.</i>",
+                    ST["body"],
+                ))
 
             if assisted.get("readme_suggestion"):
-                els.append(vspace(3))
-                els.append(Paragraph("<b>Suggested README.md addition for the repository maintainer:</b>", ST["body"]))
-                els.append(vspace(2))
-                r_pars = [Paragraph(esc(ln) if ln.strip() else "&nbsp;", ST["mono"])
-                          for ln in assisted["readme_suggestion"].splitlines()]
-                rbox = Table([[r_pars]], colWidths=[CW])
-                rbox.setStyle(TableStyle([
-                    ("BACKGROUND",    (0,0),(-1,-1), GRAY_LIGHT),
-                    ("BOX",           (0,0),(-1,-1), 0.5, BORDER),
-                    ("TOPPADDING",    (0,0),(-1,-1), 8),
-                    ("BOTTOMPADDING", (0,0),(-1,-1), 8),
-                    ("LEFTPADDING",   (0,0),(-1,-1), 14),
-                    ("RIGHTPADDING",  (0,0),(-1,-1), 14),
-                ]))
-                els.append(rbox)
+                els.append(_subsection("Suggested README.md block for the repository maintainer"))
+                clean_readme_lines = [
+                    _to_local_user_cmd(ln) if not ln.startswith(("#", "```", "sudo ", "git ", "cd ", "mkdir ")) else ln
+                    for ln in assisted["readme_suggestion"].splitlines()
+                ]
+                els.append(_mono_rows_table(clean_readme_lines))
 
-        a_cd_outs = ((assisted.get("content_detail") or {}).get("outputs") or [])
-        a_stats = a_cd_outs[0].get("stats") if a_cd_outs and isinstance(a_cd_outs[0], dict) else None
-        a_prev = assisted.get("output_preview") or {}
-        if assisted.get("passed") and (a_stats or a_prev.get("file")):
-            els.append(vspace(3))
-            summary_bits = []
-            if a_prev.get("file"):
-                summary_bits.append(f"file <font name=\"Courier\">{esc(a_prev['file'])}</font> ({a_prev.get('size_bytes', 0)} bytes)")
-            if a_stats:
-                summary_bits.append(f"{a_stats.get('rows', 0)} records")
-                summary_bits.append(f"{a_stats.get('distinct_str_loci', 0)} distinct STR loci")
-            els.append(boxed([Paragraph(
-                "<b>Assisted output verified:</b> " + " · ".join(summary_bits) + ".",
-                ST["body"],
-            )]))
+        els.append(_subsection("Verification gates (Run 2 with suggested adjustments)"))
+        a_log_fname = ((assisted.get("logs") or {}).get("assisted-external")
+                       or (assisted.get("logs") or {}).get("assisted-build") or "")
+        els.append(_gates_table(assisted.get("gates") or {}, exec_established=True, log_fname=a_log_fname))
 
-    # §2 Metadata
-    els.append(section_num(str(sec), "Reproducibility Metadata"))
-    sec += 1
-    ver_time = cfg.get("ver_time", "")
-    meta_rows = [
-        ("Tool",            cfg["tool_name"]),
-        ("Version",         cfg["tool_version"]),
-        ("Repository",      link(cfg["repo_url"])),
-        ("Commit (pinned)", link(cfg["commit_url"], cfg["commit"])),
-        ("Container OS",    cfg.get("container_os", "ubuntu-22.04")),
-        ("Marker panel",    cfg.get("panel", "—")),
-        ("Verified on",     (cfg["ver_date"] + ("  " + ver_time if ver_time else "")).strip()),
-        ("CI run",          link(cfg["ci_run"]) if cfg.get("ci_run") else "—"),
-    ]
-    els.append(kv_table(meta_rows))
-    els.append(vspace(3))
-    els.append(Paragraph(RECORD_NOTE, ST["body"]))
+        out_els_2 = _output_evidence_elements(
+            cfg,
+            cfg.get("effective_stats") or {},
+            cfg.get("effective_io_detail") or {},
+            cfg.get("effective_content_detail") or {},
+            cfg.get("effective_output_preview"),
+        )
+        if out_els_2:
+            els.append(_subsection("Generated and verified output (Run 2)"))
+            els.extend(out_els_2)
 
-    # §6 Output Content Evidence
-    els.append(section_num(str(sec), "Output Content Evidence"))
-    sec += 1
-    stats = cfg.get("stats", {})
-    io_outputs = (cfg.get("io_detail") or {}).get("outputs") or []
-    io0 = io_outputs[0] if io_outputs and isinstance(io_outputs[0], dict) else {}
-    io_files = io0.get("files") or []
-    io_file0 = io_files[0] if io_files and isinstance(io_files[0], dict) else {}
-    cd_outputs = (cfg.get("content_detail") or {}).get("outputs") or []
-    cd0 = cd_outputs[0] if cd_outputs and isinstance(cd_outputs[0], dict) else {}
-    assessed = bool(stats)   # the Content gate ran and produced statistics
-    if not assessed:
-        els.append(boxed([Paragraph("<i>No output files were generated because the run stopped before completion.</i>", ST["body"])]))
-    else:
-        called_loci = stats.get("str_loci") or stats.get("loci") or []
-        loci_str = " · ".join(called_loci) if called_loci else "—"
-        fmt_val = stats.get("format") or cfg.get("declared_format", "—")
-        vcf_ver = io_file0.get("version")
-        if vcf_ver and str(fmt_val).upper() == "VCF":
-            fmt_display = f"VCF {vcf_ver}"
-        else:
-            fmt_display = str(fmt_val)
-
-        total_rows = stats.get("rows", 0)
-        called_rec = io0.get("called_records")
-        uncalled_rec = io0.get("uncalled_rows")
-        malformed_rows = stats.get("malformed_rows")
-        if isinstance(called_rec, int) and isinstance(uncalled_rec, int):
-            rec_display = f"{total_rows} total ({called_rec} with called genotypes, {uncalled_rec} uncalled"
-            if isinstance(malformed_rows, int):
-                rec_display += f", {malformed_rows} malformed"
-            rec_display += ")"
-        elif isinstance(malformed_rows, int):
-            rec_display = f"{total_rows} ({malformed_rows} malformed)"
-        else:
-            rec_display = str(total_rows)
-
-        # Build the exact list of structural & plausibility checks performed by
-        # the engine (only checks actually recorded as True in io_detail / content_detail).
-        io_checks = io0.get("checks") or {}
-        cd_checks = cd0.get("checks") or {}
-        profile = io0.get("validation_profile")
-        check_labels: list[str] = []
-        if io_checks.get("exists"):
-            check_labels.append("file exists")
-        if io_checks.get("non_empty"):
-            check_labels.append("non-empty")
-        if io_checks.get("confined"):
-            check_labels.append("confined to output directory")
-        for ck, ok in io_checks.items():
-            if ok and ck.startswith("parses_as_"):
-                kind = ck.removeprefix("parses_as_").upper()
-                label = f"parses as {fmt_display if kind == 'VCF' else kind}"
-                if profile:
-                    label += f" ({profile})"
-                check_labels.append(label)
-        if io_checks.get("min_records"):
-            check_labels.append("minimum record count met")
-        if io_checks.get("has_called_genotypes") or cd_checks.get("genotypes_called"):
-            check_labels.append("non-missing genotype fields present")
-        if cd_checks.get("given_loci_recognised"):
-            check_labels.append("reference panel loci recognised")
-        if isinstance(malformed_rows, int) and malformed_rows == 0:
-            check_labels.append("0 malformed rows")
-
-        ev_rows = [
-            ("Output file",              stats.get("output_file") or io0.get("resolved") or cfg.get("declared_output", "—")),
-            ("Format",                   fmt_display),
-            ("Records",                  rec_display),
-            ("Distinct loci in output",  str(stats.get("distinct_str_loci", 0))),
-        ]
-        regions_given = stats.get("regions_given")
-        regions_hit = stats.get("regions_hit")
-        if isinstance(regions_given, int) and regions_given > 0 and isinstance(regions_hit, int):
-            ev_rows.append(("Reference panel coverage", f"{regions_hit} / {regions_given} reference panel loci hit"))
-        total_reads = stats.get("total_reads")
-        if isinstance(total_reads, int) and total_reads > 0:
-            depth_txt = f"{total_reads:,} total reads"
-            max_d = stats.get("max_sequence_depth")
-            d_src = stats.get("depth_source")
-            if isinstance(max_d, int) and max_d > 0:
-                depth_txt += f" (max {max_d}" + (f", via {d_src}" if d_src else "") + ")"
-            ev_rows.append(("Reported read depth", depth_txt))
-        if check_labels:
-            ev_rows.append(("Checks verified", " · ".join(check_labels)))
-        ev_rows.append(("STR loci detected", loci_str))
-        tdata = [[Paragraph(k, ST["meta_label"]),
-                  Paragraph(v, ST["tbl_cell"])] for k, v in ev_rows]
-        evt = Table(tdata, colWidths=[60*mm, CW - 60*mm])
-        evt.setStyle(TableStyle([
-            ("VALIGN",        (0,0),(-1,-1), "TOP"),
-            ("LEFTPADDING",   (0,0),(-1,-1), 10),
-            ("RIGHTPADDING",  (0,0),(-1,-1), 10),
-            ("TOPPADDING",    (0,0),(-1,-1), 5),
-            ("BOTTOMPADDING", (0,0),(-1,-1), 5),
-            ("ROWBACKGROUNDS",(0,0),(-1,-1), [WHITE, GRAY_LIGHT]),
-            ("LINEBELOW",     (0,0),(-1,-2), 0.3, BORDER),
-            ("BOX",           (0,0),(-1,-1), 0.5, BORDER),
-        ]))
-        els.append(evt)
-        if isinstance(regions_given, int) and regions_given > 0 and isinstance(regions_hit, int):
-            n_out = stats.get("distinct_str_loci", 0)
-            els.append(vspace(3))
-            els.append(Paragraph(
-                f"<i>Note on locus counts: the staged reference panel defines {regions_given} target "
-                f"regions ({regions_hit} overlapped by this run's output), whereas the output count "
-                f"({n_out} distinct loci across {total_rows} records) reflects all entries written by "
-                "the tool, which may split complex repeats into sub-regions or include additional "
-                "loci from its own catalog.</i>",
-                ST["body"],
-            ))
-
-    # §7 Verification Data
-    els.append(section_num(str(sec), "Verification Data"))
+    # ── Section 3: Verification Data and Inputs Supplied Beyond the Repository ─
+    els.append(section_num(str(sec), "Verification Data and Inputs Supplied Beyond the Repository"))
     sec += 1
     ds = cfg.get("dataset", {})
-    # Evidence, not assumption — see certificate_text.test_data_item.
     td = cfg.get("repo_test_data") or {}
-    installs_passed = bool((cfg.get("gates") or {}).get("installs"))
-    if installs_passed:
-        ref_phrase = "STRhub ran the verification using the public reference dataset listed below."
+    executed_any = bool((cfg.get("gates") or {}).get("installs") or assisted.get("passed"))
+    if executed_any:
+        ref_phrase = "STRhub executed the verification using the public reference dataset listed below."
     else:
         ref_phrase = ("STRhub selected the public reference dataset listed below, "
                       "but it was not executed because installation did not complete.")
@@ -1080,30 +1134,29 @@ def build_body(cfg):
     els.append(Paragraph(intro, ST["body"]))
     els.append(vspace(3))
 
-    ref_assembly = ds.get("reference") or "—"
+    ref_assembly = ds.get("reference") or "-"
     src = ds.get("source", "")
-    src_display = (src[:60] + "…") if len(src) > 60 else src
+    src_display = (src[:60] + "...") if len(src) > 60 else src
     panel_loci = cfg.get("panel_loci") or []
     if panel_loci:
         loci_val = (f"{len(panel_loci)} loci: " + "  ·  ".join(panel_loci))
-        if not installs_passed:
+        if not executed_any:
             loci_val = f"{len(panel_loci)} loci in selected panel (not executed)"
     else:
-        loci_val = "—"
+        loci_val = "-"
     ds_rows = []
     if cfg.get("input_type"):
-        ds_rows.append(("Dataset ID", cfg["input_type"]))
-    ds_rows.append(("Dataset", ds.get("name", "—")))
+        ds_rows.append(("Dataset ID", esc(cfg["input_type"])))
+    ds_rows.append(("Dataset", esc(ds.get("name", "-"))))
     tech = ds.get("chemistry") or ds.get("sequencer")
     if tech:
-        ds_rows.append(("Technology", tech))
+        ds_rows.append(("Technology", esc(tech)))
     ds_rows += [
-        ("Source",               link(src, src_display) if src else "—"),
-        ("License",              ds.get("license", "—")),
-        ("Aligned to",           ref_assembly),
-        ("Reference panel loci", loci_val),
+        ("Source",               link(src, esc(src_display)) if src else "-"),
+        ("License",              esc(ds.get("license", "-"))),
+        ("Aligned to",           esc(ref_assembly)),
+        ("Reference panel loci", esc(loci_val)),
     ]
-
     tdata = [[Paragraph(k, ST["meta_label"]),
               Paragraph(v, S("dv", fontSize=8, textColor=GRAY, leading=13))]
              for k, v in ds_rows]
@@ -1120,129 +1173,60 @@ def build_body(cfg):
     ]))
     els.append(dst)
 
-    # §8 Verification Matrix
-    # Stage independence: a failed installation blocks downstream execution and
-    # must never be reported as FAIL on a dataset that was never processed.
-    # Likewise, when execution_finding_established is False (undetermined),
-    # an unestablished output gate is NOT ESTABLISHED rather than FAIL.
-    gates = dict(cfg.get("gates") or {})
-    exec_established = cfg.get("execution_finding_established", True)
-    ext = next((d for d in (cfg.get("datasets") or [])
-                if d.get("leg") == "external"), {}) or {}
-    if not gates.get("installs"):
-        ext_tag = '<font color="#9ca3af"><b>NOT ATTEMPTED</b></font>'
-        ext_label = ("Reference dataset (not executed: installation failed)"
-                     if exec_established is not False
-                     else "Reference dataset (not executed)")
-    elif ext.get("passed"):
-        ext_tag = '<font color="#00909c"><b>PASS</b></font>'
-        ext_label = "Run on reference dataset"
-    elif exec_established is False:
-        ext_tag = '<font color="#9ca3af"><b>NOT ESTABLISHED</b></font>'
-        ext_label = "Run on reference dataset (output validity not established)"
-    elif ext.get("available"):
-        ext_tag = '<font color="#ef4444"><b>FAIL</b></font>'
-        ext_label = "Run on reference dataset"
-    else:
-        ext_tag = '<font color="#9ca3af"><b>N/A</b></font>'
-        ext_label = "Run on reference dataset"
-
-    matrix_rows = [(ext_tag, ext_label, ds.get("name", "—"))]
-    tdata = []
-    for tag, label, val in matrix_rows:
-        tag_p = Paragraph(tag if tag else "", ST["tbl_cell"])
-        tdata.append([tag_p, Paragraph(label, ST["tbl_cell"]),
-                      Paragraph(val, ST["tbl_cell"])])
-    C2 = CW * 0.46
-    mt = Table(tdata, colWidths=[28*mm, C2, CW - 28*mm - C2])
-    mt.setStyle(TableStyle([
-        ("VALIGN",        (0,0),(-1,-1), "MIDDLE"),
-        ("LEFTPADDING",   (0,0),(-1,-1), 10),
-        ("RIGHTPADDING",  (0,0),(-1,-1), 10),
-        ("TOPPADDING",    (0,0),(-1,-1), 5),
-        ("BOTTOMPADDING", (0,0),(-1,-1), 5),
-        ("ROWBACKGROUNDS",(0,0),(-1,-1), [WHITE, GRAY_LIGHT]),
-        ("LINEBELOW",     (0,0),(-1,-2), 0.3, BORDER),
-        ("BOX",           (0,0),(-1,-1), 0.5, BORDER),
-        ("SPAN",          (0,0),(0,-1)),
-        ("VALIGN",        (0,0),(0,-1), "TOP"),
-    ]))
-    els.append(keep_section(section_num(str(sec), "Verification Matrix"), mt))
-    sec += 1
-
-    # What the run needed beyond the repository. Immediately before the notes and
-    # after everything the run established, so a reader meets it holding the
-    # ladder: the result above describes a run configured this way, and a green
-    # ladder should not quietly absorb the work it took to get there.
     needed = cfg.get("needed_beyond_repo") or []
     if needed:
+        els.append(_subsection("What this run needed beyond the repository"))
         need_els = [Paragraph(
             "The result above describes a run configured as follows. Anyone "
-            "repeating it needs the same things.", ST["body"]), vspace(2)]
+            "repeating it needs the same inputs and environment.", ST["body"]), vspace(2)]
         need_els += [Paragraph(
-            f'<font color="#9ca3af">–</font>  {item}',
+            f'<font color="#9ca3af">–</font>  {esc(item)}',
             S("nb", fontSize=8.5, textColor=GRAY, leading=14,
               leftIndent=10, spaceAfter=1)) for item in needed]
-        els.append(section_num(str(sec), "What This Run Needed Beyond the Repository"))
-        sec += 1
         els.append(boxed(need_els))
 
-    # Notes from reading the repository. A section of its own because the label
-    # is the point: nothing here was established by running the tool, so it must
-    # not sit inside Verification Gates or Errors Reported, where everything else
-    # was. Placed after those and before Limitations, and named after where it
-    # came from rather than what it says.
-    cav = cfg.get("caveats") or {}
-    if cav.get("items"):
-        # Model id stays in the JSON, out of the prose — see report.py.
-        note_els = [Paragraph(
-            "Recorded automatically from the tool's public files when this run was "
-            "configured. Not verified by execution, and not part of the gates "
-            "above. Useful for what to check by hand.",
-            ST["body"])]
-        note_els.append(vspace(2))
-        note_els += [Paragraph(
-            f'<font color="#9ca3af">–</font>  {item}',
-            S("cav", fontSize=8.5, textColor=GRAY, leading=14,
-              leftIndent=10, spaceAfter=1)) for item in cav["items"]]
-        els.append(section_num(str(sec), "Notes from Reading the Repository"))
-        sec += 1
-        els.append(boxed(note_els))
-
-    # Scope and Limitations (consolidated)
-    els.append(section_num(str(sec), "Scope and Limitations"))
+    # ── Section 4: How to Interpret This Result and Scope ─────────────────────
+    els.append(section_num(str(sec), "How to Interpret This Result and Scope"))
     sec += 1
     cert = cfg.get("certificate") or {}
-    lim_items = cert.get("limitations") or limitations_for(
-        cfg.get("dataset"),
-        input_type=cfg.get("input_type"),
-        executed=bool((cfg.get("gates") or {}).get("installs")),
-    )
+    raw_lims = cert.get("limitations") or []
+    if assisted.get("passed") and any("did not complete" in str(x) for x in raw_lims):
+        lim_items = limitations_for(cfg.get("dataset"), input_type=cfg.get("input_type"), executed=True)
+    else:
+        lim_items = raw_lims or limitations_for(
+            cfg.get("dataset"),
+            input_type=cfg.get("input_type"),
+            executed=executed_any,
+        )
     lim = [Paragraph(
         "Concerns reproducible execution only; no claim of genotype accuracy, "
         "concordance, forensic casework suitability, or regulatory validation.",
         ST["body"]), vspace(2)]
     lim += [Paragraph(
-        f'<font color="#9ca3af">–</font>  {item}',
+        f'<font color="#9ca3af">–</font>  {esc(item)}',
         S("li", fontSize=8.5, textColor=GRAY, leading=14,
           leftIndent=10, spaceAfter=1)) for item in lim_items]
     lim += [vspace(2), Paragraph(DISCLAIMER, ST["body"])]
     els.append(boxed(lim))
+    els.append(vspace(4))
 
-    # §11 Conclusion. What the run established, gate by gate — see
-    # conclusion_items_for, which is pure so it can be held to it by tests.
-    # The words the report carries, when it does (certificate_for): the
-    # certificate prints the block, not a second derivation of it.
-    cert = cfg.get("certificate") or {}
-    conclusion_items = ([(c["title"], c["body"]) for c in cert["conclusion"]]
-                        if cert.get("conclusion") else conclusion_items_for(cfg))
+    has_stale_cert = bool(
+        assisted.get("passed")
+        and any("No output produced" == c.get("title") or "not processed" in str(c.get("body", ""))
+                for c in (cert.get("conclusion") or []))
+    )
+    conclusion_items = (
+        [(c["title"], c["body"]) for c in cert["conclusion"]]
+        if (cert.get("conclusion") and not has_stale_cert)
+        else conclusion_items_for(cfg)
+    )
     con_content = []
     for title, body in conclusion_items:
         con_content.append(Paragraph(
-            f'<font color="#00909c">◆</font>  <b>{title}</b>',
+            f'<font color="#00909c">◆</font>  <b>{esc(title)}</b>',
             S("ct2", fontSize=9, textColor=INK, leading=14,
               fontName="Helvetica-Bold", spaceAfter=2)))
-        con_content.append(Paragraph(body,
+        con_content.append(Paragraph(esc(body),
             S("cb2", fontSize=8.5, textColor=GRAY, leading=13,
               leftIndent=14, spaceAfter=8)))
     con_box = Table([[con_content]], colWidths=[CW])
@@ -1254,7 +1238,98 @@ def build_body(cfg):
         ("LEFTPADDING",   (0,0),(-1,-1), 16),
         ("RIGHTPADDING",  (0,0),(-1,-1), 16),
     ]))
-    els.append(keep_section(section_num(str(sec), "Conclusion"), con_box))
+    els.append(con_box)
+    return els
+
+
+# ── Technical Annex (Commands, Dockerfiles, Recorded Terminals & Evidence) ────
+def build_technical_annex(cfg: dict) -> list:
+    els: list = [
+        PageBreak(),
+        build_header_inner(cfg),
+        HR(TEAL, thickness=1.2, spaceB=4, spaceA=8),
+        Paragraph("Technical Annex: Executed Commands, Recorded Terminals, and Evidence", ST["appendix_title"]),
+        Paragraph(
+            "Complete technical record for independent replication and maintainer audit, including "
+            "exact container invocations, evaluator Dockerfiles, recorded terminal transcripts, and "
+            "cited repository files at the pinned commit.",
+            S("anx_sub", fontSize=8.2, textColor=GRAY, leading=12.5, spaceAfter=6),
+        ),
+    ]
+
+    # A. Run 1 (Strictly as Documented)
+    command_heading, command_lead = cfg.get("command_presentation") or command_presentation(None)
+    els.append(_subsection(f"Run 1 (Strictly as Documented): {command_heading}"))
+    els.append(Paragraph(esc(command_lead), ST["body"]))
+    els.append(vspace(2))
+    els.append(_mono_rows_table(cfg.get("cmd_lines", ["# Command not available"]), dark=False))
+
+    if cfg.get("strict_dockerfile"):
+        els.append(_subsection("Run 1 Evaluator Dockerfile"))
+        df1_lines = [ln.rstrip() for ln in str(cfg["strict_dockerfile"]).splitlines() if ln.strip()]
+        els.append(_mono_rows_table(df1_lines[:45], dark=False))
+
+    strict_term = cfg.get("strict_terminal_lines") or []
+    if strict_term:
+        els.append(_subsection(f"Run 1 Recorded Terminal Output ({cfg.get('strict_terminal_label', 'build / execution')})"))
+        els.append(_mono_rows_table(strict_term, dark=True))
+
+    # B. Run 2 (With Suggested Adjustments)
+    assisted = cfg.get("assisted_run") or {}
+    if assisted.get("attempted"):
+        vc = assisted.get("verified_commands") or {}
+        if vc.get("run"):
+            els.append(_subsection("Run 2 (With Suggested Adjustments): Exact Container Command Executed"))
+            els.append(Paragraph(
+                "Executed inside the isolated container with the verified commit mounted read-only.",
+                ST["body"],
+            ))
+            els.append(vspace(2))
+            els.append(_mono_rows_table(_format_cmd(vc["run"]), dark=False))
+        if vc.get("dockerfile"):
+            els.append(_subsection("Run 2 Evaluator Dockerfile"))
+            df2_lines = [ln.rstrip() for ln in str(vc["dockerfile"]).splitlines() if ln.strip()]
+            els.append(_mono_rows_table(df2_lines[:50], dark=False))
+        ass_term = cfg.get("assisted_terminal_lines") or []
+        if ass_term:
+            els.append(_subsection(f"Run 2 Recorded Terminal Output ({cfg.get('assisted_terminal_label', 'assisted run')})"))
+            els.append(_mono_rows_table(ass_term, dark=True))
+
+    # C. Cited Repository Evidence
+    ev_list = cfg.get("evidence") or []
+    if ev_list:
+        els.append(_subsection("Cited Repository Evidence at Pinned Commit"))
+        ehead = [Paragraph(f"<b>{h}</b>", ST["tbl_cell"]) for h in ("Claim", "File / Line", "Quoted repository text")]
+        erows = [ehead]
+        c_st = S("evc", fontSize=7.6, textColor=INK, leading=11)
+        q_st = S("evq", fontSize=7.4, fontName="Courier", textColor=GRAY, leading=10.5)
+        for e in ev_list:
+            claim_txt = str(e.get("claim") or "").replace("_", " ").capitalize()
+            loc_txt = f"{e.get('path', '')}" + (f"#L{e['line']}" if e.get("line") else "")
+            loc_cell = link(e["url"], esc(loc_txt)) if e.get("url") else esc(loc_txt)
+            quote_raw = str(e.get("text") or "-") if e.get("kind") != "tree" else "(repository file)"
+            if len(quote_raw) > 160:
+                quote_raw = quote_raw[:157] + "..."
+            erows.append([
+                Paragraph(esc(claim_txt), c_st),
+                Paragraph(loc_cell, c_st),
+                Paragraph(esc(quote_raw), q_st),
+            ])
+        etbl = Table(erows, colWidths=[34*mm, 44*mm, CW - 78*mm], repeatRows=1)
+        etbl.setStyle(TableStyle([
+            ("VALIGN",        (0,0),(-1,-1), "TOP"),
+            ("LEFTPADDING",   (0,0),(-1,-1), 7),
+            ("RIGHTPADDING",  (0,0),(-1,-1), 7),
+            ("TOPPADDING",    (0,0),(-1,-1), 4),
+            ("BOTTOMPADDING", (0,0),(-1,-1), 4),
+            ("BACKGROUND",    (0,0),(-1,0),  GRAY_LIGHT),
+            ("ROWBACKGROUNDS",(0,1),(-1,-1), [WHITE, GRAY_LIGHT]),
+            ("LINEBELOW",     (0,0),(-1,0),  0.5, BORDER),
+            ("LINEBELOW",     (0,1),(-1,-2), 0.3, BORDER),
+            ("BOX",           (0,0),(-1,-1), 0.5, BORDER),
+        ]))
+        els.append(etbl)
+
     return els
 
 # ── Appendix ──────────────────────────────────────────────────────────────────
@@ -1324,8 +1399,9 @@ def build_appendix(cfg):
         return tbl
 
     els = []
-    fmt_val = ((cfg.get("stats") or {}).get("format") or cfg.get("declared_format", "")).upper()
-    depth_src = (cfg.get("stats") or {}).get("depth_source") or ("FORMAT/DP" if fmt_val == "VCF" else "")
+    eff_st = cfg.get("effective_stats") or cfg.get("stats") or {}
+    fmt_val = (eff_st.get("format") or cfg.get("declared_format", "")).upper()
+    depth_src = eff_st.get("depth_source") or ("FORMAT/DP" if fmt_val == "VCF" else "")
     pages = [loci_data[i:i + PER_PAGE] for i in range(0, len(loci_data), PER_PAGE)]
     for page_idx, page_loci in enumerate(pages):
         if page_idx > 0:
@@ -1424,10 +1500,14 @@ def load_config(manifest_path: str, datasets_path: str | None = None,
         pathlib.Path(__file__).resolve().parent.parent / "reports" / f"{slug}.json",
     ]
     report: dict = {}
+    report_dir: pathlib.Path | None = None
     for rp in candidates:
         if rp.exists():
             report = json.loads(rp.read_text())
+            report_dir = rp.parent
             break
+    if report_dir is None:
+        report_dir = pathlib.Path("reports")
 
     # Dates
     generated = report.get("generated", "")
@@ -1453,13 +1533,17 @@ def load_config(manifest_path: str, datasets_path: str | None = None,
     gates = {key: gates_raw.get(key, False) for key, _, _ in GATE_DISPLAY}
     level = report.get("level", "none")
 
-    # Run command
+    # Run command (unwrap output-capture boilerplate for clean readability in Technical Annex)
+    from prepare import unwrap_example
     recorded_run = report.get("run") or {}
     raw_cmd = (recorded_run.get("effective_cmd") or recorded_run.get("cmd") or
                m.get("run", {}).get("cmd") or
                m.get("run", {}).get("command") or "")
-    env_note = f"# Environment: {(m.get('environment', {}).get('os') or ['ubuntu-22.04'])[0]}  ·  {tool_display}  ·  commit {commit[:7]}"
-    cmd_lines = [env_note, ""] + _format_cmd(raw_cmd)
+    unwrapped_strict_cmd, strict_cwd = unwrap_example(raw_cmd)
+    display_strict_cmd = unwrapped_strict_cmd or raw_cmd
+    cwd_note = f"  ·  workdir: {strict_cwd}" if strict_cwd and strict_cwd != "." else ""
+    env_note = f"# Environment: {(m.get('environment', {}).get('os') or ['ubuntu-22.04'])[0]}  ·  {tool_display}  ·  commit {commit[:7]}{cwd_note}"
+    cmd_lines = [env_note, ""] + _format_cmd(display_strict_cmd)
 
     # Dataset
     input_type = (m.get("inputs", {}).get("type") or
@@ -1492,29 +1576,64 @@ def load_config(manifest_path: str, datasets_path: str | None = None,
                         panel_loci.append(cols[3])
                 break
 
-    # Terminal failure excerpt from log if the run stopped
-    failure_excerpt = report.get("failure_excerpt", "")
-    if not failure_excerpt:
-        log_fname = (report.get("logs") or {}).get("external") or (report.get("logs") or {}).get("build", "")
-        if log_fname:
-            candidates = [pathlib.Path(f"reports/{log_fname}"), pathlib.Path(log_fname)]
-            for p in candidates:
-                if p.exists():
+    # Terminal transcripts & failure excerpt for Technical Annex
+    def _read_first_existing(names: list[str]) -> str:
+        for nm in names:
+            if not nm:
+                continue
+            for p in (report_dir / nm, pathlib.Path("reports") / nm, pathlib.Path(nm)):
+                if p.is_file():
                     try:
-                        lines = [ln.rstrip() for ln in p.read_text(errors="replace").splitlines() if ln.strip()]
-                        if lines:
-                            failure_excerpt = "\n".join(lines[-14:])
+                        return p.read_text(errors="replace")
                     except Exception:
                         pass
-                    break
+        return ""
+
+    terms_map = report.get("terminals") or {}
+    logs_map = report.get("logs") or {}
+    strict_leg = "external" if (terms_map.get("external") or logs_map.get("external")) else "build"
+    strict_raw = _read_first_existing([
+        terms_map.get("external", ""),
+        logs_map.get("external", ""),
+        terms_map.get("build", ""),
+        logs_map.get("build", ""),
+    ])
+    strict_terminal_lines = _clean_terminal_lines(strict_raw, limit=34)
+
+    assisted_doc = report.get("assisted_run") or {}
+    a_terms_map = assisted_doc.get("terminals") or {}
+    a_logs_map = assisted_doc.get("logs") or {}
+    ass_leg = "assisted-external" if (a_terms_map.get("assisted-external") or a_logs_map.get("assisted-external")) else "assisted-build"
+    ass_raw = _read_first_existing([
+        a_terms_map.get("assisted-external", ""),
+        a_logs_map.get("assisted-external", ""),
+        a_terms_map.get("assisted-build", ""),
+        a_logs_map.get("assisted-build", ""),
+    ])
+    assisted_terminal_lines = _clean_terminal_lines(ass_raw, limit=34)
+
+    strict_dockerfile = ""
+    for rec_cand in (report_dir / f"{slug}.recipe.json", pathlib.Path("reports") / f"{slug}.recipe.json"):
+        if rec_cand.is_file():
+            try:
+                rec_json = json.loads(rec_cand.read_text(errors="replace"))
+                if isinstance(rec_json.get("dockerfile"), str):
+                    strict_dockerfile = rec_json["dockerfile"]
+            except Exception:
+                pass
+            break
+
+    failure_excerpt = report.get("failure_excerpt", "")
+    if not failure_excerpt and strict_terminal_lines:
+        failure_excerpt = "\n".join(strict_terminal_lines[-14:])
 
     # Declared output (from the manifest) — what is shown instead when the Content
     # gate did not run (no content: block), instead of a hardcoded VCF guess.
     declared_out = (m.get("outputs") or [{}])[0]
-    declared_output = declared_out.get("path", "—")
-    declared_format = (declared_out.get("format") or "—").upper()
+    declared_output = declared_out.get("path", "-")
+    declared_format = (declared_out.get("format") or "-").upper()
 
-    # Stats from content_detail (present only when the Content gate ran).
+    # Stats from Track 1 content_detail (kept unchanged for certificate_text parity).
     stats: dict = {}
     outputs = report.get("content_detail", {}).get("outputs", [])
     if outputs and isinstance(outputs[0], dict) and outputs[0].get("stats"):
@@ -1523,8 +1642,66 @@ def load_config(manifest_path: str, datasets_path: str | None = None,
                  "output_file": outputs[0].get("resolved", declared_output),
                  "format": declared_format}
 
+    # Effective output stats (Track 1 if present, else passing Track 2 assisted_run)
+    effective_stats = dict(stats)
+    effective_io_detail = report.get("io_detail") or {}
+    effective_content_detail = report.get("content_detail") or {}
+    effective_output_preview = report.get("output_preview")
+    if not effective_stats and assisted_doc.get("passed"):
+        a_outs = ((assisted_doc.get("content_detail") or {}).get("outputs") or [])
+        if a_outs and isinstance(a_outs[0], dict) and a_outs[0].get("stats"):
+            effective_stats = {
+                **(a_outs[0].get("stats") or {}),
+                "output_file": a_outs[0].get("resolved", declared_output),
+                "format": declared_format,
+            }
+        effective_io_detail = assisted_doc.get("io_detail") or effective_io_detail
+        effective_content_detail = assisted_doc.get("content_detail") or effective_content_detail
+        effective_output_preview = assisted_doc.get("output_preview") or effective_output_preview
+
     # Loci (sorted by depth desc — top_loci_by_depth is already most_common())
-    loci_with_depth = [(l, d) for l, d in stats.get("top_loci_by_depth", [])]
+    loci_with_depth = [(l, d) for l, d in effective_stats.get("top_loci_by_depth", [])]
+
+    import upstream as upstream_lib
+    upstream_note = upstream_lib.note(report.get("upstream")) or ""
+
+    # Normalize needed_beyond_repo for older saved JSONs where assisted_run passed
+    needed_list = list(report.get("needed_beyond_repo") or [])
+    if assisted_doc.get("passed"):
+        vc_doc = assisted_doc.get("verified_commands") or {}
+        norm_needed: list[str] = []
+        for item in needed_list:
+            if item.startswith("Test data:") and "not executed" in item:
+                norm_needed.append(
+                    "Test data: no sample from the repository was used, so a public reference sample stood in."
+                )
+            elif item.startswith("A base environment for the documented installation:"):
+                extra_bits: list[str] = []
+                if vc_doc.get("uses_conda"):
+                    extra_bits.append("Miniforge (conda/mamba)")
+                if vc_doc.get("extra_apt"):
+                    extra_bits.append("Ubuntu build packages (" + ", ".join(vc_doc["extra_apt"]) + ")")
+                if vc_doc.get("git_https_rewrite"):
+                    extra_bits.append("HTTPS Git URL rewrite for public GitHub dependencies")
+                if vc_doc.get("init_submodules"):
+                    extra_bits.append("initialized Git submodules")
+                if any("pip install" in str(c) for c in (vc_doc.get("install") or [])):
+                    extra_bits.append("Python package installation in the active environment")
+                detail_str = ", ".join(extra_bits) if extra_bits else "Ubuntu 22.04 baseline tools"
+                norm_needed.append(
+                    f"Base environment and assisted adjustments: STRhub ran the assisted verification on "
+                    f"Ubuntu 22.04 with {detail_str}. Unpinned system and package versions can vary over time."
+                )
+            else:
+                norm_needed.append(item)
+        if "/data/ref/" in str(vc_doc.get("run") or "") and not any("reference genome" in x.lower() for x in norm_needed):
+            ref_g = dataset.get("reference_genome") or {}
+            asm = ref_g.get("assembly") or dataset.get("reference") or "GRCh38 / hg38"
+            mp = f"/data/ref/{ref_g.get('filename') or 'hg38.fa'}"
+            norm_needed.append(
+                f"A reference genome ({asm}): the command names one, and STRhub mounted the public copy at {mp}."
+            )
+        needed_list = norm_needed
 
     # Whether this result is published is the deploy gate's decision on the
     # verdict, handed in by the workflow. Without it, the old rule holds: a
@@ -1543,11 +1720,7 @@ def load_config(manifest_path: str, datasets_path: str | None = None,
         "repo_url":       repo_url,
         "commit":         commit,
         "commit_url":     commit_url,
-        # A permalink only for a result that is published, and a "not
-        # published" mark on one that is not. Whether it is published is the
-        # deploy gate's decision on the verdict, handed in by the workflow;
-        # how the run was triggered (a trial, a scheduled refresh) is not it.
-        # Without the flag, fall back to the old rule: a trial publishes nothing.
+        "upstream_note":  upstream_note,
         "permalink":      f"https://strhub.app/verified/{slug}" if _published else "",
         "ci_run":         report.get("ci_run", ""),
         "gates":          gates,
@@ -1558,46 +1731,41 @@ def load_config(manifest_path: str, datasets_path: str | None = None,
         "input_type":     input_type,
         "panel":          PANEL_MAP.get(input_type, input_type or "STR"),
         "stats":          stats,
+        "effective_stats": effective_stats,
         "io_detail":      report.get("io_detail") or {},
         "content_detail": report.get("content_detail") or {},
+        "output_preview": report.get("output_preview"),
+        "effective_io_detail": effective_io_detail,
+        "effective_content_detail": effective_content_detail,
+        "effective_output_preview": effective_output_preview,
         "declared_output": declared_output,
         "declared_format": declared_format,
         "loci_with_depth":loci_with_depth,
-        "loci_list":      stats.get("str_loci", []),
+        "loci_list":      effective_stats.get("str_loci", []),
         "panel_loci":     panel_loci,
         "dataset":        dataset,
-        # Per-leg outcomes (external / example), so the matrix reports
-        # what each leg did instead of asserting a pass.
         "datasets":       report.get("datasets") or [],
-        # Why the build failed, with the side it falls on. Absent unless the
-        # Installs gate failed and the build log named a cause.
         "install_detail": report.get("install_detail") or {},
-        # The one sentence the web leads with. A certificate that omits it can
-        # read as a pass while the report it renders says "Fails".
         "verdict":        report.get("verdict") or {},
         "execution_finding_established": execution_finding_established(report),
         "step1":          report.get("step1") or {},
-        # Whether the repository ships example data, when a run actually read
-        # the tree to find out. Absent means nobody looked.
         "repo_test_data": report.get("repo_test_data") or {},
-        # Quoted from the README at the pinned ref; the framing is ours, the
-        # content is the author's.
         "author_known_issues": report.get("author_known_issues") or [],
-        # Unmarked, the PDF of a run that was not published is indistinguishable
-        # from an attestation anyone may circulate.
         "is_trial":       not _published,
-        # "maintainer" | "third_party" | "" — who filled in the submission. Kept
-        # apart from the maintainer named in the manifest, who answers for the
-        # software: the two are the same person only when a tool's own maintainer
-        # submits it. Empty on runs from before the form asked.
         "submitted_by":   (report.get("submission") or {}).get("by") or "",
         "diagnostics":    report.get("diagnostics") or {},
-        # Read off the repository when the run was configured, not produced by it.
         "caveats":        report.get("caveats") or {},
-        "needed_beyond_repo": report.get("needed_beyond_repo") or [],
+        "needed_beyond_repo": needed_list,
+        "recommendations": report.get("recommendations") or [],
+        "evidence":       report.get("evidence") or [],
+        "strict_dockerfile": strict_dockerfile,
+        "strict_terminal_lines": strict_terminal_lines,
+        "strict_terminal_label": "execution" if strict_leg == "external" else "installation",
+        "assisted_terminal_lines": assisted_terminal_lines,
+        "assisted_terminal_label": "execution" if ass_leg == "assisted-external" else "installation",
         "headline":       headline(report)[0] if report else "",
         "certificate":    report.get("certificate") or {},
-        "assisted_run":   report.get("assisted_run") or {},
+        "assisted_run":   assisted_doc,
         "log_filename":   (report.get("logs") or {}).get("external", ""),
         "failure_excerpt": failure_excerpt,
     }
@@ -1627,7 +1795,7 @@ def main() -> int:
         out_path, pagesize=A4,
         leftMargin=ML, rightMargin=MR,
         topMargin=MT, bottomMargin=MB + 8*mm,
-        title=f"STRhub Verified — {cfg['tool_display']}",
+        title=f"STRhub Verified: {cfg['tool_display']}",
         author="STRhub · strhub.app",
         subject="Technical Reproducibility Validation Report",
     )
@@ -1635,6 +1803,10 @@ def main() -> int:
     story += build_cover(cfg)
     story.append(PageBreak())
     story += build_body(cfg)
+    story += build_technical_annex(cfg)
+    if cfg.get("loci_with_depth"):
+        story.append(PageBreak())
+        story += build_appendix(cfg)
 
     doc.build(story, canvasmaker=_make_canvas_class(cfg))
     print(f"✓ {out_path}")

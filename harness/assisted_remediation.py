@@ -177,7 +177,7 @@ def _assisted_rewrite_command(raw_cmd: str, input_type: str | None, regions: str
                 f"Positional read-file argument `{orig_tok}` has no explicit input flag, "
                 "so the literal profile refused to guess it."
             ),
-            "adjustment_applied": f"Bound positional read-file token `{orig_tok}` -> `{target}`.",
+            "adjustment_applied": f"Bound positional read-file token `{orig_tok}` to `{target}`.",
             "author_fix": (
                 "Document an explicit input flag (e.g. `--bam` / `-i`) if supported, or ship a small "
                 f"example file at `{orig_tok}` in the repository so the documented command runs verbatim."
