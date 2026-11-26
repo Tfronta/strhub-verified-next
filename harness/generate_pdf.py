@@ -865,47 +865,50 @@ def build_body(cfg):
             els.append(atbl)
             els.append(vspace(4))
 
-        vc = assisted.get("verified_commands") or {}
-        v_lines: list[str] = ["# Verified commands to reproduce this commit today:"]
-        if vc.get("extra_apt"):
-            v_lines.append("$ sudo apt-get update && sudo apt-get install -y " + " ".join(vc["extra_apt"]))
-        if vc.get("init_submodules"):
-            v_lines.append("$ git submodule update --init --recursive")
-        for ic in vc.get("install") or []:
-            v_lines.append(f"$ {ic}")
-        for md in vc.get("mkdir_dirs") or []:
-            v_lines.append(f"$ mkdir -p {md}")
-        if vc.get("run"):
-            v_lines.extend(_format_cmd(vc["run"]))
-        if len(v_lines) > 1:
-            v_pars = [Paragraph(esc(ln), ST["mono"]) for ln in v_lines]
-            vbox = Table([[v_pars]], colWidths=[CW])
-            vbox.setStyle(TableStyle([
-                ("BACKGROUND",    (0,0),(-1,-1), WHITE),
-                ("BOX",           (0,0),(-1,-1), 0.5, BORDER),
-                ("TOPPADDING",    (0,0),(-1,-1), 10),
-                ("BOTTOMPADDING", (0,0),(-1,-1), 10),
-                ("LEFTPADDING",   (0,0),(-1,-1), 14),
-                ("RIGHTPADDING",  (0,0),(-1,-1), 14),
-            ]))
-            els.append(vbox)
+        if assisted.get("passed"):
+            vc = assisted.get("verified_commands") or {}
+            v_lines: list[str] = ["# Verified commands to reproduce this commit today:"]
+            if vc.get("extra_apt"):
+                v_lines.append("$ sudo apt-get update && sudo apt-get install -y " + " ".join(vc["extra_apt"]))
+            if vc.get("git_https_rewrite"):
+                v_lines.append('$ git config --global url."https://github.com/".insteadOf "git@github.com:"')
+            if vc.get("init_submodules"):
+                v_lines.append("$ git submodule update --init --recursive")
+            for ic in vc.get("install") or []:
+                v_lines.append(f"$ {ic}")
+            for md in vc.get("mkdir_dirs") or []:
+                v_lines.append(f"$ mkdir -p {md}")
+            if vc.get("run"):
+                v_lines.extend(_format_cmd(vc["run"]))
+            if len(v_lines) > 1:
+                v_pars = [Paragraph(esc(ln), ST["mono"]) for ln in v_lines]
+                vbox = Table([[v_pars]], colWidths=[CW])
+                vbox.setStyle(TableStyle([
+                    ("BACKGROUND",    (0,0),(-1,-1), WHITE),
+                    ("BOX",           (0,0),(-1,-1), 0.5, BORDER),
+                    ("TOPPADDING",    (0,0),(-1,-1), 10),
+                    ("BOTTOMPADDING", (0,0),(-1,-1), 10),
+                    ("LEFTPADDING",   (0,0),(-1,-1), 14),
+                    ("RIGHTPADDING",  (0,0),(-1,-1), 14),
+                ]))
+                els.append(vbox)
 
-        if assisted.get("readme_suggestion"):
-            els.append(vspace(3))
-            els.append(Paragraph("<b>Suggested README.md addition for the repository maintainer:</b>", ST["body"]))
-            els.append(vspace(2))
-            r_pars = [Paragraph(esc(ln) if ln.strip() else "&nbsp;", ST["mono"])
-                      for ln in assisted["readme_suggestion"].splitlines()]
-            rbox = Table([[r_pars]], colWidths=[CW])
-            rbox.setStyle(TableStyle([
-                ("BACKGROUND",    (0,0),(-1,-1), GRAY_LIGHT),
-                ("BOX",           (0,0),(-1,-1), 0.5, BORDER),
-                ("TOPPADDING",    (0,0),(-1,-1), 8),
-                ("BOTTOMPADDING", (0,0),(-1,-1), 8),
-                ("LEFTPADDING",   (0,0),(-1,-1), 14),
-                ("RIGHTPADDING",  (0,0),(-1,-1), 14),
-            ]))
-            els.append(rbox)
+            if assisted.get("readme_suggestion"):
+                els.append(vspace(3))
+                els.append(Paragraph("<b>Suggested README.md addition for the repository maintainer:</b>", ST["body"]))
+                els.append(vspace(2))
+                r_pars = [Paragraph(esc(ln) if ln.strip() else "&nbsp;", ST["mono"])
+                          for ln in assisted["readme_suggestion"].splitlines()]
+                rbox = Table([[r_pars]], colWidths=[CW])
+                rbox.setStyle(TableStyle([
+                    ("BACKGROUND",    (0,0),(-1,-1), GRAY_LIGHT),
+                    ("BOX",           (0,0),(-1,-1), 0.5, BORDER),
+                    ("TOPPADDING",    (0,0),(-1,-1), 8),
+                    ("BOTTOMPADDING", (0,0),(-1,-1), 8),
+                    ("LEFTPADDING",   (0,0),(-1,-1), 14),
+                    ("RIGHTPADDING",  (0,0),(-1,-1), 14),
+                ]))
+                els.append(rbox)
 
         a_cd_outs = ((assisted.get("content_detail") or {}).get("outputs") or [])
         a_stats = a_cd_outs[0].get("stats") if a_cd_outs and isinstance(a_cd_outs[0], dict) else None

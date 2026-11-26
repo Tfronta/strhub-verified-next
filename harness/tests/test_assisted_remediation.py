@@ -73,8 +73,10 @@ def test_straglr_positional_bam_triggers_rule5_and_stages_reference_genome():
 def test_longtr_build_failure_triggers_missing_apt_and_submodules():
     proposal, manifest, review = _eval_snapshot("longtr")
     assert review["install_ready"] is True
-    build_log = "/bin/sh: 1: autoreconf: not found\nfatal error: zlib.h: No such file or directory\n"
-    # 1. LongTR snapshot (without .gitmodules) remediates missing autotools + zlib1g-dev
+    # Even when Track 1 stopped on the very first command (`autoreconf: not found`) before
+    # `./configure`, `cmake`, or `git clone git@github.com:` ran, Track 2 supplies the
+    # complete native C/C++ build toolchain AND the HTTPS rewrite for `ssh_urls_in`!
+    build_log = "/bin/sh: 1: autoreconf: not found\n"
     plan = ar.plan_assisted_run(
         proposal,
         manifest,
@@ -87,8 +89,14 @@ def test_longtr_build_failure_triggers_missing_apt_and_submodules():
     )
     assert plan is not None
     assert plan["needs_rebuild"] is True
-    assert {"autoconf", "automake", "libtool", "zlib1g-dev"} <= set(plan["extra_apt"])
-    assert "missing_apt_build_tool" in {a["rule_id"] for a in plan["adjustments"]}
+    assert {
+        "cmake", "autoconf", "automake", "libtool", "pkg-config",
+        "zlib1g-dev", "libbz2-dev", "liblzma-dev", "libcurl4-openssl-dev",
+        "libssl-dev", "libgtest-dev",
+    } <= set(plan["extra_apt"])
+    assert plan["git_https_rewrite"] is True
+    assert "url.https://github.com/.insteadOf" in plan["dockerfile"]
+    assert {"missing_apt_build_tool", "ssh_git_url_in_build"} <= {a["rule_id"] for a in plan["adjustments"]}
 
     # 2. When a repository tree also carries `.gitmodules` and README omitted `--recursive`,
     #    Rule 2 (`uninitialized_submodules`) triggers automatically alongside Rule 1.

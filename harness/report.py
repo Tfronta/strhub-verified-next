@@ -599,9 +599,10 @@ def _summary_md(report: dict, slug: str) -> str:
         ]
         adjs = assisted.get("adjustments") or []
         if adjs:
+            adj_heading = "Adjustments applied" if assisted.get("passed") else "Adjustments attempted"
             lines += [
                 "",
-                "### Adjustments applied",
+                f"### {adj_heading}",
                 "",
                 "| What stopped literal run | Adjustment applied | Suggested repository change |",
                 "|---|---|---|",
@@ -611,21 +612,24 @@ def _summary_md(report: dict, slug: str) -> str:
                 ap_txt = str(a.get("adjustment_applied", "—")).replace("\n", " ")
                 fx = str(a.get("author_fix", "—")).replace("\n", " ")
                 lines.append(f"| {w} | {ap_txt} | {fx} |")
-        vc = assisted.get("verified_commands") or {}
-        cmd_seq: list[str] = []
-        if vc.get("extra_apt"):
-            cmd_seq.append("sudo apt-get update && sudo apt-get install -y " + " ".join(vc["extra_apt"]))
-        if vc.get("init_submodules"):
-            cmd_seq.append("git submodule update --init --recursive")
-        cmd_seq.extend(vc.get("install") or [])
-        for d in vc.get("mkdir_dirs") or []:
-            cmd_seq.append(f"mkdir -p {d}")
-        if vc.get("run"):
-            cmd_seq.append(vc["run"])
-        if cmd_seq:
-            lines += ["", "### Verified commands (reproducible today)", "", "```bash", *cmd_seq, "```"]
-        if assisted.get("readme_suggestion"):
-            lines += ["", "### Suggested README.md block", "", assisted["readme_suggestion"]]
+        if assisted.get("passed"):
+            vc = assisted.get("verified_commands") or {}
+            cmd_seq: list[str] = []
+            if vc.get("extra_apt"):
+                cmd_seq.append("sudo apt-get update && sudo apt-get install -y " + " ".join(vc["extra_apt"]))
+            if vc.get("git_https_rewrite"):
+                cmd_seq.append('git config --global url."https://github.com/".insteadOf "git@github.com:"')
+            if vc.get("init_submodules"):
+                cmd_seq.append("git submodule update --init --recursive")
+            cmd_seq.extend(vc.get("install") or [])
+            for d in vc.get("mkdir_dirs") or []:
+                cmd_seq.append(f"mkdir -p {d}")
+            if vc.get("run"):
+                cmd_seq.append(vc["run"])
+            if cmd_seq:
+                lines += ["", "### Verified commands (reproducible today)", "", "```bash", *cmd_seq, "```"]
+            if assisted.get("readme_suggestion"):
+                lines += ["", "### Suggested README.md block", "", assisted["readme_suggestion"]]
         a_prev = assisted.get("output_preview")
         if isinstance(a_prev, dict) and a_prev.get("file"):
             lines += [
@@ -1090,34 +1094,40 @@ def _summary_html(report: dict, slug: str) -> str:
             f"<td>{esc(a.get('author_fix', '—'))}</td></tr>"
             for a in (assisted.get("adjustments") or [])
         )
+        adj_heading = "Adjustments applied" if assisted.get("passed") else "Adjustments attempted"
         adj_table = (
-            "<h3>Adjustments applied</h3>"
+            f"<h3>{adj_heading}</h3>"
             "<table><thead><tr><th>What stopped literal run</th><th>Adjustment applied</th>"
             "<th>Suggested repository change</th></tr></thead>"
             f"<tbody>{adj_rows}</tbody></table>"
             if adj_rows else ""
         )
-        vc = assisted.get("verified_commands") or {}
-        cmd_seq = []
-        if vc.get("extra_apt"):
-            cmd_seq.append("sudo apt-get update && sudo apt-get install -y " + " ".join(vc["extra_apt"]))
-        if vc.get("init_submodules"):
-            cmd_seq.append("git submodule update --init --recursive")
-        cmd_seq.extend(vc.get("install") or [])
-        for d in vc.get("mkdir_dirs") or []:
-            cmd_seq.append(f"mkdir -p {d}")
-        if vc.get("run"):
-            cmd_seq.append(vc["run"])
-        cmd_html = (
-            "<h3>Verified commands (reproducible today)</h3>"
-            f"<pre><code>{esc(chr(10).join(cmd_seq))}</code></pre>"
-            if cmd_seq else ""
-        )
-        readme_html = (
-            "<h3>Suggested README.md block</h3>"
-            f"<pre><code>{esc(assisted['readme_suggestion'])}</code></pre>"
-            if assisted.get("readme_suggestion") else ""
-        )
+        cmd_html = ""
+        readme_html = ""
+        if assisted.get("passed"):
+            vc = assisted.get("verified_commands") or {}
+            cmd_seq = []
+            if vc.get("extra_apt"):
+                cmd_seq.append("sudo apt-get update && sudo apt-get install -y " + " ".join(vc["extra_apt"]))
+            if vc.get("git_https_rewrite"):
+                cmd_seq.append('git config --global url."https://github.com/".insteadOf "git@github.com:"')
+            if vc.get("init_submodules"):
+                cmd_seq.append("git submodule update --init --recursive")
+            cmd_seq.extend(vc.get("install") or [])
+            for d in vc.get("mkdir_dirs") or []:
+                cmd_seq.append(f"mkdir -p {d}")
+            if vc.get("run"):
+                cmd_seq.append(vc["run"])
+            cmd_html = (
+                "<h3>Verified commands (reproducible today)</h3>"
+                f"<pre><code>{esc(chr(10).join(cmd_seq))}</code></pre>"
+                if cmd_seq else ""
+            )
+            readme_html = (
+                "<h3>Suggested README.md block</h3>"
+                f"<pre><code>{esc(assisted['readme_suggestion'])}</code></pre>"
+                if assisted.get("readme_suggestion") else ""
+            )
         assisted_block = (
             "<h2>Automated verification with adjustments</h2>"
             f"<p>Outcome: {a_status} &middot; Source code modified: <b>No</b> (<code>/app:ro</code>).</p>"

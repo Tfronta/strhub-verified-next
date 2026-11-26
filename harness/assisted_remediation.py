@@ -51,6 +51,30 @@ _CMD_TO_APT: dict[str, tuple[str, ...]] = {
     "rustc": ("cargo",),
 }
 
+#: Standard Ubuntu 22.04 C/C++ build toolchain & compression/TLS/unit-test `-dev`
+#: headers. Because `make` / `./configure` / `cmake` abort at the FIRST missing
+#: executable or header (`autoreconf` -> `zlib.h` -> `bzlib.h` -> `lzma.h` ->
+#: `curl/curl.h` -> `cmake` -> `GTest`), a single-pass (`MAX_ASSISTED_ATTEMPTS == 1`)
+#: native C/C++ build supplies this standard Debian/Ubuntu C/C++ bundle together.
+_STANDARD_NATIVE_CPP_APT: tuple[str, ...] = (
+    "cmake",
+    "autoconf",
+    "automake",
+    "libtool",
+    "pkg-config",
+    "zlib1g-dev",
+    "libbz2-dev",
+    "liblzma-dev",
+    "libcurl4-openssl-dev",
+    "libssl-dev",
+    "libgtest-dev",
+)
+_NATIVE_BUILD_CMD_RE = re.compile(r"\b(?:make|cmake|autoreconf|autoconf|configure|g\+\+|gcc|clang\+\+)\b")
+_GIT_SSH_LOG_RE = re.compile(
+    r"(?:git@github\.com:|Permission denied \(publickey\)|Host key verification failed)",
+    re.I,
+)
+
 #: Closed generic table mapping missing C/C++ headers, CMake Find modules, or
 #: linker flags in `log_build.txt` to standard Ubuntu 22.04 `-dev` packages.
 _BUILD_LOG_APT_RULES: tuple[tuple[re.Pattern[str], tuple[str, ...], str], ...] = (
@@ -267,6 +291,7 @@ def _build_assisted_dockerfile(
     conda_env: str | None,
     venv_activate: str | None,
     extra_apt: list[str],
+    git_https_rewrite: bool = False,
 ) -> str:
     lines = ["# Assisted remediation carrier: strhub-assisted-remediation/1 (Track 2 rehearsal)."]
     lines += documented_install.base_lines(uses_conda)
@@ -275,6 +300,12 @@ def _build_assisted_dockerfile(
             "RUN " + json.dumps([
                 "bash", "-c",
                 "apt-get update && apt-get install -y --no-install-recommends " + " ".join(extra_apt),
+            ])
+        )
+    if git_https_rewrite:
+        lines.append(
+            "RUN " + json.dumps([
+                "git", "config", "--global", "url.https://github.com/.insteadOf", "git@github.com:",
             ])
         )
     lines += ['COPY [".", "/opt/tool"]', "WORKDIR /opt/tool"]
@@ -292,6 +323,7 @@ def _build_readme_suggestion(
     repo_url: str,
     init_submodules: bool,
     extra_apt: list[str],
+    git_https_rewrite: bool,
     install_commands: list[str],
     mkdir_dirs: list[str],
     display_run_cmd: str,
@@ -302,6 +334,8 @@ def _build_readme_suggestion(
     inst_lines: list[str] = []
     if extra_apt:
         inst_lines.append("sudo apt-get update && sudo apt-get install -y " + " ".join(extra_apt))
+    if git_https_rewrite:
+        inst_lines.append('git config --global url."https://github.com/".insteadOf "git@github.com:"')
     inst_lines.append(f"git clone {clone_flag}{repo_clean}")
     inst_lines.append(f"cd {repo_dir}")
     inst_lines.extend(install_commands)
@@ -375,6 +409,8 @@ def plan_assisted_run(
 
     install_commands = list(doc_cmds)
     extra_apt: list[str] = []
+    git_https_rewrite = False
+    ssh_files = [str(f) for f in ((proposal.get("build") or {}).get("ssh_urls_in") or []) if f]
 
     # --- Installation remediation (Rules 1, 2, 3, 4) -------------------------
     if not review.get("install_ready"):
@@ -412,26 +448,75 @@ def plan_assisted_run(
             })
         elif "Makefile" in tree_paths and "CMakeLists.txt" not in tree_paths:
             install_commands = ["make"]
+            extra_apt = list(_STANDARD_NATIVE_CPP_APT)
             adjustments.append({
                 "rule_id": "standard_manifest_in_root",
                 "category": "environment",
                 "what_failed_strict": "No literally copyable installation code block was admitted from README.md.",
-                "adjustment_applied": "Ran `make` against the root `Makefile` shipped in the commit.",
+                "adjustment_applied": (
+                    "Installed standard Ubuntu 22.04 C/C++ build packages and ran `make` against "
+                    "the root `Makefile` shipped in the commit."
+                ),
                 "author_fix": "Add a copyable `make` installation block (plus required `apt` libraries) to README.md.",
             })
+            if ssh_files:
+                git_https_rewrite = True
+                adjustments.append({
+                    "rule_id": "ssh_git_url_in_build",
+                    "category": "environment",
+                    "what_failed_strict": (
+                        f"Build file(s) (`{', '.join(ssh_files)}`) clone public GitHub dependencies via "
+                        "`git@github.com:` SSH URLs, which fail without a configured SSH key."
+                    ),
+                    "adjustment_applied": (
+                        'Configured Git HTTPS URL rewrite (`git config --global url."https://github.com/".insteadOf "git@github.com:"`).'
+                    ),
+                    "author_fix": (
+                        f"Replace `git@github.com:` with `https://github.com/` in `{', '.join(ssh_files)}` "
+                        "so clean checkouts build without SSH keys."
+                    ),
+                })
         else:
             return None
     elif installs_attempted and not installs_passed:
-        # Rule 1: missing standard Ubuntu build tools or `-dev` libraries
+        # Rule 1: missing standard Ubuntu build tools or `-dev` libraries.
+        # Because `make`/`./configure`/`cmake` abort on the first missing tool or header,
+        # a single-pass native C/C++ build supplies the standard Ubuntu C/C++ bundle together.
         apt_pkgs, apt_reasons = _detect_missing_apt(build_log_text)
+        is_native_build = any(_NATIVE_BUILD_CMD_RE.search(c) for c in install_commands)
+        native_pkg_hit = bool(set(apt_pkgs) & (set(_STANDARD_NATIVE_CPP_APT) | {"libhts-dev", "libncurses5-dev"}))
         if apt_pkgs:
-            extra_apt = apt_pkgs
+            extra_apt = (
+                _dedupe(list(_STANDARD_NATIVE_CPP_APT) + apt_pkgs)
+                if (is_native_build or native_pkg_hit)
+                else apt_pkgs
+            )
             adjustments.append({
                 "rule_id": "missing_apt_build_tool",
                 "category": "environment",
                 "what_failed_strict": "Build failed due to undeclared system packages (" + ", ".join(apt_reasons) + ").",
-                "adjustment_applied": "Installed standard Ubuntu 22.04 build packages: `" + " ".join(apt_pkgs) + "`.",
-                "author_fix": "Add `sudo apt-get update && sudo apt-get install -y " + " ".join(apt_pkgs) + "` to README.md.",
+                "adjustment_applied": "Installed standard Ubuntu 22.04 build packages: `" + " ".join(extra_apt) + "`.",
+                "author_fix": "Add `sudo apt-get update && sudo apt-get install -y " + " ".join(extra_apt) + "` to README.md.",
+            })
+        # Rule 1b: public GitHub `git@github.com:` SSH URLs inside build scripts/submodules
+        if ssh_files or _GIT_SSH_LOG_RE.search(build_log_text):
+            git_https_rewrite = True
+            where_ssh = f" (`{', '.join(ssh_files)}`)" if ssh_files else ""
+            target_fix = f"`{', '.join(ssh_files)}`" if ssh_files else "build scripts / `.gitmodules`"
+            adjustments.append({
+                "rule_id": "ssh_git_url_in_build",
+                "category": "environment",
+                "what_failed_strict": (
+                    f"Build step{where_ssh} clones public GitHub dependencies via `git@github.com:` SSH URLs, "
+                    "which fail without a configured SSH key."
+                ),
+                "adjustment_applied": (
+                    'Configured Git HTTPS URL rewrite (`git config --global url."https://github.com/".insteadOf "git@github.com:"`).'
+                ),
+                "author_fix": (
+                    f"Replace `git@github.com:` with `https://github.com/` in {target_fix} "
+                    "so clean checkouts build without SSH keys."
+                ),
             })
         # Rule 2: uninitialized `.gitmodules`
         if ".gitmodules" in tree_paths and not init_submodules:
@@ -503,6 +588,7 @@ def plan_assisted_run(
         conda_env=conda_env,
         venv_activate=venv_activate,
         extra_apt=extra_apt,
+        git_https_rewrite=git_https_rewrite,
     )
     ref_genome = input_provenance.reference_for(ds, assisted_cmd)
     repo_url = (manifest.get("source") or {}).get("repo") or proposal.get("repo") or ""
@@ -518,6 +604,7 @@ def plan_assisted_run(
         "venv_activate": venv_activate,
         "init_submodules": init_submodules,
         "extra_apt": extra_apt,
+        "git_https_rewrite": git_https_rewrite,
         "install_commands": install_commands,
         "dockerfile": dockerfile,
         "unwrapped_run_cmd": assisted_cmd,
@@ -528,7 +615,8 @@ def plan_assisted_run(
         "regions": regions,
         "needs_reference": bool(ref_genome),
         "readme_suggestion": _build_readme_suggestion(
-            repo_url, init_submodules, extra_apt, install_commands, mkdir_dirs, raw_run_cmd,
+            repo_url, init_submodules, extra_apt, git_https_rewrite,
+            install_commands, mkdir_dirs, raw_run_cmd,
         ),
     }
 
@@ -607,7 +695,12 @@ def execute_assisted_run(
                 return None
 
         if plan["init_submodules"] and (src_abs / ".gitmodules").exists():
-            argv_sub = ["git", "-C", str(src_rel), "submodule", "update", "--init", "--recursive"]
+            git_cmd = (
+                ["git", "-c", "url.https://github.com/.insteadOf=git@github.com:"]
+                if plan.get("git_https_rewrite")
+                else ["git"]
+            )
+            argv_sub = [*git_cmd, "-C", str(src_rel), "submodule", "update", "--init", "--recursive"]
             if ctx.exe.run(argv_sub, log=log_build_abs, cwd=ctx.root) != 0:
                 return _assemble_record(plan, installs_ok=False, runs_ok=False, io_doc=None, ct_doc=None,
                                         log_build=str(log_build_abs), log_ext="", out_ext="")
@@ -737,6 +830,7 @@ def _assemble_record(
         "adjustments": plan["adjustments"],
         "verified_commands": {
             "extra_apt": plan["extra_apt"],
+            "git_https_rewrite": bool(plan.get("git_https_rewrite")),
             "init_submodules": plan["init_submodules"],
             "install": plan["install_commands"],
             "mkdir_dirs": plan["mkdir_dirs"],
