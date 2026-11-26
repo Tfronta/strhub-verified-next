@@ -136,11 +136,14 @@ def _summary_entry(slug: str, r: dict, prefix: str = "") -> dict:
     ref = r.get("source", {}).get("ref_resolved")
     verdict_obj = r.get("verdict") or {}
     gates_obj = r.get("gates") or {}
+    assisted_obj = r.get("assisted_run") or {}
+    assisted_runs = bool(assisted_obj.get("passed"))
+    assisted_level = assisted_obj.get("level") if assisted_obj.get("attempted") else None
     content_verified = bool(
         verdict_obj["content_verified"]
         if "content_verified" in verdict_obj
         else gates_obj.get("content", False)
-    )
+    ) or bool(assisted_obj.get("content_verified") and assisted_runs)
     return {
         "slug": slug,
         "name": tool.get("name", slug),
@@ -168,6 +171,8 @@ def _summary_entry(slug: str, r: dict, prefix: str = "") -> dict:
         # re-deriving it from the gates.
         "verdict": verdict_obj.get("code"),
         "verdict_basis": verdict_obj.get("basis"),
+        "assisted_runs": assisted_runs,
+        "assisted_level": assisted_level,
         "content_verified": content_verified,
         "errors_reported": errors_reported,
         "generated": r.get("generated"),
@@ -203,6 +208,8 @@ def _version_entry(slug: str, sha: str | None, r: dict, prefix: str, reports: pa
         "label": e["label"],
         "verdict": e["verdict"],
         "verdict_basis": e["verdict_basis"],
+        "assisted_runs": e["assisted_runs"],
+        "assisted_level": e["assisted_level"],
         "content_verified": e["content_verified"],
         "errors_reported": e["errors_reported"],
         "ci_run": e["ci_run"],

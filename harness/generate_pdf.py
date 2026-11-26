@@ -369,12 +369,24 @@ def build_cover(cfg):
     # repository — before the rung it reached (certificate_text.headline,
     # the same the badge and the page print).
     result_label = cfg.get("headline") or LEVEL_LABEL.get(cfg["level"], "Not verified")
-    res_color = "#ef4444" if (cfg.get("verdict") or {}).get("code") == "fails" else "#00909c"
+    assisted_cover = cfg.get("assisted_run") or {}
+    if assisted_cover.get("passed"):
+        res_color = "#b45309"
+    elif (cfg.get("verdict") or {}).get("code") == "fails":
+        res_color = "#ef4444"
+    else:
+        res_color = "#00909c"
     meta_rows = [
         ("Verification date",  cfg["ver_date"]),
         ("Repository commit",  link(cfg["commit_url"], cfg["commit"])),
-        ("Result",             f'<font color="{res_color}"><b>{result_label}</b></font>'),
-        ("Reached",            LEVEL_LABEL.get(cfg["level"], "Not run")),
+        ("Result",             f'<font color="{res_color}"><b>{esc(result_label)}</b></font>'),
+        ("Reached (literal)",  LEVEL_LABEL.get(cfg["level"], "Not run")),
+    ]
+    if assisted_cover.get("passed"):
+        n_adj = len(assisted_cover.get("adjustments") or [])
+        a_lvl = LEVEL_LABEL.get(assisted_cover.get("level", "io"), "Runs + Expected IO")
+        meta_rows.append(("Assisted track", f'<font color="#b45309"><b>{esc(a_lvl)}</b></font> ({n_adj} standard adjustment(s); no code changes)'))
+    meta_rows += [
         ("Permalink",          link(cfg["permalink"]) if cfg.get("permalink")
                                else "Not published — this is a test run"),
         ("STRhub",             link("https://strhub.app")),
@@ -467,13 +479,29 @@ def build_body(cfg):
     n_pass = sum(1 for ok in gates_dict.values() if ok)
     n_total = len(gates_dict)
     verdict = cfg.get("verdict") or {}
-    res_color = "#ef4444" if verdict.get("code") == "fails" else "#00909c"
+    assisted_exec = cfg.get("assisted_run") or {}
+    if assisted_exec.get("passed"):
+        res_color = "#b45309"
+    elif verdict.get("code") == "fails":
+        res_color = "#ef4444"
+    else:
+        res_color = "#00909c"
     els.append(section_num("1", "Executive Summary"))
     exec_rows = [
         ("PURPOSE",           PURPOSE),
         ("RESULT",            f'<font color="{res_color}"><b>{esc(result_label)}</b></font>'),
-        ("REACHED",           f'{esc(attest_label)}, {n_pass}/{n_total} gates passed'),
+        ("REACHED (LITERAL)", f'{esc(attest_label)}, {n_pass}/{n_total} gates passed'),
     ]
+    if assisted_exec.get("attempted"):
+        a_lvl = LEVEL_LABEL.get(assisted_exec.get("level", "none"), "Not run")
+        a_gates = assisted_exec.get("gates") or {}
+        a_n = sum(1 for k, _, _ in GATE_DISPLAY if a_gates.get(k))
+        a_txt = (
+            f'<font color="#b45309"><b>PASS — {esc(a_lvl)}</b></font> ({a_n}/5 gates; no source-code edits)'
+            if assisted_exec.get("passed")
+            else f'Stopped at {esc(a_lvl)} ({a_n}/5 gates)'
+        )
+        exec_rows.append(("ASSISTED TRACK", a_txt))
     if verdict.get("reason"):
         exec_rows.append(("WHY", esc(verdict["reason"])))
     exec_rows += [
@@ -780,6 +808,120 @@ def build_body(cfg):
         ("RIGHTPADDING",  (0,0),(-1,-1), 16),
     ]))
     els.append(cmd_box)
+
+    # Automated Verification with Adjustments (Track 2 — canonical for reviewers, users & authors)
+    assisted = cfg.get("assisted_run") or {}
+    if assisted.get("attempted"):
+        els.append(section_num(str(sec), "Automated Verification with Adjustments"))
+        sec += 1
+        if assisted.get("passed"):
+            lead_txt = (
+                "Because the literal procedure stopped before end-to-end output verification, STRhub "
+                "automatically executed one isolated assisted run on the same pinned commit using only "
+                "standard environment/CLI adjustments (zero source-code modifications; repository mounted "
+                "read-only at <font name=\"Courier\">/app:ro</font>). <b>The assisted run succeeded and produced "
+                "structurally valid output.</b>"
+            )
+        else:
+            lead_txt = (
+                "STRhub automatically attempted one isolated assisted run with standard environment/CLI "
+                f"adjustments (no source-code modifications), which stopped at "
+                f"<b>{esc(LEVEL_LABEL.get(assisted.get('level', 'none'), 'Not run'))}</b>."
+            )
+        els.append(Paragraph(lead_txt, ST["body"]))
+        els.append(vspace(3))
+
+        adjs = assisted.get("adjustments") or []
+        if adjs:
+            ahead = [
+                Paragraph(f"<b>{h}</b>", ST["tbl_cell"])
+                for h in ("What stopped literal run", "Adjustment applied", "Suggested repository change")
+            ]
+            arows = [ahead]
+            cell_st = S("adjc", fontSize=7.8, textColor=INK, leading=11.5)
+            for a in adjs:
+                def _fmt_bt(val: str) -> str:
+                    s = esc(val or "—")
+                    return re.sub(r"`([^`]+)`", r'<font name="Courier">\1</font>', s)
+                arows.append([
+                    Paragraph(_fmt_bt(a.get("what_failed_strict", "—")), cell_st),
+                    Paragraph(_fmt_bt(a.get("adjustment_applied", "—")), cell_st),
+                    Paragraph(_fmt_bt(a.get("author_fix", "—")), cell_st),
+                ])
+            c_w = CW / 3.0
+            atbl = Table(arows, colWidths=[c_w, c_w, c_w])
+            atbl.setStyle(TableStyle([
+                ("VALIGN",        (0,0),(-1,-1), "TOP"),
+                ("LEFTPADDING",   (0,0),(-1,-1), 8),
+                ("RIGHTPADDING",  (0,0),(-1,-1), 8),
+                ("TOPPADDING",    (0,0),(-1,-1), 5),
+                ("BOTTOMPADDING", (0,0),(-1,-1), 5),
+                ("BACKGROUND",    (0,0),(-1,0),  colors.HexColor("#fef3c7")),
+                ("ROWBACKGROUNDS",(0,1),(-1,-1), [WHITE, GRAY_LIGHT]),
+                ("LINEBELOW",     (0,0),(-1,0),  0.6, colors.HexColor("#f59e0b")),
+                ("LINEBELOW",     (0,1),(-1,-2), 0.3, BORDER),
+                ("BOX",           (0,0),(-1,-1), 0.5, BORDER),
+            ]))
+            els.append(atbl)
+            els.append(vspace(4))
+
+        vc = assisted.get("verified_commands") or {}
+        v_lines: list[str] = ["# Verified commands to reproduce this commit today:"]
+        if vc.get("extra_apt"):
+            v_lines.append("$ sudo apt-get update && sudo apt-get install -y " + " ".join(vc["extra_apt"]))
+        if vc.get("init_submodules"):
+            v_lines.append("$ git submodule update --init --recursive")
+        for ic in vc.get("install") or []:
+            v_lines.append(f"$ {ic}")
+        for md in vc.get("mkdir_dirs") or []:
+            v_lines.append(f"$ mkdir -p {md}")
+        if vc.get("run"):
+            v_lines.extend(_format_cmd(vc["run"]))
+        if len(v_lines) > 1:
+            v_pars = [Paragraph(esc(ln), ST["mono"]) for ln in v_lines]
+            vbox = Table([[v_pars]], colWidths=[CW])
+            vbox.setStyle(TableStyle([
+                ("BACKGROUND",    (0,0),(-1,-1), WHITE),
+                ("BOX",           (0,0),(-1,-1), 0.5, BORDER),
+                ("TOPPADDING",    (0,0),(-1,-1), 10),
+                ("BOTTOMPADDING", (0,0),(-1,-1), 10),
+                ("LEFTPADDING",   (0,0),(-1,-1), 14),
+                ("RIGHTPADDING",  (0,0),(-1,-1), 14),
+            ]))
+            els.append(vbox)
+
+        if assisted.get("readme_suggestion"):
+            els.append(vspace(3))
+            els.append(Paragraph("<b>Suggested README.md addition for the repository maintainer:</b>", ST["body"]))
+            els.append(vspace(2))
+            r_pars = [Paragraph(esc(ln) if ln.strip() else "&nbsp;", ST["mono"])
+                      for ln in assisted["readme_suggestion"].splitlines()]
+            rbox = Table([[r_pars]], colWidths=[CW])
+            rbox.setStyle(TableStyle([
+                ("BACKGROUND",    (0,0),(-1,-1), GRAY_LIGHT),
+                ("BOX",           (0,0),(-1,-1), 0.5, BORDER),
+                ("TOPPADDING",    (0,0),(-1,-1), 8),
+                ("BOTTOMPADDING", (0,0),(-1,-1), 8),
+                ("LEFTPADDING",   (0,0),(-1,-1), 14),
+                ("RIGHTPADDING",  (0,0),(-1,-1), 14),
+            ]))
+            els.append(rbox)
+
+        a_cd_outs = ((assisted.get("content_detail") or {}).get("outputs") or [])
+        a_stats = a_cd_outs[0].get("stats") if a_cd_outs and isinstance(a_cd_outs[0], dict) else None
+        a_prev = assisted.get("output_preview") or {}
+        if assisted.get("passed") and (a_stats or a_prev.get("file")):
+            els.append(vspace(3))
+            summary_bits = []
+            if a_prev.get("file"):
+                summary_bits.append(f"file <font name=\"Courier\">{esc(a_prev['file'])}</font> ({a_prev.get('size_bytes', 0)} bytes)")
+            if a_stats:
+                summary_bits.append(f"{a_stats.get('rows', 0)} records")
+                summary_bits.append(f"{a_stats.get('distinct_str_loci', 0)} distinct STR loci")
+            els.append(boxed([Paragraph(
+                "<b>Assisted output verified:</b> " + " · ".join(summary_bits) + ".",
+                ST["body"],
+            )]))
 
     # §2 Metadata
     els.append(section_num(str(sec), "Reproducibility Metadata"))
@@ -1452,6 +1594,7 @@ def load_config(manifest_path: str, datasets_path: str | None = None,
         "needed_beyond_repo": report.get("needed_beyond_repo") or [],
         "headline":       headline(report)[0] if report else "",
         "certificate":    report.get("certificate") or {},
+        "assisted_run":   report.get("assisted_run") or {},
         "log_filename":   (report.get("logs") or {}).get("external", ""),
         "failure_excerpt": failure_excerpt,
     }

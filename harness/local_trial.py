@@ -304,15 +304,25 @@ def build_local_trial(repo_url: str, ref: str, ref_label: str, out_dir: pathlib.
         record_path = tmp_path / "run_record.json"
 
         infra_failure = preflight.get("input_failure", "")
-        if preflight.get("install_ready") != "1" or (not may_run and preflight.get("example_ready") != "1"):
-            # No proven procedure: nothing is built or run, and no process starts.
-            log_build.write_text(
-                f"==== STRhub Verified local evaluation ====\n"
-                f"Repository: https://github.com/{slug} @ {ref}\n"
-                f"Procedure classifier blocker: {proc.get('blocker')}\n"
-                f"Reason: {proc.get('reason')}\n"
+        can_run_track1 = preflight.get("install_ready") == "1" and (
+            may_run or preflight.get("example_ready") == "1"
+        )
+        can_run_track2 = False
+        if run_docker and not can_run_track1 and not infra_failure:
+            import assisted_remediation
+            can_run_track2 = (
+                assisted_remediation.plan_assisted_run(
+                    proposal,
+                    built["manifest"],
+                    proc,
+                    installs_passed=preflight.get("install_ready") == "1",
+                    installs_attempted=preflight.get("install_ready") == "1",
+                    runs_passed=False,
+                    io_passed=False,
+                )
+                is not None
             )
-        elif run_docker:
+        if run_docker and (can_run_track1 or can_run_track2):
             d_info = subprocess.run(["docker", "info"], capture_output=True, text=True, check=False)
             if d_info.returncode != 0:
                 infra_failure = "Docker daemon is not running or reachable on this machine"
@@ -334,6 +344,14 @@ def build_local_trial(repo_url: str, ref: str, ref_label: str, out_dir: pathlib.
                     rec = engine_runner.run(plan, work_dir, ROOT, exe=exe or Executor(), results=results_dir,
                                             image=f"strhub-trial:{run_slug}", container_prefix=run_slug)
                 engine_record.write(rec, record_path)
+        elif not can_run_track1:
+            # No proven procedure (and no deterministic Track 2 adjustment): nothing is built or run, and no process starts.
+            log_build.write_text(
+                f"==== STRhub Verified local evaluation ====\n"
+                f"Repository: https://github.com/{slug} @ {ref}\n"
+                f"Procedure classifier blocker: {proc.get('blocker')}\n"
+                f"Reason: {proc.get('reason')}\n"
+            )
         else:
             infra_failure = "local preview mode (no container was built or executed on this machine)"
             log_build.write_text(
@@ -399,7 +417,13 @@ def build_local_trial(repo_url: str, ref: str, ref_label: str, out_dir: pathlib.
         shutil.copy2(reports_dir / f"{cat_slug}.html", out_dir / "report.html")
         if record_path.is_file():
             shutil.copy2(record_path, out_dir / "run_record.json")
-        for leg, log in (("build", log_build), ("external", log_ext), ("example", log_ex)):
+        for leg, log in (
+            ("build", log_build),
+            ("external", log_ext),
+            ("example", log_ex),
+            ("assisted-build", work_dir / "assisted" / "log_build.txt"),
+            ("assisted-external", work_dir / "assisted" / "log_external.txt"),
+        ):
             if log.is_file() and log.stat().st_size > 0:
                 shutil.copy2(log, out_dir / f"log-{leg}.txt")
             transcript = log.with_suffix(log.suffix + ".terminal")

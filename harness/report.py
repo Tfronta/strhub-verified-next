@@ -583,6 +583,58 @@ def _summary_md(report: dict, slug: str) -> str:
     for leg, fname in (report.get("logs") or {}).items():
         lines.append(f"- Log ({leg}): [`{fname}`]({fname})")
 
+    assisted = report.get("assisted_run") or {}
+    if assisted.get("attempted"):
+        status_str = (
+            "PASS — Runs with adjustments"
+            if assisted.get("passed")
+            else f"Stopped at {LABELS.get(assisted.get('level', 'none'), 'not run')}"
+        )
+        lines += [
+            "",
+            "## Automated verification with adjustments",
+            "",
+            f"- Outcome: **{status_str}** (`{assisted.get('level', 'none')}`)",
+            "- Source code modified: **No** (upstream checkout mounted read-only at `/app:ro`).",
+        ]
+        adjs = assisted.get("adjustments") or []
+        if adjs:
+            lines += [
+                "",
+                "### Adjustments applied",
+                "",
+                "| What stopped literal run | Adjustment applied | Suggested repository change |",
+                "|---|---|---|",
+            ]
+            for a in adjs:
+                w = str(a.get("what_failed_strict", "—")).replace("\n", " ")
+                ap_txt = str(a.get("adjustment_applied", "—")).replace("\n", " ")
+                fx = str(a.get("author_fix", "—")).replace("\n", " ")
+                lines.append(f"| {w} | {ap_txt} | {fx} |")
+        vc = assisted.get("verified_commands") or {}
+        cmd_seq: list[str] = []
+        if vc.get("extra_apt"):
+            cmd_seq.append("sudo apt-get update && sudo apt-get install -y " + " ".join(vc["extra_apt"]))
+        if vc.get("init_submodules"):
+            cmd_seq.append("git submodule update --init --recursive")
+        cmd_seq.extend(vc.get("install") or [])
+        for d in vc.get("mkdir_dirs") or []:
+            cmd_seq.append(f"mkdir -p {d}")
+        if vc.get("run"):
+            cmd_seq.append(vc["run"])
+        if cmd_seq:
+            lines += ["", "### Verified commands (reproducible today)", "", "```bash", *cmd_seq, "```"]
+        if assisted.get("readme_suggestion"):
+            lines += ["", "### Suggested README.md block", "", assisted["readme_suggestion"]]
+        a_prev = assisted.get("output_preview")
+        if isinstance(a_prev, dict) and a_prev.get("file"):
+            lines += [
+                "",
+                f"### Assisted output preview (`{a_prev['file']}`, {a_prev.get('size_bytes', 0)} bytes)",
+            ]
+            if a_prev.get("lines"):
+                lines += ["", "```text", *a_prev["lines"], "```"]
+
     # Then the context: where the run came from, and what else it established.
     lines += ["", "## Run details", "",
               f"- Source: `{report['source']['repo']}` @ `{report['source']['ref_resolved']}`",
@@ -1024,6 +1076,54 @@ def _summary_html(report: dict, slug: str) -> str:
         f'<p style="font-size:.85rem">Log ({esc(leg)}): <a href="{esc(fname)}">{esc(fname)}</a></p>'
         for leg, fname in (report.get("logs") or {}).items())
 
+    assisted_block = ""
+    assisted = report.get("assisted_run") or {}
+    if assisted.get("attempted"):
+        a_status = (
+            '<span class="warn">PASS — Runs with adjustments</span>'
+            if assisted.get("passed")
+            else f'<span class="no">Stopped at {esc(LABELS.get(assisted.get("level", "none"), "not run"))}</span>'
+        )
+        adj_rows = "".join(
+            f"<tr><td>{esc(a.get('what_failed_strict', '—'))}</td>"
+            f"<td>{esc(a.get('adjustment_applied', '—'))}</td>"
+            f"<td>{esc(a.get('author_fix', '—'))}</td></tr>"
+            for a in (assisted.get("adjustments") or [])
+        )
+        adj_table = (
+            "<h3>Adjustments applied</h3>"
+            "<table><thead><tr><th>What stopped literal run</th><th>Adjustment applied</th>"
+            "<th>Suggested repository change</th></tr></thead>"
+            f"<tbody>{adj_rows}</tbody></table>"
+            if adj_rows else ""
+        )
+        vc = assisted.get("verified_commands") or {}
+        cmd_seq = []
+        if vc.get("extra_apt"):
+            cmd_seq.append("sudo apt-get update && sudo apt-get install -y " + " ".join(vc["extra_apt"]))
+        if vc.get("init_submodules"):
+            cmd_seq.append("git submodule update --init --recursive")
+        cmd_seq.extend(vc.get("install") or [])
+        for d in vc.get("mkdir_dirs") or []:
+            cmd_seq.append(f"mkdir -p {d}")
+        if vc.get("run"):
+            cmd_seq.append(vc["run"])
+        cmd_html = (
+            "<h3>Verified commands (reproducible today)</h3>"
+            f"<pre><code>{esc(chr(10).join(cmd_seq))}</code></pre>"
+            if cmd_seq else ""
+        )
+        readme_html = (
+            "<h3>Suggested README.md block</h3>"
+            f"<pre><code>{esc(assisted['readme_suggestion'])}</code></pre>"
+            if assisted.get("readme_suggestion") else ""
+        )
+        assisted_block = (
+            "<h2>Automated verification with adjustments</h2>"
+            f"<p>Outcome: {a_status} &middot; Source code modified: <b>No</b> (<code>/app:ro</code>).</p>"
+            f"{adj_table}{cmd_html}{readme_html}"
+        )
+
     caveats_block = ""
     cav = report.get("caveats") or {}
     if cav.get("items"):
@@ -1079,6 +1179,7 @@ def _summary_html(report: dict, slug: str) -> str:
 {preparation_block}
 {recommendations_block}
 {logs_block}
+{assisted_block}
 <h2>Run details</h2>
 <ul class="meta">
   <li>Variant: <code>{esc(slug)}</code></li>
@@ -1148,6 +1249,7 @@ def _certificate_cfg(report: dict, m: dict) -> dict:
         "declared_format": (declared.get("format") or "—").upper(),
         "dataset": ds_entry,
         "repo_test_data": report.get("repo_test_data") or {},
+        "assisted_run": report.get("assisted_run") or {},
     }
 
 
@@ -1165,6 +1267,7 @@ def apply_engine_record(args, path: str) -> dict | None:
     if not p.is_file():
         args.available = args.installs = args.runs = args.example_runs = "skipped"
         args.environment_built = ""
+        args.assisted = None
         return None
     rec = json.loads(p.read_text())
     outcomes = rec.get("outcomes") or {}
@@ -1176,6 +1279,7 @@ def apply_engine_record(args, path: str) -> dict | None:
     args.io = ladder.get("io") or args.io
     args.content = ladder.get("content") or args.content
     args.environment_built = rec.get("environment_built") or ""
+    args.assisted = rec.get("assisted")
     if not args.infra_failure.strip() and rec.get("infra_failure"):
         args.infra_failure = rec["infra_failure"]
     return rec
@@ -1620,6 +1724,81 @@ def main() -> int:
         preview = build_output_preview(ex_out_dir, preferred_ex, leg="example")
     if preview is not None:
         report["output_preview"] = preview
+
+    assisted_raw = getattr(args, "assisted", None)
+    if isinstance(assisted_raw, dict) and assisted_raw.get("attempted"):
+        a_paths = assisted_raw.get("paths") or {}
+        a_logs: dict[str, str] = {}
+        a_terms: dict[str, str] = {}
+        for a_leg, raw_p in (
+            ("assisted-build", a_paths.get("log_build", "")),
+            ("assisted-external", a_paths.get("log_external", "")),
+        ):
+            if not raw_p:
+                continue
+            ap_file = pathlib.Path(raw_p)
+            if not ap_file.is_absolute():
+                ap_file = ROOT / ap_file
+            if ap_file.is_file() and ap_file.stat().st_size > 0:
+                dest = f"{slug}.log-{a_leg}.txt"
+                shutil.copy2(ap_file, reports / dest)
+                logs[a_leg] = dest
+                a_logs[a_leg] = dest
+            t_file = ap_file.with_suffix(ap_file.suffix + ".terminal")
+            if t_file.is_file() and t_file.stat().st_size > 0:
+                dest = f"{slug}.terminal-{a_leg}.txt"
+                shutil.copy2(t_file, reports / dest)
+                terminals[a_leg] = dest
+                a_terms[a_leg] = dest
+        if logs:
+            report["logs"] = logs
+        if terminals:
+            report["terminals"] = terminals
+
+        a_out_raw = a_paths.get("out_external", "")
+        a_out_dir = None
+        if a_out_raw:
+            a_out_dir = pathlib.Path(a_out_raw)
+            if not a_out_dir.is_absolute():
+                a_out_dir = ROOT / a_out_dir
+        a_io = assisted_raw.get("io_detail") or {}
+        a_pref: list[str] = []
+        for o in a_io.get("outputs") or []:
+            if isinstance(o, dict):
+                if o.get("resolved"):
+                    a_pref.append(str(o["resolved"]))
+                for f in o.get("files") or []:
+                    if isinstance(f, dict) and f.get("resolved"):
+                        a_pref.append(str(f["resolved"]))
+        a_preview = build_output_preview(a_out_dir, a_pref, leg="assisted")
+        a_diags: dict[str, list[dict]] = {}
+        for d_key, raw_p in (("build", a_paths.get("log_build", "")), ("external", a_paths.get("log_external", ""))):
+            if not raw_p:
+                continue
+            dp = pathlib.Path(raw_p)
+            if not dp.is_absolute():
+                dp = ROOT / dp
+            d_issues = diagnose_log.diagnose_file(dp)
+            if d_issues:
+                a_diags[d_key] = d_issues
+
+        report["assisted_run"] = {
+            "schema": assisted_raw.get("schema", "strhub-assisted-remediation/1"),
+            "attempted": True,
+            "passed": bool(assisted_raw.get("passed")),
+            "level": assisted_raw.get("level", "none"),
+            "content_verified": bool(assisted_raw.get("content_verified")),
+            "gates": assisted_raw.get("gates") or {},
+            "adjustments": assisted_raw.get("adjustments") or [],
+            "verified_commands": assisted_raw.get("verified_commands") or {},
+            "readme_suggestion": assisted_raw.get("readme_suggestion", ""),
+            "io_detail": a_io,
+            "content_detail": assisted_raw.get("content_detail") or {},
+            **({"output_preview": a_preview} if a_preview is not None else {}),
+            **({"diagnostics": a_diags} if a_diags else {}),
+            **({"logs": a_logs} if a_logs else {}),
+            **({"terminals": a_terms} if a_terms else {}),
+        }
 
     # What STRhub did to get the tool ready, when the repository's own
     # instructions were not enough: every step, every file, every input.

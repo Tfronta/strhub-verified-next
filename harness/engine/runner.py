@@ -53,19 +53,58 @@ def run(plan: dict, work: pathlib.Path, root: pathlib.Path, exe: Executor | None
     ex = keep(stages.runs_example(ctx, ins))
     keep(stages.check_example(ctx))
     ext = keep(stages.runs_external(ctx, ins))
-    keep(stages.check_io(ctx, ext))
+    io_stage = keep(stages.check_io(ctx, ext))
     keep(stages.check_content(ctx, ext))
     legs = stages.matrix(ctx)
 
     # The badge ladder rests on the external leg; a leg whose mount was not
     # verified never ran, and reads as a skipped step, as it did.
     verified = ext.outputs.get("input_evidence") == "verified"
+    infra = _infra_failure(ctx.plan, ins, ext)
     ladder = {"leg": "external", "runs": ext.outcome if verified else "skipped",
               "io": ctx.result("io_external.json"), "content": ctx.result("content_external.json"),
               "supported_loci": ctx.plan.get("supported_loci", ""),
               "input_type": ctx.plan.get("input_type", ""), "dataset": ctx.plan.get("dataset_name", "")}
 
-    return {
+    assisted_record = None
+    io_doc = stages._load(ctx.result_abs("io_external.json"))
+    io_ok = bool(io_doc.get("passed")) if isinstance(io_doc, dict) else io_stage.passed
+    track1_passed = verified and ext.passed and io_ok
+    if not infra and av.passed and not track1_passed:
+        prop_raw = ctx.plan.get("proposal") or ""
+        prop_path = pathlib.Path(prop_raw) if prop_raw else (ctx.root / "recipe_proposal.json")
+        if not prop_path.is_absolute():
+            prop_path = ctx.root / prop_path
+        mf_raw = ctx.plan.get("manifest") or ""
+        mf_path = pathlib.Path(mf_raw) if mf_raw else None
+        if mf_path is not None and not mf_path.is_absolute():
+            mf_path = ctx.root / mf_path
+        rev_path = ctx.work_abs / "procedure_review.json"
+        if prop_path.is_file() and mf_path is not None and mf_path.is_file() and rev_path.is_file():
+            import sys as _sys
+            if str(ctx.root / "harness") not in _sys.path:
+                _sys.path.insert(0, str(ctx.root / "harness"))
+            import _manifest
+            import assisted_remediation
+            proposal_doc = stages._load(prop_path)
+            review_doc = stages._load(rev_path)
+            try:
+                manifest_doc = _manifest.load(str(mf_path))
+            except Exception:  # noqa: BLE001
+                manifest_doc = None
+            assisted_record = assisted_remediation.execute_assisted_run(
+                ctx,
+                proposal_doc,
+                manifest_doc,
+                review_doc,
+                available_passed=av.passed,
+                installs_passed=ins.passed,
+                installs_attempted=ins.status != "not_run",
+                runs_passed=bool(verified and ext.passed),
+                io_passed=io_ok,
+            )
+
+    out_rec = {
         "schema": record.SCHEMA,
         "created": record.now(),
         "tool": ctx.plan.get("tool", ""),
@@ -85,8 +124,11 @@ def run(plan: dict, work: pathlib.Path, root: pathlib.Path, exe: Executor | None
             "source": ins.outputs.get("source_evidence", ""),
             "input": ext.outputs.get("input_evidence", ""),
         },
-        "infra_failure": _infra_failure(ctx.plan, ins, ext),
+        "infra_failure": infra,
         "ladder": ladder,
         "environment_built": ins.outputs.get("environment", ""),
         "matrix": legs,
     }
+    if assisted_record is not None:
+        out_rec["assisted"] = assisted_record
+    return out_rec

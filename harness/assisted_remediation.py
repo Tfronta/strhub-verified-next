@@ -1,0 +1,754 @@
+"""Deterministic, tool-agnostic Track 2 ("Runs with adjustments") remediation.
+
+ARCHITECTURAL INVARIANTS (ENFORCED BY `tests/test_no_forcing_guardrails.py`):
+  1. ZERO AD-HOC / PER-TOOL LOGIC: Never branch on tool name, slug, author, or
+     repository URL. Every rule below triggers solely on generic, observable
+     structural facts (compiler/linker/pip diagnostics, standard root packaging
+     manifests, `.gitmodules`, or single positional read-file tokens).
+  2. ZERO SOURCE CODE MODIFICATION: The upstream checkout is NEVER edited or
+     patched, and is mounted strictly read-only (`:/app:ro`) at runtime. Tools
+     that require editing source files or custom config templates belong to
+     Manual Verification (Level 2).
+  3. STRICT TRACK SEPARATION: Track 1's `gates`, `verdict`, and `procedure_review`
+     are NEVER mutated. Track 2 runs at most once (`MAX_ASSISTED_ATTEMPTS == 1`)
+     in an isolated `work/assisted/` workspace and records its full delta under
+     `assisted_run` so reviewers, users, and authors see both what failed
+     literally and the exact adjustments that make the commit run.
+"""
+from __future__ import annotations
+
+import json
+import os
+import pathlib
+import re
+import shutil
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+import datasets as datasets_lib  # noqa: E402
+import diagnose_log  # noqa: E402
+import documented_install  # noqa: E402
+import fidelity  # noqa: E402
+import input_provenance  # noqa: E402
+from prepare import example_wrapper, unwrap_example  # noqa: E402
+
+SCHEMA = "strhub-assisted-remediation/1"
+MAX_ASSISTED_ATTEMPTS = 1
+ROOT = pathlib.Path(__file__).resolve().parent.parent
+
+#: Closed generic table mapping missing standard build executables in Ubuntu 22.04
+#: to their canonical Debian/Ubuntu apt package names.
+_CMD_TO_APT: dict[str, tuple[str, ...]] = {
+    "cmake": ("cmake",),
+    "autoreconf": ("autoconf", "automake", "libtool", "pkg-config"),
+    "aclocal": ("autoconf", "automake", "libtool"),
+    "autoconf": ("autoconf", "automake", "libtool"),
+    "automake": ("autoconf", "automake", "libtool"),
+    "libtoolize": ("libtool",),
+    "libtool": ("libtool",),
+    "pkg-config": ("pkg-config",),
+    "cargo": ("cargo",),
+    "rustc": ("cargo",),
+}
+
+#: Closed generic table mapping missing C/C++ headers, CMake Find modules, or
+#: linker flags in `log_build.txt` to standard Ubuntu 22.04 `-dev` packages.
+_BUILD_LOG_APT_RULES: tuple[tuple[re.Pattern[str], tuple[str, ...], str], ...] = (
+    (re.compile(r"(?:zlib\.h:\s*No such file|Could NOT find ZLIB|cannot find -lz\b)", re.I),
+     ("zlib1g-dev",), "zlib development headers (`zlib1g-dev`)"),
+    (re.compile(r"(?:bzlib\.h:\s*No such file|Could NOT find BZip2|cannot find -lbz2\b)", re.I),
+     ("libbz2-dev",), "bzip2 development headers (`libbz2-dev`)"),
+    (re.compile(r"(?:lzma\.h:\s*No such file|Could NOT find LibLZMA|cannot find -llzma\b)", re.I),
+     ("liblzma-dev",), "LZMA/xz development headers (`liblzma-dev`)"),
+    (re.compile(r"(?:curl/curl\.h:\s*No such file|Could NOT find CURL|cannot find -lcurl\b)", re.I),
+     ("libcurl4-openssl-dev",), "libcurl development headers (`libcurl4-openssl-dev`)"),
+    (re.compile(r"(?:htslib/\w+\.h:\s*No such file|cannot find -lhts\b)", re.I),
+     ("libhts-dev",), "HTSlib development headers (`libhts-dev`)"),
+    (re.compile(r"(?:openssl/\w+\.h:\s*No such file|Could NOT find OpenSSL|cannot find -l(?:ssl|crypto)\b)", re.I),
+     ("libssl-dev",), "OpenSSL development headers (`libssl-dev`)"),
+    (re.compile(r"(?:(?:n?curses)\.h:\s*No such file|cannot find -l(?:n?cursesw?)\b)", re.I),
+     ("libncurses5-dev",), "ncurses development headers (`libncurses5-dev`)"),
+)
+
+_SAFE_REL_SUBDIR = re.compile(r"^[A-Za-z0-9._-]+(?:/[A-Za-z0-9._-]+)*$")
+
+
+def _dedupe(items: list[str]) -> list[str]:
+    seen: set[str] = set()
+    out: list[str] = []
+    for x in items:
+        if x and x not in seen:
+            seen.add(x)
+            out.append(x)
+    return out
+
+
+def _assisted_rewrite_command(raw_cmd: str, input_type: str | None, regions: str | None) -> tuple[str, list[dict]]:
+    """Apply `one_sample=True` list collapsing or single positional read-file
+    binding when the strict profile left the input unsubstituted."""
+    adjustments: list[dict] = []
+    if not input_type or not raw_cmd or raw_cmd.strip().startswith("true"):
+        return raw_cmd, adjustments
+
+    ds = datasets_lib.resolve(input_type)
+    canonical = (ds or {}).get("canonical_input")
+    if not canonical:
+        return raw_cmd, adjustments
+
+    strict_rw = fidelity.rewrite(raw_cmd, input_type, regions=regions, one_sample=False)
+    if f"/data/in/{canonical}" in strict_rw["command"] and not strict_rw["limitations"]:
+        return strict_rw["command"], adjustments
+
+    # Case 5a: comma-separated sample list (`--bams a.bam,b.bam`) collapsed via one_sample=True
+    one_rw = fidelity.rewrite(raw_cmd, input_type, regions=regions, one_sample=True)
+    if f"/data/in/{canonical}" in one_rw["command"] and not one_rw["limitations"]:
+        adjustments.append({
+            "rule_id": "positional_reads_arg",
+            "category": "cli_invocation",
+            "what_failed_strict": "The documented command passes a multi-sample comma-separated input list.",
+            "adjustment_applied": f"Collapsed the multi-sample input list to the single reference sample `/data/in/{canonical}`.",
+            "author_fix": "Include a single-sample invocation example in README.md alongside multi-sample syntax.",
+        })
+        return one_rw["command"], adjustments
+
+    # Case 5b: single positional read-file token (`tool sample.bam ...`) without a preceding input flag
+    base_cmd = one_rw["command"]
+    try:
+        toks = fidelity.tokens(base_cmd)
+    except ValueError:
+        return base_cmd, adjustments
+
+    def _read_kind(p: str) -> str:
+        if re.search(r"\.f(?:ast)?q(?:\.gz)?$", p, re.I):
+            return "fastq"
+        if re.search(r"\.cram(?:\.gz)?$", p, re.I):
+            return "cram"
+        return "bam"
+
+    positional_matches: list[tuple[int, int, str]] = []
+    for idx, m in enumerate(fidelity.TOKEN.finditer(base_cmd)):
+        if idx == 0:
+            continue
+        raw_tok = m.group()
+        if (m.start() and not base_cmd[m.start() - 1].isspace()) or (
+            m.end() < len(base_cmd) and not base_cmd[m.end()].isspace()
+        ):
+            continue
+        val = raw_tok[1:-1] if len(raw_tok) > 1 and raw_tok[0] == raw_tok[-1] and raw_tok[0] in "'\"" else raw_tok
+        prev = toks[idx - 1] if idx else ""
+        if prev in fidelity.OUTPUT_FLAGS or val.startswith("/data/"):
+            continue
+        if fidelity.READ_PATH.fullmatch(val) and _read_kind(val) == _read_kind(canonical) and val.endswith(".gz") == canonical.endswith(".gz"):
+            positional_matches.append((m.start(), m.end(), raw_tok))
+
+    if len(positional_matches) == 1:
+        start, end, orig_tok = positional_matches[0]
+        target = f"/data/in/{canonical}"
+        repl = orig_tok[0] + target + orig_tok[-1] if orig_tok[0] in "'\"" else target
+        rewritten = base_cmd[:start] + repl + base_cmd[end:]
+        adjustments.append({
+            "rule_id": "positional_reads_arg",
+            "category": "cli_invocation",
+            "what_failed_strict": (
+                f"Positional read-file argument `{orig_tok}` has no explicit input flag, "
+                "so the literal profile refused to guess it."
+            ),
+            "adjustment_applied": f"Bound positional read-file token `{orig_tok}` -> `{target}`.",
+            "author_fix": (
+                "Document an explicit input flag (e.g. `--bam` / `-i`) if supported, or ship a small "
+                f"example file at `{orig_tok}` in the repository so the documented command runs verbatim."
+            ),
+        })
+        return rewritten, adjustments
+
+    return base_cmd, adjustments
+
+
+def _output_parent_dirs(unwrapped_cmd: str) -> list[str]:
+    """Detect relative parent directories written by explicit output flags or
+    shell `>` redirection so Track 2 can pre-create them with `mkdir -p`."""
+    try:
+        toks = fidelity.tokens(unwrapped_cmd)
+    except ValueError:
+        return []
+    dirs: list[str] = []
+    for i, raw in enumerate(toks):
+        prev = toks[i - 1] if i else ""
+        val = raw[1:-1] if len(raw) > 1 and raw[0] == raw[-1] and raw[0] in "'\"" else raw
+        if val.startswith(("/", "-", "<")) or ".." in val.split("/"):
+            continue
+        if prev in ("--out-dir", "--outdir", "--working_path", "--working-path"):
+            clean = val.strip("/")
+            if clean and _SAFE_REL_SUBDIR.fullmatch(clean):
+                dirs.append(clean)
+        elif prev in fidelity.OUTPUT_FLAGS or prev == ">":
+            parent = str(pathlib.PurePosixPath(val).parent)
+            if parent and parent != "." and _SAFE_REL_SUBDIR.fullmatch(parent):
+                dirs.append(parent)
+    return _dedupe(dirs)
+
+
+def needs_reference_genome(proposal: dict | None, manifest: dict | None) -> dict | None:
+    """Return the dataset's `reference_genome` metadata when a potential Track 2
+    assisted command references hg38 / a FASTA mount even though Track 1's
+    `procedure_ready` was False (allowing `verify.yml` to cache/stage `work/ref`)."""
+    if not isinstance(manifest, dict):
+        return None
+    inputs = manifest.get("inputs") or {}
+    input_type = inputs.get("type")
+    if not input_type:
+        return None
+    ds = datasets_lib.resolve(input_type)
+    if not ds:
+        return None
+    raw_cmd, _ = unwrap_example((manifest.get("run") or {}).get("cmd") or "")
+    candidate_cmd, _ = _assisted_rewrite_command(raw_cmd, input_type, inputs.get("regions"))
+    return input_provenance.reference_for(ds, candidate_cmd)
+
+
+def _detect_missing_apt(build_log_text: str) -> tuple[list[str], list[str]]:
+    """Inspect `log_build.txt` for missing standard build tools or `-dev` headers."""
+    pkgs: list[str] = []
+    reasons: list[str] = []
+    issues = diagnose_log.diagnose(build_log_text) if build_log_text else []
+    for issue in issues:
+        if issue.get("id") == "cmd_not_found":
+            for ex in issue.get("examples") or []:
+                mapped = _CMD_TO_APT.get(ex.strip().lower())
+                if mapped:
+                    pkgs.extend(mapped)
+                    reasons.append(f"missing command `{ex}`")
+    for m_cmd in re.finditer(r"(?:bash:\s*(?:line \d+:\s*)?|/bin/sh:\s*\d*:\s*|make:\s*)([A-Za-z0-9_+-]+):\s*(?:command )?not found", build_log_text):
+        cmd_name = m_cmd.group(1).strip().lower()
+        if cmd_name in _CMD_TO_APT:
+            pkgs.extend(_CMD_TO_APT[cmd_name])
+            reasons.append(f"missing command `{cmd_name}`")
+    for pattern, rule_pkgs, label in _BUILD_LOG_APT_RULES:
+        if pattern.search(build_log_text):
+            pkgs.extend(rule_pkgs)
+            reasons.append(f"missing {label}")
+    return _dedupe(pkgs), _dedupe(reasons)
+
+
+def _detect_python_floor_upgrade(commands: list[str], build_log_text: str) -> tuple[list[str], dict | None]:
+    """If `conda create ... python=3.Y` failed because a dependency declared
+    `Requires-Python >=3.X` (X > Y), bump `python=3.Y` to a compatible minor."""
+    req_minors = [int(m.group(1)) for m in re.finditer(r"Requires-Python\s*>=\s*3\.(\d+)", build_log_text)]
+    if not req_minors:
+        return commands, None
+    needed_minor = max(10, min(max(req_minors), 11))
+    updated: list[str] = []
+    changed_from: str | None = None
+    for cmd in commands:
+        m_py = re.search(r"\bpython=3\.(\d+)\b", cmd)
+        if m_py and re.match(r"^(?:conda|mamba)\s+create\b", cmd) and int(m_py.group(1)) < max(req_minors):
+            changed_from = f"3.{m_py.group(1)}"
+            updated.append(re.sub(r"\bpython=3\.\d+\b", f"python=3.{needed_minor}", cmd, count=1))
+        else:
+            updated.append(cmd)
+    if not changed_from:
+        return commands, None
+    return updated, {
+        "rule_id": "python_floor_conflict",
+        "category": "environment",
+        "what_failed_strict": (
+            f"README specifies `python={changed_from}`, but package metadata on PyPI requires "
+            f"`Python >= 3.{min(req_minors)}`."
+        ),
+        "adjustment_applied": f"Updated Conda environment Python version from `{changed_from}` to `3.{needed_minor}`.",
+        "author_fix": f"Update `python={changed_from}` to `python=3.{needed_minor}` in the README installation block.",
+    }
+
+
+def _build_assisted_dockerfile(
+    install_commands: list[str],
+    *,
+    uses_conda: bool,
+    conda_env: str | None,
+    venv_activate: str | None,
+    extra_apt: list[str],
+) -> str:
+    lines = ["# Assisted remediation carrier: strhub-assisted-remediation/1 (Track 2 rehearsal)."]
+    lines += documented_install.base_lines(uses_conda)
+    if extra_apt:
+        lines.append(
+            "RUN " + json.dumps([
+                "bash", "-c",
+                "apt-get update && apt-get install -y --no-install-recommends " + " ".join(extra_apt),
+            ])
+        )
+    lines += ['COPY [".", "/opt/tool"]', "WORKDIR /opt/tool"]
+    script = "set -eo pipefail\n" + "\n".join(install_commands) + "\n"
+    lines.append("RUN " + json.dumps(["bash", "-lc", script]))
+    if conda_env:
+        lines.append("RUN " + json.dumps(["bash", "-c", f"echo 'conda activate {conda_env}' > /etc/profile.d/zz-strhub-env.sh"]))
+    if venv_activate:
+        lines.append("RUN " + json.dumps(["bash", "-c", f"echo 'source {venv_activate}' >> /etc/profile.d/zz-strhub-env.sh"]))
+    lines.append('ENTRYPOINT ["/bin/bash", "-lc"]')
+    return "\n".join(lines) + "\n"
+
+
+def _build_readme_suggestion(
+    repo_url: str,
+    init_submodules: bool,
+    extra_apt: list[str],
+    install_commands: list[str],
+    mkdir_dirs: list[str],
+    display_run_cmd: str,
+) -> str:
+    clone_flag = "--recursive " if init_submodules else ""
+    repo_clean = (repo_url or "https://github.com/owner/tool").rstrip("/")
+    repo_dir = repo_clean.rsplit("/", 1)[-1].removesuffix(".git")
+    inst_lines: list[str] = []
+    if extra_apt:
+        inst_lines.append("sudo apt-get update && sudo apt-get install -y " + " ".join(extra_apt))
+    inst_lines.append(f"git clone {clone_flag}{repo_clean}")
+    inst_lines.append(f"cd {repo_dir}")
+    inst_lines.extend(install_commands)
+    usage_lines: list[str] = []
+    for d in mkdir_dirs:
+        usage_lines.append(f"mkdir -p {d}")
+    usage_lines.append(display_run_cmd)
+    return (
+        "## Installation\n\n```bash\n"
+        + "\n".join(inst_lines)
+        + "\n```\n\n## Usage\n\n```bash\n"
+        + "\n".join(usage_lines)
+        + "\n```"
+    )
+
+
+def plan_assisted_run(
+    proposal: dict | None,
+    manifest: dict | None,
+    review: dict | None,
+    *,
+    installs_passed: bool,
+    installs_attempted: bool,
+    runs_passed: bool,
+    io_passed: bool,
+    build_log_text: str = "",
+) -> dict | None:
+    """Pure planner: inspect Track 1's outcome and return a deterministic Track 2
+    plan if and only if at least one of the 6 closed generic rules applies."""
+    if not isinstance(proposal, dict) or not isinstance(manifest, dict) or not isinstance(review, dict):
+        return None
+    if runs_passed and io_passed:
+        return None
+
+    # Never retry hardware/licensing ceilings in Track 2.
+    compat = manifest.get("compatibility") or {}
+    if any(compat.values()):
+        return None
+    if build_log_text:
+        log_ids = {i.get("id") for i in diagnose_log.diagnose(build_log_text)}
+        if log_ids & diagnose_log.HARNESS_INCOMPATIBLE:
+            return None
+
+    tree_paths = set(proposal.get("tree_paths") or [])
+    if ".dockerignore" in tree_paths:
+        return None
+
+    raw_run_cmd, raw_cwd = unwrap_example((manifest.get("run") or {}).get("cmd") or "")
+    cwd = raw_cwd or "."
+    if not raw_run_cmd or raw_run_cmd.strip().startswith("true"):
+        return None
+
+    inputs = manifest.get("inputs") or {}
+    input_type = inputs.get("type")
+    regions = inputs.get("regions")
+    if not input_type or not datasets_lib.resolve(input_type):
+        return None
+
+    adjustments: list[dict] = []
+    inst_info = review.get("installation") or {}
+    base_cond = inst_info.get("base_condition") or {}
+    doc_cmds = [c["text"] for c in (inst_info.get("commands") or []) if isinstance(c, dict) and c.get("text")]
+    uses_conda = bool(base_cond.get("miniforge"))
+    conda_env = inst_info.get("conda_environment")
+    init_submodules = bool(base_cond.get("submodules"))
+    venv_activate: str | None = None
+    for c in doc_cmds:
+        m_act = re.fullmatch(r"(?:source|\.) (\S+)/bin/activate", c)
+        if m_act:
+            venv_activate = f"/opt/tool/{m_act.group(1).strip('./')}/bin/activate"
+
+    install_commands = list(doc_cmds)
+    extra_apt: list[str] = []
+
+    # --- Installation remediation (Rules 1, 2, 3, 4) -------------------------
+    if not review.get("install_ready"):
+        # Rule 4: standard root packaging manifest when README install block is missing/unusable
+        if "environment.yml" in tree_paths or "environment.yaml" in tree_paths:
+            env_file = "environment.yml" if "environment.yml" in tree_paths else "environment.yaml"
+            install_commands = [
+                f"conda env create --name strhub_assisted --file={env_file}",
+                "conda activate strhub_assisted",
+            ]
+            uses_conda = True
+            conda_env = "strhub_assisted"
+            adjustments.append({
+                "rule_id": "standard_manifest_in_root",
+                "category": "environment",
+                "what_failed_strict": "No literally copyable installation code block was admitted from README.md.",
+                "adjustment_applied": f"Built Conda environment directly from root `{env_file}` shipped in the commit.",
+                "author_fix": f"Add a copyable installation block to README.md:\n`conda env create -n tool -f {env_file} && conda activate tool`.",
+            })
+        elif "pyproject.toml" in tree_paths or "setup.py" in tree_paths:
+            pkg_file = "pyproject.toml" if "pyproject.toml" in tree_paths else "setup.py"
+            install_commands = [
+                "python3 -m venv .strhub-venv",
+                "source .strhub-venv/bin/activate",
+                "python -m pip install .",
+            ]
+            uses_conda = False
+            venv_activate = "/opt/tool/.strhub-venv/bin/activate"
+            adjustments.append({
+                "rule_id": "standard_manifest_in_root",
+                "category": "environment",
+                "what_failed_strict": "No literally copyable installation code block was admitted from README.md.",
+                "adjustment_applied": f"Installed Python package in a clean virtualenv from root `{pkg_file}`.",
+                "author_fix": "Add a copyable installation block to README.md:\n`python3 -m venv .venv && source .venv/bin/activate && pip install .`.",
+            })
+        elif "Makefile" in tree_paths and "CMakeLists.txt" not in tree_paths:
+            install_commands = ["make"]
+            adjustments.append({
+                "rule_id": "standard_manifest_in_root",
+                "category": "environment",
+                "what_failed_strict": "No literally copyable installation code block was admitted from README.md.",
+                "adjustment_applied": "Ran `make` against the root `Makefile` shipped in the commit.",
+                "author_fix": "Add a copyable `make` installation block (plus required `apt` libraries) to README.md.",
+            })
+        else:
+            return None
+    elif installs_attempted and not installs_passed:
+        # Rule 1: missing standard Ubuntu build tools or `-dev` libraries
+        apt_pkgs, apt_reasons = _detect_missing_apt(build_log_text)
+        if apt_pkgs:
+            extra_apt = apt_pkgs
+            adjustments.append({
+                "rule_id": "missing_apt_build_tool",
+                "category": "environment",
+                "what_failed_strict": "Build failed due to undeclared system packages (" + ", ".join(apt_reasons) + ").",
+                "adjustment_applied": "Installed standard Ubuntu 22.04 build packages: `" + " ".join(apt_pkgs) + "`.",
+                "author_fix": "Add `sudo apt-get update && sudo apt-get install -y " + " ".join(apt_pkgs) + "` to README.md.",
+            })
+        # Rule 2: uninitialized `.gitmodules`
+        if ".gitmodules" in tree_paths and not init_submodules:
+            init_submodules = True
+            adjustments.append({
+                "rule_id": "uninitialized_submodules",
+                "category": "environment",
+                "what_failed_strict": "Repository contains `.gitmodules`, but README.md did not specify `--recursive`.",
+                "adjustment_applied": "Initialized Git submodules (`git submodule update --init --recursive`) before building.",
+                "author_fix": "Document `git clone --recursive <repo-url>` in README.md.",
+            })
+        # Rule 3: Conda Python version floor conflict
+        if uses_conda:
+            install_commands, py_adj = _detect_python_floor_upgrade(install_commands, build_log_text)
+            if py_adj:
+                adjustments.append(py_adj)
+        if not adjustments:
+            # Build failed for a reason none of our generic rules can safely fix.
+            return None
+
+    # --- CLI & Runtime remediation (Rules 5 & 6) -----------------------------
+    assisted_cmd, cli_adjs = _assisted_rewrite_command(raw_run_cmd, input_type, regions)
+    adjustments.extend(cli_adjs)
+
+    ds = datasets_lib.resolve(input_type) or {}
+    canonical = ds.get("canonical_input") or ""
+    if not canonical or f"/data/in/{canonical}" not in assisted_cmd:
+        # Even after Rule 5, the command still does not read the staged dataset
+        # (e.g. it points to a custom missing config or hg19 path): abort cleanly.
+        return None
+    # Check remaining unresolvable placeholders or wrong assembly
+    if re.search(r"(?:hg19|grch37|b37|hs37d5)(?![a-z0-9])", assisted_cmd, re.I) and ds.get("reference") == "hg38":
+        return None
+    if re.search(r"\bpath/to/", assisted_cmd, re.I):
+        return None
+
+    mkdir_dirs = _output_parent_dirs(assisted_cmd)
+    if mkdir_dirs and (not runs_passed or not io_passed):
+        # Only log Rule 6 as a primary adjustment if Track 1 already installed and failed at run/io,
+        # or include mkdir defensively alongside other adjustments.
+        if installs_passed and review.get("may_say_runs") and not adjustments:
+            adjustments.append({
+                "rule_id": "missing_output_parent_dir",
+                "category": "cli_invocation",
+                "what_failed_strict": "The documented command writes into a subdirectory that may not exist in a clean checkout.",
+                "adjustment_applied": "Pre-created output parent directory (`mkdir -p " + " ".join(mkdir_dirs) + "`).",
+                "author_fix": "Add `mkdir -p " + " ".join(mkdir_dirs) + "` before the command in README.md.",
+            })
+        elif adjustments:
+            adjustments.append({
+                "rule_id": "missing_output_parent_dir",
+                "category": "cli_invocation",
+                "what_failed_strict": "Command targets nested output path(s) `" + ", ".join(mkdir_dirs) + "`.",
+                "adjustment_applied": "Pre-created output parent directory (`mkdir -p " + " ".join(mkdir_dirs) + "`).",
+                "author_fix": "Ensure README.md includes `mkdir -p " + " ".join(mkdir_dirs) + "` or create output directories automatically.",
+            })
+
+    if not adjustments:
+        return None
+
+    exec_inner = (
+        "mkdir -p " + " ".join(mkdir_dirs) + " && " + assisted_cmd
+        if mkdir_dirs else assisted_cmd
+    )
+    wrapped_cmd = example_wrapper(exec_inner, cwd)
+    dockerfile = _build_assisted_dockerfile(
+        install_commands,
+        uses_conda=uses_conda,
+        conda_env=conda_env,
+        venv_activate=venv_activate,
+        extra_apt=extra_apt,
+    )
+    ref_genome = input_provenance.reference_for(ds, assisted_cmd)
+    repo_url = (manifest.get("source") or {}).get("repo") or proposal.get("repo") or ""
+
+    needs_rebuild = bool(not installs_passed or any(a["category"] == "environment" for a in adjustments))
+
+    return {
+        "schema": SCHEMA,
+        "adjustments": adjustments,
+        "needs_rebuild": needs_rebuild,
+        "uses_conda": uses_conda,
+        "conda_env": conda_env,
+        "venv_activate": venv_activate,
+        "init_submodules": init_submodules,
+        "extra_apt": extra_apt,
+        "install_commands": install_commands,
+        "dockerfile": dockerfile,
+        "unwrapped_run_cmd": assisted_cmd,
+        "wrapped_run_cmd": wrapped_cmd,
+        "mkdir_dirs": mkdir_dirs,
+        "cwd": cwd,
+        "input_type": input_type,
+        "regions": regions,
+        "needs_reference": bool(ref_genome),
+        "readme_suggestion": _build_readme_suggestion(
+            repo_url, init_submodules, extra_apt, install_commands, mkdir_dirs, raw_run_cmd,
+        ),
+    }
+
+
+def execute_assisted_run(
+    ctx,
+    proposal: dict | None,
+    manifest: dict | None,
+    review: dict | None,
+    *,
+    available_passed: bool,
+    installs_passed: bool,
+    installs_attempted: bool,
+    runs_passed: bool,
+    io_passed: bool,
+) -> dict | None:
+    """Execute at most `MAX_ASSISTED_ATTEMPTS` (1) isolated Track 2 pass under
+    `work/assisted/` when Track 1 did not reach `runs and io`."""
+    try:
+        from harness.engine import stages
+    except ImportError:
+        from engine import stages
+
+    if not available_passed or (runs_passed and io_passed):
+        return None
+
+    build_log_path = ctx.work_abs / "log_build.txt"
+    build_log_text = build_log_path.read_text(errors="replace") if build_log_path.is_file() else ""
+
+    plan = plan_assisted_run(
+        proposal,
+        manifest,
+        review,
+        installs_passed=installs_passed,
+        installs_attempted=installs_attempted,
+        runs_passed=runs_passed,
+        io_passed=io_passed,
+        build_log_text=build_log_text,
+    )
+    if plan is None:
+        return None
+
+    assisted_rel = ctx.work / "assisted"
+    assisted_abs = ctx.work_abs / "assisted"
+    shutil.rmtree(assisted_abs, ignore_errors=True)
+    assisted_abs.mkdir(parents=True, exist_ok=True)
+
+    repo = ctx.plan["repo"]
+    ref = ctx.plan["ref"]
+    name = os.path.basename(str(repo).removesuffix(".git"))
+    src_rel = assisted_rel / "ctx" / name
+    src_abs = assisted_abs / "ctx" / name
+
+    log_build_rel = assisted_rel / "log_build.txt"
+    log_build_abs = assisted_abs / "log_build.txt"
+    log_build_abs.write_text("")
+
+    reusable_checkout = ctx.work_abs / "ctx" / name
+    if installs_passed and not plan["needs_rebuild"] and reusable_checkout.is_dir():
+        # Track 1 already built the exact environment image cleanly; reuse it
+        # without re-running a multi-minute Conda/C++ build, while keeping `/app:ro`.
+        src_abs = reusable_checkout
+        assisted_image = ctx.image
+        if build_log_path.is_file() and build_log_path.stat().st_size > 0:
+            shutil.copy2(build_log_path, log_build_abs)
+        term_src = build_log_path.with_suffix(build_log_path.suffix + ".terminal")
+        if term_src.is_file() and term_src.stat().st_size > 0:
+            shutil.copy2(term_src, log_build_abs.with_suffix(log_build_abs.suffix + ".terminal"))
+    else:
+        src_abs.parent.mkdir(parents=True, exist_ok=True)
+        for argv in (
+            ["git", "clone", "-q", "--", repo, str(src_rel)],
+            ["git", "-C", str(src_rel), "checkout", "-q", ref],
+        ):
+            if ctx.exe.run(argv, log=log_build_abs, cwd=ctx.root) != 0:
+                return None
+
+        if plan["init_submodules"] and (src_abs / ".gitmodules").exists():
+            argv_sub = ["git", "-C", str(src_rel), "submodule", "update", "--init", "--recursive"]
+            if ctx.exe.run(argv_sub, log=log_build_abs, cwd=ctx.root) != 0:
+                return _assemble_record(plan, installs_ok=False, runs_ok=False, io_doc=None, ct_doc=None,
+                                        log_build=str(log_build_abs), log_ext="", out_ext="")
+
+        df_abs = assisted_abs / "assisted.Dockerfile"
+        df_abs.write_text(plan["dockerfile"], encoding="utf-8")
+        assisted_image = f"{ctx.image}-assisted"
+        argv_build = [
+            "bash", ctx.harness("record_terminal.sh"), str(log_build_rel),
+            "docker", "build", *stages.BUILD_LIMITS,
+            "-f", str(df_abs), "-t", assisted_image, str(src_rel),
+        ]
+        rc_build = ctx.exe.run(argv_build, timeout=stages.BUILD_TIMEOUT_MINUTES * 60, cwd=ctx.root)
+        if rc_build != 0:
+            return _assemble_record(plan, installs_ok=False, runs_ok=False, io_doc=None, ct_doc=None,
+                                    log_build=str(log_build_abs), log_ext="", out_ext="")
+
+    # Stage verified dataset into work/assisted/in_external
+    in_abs = assisted_abs / "in_external"
+    out_rel = assisted_rel / "out_external"
+    out_abs = assisted_abs / "out_external"
+    out_abs.mkdir(parents=True, exist_ok=True)
+    out_abs.chmod(0o777)
+
+    try:
+        ds_root = ctx.root if (ctx.root / ".git").exists() and (ctx.root / "datasets").is_dir() else ROOT
+        _, dataset, files = input_provenance._plan(ds_root, plan["input_type"], plan["regions"])
+        in_abs.mkdir(parents=True, exist_ok=True)
+        import gzip as _gzip
+        for source, fname, unpack in files:
+            opener = _gzip.open if unpack else open
+            with opener(source, "rb") as s_fh, (in_abs / fname).open("xb") as d_fh:
+                shutil.copyfileobj(s_fh, d_fh)
+    except Exception:  # noqa: BLE001
+        return None
+
+    ref_dir_abs: pathlib.Path | None = None
+    if plan["needs_reference"]:
+        cand_ref = ctx.work_abs / "ref"
+        genome = (dataset or {}).get("reference_genome") or {}
+        if not genome.get("filename") or not (cand_ref / genome["filename"]).is_file():
+            return None
+        ref_dir_abs = cand_ref
+
+    log_ext_rel = assisted_rel / "log_external.txt"
+    log_ext_abs = assisted_abs / "log_external.txt"
+    mounts = [
+        "-v", f"{src_abs}:/app:ro",
+        "-v", f"{in_abs}:/data/in:ro",
+    ]
+    if ref_dir_abs is not None:
+        mounts += ["-v", f"{ref_dir_abs}:/data/ref:ro"]
+    mounts += ["-v", f"{out_abs}:/data/out"]
+
+    argv_run = [
+        "bash", ctx.harness("run_container.sh"),
+        f"{ctx.container_prefix}_assisted",
+        str(ctx.plan["timeout"]),
+        str(log_ext_rel),
+        *stages.HARDENING,
+        *mounts,
+        assisted_image,
+        plan["wrapped_run_cmd"],
+    ]
+    rc_run = ctx.exe.run(argv_run, timeout=int(ctx.plan["step_timeout"]) * 60, cwd=ctx.root)
+    runs_ok = rc_run == 0
+
+    io_json_abs = assisted_abs / "io_external.json"
+    ct_json_abs = assisted_abs / "content_external.json"
+    ctx.exe.run(
+        [ctx.python, ctx.harness("check_io.py"), ctx.manifest, str(out_rel), "--json", str(io_json_abs)],
+        cwd=ctx.root,
+    )
+    ctx.exe.run(
+        [ctx.python, ctx.harness("check_content.py"), ctx.manifest, str(out_rel),
+         "--json", str(ct_json_abs), "--panel", dataset.get("supported_loci", "")],
+        cwd=ctx.root,
+    )
+    io_doc = stages._load(io_json_abs)
+    ct_doc = stages._load(ct_json_abs)
+    return _assemble_record(
+        plan,
+        installs_ok=True,
+        runs_ok=runs_ok,
+        io_doc=io_doc,
+        ct_doc=ct_doc,
+        log_build=str(log_build_abs),
+        log_ext=str(log_ext_abs),
+        out_ext=str(out_abs),
+    )
+
+
+def _assemble_record(
+    plan: dict,
+    *,
+    installs_ok: bool,
+    runs_ok: bool,
+    io_doc: dict | None,
+    ct_doc: dict | None,
+    log_build: str,
+    log_ext: str,
+    out_ext: str,
+) -> dict:
+    io_ok = bool(runs_ok and io_doc and io_doc.get("passed"))
+    ct_ok = bool(io_ok and ct_doc and ct_doc.get("passed"))
+    gates = {
+        "available": True,
+        "installs": bool(installs_ok),
+        "runs": bool(runs_ok),
+        "io": io_ok,
+        "content": ct_ok,
+    }
+    ladder = ("available", "installs", "runs", "io", "content")
+    level = "none"
+    for g in ladder:
+        if gates[g]:
+            level = g
+        else:
+            break
+    return {
+        "schema": SCHEMA,
+        "attempted": True,
+        "passed": bool(runs_ok and io_ok),
+        "level": level,
+        "content_verified": ct_ok,
+        "gates": gates,
+        "adjustments": plan["adjustments"],
+        "verified_commands": {
+            "extra_apt": plan["extra_apt"],
+            "init_submodules": plan["init_submodules"],
+            "install": plan["install_commands"],
+            "mkdir_dirs": plan["mkdir_dirs"],
+            "run": plan["unwrapped_run_cmd"],
+            "dockerfile": plan["dockerfile"],
+        },
+        "readme_suggestion": plan["readme_suggestion"],
+        "io_detail": io_doc or {},
+        "content_detail": ct_doc or {},
+        "paths": {
+            "log_build": log_build,
+            "log_external": log_ext,
+            "out_external": out_ext,
+        },
+    }

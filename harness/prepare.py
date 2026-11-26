@@ -55,7 +55,7 @@ def _check_dataset(input_type) -> None:
 
 def preflight(m: dict, tool_dir: pathlib.Path, work: pathlib.Path) -> None:
     """All runner-side paths are checked before the first staging effect."""
-    for name in ("proposal", "in_external", "ref", "out_external", "out_example", "ctx"):
+    for name in ("proposal", "in_external", "ref", "out_external", "out_example", "ctx", "assisted"):
         dest = _paths.destination(work, name)
         if dest.is_dir():
             # Includes stale files: staging must not follow a symlink
@@ -187,6 +187,12 @@ def main() -> int:
             input_failure = f"shared dataset staging could not be verified: {exc}"
             print(f"::error::{input_failure}", file=sys.stderr)
             install_ready = procedure_ready = False
+    elif not procedure_ready and not input_failure and input_type:
+        # Track 1 remains strictly `external_ready=0` (never staging `in_external`),
+        # while allowing `verify.yml` to cache/download `work/ref` if Track 2's
+        # deterministic assisted invocation requires the dataset's reference genome.
+        import assisted_remediation
+        reference = assisted_remediation.needs_reference_genome(proposal_data, m) or {}
 
     # The repository's own example needs the documented install and nothing of
     # STRhub's: it runs whether or not the run on STRhub's sample can.
@@ -219,6 +225,7 @@ def main() -> int:
         "ref_genome_filename": reference.get("filename", ""),
         "input_failure": input_failure,
         "supported_loci": supported_loci,
+        **({"proposal": args.proposal} if args.proposal else {}),
     }
     # Every value is flattened to one line: this goes to $GITHUB_OUTPUT, where a
     # newline starts a new key. Only `cmd` used to be flattened.

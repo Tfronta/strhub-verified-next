@@ -27,6 +27,9 @@ PREPARED_FAILS = "Documented command fails, with STRhub's preparation"
 #: supplied only the inputs the documented command leaves to its reader.
 INPUTS_RUNS = "Runs as documented, on STRhub's inputs"
 INPUTS_FAILS = "Does not run as documented, on STRhub's inputs"
+#: The label of a documented run whose literal Track 1 stopped, and whose
+#: automatic Track 2 (`assisted_run`) passed end-to-end with generic environment/CLI adjustments.
+RUNS_WITH_ADJUSTMENTS = "Runs with adjustments"
 #: The label of a report on gh-pages that is not a run of this instrument.
 NOT_DOCUMENTED = "Not verified as documented"
 
@@ -356,14 +359,14 @@ def headline(report: dict) -> tuple[str, str]:
         return NOT_DOCUMENTED, "lightgrey"
     code = (report.get("verdict") or {}).get("code")
     level = report.get("level", "none")
-    if code == "undetermined":
-        return "Could not be determined", "lightgrey"
-    if code == "out_of_scope":
-        return "Out of scope", "lightgrey"
     runs = code == "runs" if code else level in ("io", "content")
     # A run STRhub prepared says so in the label itself: the badge travels
     # alone, and "as documented" would claim the installation for the README.
     if report.get("preparation"):
+        if code == "undetermined":
+            return "Could not be determined", "lightgrey"
+        if code == "out_of_scope":
+            return "Out of scope", "lightgrey"
         own_install = report["preparation"].get("installation") == "repository"
         ran, failed = (INPUTS_RUNS, INPUTS_FAILS) if own_install else (PREPARED_RUNS, PREPARED_FAILS)
         if runs:
@@ -375,6 +378,12 @@ def headline(report: dict) -> tuple[str, str]:
         # Content (a file that looks like genotypes) does not strengthen the
         # colour. Phase 1 claims execution, not analytical validity.
         return "Runs as documented", "green"
+    if (report.get("assisted_run") or {}).get("passed") is True:
+        return RUNS_WITH_ADJUSTMENTS, "yellow"
+    if code == "undetermined":
+        return "Could not be determined", "lightgrey"
+    if code == "out_of_scope":
+        return "Out of scope", "lightgrey"
     return f"Does not run as documented: {STOPS_AT.get(level, 'stops at ' + level)}", "red"
 
 
@@ -459,6 +468,17 @@ def conclusion_items_for(cfg: dict) -> list[tuple[str, str]]:
     had run. A PDF travels on its own, detached from the page and the log; it
     may not say the opposite of the report it renders.
     """
+    assisted = cfg.get("assisted_run") or {}
+    assisted_note = None
+    if assisted.get("passed") is True:
+        n_adj = len(assisted.get("adjustments") or [])
+        assisted_note = (
+            "Automated verification with adjustments",
+            f"Although the literal documented procedure did not complete unchanged, the automated "
+            f"assisted track executed the pinned commit end-to-end without source-code edits using "
+            f"{n_adj} standard environment/CLI adjustment(s) and produced structurally valid output.",
+        )
+
     if cfg.get("execution_finding_established") is False:
         items = [("Procedure not established",
                   "The recorded gate observations do not establish whether the documented procedure succeeded or failed."),
@@ -467,6 +487,8 @@ def conclusion_items_for(cfg: dict) -> list[tuple[str, str]]:
         verdict = cfg.get("verdict") or {}
         if verdict.get("title") and verdict.get("reason"):
             items.append((f"Verdict: {verdict['title']}", verdict["reason"]))
+        if assisted_note:
+            items.append(assisted_note)
         items.append(("Reproducibility not established",
                       "These observations are insufficient to establish a reproducible documented execution finding."))
         return items
@@ -542,6 +564,8 @@ def conclusion_items_for(cfg: dict) -> list[tuple[str, str]]:
     # The one sentence the web leads with, in the certificate too.
     if verdict.get("title") and verdict.get("reason"):
         items.append((f"Verdict: {verdict['title']}", verdict["reason"]))
+    if assisted_note:
+        items.append(assisted_note)
     if gates.get("installs"):
         repro = (
             "Repeatability of this verification run",
