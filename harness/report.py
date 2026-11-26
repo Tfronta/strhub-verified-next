@@ -592,7 +592,7 @@ def _summary_md(report: dict, slug: str) -> str:
         )
         lines += [
             "",
-            "## Automated verification with adjustments",
+            "## 2. Automated run with suggested documentation adjustments",
             "",
             f"- Outcome: **{status_str}** (`{assisted.get('level', 'none')}`)",
             "- Source code modified: **No** (upstream checkout mounted read-only at `/app:ro`).",
@@ -1129,7 +1129,7 @@ def _summary_html(report: dict, slug: str) -> str:
                 if assisted.get("readme_suggestion") else ""
             )
         assisted_block = (
-            "<h2>Automated verification with adjustments</h2>"
+            "<h2>2. Automated run with suggested documentation adjustments</h2>"
             f"<p>Outcome: {a_status} &middot; Source code modified: <b>No</b> (<code>/app:ro</code>).</p>"
             f"{adj_table}{cmd_html}{readme_html}"
         )

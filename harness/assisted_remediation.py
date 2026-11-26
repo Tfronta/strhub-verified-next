@@ -315,6 +315,7 @@ def _build_assisted_dockerfile(
         lines.append("RUN " + json.dumps(["bash", "-c", f"echo 'conda activate {conda_env}' > /etc/profile.d/zz-strhub-env.sh"]))
     if venv_activate:
         lines.append("RUN " + json.dumps(["bash", "-c", f"echo 'source {venv_activate}' >> /etc/profile.d/zz-strhub-env.sh"]))
+    lines.append('RUN ["bash", "-c", "echo \'export PATH=\\"$PATH:/opt/tool\\"\' >> /etc/profile.d/zz-strhub-path.sh"]')
     lines.append('ENTRYPOINT ["/bin/bash", "-lc"]')
     return "\n".join(lines) + "\n"
 
@@ -537,9 +538,64 @@ def plan_assisted_run(
             # Build failed for a reason none of our generic rules can safely fix.
             return None
 
+    # Rule 4b: Conda dependency file (`environment.y*ml`) paired with root `setup.py` /
+    # `pyproject.toml` where README omitted `pip install .` (so dependencies installed,
+    # but the repository's own CLI script was never placed on `$PATH`).
+    if (
+        review.get("install_ready")
+        and uses_conda
+        and ("setup.py" in tree_paths or "pyproject.toml" in tree_paths)
+        and not any(
+            re.search(r"\b(?:pip\s+install|python3?\s+setup\.py\s+(?:install|develop))", c)
+            for c in install_commands
+        )
+    ):
+        pkg_manifest = "pyproject.toml" if "pyproject.toml" in tree_paths else "setup.py"
+        install_commands.append("python -m pip install --no-deps .")
+        adjustments.append({
+            "rule_id": "standard_manifest_in_root",
+            "category": "environment",
+            "what_failed_strict": (
+                f"Conda environment commands installed dependencies without installing the repository's "
+                f"root Python package (`{pkg_manifest}`), leaving CLI scripts off `$PATH`."
+            ),
+            "adjustment_applied": (
+                "Installed the verified commit's Python package into the Conda environment "
+                "(`python -m pip install --no-deps .`)."
+            ),
+            "author_fix": (
+                "Add `pip install --no-deps .` after `conda activate` in README.md (or prefix `./` when "
+                "invoking scripts from the cloned directory)."
+            ),
+        })
+
     # --- CLI & Runtime remediation (Rules 5 & 6) -----------------------------
     assisted_cmd, cli_adjs = _assisted_rewrite_command(raw_run_cmd, input_type, regions)
     adjustments.extend(cli_adjs)
+
+    # Rule 5c: bare `.py` script in repository root invoked without `python` or `./`
+    # when no root Python packaging manifest installed it onto `$PATH`.
+    try:
+        cmd_toks = fidelity.tokens(assisted_cmd)
+    except ValueError:
+        cmd_toks = []
+    if (
+        cmd_toks
+        and "/" not in cmd_toks[0]
+        and cmd_toks[0].endswith(".py")
+        and cmd_toks[0] in tree_paths
+        and "setup.py" not in tree_paths
+        and "pyproject.toml" not in tree_paths
+    ):
+        orig_exe = cmd_toks[0]
+        assisted_cmd = f"python3 ./{orig_exe}" + assisted_cmd[len(orig_exe):]
+        adjustments.append({
+            "rule_id": "positional_reads_arg",
+            "category": "cli_invocation",
+            "what_failed_strict": f"Command invokes `{orig_exe}` without `./` or `python3`, and `.` is not on `$PATH`.",
+            "adjustment_applied": f"Invoked root script explicitly as `python3 ./{orig_exe}`.",
+            "author_fix": f"Prefix `python3 ./{orig_exe}` (or `./{orig_exe}`) in README.md.",
+        })
 
     ds = datasets_lib.resolve(input_type) or {}
     canonical = ds.get("canonical_input") or ""

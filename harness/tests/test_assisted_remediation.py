@@ -51,7 +51,8 @@ def test_straglr_positional_bam_triggers_rule5_and_stages_reference_genome():
     ref = ar.needs_reference_genome(proposal, manifest)
     assert ref is not None and ref.get("filename") == "hg38.fa"
 
-    # Track 2 binds positional `sample.mm2.bam` -> `/data/in/input.bam` and reuses Track 1's image
+    # Track 2 binds positional `sample.mm2.bam` -> `/data/in/input.bam` AND installs root `setup.py`
+    # (`python -m pip install --no-deps .`) so `straglr.py` is placed on the Conda env's `$PATH`!
     plan = ar.plan_assisted_run(
         proposal,
         manifest,
@@ -62,12 +63,14 @@ def test_straglr_positional_bam_triggers_rule5_and_stages_reference_genome():
         io_passed=False,
     )
     assert plan is not None
-    assert plan["needs_rebuild"] is False
+    assert plan["needs_rebuild"] is True
+    assert "python -m pip install --no-deps ." in plan["install_commands"]
     assert plan["needs_reference"] is True
     assert "/data/in/input.bam" in plan["unwrapped_run_cmd"]
     assert "/data/ref/hg38.fa" in plan["unwrapped_run_cmd"]
     rule_ids = [a["rule_id"] for a in plan["adjustments"]]
     assert "positional_reads_arg" in rule_ids
+    assert "standard_manifest_in_root" in rule_ids
 
 
 def test_longtr_build_failure_triggers_missing_apt_and_submodules():
@@ -300,9 +303,9 @@ def test_end_to_end_assisted_report_preserves_authorization_and_renders_pdf(tmp_
     assert rec["assisted"]["attempted"] is True
     assert rec["assisted"]["passed"] is True
     assert rec["assisted"]["level"] == "content"
-    # Notice docker build ran ONLY ONCE (Track 1 built image, Track 2 reused it!)
+    # Track 1 built literal image, Track 2 built assisted image adding `pip install --no-deps .`
     docker_builds = [c for c in fake.calls if c[0] == "bash" and c[1].endswith("record_terminal.sh")]
-    assert len(docker_builds) == 1
+    assert len(docker_builds) == 2
 
     rec_path = tmp_path / "run_record.json"
     rec_path.write_text(json.dumps(rec, indent=2))
@@ -344,8 +347,8 @@ def test_end_to_end_assisted_report_preserves_authorization_and_renders_pdf(tmp_
         assert written["assisted_run"]["passed"] is True
         assert written["assisted_run"]["output_preview"]["file"] == "output_prefix.tsv"
         assert "HTT" in "\n".join(written["assisted_run"]["output_preview"]["lines"])
-        assert "Automated verification with adjustments" in md
-        assert "Automated verification with adjustments" in html
+        assert "Automated run with suggested documentation adjustments" in md
+        assert "Automated run with suggested documentation adjustments" in html
 
         # 3. build_index surfaces assisted_runs & assisted_level
         site_tmp = tmp_path / "site"

@@ -199,7 +199,7 @@ def certificate_for(report: dict, cfg: dict) -> dict:
         "limitations": limitations_for(
             cfg.get("dataset"),
             input_type=cfg.get("input_type"),
-            executed=bool(gates.get("installs")),
+            executed=bool(gates.get("installs") or (report.get("assisted_run") or {}).get("passed")),
         ),
         "scope": {"statement": SCOPE_STATEMENT, "not": SCOPE_NOT, "disclaimer": DISCLAIMER},
     }
@@ -406,7 +406,8 @@ def test_data_item(cfg: dict, ds_name: str) -> tuple[str, str]:
     """What the run used (or selected, when installation stopped before execution)
     for input, and — only on evidence — whether the repository ships any of its own."""
     gates = dict(cfg.get("gates") or {})
-    attempted = bool(gates.get("installs"))
+    assisted = cfg.get("assisted_run") or {}
+    attempted = bool(gates.get("installs") or assisted.get("passed"))
     td = cfg.get("repo_test_data") or {}
     if not attempted:
         selected = (f"STRhub Verified selected {ds_name} as the reference dataset, "
@@ -489,8 +490,9 @@ def conclusion_items_for(cfg: dict) -> list[tuple[str, str]]:
             items.append((f"Verdict: {verdict['title']}", verdict["reason"]))
         if assisted_note:
             items.append(assisted_note)
-        items.append(("Reproducibility not established",
-                      "These observations are insufficient to establish a reproducible documented execution finding."))
+        else:
+            items.append(("Reproducibility not established",
+                          "These observations are insufficient to establish a reproducible documented execution finding."))
         return items
     verdict = cfg.get("verdict") or {}
     if verdict.get("basis") == "example":
@@ -535,7 +537,15 @@ def conclusion_items_for(cfg: dict) -> list[tuple[str, str]]:
                f"The environment for {cfg['tool_display']} could not be built from the "
                "declared install steps, so nothing further was attempted.")
 
-    if gates.get("content"):
+    a_passed = assisted.get("passed") is True
+    a_gates = dict(assisted.get("gates") or {}) if a_passed else {}
+    a_outs = ((assisted.get("content_detail") or {}).get("outputs") or []) if a_passed else []
+    a_stats = a_outs[0].get("stats") or {} if a_outs and isinstance(a_outs[0], dict) else {}
+    eff_content = bool(gates.get("content") or a_gates.get("content"))
+    eff_io = bool(gates.get("io") or a_gates.get("io"))
+    eff_loci = n_loci if gates.get("content") else (a_stats.get("distinct_str_loci") or a_stats.get("distinct_loci") or 0)
+
+    if eff_content:
         input_type = str(cfg.get("input_type") or "").lower()
         panel_label = (cfg.get("dataset") or {}).get("panel_label")
         if not panel_label:
@@ -545,13 +555,23 @@ def conclusion_items_for(cfg: dict) -> list[tuple[str, str]]:
                 panel_label = "Y-STR loci"
             else:
                 panel_label = "target forensic STR loci"
-        produced = ("Produces plausible output",
+        produced_title = (
+            "Produces plausible output"
+            if gates.get("content")
+            else "Produces plausible output (with adjustments)"
+        )
+        produced = (produced_title,
                     f"The tool generated a structurally valid {fmt_label}output file containing "
-                    f"{n_loci} distinct recognizable loci ({panel_label}); structural plausibility "
+                    f"{eff_loci} distinct recognizable loci ({panel_label}); structural plausibility "
                     f"checks verify output format and locus presence, not genotype validity or "
                     f"completeness across every listed locus.")
-    elif gates.get("io"):
-        produced = ("Produces output in the declared format",
+    elif eff_io:
+        produced_title = (
+            "Produces output in the declared format"
+            if gates.get("io")
+            else "Produces output in the declared format (with adjustments)"
+        )
+        produced = (produced_title,
                     f"The tool wrote a non-empty {fmt_label}file. Output generated; STR content "
                     "not verified automatically.")
     else:
@@ -560,13 +580,13 @@ def conclusion_items_for(cfg: dict) -> list[tuple[str, str]]:
                     "for structure or content. This says the run did not get that far; it is "
                     "not a finding about the quality of the software.")
 
-    items = [ran, produced]
-    # The one sentence the web leads with, in the certificate too.
+    items = [ran]
     if verdict.get("title") and verdict.get("reason"):
         items.append((f"Verdict: {verdict['title']}", verdict["reason"]))
     if assisted_note:
         items.append(assisted_note)
-    if gates.get("installs"):
+    items.append(produced)
+    if gates.get("installs") or a_passed:
         repro = (
             "Repeatability of this verification run",
             "The pinned commit, declared base environment, executed installation and "

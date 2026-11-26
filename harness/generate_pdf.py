@@ -812,7 +812,7 @@ def build_body(cfg):
     # Automated Verification with Adjustments (Track 2 — canonical for reviewers, users & authors)
     assisted = cfg.get("assisted_run") or {}
     if assisted.get("attempted"):
-        els.append(section_num(str(sec), "Automated Verification with Adjustments"))
+        els.append(section_num(str(sec), "Automated Run with Suggested Documentation Adjustments"))
         sec += 1
         if assisted.get("passed"):
             lead_txt = (
