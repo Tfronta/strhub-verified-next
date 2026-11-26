@@ -434,7 +434,15 @@ def execution_finding_established(report: dict) -> bool | None:
     if "procedure_validation" not in report:
         return None
     review, verdict = report.get("procedure_review") or {}, report.get("verdict") or {}
+    gates = report.get("gates") or {}
+    build_failed_reviewed = (
+        review.get("install_ready") is True
+        and gates.get("available") is True
+        and gates.get("installs") is False
+        and verdict.get("code") == "fails"
+    )
     reviewed = (review.get("may_say_runs") is True
+                or build_failed_reviewed
                 or (review.get("example_ready") is True and verdict.get("basis") == "example"))
     return bool((report.get("procedure_validation") or {}).get("valid") and reviewed
                 and verdict.get("code") in ("runs", "fails")

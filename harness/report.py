@@ -49,6 +49,7 @@ SLICE_SCOPE_NOTE = (
 OUTPUT_PREVIEW_MAX_LINES = 18
 OUTPUT_PREVIEW_MAX_BYTES = 4096
 OUTPUT_PREVIEW_READ_CAP = 16384
+OUTPUT_PREVIEW_VCF_READ_CAP = 262144
 _ANSI_CSI_RE = re.compile(r"\x1b\[[0-9;?]*[A-Za-z]")
 
 
@@ -93,20 +94,23 @@ def build_output_preview(
         chosen = candidates[0]
     rel_name = str(chosen.relative_to(out_dir))
     size_bytes = chosen.stat().st_size
+    lower_name = chosen.name.lower()
+    is_vcf_name = lower_name.endswith((".vcf", ".vcf.gz"))
+    read_cap = OUTPUT_PREVIEW_VCF_READ_CAP if is_vcf_name else OUTPUT_PREVIEW_READ_CAP
     import gzip as _gzip
     try:
-        if chosen.name.lower().endswith(".gz"):
+        if lower_name.endswith(".gz"):
             with _gzip.open(chosen, "rb") as gz:
-                raw = gz.read(OUTPUT_PREVIEW_READ_CAP + 1)
+                raw = gz.read(read_cap + 1)
         else:
             with open(chosen, "rb") as fh:
-                raw = fh.read(OUTPUT_PREVIEW_READ_CAP + 1)
+                raw = fh.read(read_cap + 1)
     except OSError:
         return None
     if not raw:
         return None
-    byte_capped = len(raw) > OUTPUT_PREVIEW_READ_CAP
-    sample = raw[:OUTPUT_PREVIEW_READ_CAP]
+    byte_capped = len(raw) > read_cap
+    sample = raw[:read_cap]
     non_text = sum(1 for b in sample if b < 9 or (13 < b < 32) or b == 127)
     if b"\x00" in sample or (sample and non_text / len(sample) > 0.10):
         return {
@@ -123,9 +127,20 @@ def build_output_preview(
     # when we already have plenty of lines.
     if byte_capped and len(raw_lines) > max_lines:
         raw_lines = raw_lines[:-1]
+    elided_vcf_headers = False
+    if raw_lines and (is_vcf_name or raw_lines[0].startswith("##fileformat=VCF")):
+        chrom_idx = next((i for i, ln in enumerate(raw_lines) if ln.startswith("#CHROM")), None)
+        if chrom_idx is not None and chrom_idx > 4:
+            omitted = chrom_idx - 4
+            raw_lines = (
+                raw_lines[:4]
+                + [f"# ... ({omitted} VCF meta-header lines omitted) ..."]
+                + raw_lines[chrom_idx:]
+            )
+            elided_vcf_headers = True
     out_lines: list[str] = []
     used_bytes = 0
-    truncated = byte_capped or len(raw_lines) > max_lines
+    truncated = byte_capped or elided_vcf_headers or len(raw_lines) > max_lines
     for idx, ln in enumerate(raw_lines):
         if idx >= max_lines:
             truncated = True

@@ -226,3 +226,75 @@ def test_authorized_external_run_is_not_masked_by_passing_own_example():
     assert v_unver["code"] == "runs" and v_unver["basis"] == "gates"
     assert v_unver["content_verified"] is False
     assert v_unver["output_status"] == "output_only_content_unverified"
+
+
+def test_failed_authorized_build_is_not_masked_by_downstream_command_gap():
+    """NanoRepeat regression: when `install_ready` is True and `docker build`
+    actually ran and failed (`installs: False`), a downstream run-command gap
+    (`may_say_runs: False`) must not mask the observed build failure as
+    `undetermined` / `pre_execution`."""
+    import json
+    import pathlib
+    import subprocess
+    import sys
+    import certificate_text
+    import propose_manifest
+
+    root = pathlib.Path(__file__).resolve().parents[2]
+    snap = root / "harness" / "testdata" / "benchmark" / "nanorepeat"
+    r = subprocess.run(
+        [sys.executable, str(root / "harness" / "detect_recipe.py"), "--offline", str(snap)],
+        capture_output=True, text=True, check=True,
+    )
+    prop = json.loads(r.stdout)
+    built = propose_manifest.build(prop, "nanorepeat")
+    prop["limitations"] = built["limitations"]
+    prop["procedure"] = built["procedure"]
+    reviewed = built["procedure"]
+    assert reviewed["install_ready"] is True
+    assert reviewed["may_say_runs"] is False
+
+    gates = {"available": True, "installs": False, "runs": False, "io": False, "content": False}
+    v = verdict.decide(gates, recipe_proposal=prop, procedure=reviewed, manifest=built["manifest"])
+    assert v["code"] == "fails"
+    assert v["basis"] == "gates"
+    assert v["failure_phase"] == "build"
+    assert "did not build" in v["reason"]
+    assert v["blockers"][0]["code"] == "build_failed"
+
+    rep = {
+        "procedure_validation": {"valid": True},
+        "procedure_review": reviewed,
+        "verdict": v,
+        "gates": gates,
+    }
+    assert certificate_text.execution_finding_established(rep) is True
+    stages = {s["key"]: s["status"] for s in certificate_text.stage_states(gates, execution_established=True)}
+    assert stages["installs"] == "FAIL"
+    assert stages["runs"] == "NOT ATTEMPTED"
+
+
+def test_vcf_output_preview_elides_long_meta_headers_to_show_calls(tmp_path):
+    import report as report_mod
+
+    vcf_lines = [
+        "##fileformat=VCFv4.3",
+        "##source=mahi_mahi-v1.0.0",
+        "##reference=/data/ref/hg38.fa",
+        "##mahi_mahiCommand=mahi-mahi --bam /data/in/input.bam",
+    ] + [f"##INFO=<ID=F{i},Number=1,Type=String,Description=\"Field {i}\">" for i in range(25)] + [
+        "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\tSAMPLE",
+        "chr4\t3074876\tHTT\tC\t<STR17>\t.\tPASS\tEND=3074933\tGT:DP\t0/1:52",
+        "chr9\t27573528\tC9orf72\tG\t<STR8>\t.\tPASS\tEND=27573546\tGT:DP\t0/0:34",
+    ]
+    out_dir = tmp_path / "out"
+    out_dir.mkdir()
+    (out_dir / "SAMPLE.vcf").write_text("\n".join(vcf_lines) + "\n")
+
+    prev = report_mod.build_output_preview(out_dir, ["SAMPLE.vcf"], leg="external")
+    assert prev is not None
+    assert prev["truncated"] is True
+    assert any("VCF meta-header lines omitted" in ln for ln in prev["lines"])
+    assert any(ln.startswith("#CHROM\tPOS") for ln in prev["lines"])
+    assert any("HTT" in ln for ln in prev["lines"])
+

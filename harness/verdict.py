@@ -270,13 +270,6 @@ def _decide(gates: dict, diagnostics: dict[str, list[dict]] | None = None,
                           + " before producing its output.",
                 "readme_gaps": gaps}
 
-    blocked = _procedure_block(procedure, gaps)
-    if blocked:
-        return blocked
-
-    # A proposed recipe that already knows it is incomplete did not test the
-    # tool, even if a file appeared. A guess confirmed by that file is how an
-    # invented input used to become "Runs".
     auto = proposal.get("schema", "").startswith("strhub-verified/recipe-proposal")
     if auto and not (proposal.get("readme") or {}).get("sufficient_to_attempt", True):
         return {"code": "undetermined", "title": TITLES["undetermined"], "basis": "readme",
@@ -284,6 +277,40 @@ def _decide(gates: dict, diagnostics: dict[str, list[dict]] | None = None,
                           "its repository. The README does not say enough for a stranger to "
                           "run it; each missing item is listed below.",
                 "readme_gaps": gaps}
+
+    # When the documented installation was authorized (`install_ready` is True)
+    # and `docker build` actually executed and failed (`available` True,
+    # `installs` False), that build failure is a real observed finding unless
+    # STRhub's own infrastructure or runner limits caused it. Never let a
+    # downstream run-command gap (`may_say_runs` False) mask a failed build as
+    # "Could not be determined / Nothing was executed".
+    if procedure.get("install_ready") is True and gates.get("available") and not gates.get("installs"):
+        if strhub_fault:
+            return {"code": "undetermined", "title": TITLES["undetermined"], "basis": "strhub_infra",
+                    "reason": "STRhub's own infrastructure failed before the tool could be tested ("
+                              + strhub_fault + "). Nothing here is a finding about the software; "
+                              "the run has to be repeated.",
+                    "readme_gaps": []}
+        if scope_limit:
+            return {"code": "undetermined", "title": TITLES["undetermined"], "basis": "scope",
+                    "reason": "Automatic verification reached an evaluator scope boundary ("
+                              + scope_limit + "); this run does not fault the software.",
+                    "readme_gaps": []}
+        declared_early = {k for k, v in (declared_compatibility or {}).items() if v}
+        incompatible_early = ids & diagnose_log.HARNESS_INCOMPATIBLE
+        if declared_early or incompatible_early:
+            what = sorted(declared_early | incompatible_early)
+            return {"code": "out_of_scope", "title": TITLES["out_of_scope"], "basis": "environment",
+                    "reason": "The tool needs something the automated runner cannot provide: "
+                              + ", ".join(what) + ".",
+                    "readme_gaps": []}
+        return {"code": "fails", "title": TITLES["fails"], "basis": "gates",
+                "reason": "The environment did not build from the declared install steps.",
+                "readme_gaps": gaps}
+
+    blocked = _procedure_block(procedure, gaps)
+    if blocked:
+        return blocked
     limits = [l for l in proposal.get("limitations", []) if l in LIMITATION_TEXT]
     if auto and limits:
         return {"code": "undetermined", "title": TITLES["undetermined"], "basis": "recipe",
@@ -427,6 +454,11 @@ def decide(gates: dict, diagnostics: dict[str, list[dict]] | None = None,
     limits = [l for l in evidence.get("limitations", []) if l in LIMITATION_TEXT]
     gaps = [g for g in (proposal.get("readme") or {}).get("gaps", []) if g.get("item") != "example_data"]
     v["blockers"] = blockers_for(gates or {}, limits, gaps, _ids(diagnostics))
+    if v.get("failure_phase") == "build" and any(b["code"] == "build_failed" for b in v["blockers"]):
+        v["blockers"] = (
+            [b for b in v["blockers"] if b["code"] == "build_failed"]
+            + [b for b in v["blockers"] if b["code"] != "build_failed"]
+        )
     if (procedure or {}).get("blocker") == "install_not_copyable":
         # Nothing was built, so nothing failed to build: what stopped the run
         # is how the installation is written, and the review says where.
