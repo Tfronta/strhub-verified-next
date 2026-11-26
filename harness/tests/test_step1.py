@@ -38,6 +38,8 @@ def test_a_failure_of_the_documented_run_invites_a_fix_and_does_not_condemn_the_
     assert s["code"] == "does_not_run"
     assert s["headline"] == "As documented, it does not run."
     assert "does not mean the tool does not work" in s["body"]
+    assert "cannot run it from start to finish" in s["body"]
+    assert "We suggest updating the documentation" in s["body"]
     assert "try the link again" in s["body"]
 
 
@@ -114,3 +116,39 @@ def test_an_amended_procedure_is_not_published_as_the_tool_failing():
     s = ct.step1_says({"verdict": v, "procedure_review": review})
     assert s["code"] == "ours"
     assert s["headline"] != "As documented, it does not run."
+
+
+def test_plain_conclusion_uses_everyday_non_technical_language_across_states():
+    import re
+    jargon_words = ("git", "commit", "sha", "docker", "container", "cli", "readme", "vcf", "bam")
+    banned_tokens = ("/app:ro", "—", "->", "→")
+    states = [
+        {"gates": G_OK, "verdict": {"code": "runs"}},
+        {
+            "gates": {"available": True, "installs": False, "runs": False, "io": False, "content": False},
+            "verdict": {"code": "fails"},
+            "assisted_run": {"attempted": True, "passed": True},
+        },
+        {
+            "gates": {"available": True, "installs": True, "runs": False, "io": False, "content": False},
+            "verdict": {"code": "fails"},
+        },
+        {
+            "gates": {"available": True, "installs": False, "runs": False, "io": False, "content": False},
+            "verdict": {"code": "undetermined"},
+            "step1": {"code": "cannot_tell"},
+        },
+        {
+            "gates": {"available": True, "installs": False, "runs": False, "io": False, "content": False},
+            "verdict": {"code": "undetermined", "basis": "scope"},
+            "step1": {"code": "ours"},
+        },
+    ]
+    for cfg in states:
+        items = ct.plain_conclusion_items_for(cfg)
+        assert len(items) == 4
+        joined = " ".join(f"{t} {b}" for t, b in items).lower()
+        for word in jargon_words:
+            assert not re.search(rf"\b{word}\b", joined), (word, joined)
+        for tok in banned_tokens:
+            assert tok not in joined, (tok, joined)

@@ -55,8 +55,8 @@ REGISTER: dict[str, tuple[str, str]] = {
     # The two sentences of step 1 that speak about somebody's repository. Both
     # deny the reading they are most likely to get: neither says the tool does
     # not work, because neither run established that (docs/PLAN-Paso-1.md).
-    "9bb264480cf8": ("certificate_text", "gates"),  # That does not mean the tool does not work. It means a third party following the README at this co
-    "f65b34dd9bd8": ("certificate_text", "readme"),  # Nothing was executed. That does not mean the tool does not work: what the guide asks for is miss
+    "9eca82f04a7e": ("certificate_text", "gates"),  # That does not mean the tool does not work. It means a third party following the README at this co
+    "e01325a71a5a": ("certificate_text", "readme"),  # Nothing was executed. That does not mean the tool does not work: what the guide asks for is miss
     "ef1d9f98ef6e": ("verdict", "run"),  # The tool did not finish within the run's time limit, so it was stopped.
     "06e75c4bbbd2": ("verdict", "tree"),  # The documented command reads a file that is not in the repository at this commit and that STRhub doe
     # The one diagnostic sentence that still speaks about the author's side: a

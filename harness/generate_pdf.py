@@ -27,7 +27,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import diagnose_log  # noqa: E402
 from command_record import presentation as command_presentation  # noqa: E402
 from certificate_text import (  # noqa: E402
-    conclusion_items_for, install_meaning, headline, execution_finding_established,
+    conclusion_items_for, plain_conclusion_items_for, step1_says, install_meaning, headline, execution_finding_established,
     stage_states, limitations_for,
     AS_IS_HEADING, NOT_DOCUMENTED, display_name,
     PURPOSE, EXEC_SCOPE, NOT_EVALUATED, SCOPE_STATEMENT, SCOPE_NOT, DISCLAIMER, OUT_OF_SCOPE, LIMITATIONS,
@@ -1208,35 +1208,34 @@ def build_body(cfg):
           leftIndent=10, spaceAfter=1)) for item in lim_items]
     lim += [vspace(2), Paragraph(DISCLAIMER, ST["body"])]
     els.append(boxed(lim))
-    els.append(vspace(4))
 
-    has_stale_cert = bool(
-        assisted.get("passed")
-        and any("No output produced" == c.get("title") or "not processed" in str(c.get("body", ""))
-                for c in (cert.get("conclusion") or []))
-    )
-    conclusion_items = (
-        [(c["title"], c["body"]) for c in cert["conclusion"]]
-        if (cert.get("conclusion") and not has_stale_cert)
-        else conclusion_items_for(cfg)
-    )
-    con_content = []
-    for title, body in conclusion_items:
+    # ── Section 5: Plain-Language Conclusion (right before Technical Annex) ───
+    els.append(section_num(str(sec), "Conclusion"))
+    sec += 1
+    plain_items = plain_conclusion_items_for(cfg)
+    con_content = [
+        Paragraph(
+            "<i>Plain-language summary for quick review (no programming background required):</i>",
+            S("cl_lead", fontSize=8.3, textColor=GRAY, leading=12.5, spaceAfter=6),
+        )
+    ]
+    for idx_item, (title, body) in enumerate(plain_items):
+        is_last = idx_item == len(plain_items) - 1
         con_content.append(Paragraph(
             f'<font color="#00909c">◆</font>  <b>{esc(title)}</b>',
-            S("ct2", fontSize=9, textColor=INK, leading=14,
-              fontName="Helvetica-Bold", spaceAfter=2)))
+            S(f"ct2_{idx_item}", fontSize=9, textColor=INK, leading=13.5,
+              fontName="Helvetica-Bold", spaceAfter=1.5)))
         con_content.append(Paragraph(esc(body),
-            S("cb2", fontSize=8.5, textColor=GRAY, leading=13,
-              leftIndent=14, spaceAfter=8)))
+            S(f"cb2_{idx_item}", fontSize=8.5, textColor=INK, leading=13,
+              leftIndent=14, spaceAfter=0 if is_last else 6.5)))
     con_box = Table([[con_content]], colWidths=[CW])
     con_box.setStyle(TableStyle([
         ("BACKGROUND",    (0,0),(-1,-1), TEAL_LIGHT),
         ("BOX",           (0,0),(-1,-1), 0.8, TEAL_MID),
-        ("TOPPADDING",    (0,0),(-1,-1), 14),
-        ("BOTTOMPADDING", (0,0),(-1,-1), 14),
-        ("LEFTPADDING",   (0,0),(-1,-1), 16),
-        ("RIGHTPADDING",  (0,0),(-1,-1), 16),
+        ("TOPPADDING",    (0,0),(-1,-1), 12),
+        ("BOTTOMPADDING", (0,0),(-1,-1), 12),
+        ("LEFTPADDING",   (0,0),(-1,-1), 15),
+        ("RIGHTPADDING",  (0,0),(-1,-1), 15),
     ]))
     els.append(con_box)
     return els
@@ -1329,6 +1328,30 @@ def build_technical_annex(cfg: dict) -> list:
             ("BOX",           (0,0),(-1,-1), 0.5, BORDER),
         ]))
         els.append(etbl)
+
+    # D. Formal Gate Findings Record (preserved for technical audit)
+    cert = cfg.get("certificate") or {}
+    has_stale_cert = bool(
+        assisted.get("passed")
+        and any("No output produced" == c.get("title") or "not processed" in str(c.get("body", ""))
+                for c in (cert.get("conclusion") or []))
+    )
+    gate_findings = (
+        [(c["title"], c["body"]) for c in cert["conclusion"]]
+        if (cert.get("conclusion") and not has_stale_cert)
+        else conclusion_items_for(cfg)
+    )
+    if gate_findings:
+        els.append(_subsection("Formal Gate Findings Record"))
+        gf_ps = []
+        for idx_gf, (g_title, g_body) in enumerate(gate_findings):
+            is_last_gf = idx_gf == len(gate_findings) - 1
+            gf_ps.append(Paragraph(
+                f"<b>{esc(g_title)}:</b> {esc(g_body)}",
+                S(f"gfp_{idx_gf}", fontSize=8, textColor=GRAY, leading=12.5,
+                  spaceAfter=0 if is_last_gf else 4),
+            ))
+        els.append(boxed(gf_ps))
 
     return els
 
@@ -1748,7 +1771,7 @@ def load_config(manifest_path: str, datasets_path: str | None = None,
         "install_detail": report.get("install_detail") or {},
         "verdict":        report.get("verdict") or {},
         "execution_finding_established": execution_finding_established(report),
-        "step1":          report.get("step1") or {},
+        "step1":          step1_says(report) if report.get("verdict") else (report.get("step1") or {}),
         "repo_test_data": report.get("repo_test_data") or {},
         "author_known_issues": report.get("author_known_issues") or [],
         "is_trial":       not _published,

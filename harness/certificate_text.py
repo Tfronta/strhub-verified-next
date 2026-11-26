@@ -266,12 +266,13 @@ STEP1_RUNS = (
 )
 STEP1_DOES_NOT_RUN = (
     "That does not mean the tool does not work. It means a third party following the README at "
-    "this commit did not reach the end. Fix the documentation, or the step that broke, and try "
-    "the link again on the new commit."
+    "this commit cannot run it from start to finish. We suggest updating the documentation, or "
+    "the step where it broke, so you can try the link again on the new commit."
 )
 STEP1_CANNOT_TELL = (
     "Nothing was executed. That does not mean the tool does not work: what the guide asks for is "
-    "missing from the README at this commit. Add it and try the link again on the new commit."
+    "missing from the README at this commit. We suggest adding it so you can try the link again "
+    "on the new commit."
 )
 STEP1_OURS = "The limitation is ours. Nothing here is a finding about the tool."
 
@@ -623,6 +624,95 @@ def conclusion_items_for(cfg: dict) -> list[tuple[str, str]]:
         repro,
     ]
     return items
+
+
+def plain_conclusion_items_for(cfg: dict) -> list[tuple[str, str]]:
+    """Short, everyday-language conclusion in four bullet topics for a reader
+    with no software or version-control background (no git/commit/Docker/CLI jargon)."""
+    gates = dict(cfg.get("gates") or {})
+    verdict = cfg.get("verdict") or {}
+    assisted = cfg.get("assisted_run") or {}
+    step1 = cfg.get("step1") or {}
+    code = verdict.get("code")
+    strict_runs = code == "runs" or bool(gates.get("runs") and gates.get("io"))
+    a_passed = assisted.get("passed") is True
+    ours = (
+        cfg.get("execution_finding_established") is False
+        or step1.get("code") == "ours"
+        or code == "out_of_scope"
+        or verdict.get("basis") in ("strhub_infra", "scope", "strhub")
+    )
+
+    if strict_runs:
+        t1 = (
+            "Yes. The software installed and ran from start to finish without errors, producing valid results."
+            if not cfg.get("errors_reported")
+            else "Yes. The software ran from start to finish and produced valid results, while printing warning messages along the way."
+        )
+        t2 = "Yes. An independent person can follow the published instructions as written and obtain results."
+    elif a_passed:
+        t1 = (
+            "Yes. The authors' original software runs from start to finish and produces valid results "
+            "without any change to its source code."
+        )
+        t2 = (
+            "Not quite as written today, because minor setup details are missing. Following the "
+            "step-by-step guide in Section 2, anyone can install and run it today."
+        )
+    elif ours:
+        t1 = (
+            "Not evaluated automatically due to a technical boundary of our test system (such as "
+            "special hardware, visual interface, or input format). This is not a fault in the software."
+        )
+        t2 = "Our automated system could not check them from start to finish; manual review by a person may be needed."
+    elif code == "undetermined":
+        t1 = (
+            "Not tested automatically yet because basic setup steps are missing from the public "
+            "instructions. This does not mean the software does not work."
+        )
+        t2 = (
+            "Not yet. Essential steps are missing from the public instructions for another person "
+            "to run it step by step (see Section 1)."
+        )
+    elif gates.get("installs"):
+        t1 = (
+            "The software installed properly, then stopped with an error while running. This does "
+            "not prove the software is broken; it shows the analysis did not finish on a clean computer."
+        )
+        t2 = (
+            "Not as written today: an outside user following only the current public instructions "
+            "encounters an error before reaching the end (see Section 1)."
+        )
+    else:
+        t1 = (
+            "Not tested yet because the initial installation stopped before finishing on a clean "
+            "computer. This does not prove the software is defective."
+        )
+        t2 = (
+            "Not as written today: an outside user following only the current public instructions "
+            "encounters an error during installation (see Section 1)."
+        )
+
+    if verdict.get("basis") == "example" and gates.get("installs"):
+        t3 = "Tested on the example data provided directly by the authors."
+    elif strict_runs or a_passed:
+        t3 = "Tested on an independent public reference sample not chosen by the authors."
+    elif gates.get("installs") and code == "fails":
+        t3 = "Attempted on an independent public reference sample, stopping before a final result file was produced."
+    else:
+        t3 = "No biological samples were processed during this automated check."
+
+    t4 = (
+        "Checks only whether the software can be installed and run. Does not evaluate biological "
+        "genotype accuracy, concordance, or forensic/clinical validity."
+    )
+
+    return [
+        ("Does the software work?", t1),
+        ("Are the current instructions enough to use it from start to finish?", t2),
+        ("What data was it tested on?", t3),
+        ("What does this report NOT evaluate?", t4),
+    ]
 
 
 def install_meaning(faults: list[str]) -> list[tuple[str, str]]:
