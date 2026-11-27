@@ -407,6 +407,11 @@ def build_cover(cfg):
                 "2. With adjustments",
                 f'Stopped at {esc(a_lvl)} ({a_n}/5 gates; {n_adj} adjustment(s) tried; 0 source-code files modified)',
             ))
+    elif assisted_cover.get("evaluated"):
+        meta_rows.append((
+            "2. With adjustments",
+            "Evaluated automatically (not executable without manual setup; 0 source-code files modified)",
+        ))
     if cfg.get("ci_run"):
         meta_rows.append(("CI workflow run", link(cfg["ci_run"])))
     if cfg.get("permalink"):
@@ -821,6 +826,11 @@ def build_body(cfg):
             else f'Stopped at {esc(a_lvl)} ({a_n}/5 gates; 0 source-code files modified)'
         )
         exec_rows.append(("2. WITH ADJUSTMENTS", a_txt))
+    elif assisted.get("evaluated"):
+        exec_rows.append((
+            "2. WITH ADJUSTMENTS",
+            "Evaluated automatically (not executable without manual setup; 0 source-code files modified)",
+        ))
     if verdict.get("reason"):
         exec_rows.append(("WHY (RUN 1)", esc(verdict["reason"])))
     exec_rows += [
@@ -991,6 +1001,7 @@ def build_body(cfg):
             els.append(KeepTogether([heading_p, boxed(q_els), vspace(2.5)]))
 
     # When Run 1 itself produced output (no Run 2 needed), show Output Content Evidence inside Section 1
+    has_sec2 = bool(assisted.get("attempted") or assisted.get("evaluated"))
     if not assisted.get("attempted"):
         out_els_1 = _output_evidence_elements(
             cfg,
@@ -1002,7 +1013,7 @@ def build_body(cfg):
         if out_els_1:
             els.append(_subsection("Generated and verified output"))
             els.extend(out_els_1)
-        recs_only = cfg.get("recommendations") or []
+        recs_only = (cfg.get("recommendations") or []) if not has_sec2 else []
         if recs_only:
             els.append(_subsection("Optional repository improvements"))
             rec_ps = [Paragraph(
@@ -1158,6 +1169,37 @@ def build_body(cfg):
         if out_els_2:
             els.append(_subsection("Generated and verified output (Run 2)"))
             els.extend(out_els_2)
+    elif assisted.get("evaluated"):
+        els.append(section_num(str(sec), "Automated Run with Suggested Documentation Adjustments"))
+        sec += 1
+        skip_txt = esc(
+            assisted.get("skip_reason")
+            or "STRhub evaluated Run 2 automatically, and no safe documentation-only adjustment applied "
+               "without modifying files or inventing parameters."
+        )
+        skip_txt = re.sub(r"`([^`]+)`", r'<font name="Courier">\1</font>', skip_txt)
+        els.append(boxed([
+            Paragraph(
+                "<b>Evaluated automatically: container run could not be launched without manual setup.</b>",
+                ST["tbl_cell"],
+            ),
+            vspace(1.5),
+            Paragraph(skip_txt, ST["body"]),
+            vspace(1),
+            Paragraph(
+                "<font color=\"#6b7280\" size=\"7.8\">Integrity guarantee: 0 source-code files modified in both steps.</font>",
+                ST["body"],
+            ),
+        ]))
+        recs_eval = cfg.get("recommendations") or []
+        if recs_eval:
+            els.append(_subsection("Suggested repository improvements"))
+            rec_ps = [Paragraph(
+                f'<font color="#9ca3af">–</font>  {esc(r.get("text", ""))}',
+                S("rc_ev", fontSize=8.2, textColor=GRAY, leading=13, leftIndent=10, spaceAfter=1.5),
+            ) for r in recs_eval if r.get("text")]
+            if rec_ps:
+                els.append(boxed(rec_ps))
 
     # ── Section 3: Verification Data and Inputs Supplied Beyond the Repository ─
     els.append(section_num(str(sec), "Verification Data and Inputs Supplied Beyond the Repository"))

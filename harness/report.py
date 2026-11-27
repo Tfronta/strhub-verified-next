@@ -638,6 +638,14 @@ def _summary_md(report: dict, slug: str) -> str:
             ]
             if a_prev.get("lines"):
                 lines += ["", "```text", *a_prev["lines"], "```"]
+    elif assisted.get("evaluated"):
+        lines += [
+            "",
+            "## 2. Automated run with suggested documentation adjustments",
+            "",
+            "- Outcome: **Evaluated automatically (container run not launched)**",
+            f"- Diagnostic: {assisted.get('skip_reason', 'Manual preparation required.')}",
+        ]
 
     # Then the context: where the run came from, and what else it established.
     lines += ["", "## Run details", "",
@@ -1132,6 +1140,12 @@ def _summary_html(report: dict, slug: str) -> str:
             "<h2>2. Automated run with suggested documentation adjustments</h2>"
             f"<p>Outcome: {a_status} &middot; Source code modified: <b>No</b> (verified commit executed read-only without source edits).</p>"
             f"{adj_table}{cmd_html}{readme_html}"
+        )
+    elif assisted.get("evaluated"):
+        assisted_block = (
+            "<h2>2. Automated run with suggested documentation adjustments</h2>"
+            "<p><b>Evaluated automatically (container run not launched):</b> "
+            f"{esc(assisted.get('skip_reason', 'Manual preparation required.'))}</p>"
         )
 
     caveats_block = ""
@@ -1795,6 +1809,7 @@ def main() -> int:
         report["assisted_run"] = {
             "schema": assisted_raw.get("schema", "strhub-assisted-remediation/1"),
             "attempted": True,
+            "evaluated": True,
             "passed": bool(assisted_raw.get("passed")),
             "level": assisted_raw.get("level", "none"),
             "content_verified": bool(assisted_raw.get("content_verified")),
@@ -1878,6 +1893,18 @@ def main() -> int:
                     "the public reference copy."
                 )
             report["needed_beyond_repo"] = updated_needed
+    elif isinstance(assisted_raw, dict) and assisted_raw.get("evaluated"):
+        report["assisted_run"] = {
+            "schema": assisted_raw.get("schema", "strhub-assisted-remediation/1"),
+            "attempted": False,
+            "evaluated": True,
+            "passed": False,
+            "level": assisted_raw.get("level", "none"),
+            "skip_reason_code": assisted_raw.get("skip_reason_code", ""),
+            "skip_reason": assisted_raw.get("skip_reason", ""),
+            "gates": assisted_raw.get("gates") or {},
+            "adjustments": [],
+        }
 
     # What STRhub did to get the tool ready, when the repository's own
     # instructions were not enough: every step, every file, every input.

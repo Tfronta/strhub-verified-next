@@ -398,3 +398,104 @@ def test_end_to_end_assisted_report_preserves_authorization_and_renders_pdf(tmp_
     finally:
         for f in reports_dir.glob("trial-straglr-e2e*"):
             f.unlink(missing_ok=True)
+
+
+def test_generic_multi_sample_equals_bed_repo_prefix_and_install_sh_plan():
+    """Verify generic handling of:
+      1) `<RepoDir>/...` parent-folder prefix when `<RepoDir>` matches repo URL and is not in `tree_paths`
+      2) `key=file.bed` `=`-joined external regions parameter -> `/data/in/regions.bed` (`bed4`)
+      3) Multiple space-separated positional BAMs (`sample1.bam sample2.bam`) -> `/data/in/input.bam`
+      4) Root `install.sh` selected when executable `./tools/bin/runner` is built by `install.sh`
+    """
+    proposal = {
+        "repo": "https://github.com/example-org/PipelineTool",
+        "ref": "a" * 40,
+        "tree_paths": [
+            "README.md",
+            "install.sh",
+            "environment.yml",
+            "pipelines/wgs_bam_pipeline.groovy",
+            "tools/runner-src/build.gradle",
+        ],
+        "build": {"file": "install.sh", "ssh_urls_in": []},
+        "commands": [],
+        "source_documents": [],
+    }
+    manifest = {
+        "source": {"repo": "https://github.com/example-org/PipelineTool", "ref": "a" * 40},
+        "inputs": {"type": "illumina-bam-hg38", "regions": None},
+        "run": {
+            "cmd": (
+                "PipelineTool/tools/bin/runner run -p input_regions=all_STRs_in_genome.bed "
+                "PipelineTool/pipelines/wgs_bam_pipeline.groovy sample1.bam sample2.bam"
+            ),
+            "cwd": ".",
+        },
+        "outputs": [{"path": "*.tsv", "format": "tsv"}],
+    }
+    review = {"install_ready": False, "may_say_runs": False, "blocker": "install_not_copyable"}
+
+    plan = ar.plan_assisted_run(
+        proposal,
+        manifest,
+        review,
+        installs_passed=False,
+        installs_attempted=False,
+        runs_passed=False,
+        io_passed=False,
+    )
+    assert plan is not None
+    assert plan["install_commands"] == ["bash install.sh"]
+    assert plan["uses_conda"] is True
+    assert plan["regions"] == "bed4"
+    assert plan["unwrapped_run_cmd"] == (
+        "./tools/bin/runner run -p input_regions=/data/in/regions.bed "
+        "pipelines/wgs_bam_pipeline.groovy /data/in/input.bam"
+    )
+    rule_ids = {a["rule_id"] for a in plan["adjustments"]}
+    assert {"standard_manifest_in_root", "repo_root_prefix", "equals_file_arg", "positional_reads_arg"} <= rule_ids
+
+
+def test_unassisted_evaluation_emits_diagnostic_record_and_fixes_pdf_conclusion():
+    """When `plan_assisted_run` returns `None`, `explain_unassisted_reason` and `_unassisted_record`
+    emit `attempted=False, evaluated=True` with a concrete `skip_reason_code`, and `plain_conclusion_items_for`
+    classifies `cannot_tell` / `undetermined` as missing public instructions rather than `ours`."""
+    proposal_nr, manifest_nr, review_nr = _eval_snapshot("nanorepeat")
+    code_nr, reason_nr = ar.explain_unassisted_reason(
+        proposal_nr,
+        manifest_nr,
+        review_nr,
+        installs_passed=True,
+        installs_attempted=True,
+    )
+    assert code_nr == "unresolved_placeholders"
+    assert "path/to/" in reason_nr
+
+    proposal_spy, manifest_spy, review_spy = _eval_snapshot("strspy")
+    code_spy, _ = ar.explain_unassisted_reason(
+        proposal_spy,
+        manifest_spy,
+        review_spy,
+        installs_passed=False,
+        installs_attempted=False,
+    )
+    assert code_spy in ("custom_input_layout", "no_standard_installer")
+
+    rec_unassisted = ar._unassisted_record(code_nr, reason_nr, installs_passed=True)
+    assert rec_unassisted["attempted"] is False
+    assert rec_unassisted["evaluated"] is True
+    assert rec_unassisted["skip_reason_code"] == "unresolved_placeholders"
+
+    # PDF plain_conclusion_items_for must NOT misclassify `cannot_tell` (`execution_finding_established=False`)
+    # as `ours` ("technical boundary of our test system")!
+    cfg_undetermined = {
+        "gates": {"available": True, "installs": False, "runs": False, "io": False, "content": False},
+        "verdict": {"code": "undetermined", "basis": "documentation"},
+        "step1": {"code": "cannot_tell"},
+        "execution_finding_established": False,
+        "assisted_run": rec_unassisted,
+    }
+    items = ct.plain_conclusion_items_for(cfg_undetermined)
+    assert "basic setup steps are missing from the public instructions" in items[0][1]
+    assert "Essential steps are missing" in items[1][1]
+

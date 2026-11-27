@@ -637,10 +637,14 @@ def plain_conclusion_items_for(cfg: dict) -> list[tuple[str, str]]:
     strict_runs = code == "runs" or bool(gates.get("runs") and gates.get("io"))
     a_passed = assisted.get("passed") is True
     ours = (
-        cfg.get("execution_finding_established") is False
-        or step1.get("code") == "ours"
+        step1.get("code") == "ours"
         or code == "out_of_scope"
         or verdict.get("basis") in ("strhub_infra", "scope", "strhub")
+        or (
+            not step1.get("code")
+            and cfg.get("execution_finding_established") is False
+            and code not in ("undetermined", "fails")
+        )
     )
 
     if strict_runs:

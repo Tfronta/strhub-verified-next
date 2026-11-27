@@ -107,24 +107,94 @@ def _dedupe(items: list[str]) -> list[str]:
     return out
 
 
-def _assisted_rewrite_command(raw_cmd: str, input_type: str | None, regions: str | None) -> tuple[str, list[dict]]:
-    """Apply `one_sample=True` list collapsing or single positional read-file
-    binding when the strict profile left the input unsubstituted."""
+def _assisted_rewrite_command(
+    raw_cmd: str,
+    input_type: str | None,
+    regions: str | None,
+    *,
+    tree_paths: set[str] | None = None,
+    repo_url: str = "",
+) -> tuple[str, str | None, list[dict]]:
+    """Apply generic CLI adjustments (parent-folder prefix resolution, `key=file`
+    input/regions/reference bindings, and single- or multi-sample positional read
+    collapsing) when the strict profile left inputs unsubstituted."""
+    eff_regions = regions
     adjustments: list[dict] = []
     if not input_type or not raw_cmd or raw_cmd.strip().startswith("true"):
-        return raw_cmd, adjustments
+        return raw_cmd, eff_regions, adjustments
 
     ds = datasets_lib.resolve(input_type)
     canonical = (ds or {}).get("canonical_input")
     if not canonical:
-        return raw_cmd, adjustments
+        return raw_cmd, eff_regions, adjustments
 
-    strict_rw = fidelity.rewrite(raw_cmd, input_type, regions=regions, one_sample=False)
+    working_cmd = raw_cmd
+
+    # Pre-step 1: strip trailing variadic ellipsis marker (`...` or `…`)
+    m_ell = re.search(r"\s+(\.\.\.|…)\s*$", working_cmd)
+    if m_ell:
+        tok_ell = m_ell.group(1)
+        working_cmd = working_cmd[:m_ell.start()].rstrip()
+        adjustments.append({
+            "rule_id": "positional_reads_arg",
+            "category": "cli_invocation",
+            "what_failed_strict": f"The documented command ends with a variadic ellipsis marker (`{tok_ell}`).",
+            "adjustment_applied": f"Removed trailing `{tok_ell}` synopsis marker for single-sample execution.",
+            "author_fix": "Provide a concrete copy-pasteable single-sample command without ellipsis markers in README.md.",
+        })
+
+    # Pre-step 2: resolve `<repo_dir>/...` parent-directory prefix when `<repo_dir>` is the
+    # cloned repository's own folder name and does not exist as a subfolder inside the tree.
+    repo_clean = (repo_url or "").rstrip("/")
+    repo_dir = repo_clean.rsplit("/", 1)[-1].removesuffix(".git") if "/" in repo_clean else ""
+    if repo_dir and tree_paths:
+        top_entries = {p.split("/", 1)[0] for p in tree_paths if p}
+        if repo_dir not in top_entries:
+            try:
+                _probe_toks = fidelity.tokens(working_cmd)
+            except ValueError:
+                _probe_toks = []
+            if _probe_toks:
+                prefix_changes: list[tuple[int, int, str, str]] = []
+                for idx, m in enumerate(fidelity.TOKEN.finditer(working_cmd)):
+                    raw_t = m.group()
+                    if (m.start() and not working_cmd[m.start() - 1].isspace()) or (
+                        m.end() < len(working_cmd) and not working_cmd[m.end()].isspace()
+                    ):
+                        continue
+                    q = raw_t[0] if len(raw_t) > 1 and raw_t[0] == raw_t[-1] and raw_t[0] in "'\"" else ""
+                    val = raw_t[1:-1] if q else raw_t
+                    if val.startswith(f"{repo_dir}/"):
+                        rest = val[len(repo_dir) + 1:]
+                        if rest and rest.split("/", 1)[0] in top_entries:
+                            new_val = f"./{rest}" if idx == 0 else rest
+                            repl = f"{q}{new_val}{q}" if q else new_val
+                            prefix_changes.append((m.start(), m.end(), raw_t, repl))
+                if prefix_changes:
+                    for st_i, en_i, _, repl in reversed(prefix_changes):
+                        working_cmd = working_cmd[:st_i] + repl + working_cmd[en_i:]
+                    examples_str = ", ".join(f"`{orig}`" for _, _, orig, _ in prefix_changes[:2])
+                    adjustments.append({
+                        "rule_id": "repo_root_prefix",
+                        "category": "cli_invocation",
+                        "what_failed_strict": (
+                            f"Command paths ({examples_str}) prefix the parent folder `{repo_dir}/`, "
+                            "assuming invocation from one directory above `git clone`."
+                        ),
+                        "adjustment_applied": (
+                            f"Resolved `{repo_dir}/...` paths relative to the cloned repository root."
+                        ),
+                        "author_fix": (
+                            f"Write paths relative to the repository root after `cd {repo_dir}` in README.md."
+                        ),
+                    })
+
+    strict_rw = fidelity.rewrite(working_cmd, input_type, regions=eff_regions, one_sample=False)
     if f"/data/in/{canonical}" in strict_rw["command"] and not strict_rw["limitations"]:
-        return strict_rw["command"], adjustments
+        return strict_rw["command"], eff_regions, adjustments
 
     # Case 5a: comma-separated sample list (`--bams a.bam,b.bam`) collapsed via one_sample=True
-    one_rw = fidelity.rewrite(raw_cmd, input_type, regions=regions, one_sample=True)
+    one_rw = fidelity.rewrite(working_cmd, input_type, regions=eff_regions, one_sample=True)
     if f"/data/in/{canonical}" in one_rw["command"] and not one_rw["limitations"]:
         adjustments.append({
             "rule_id": "positional_reads_arg",
@@ -133,14 +203,9 @@ def _assisted_rewrite_command(raw_cmd: str, input_type: str | None, regions: str
             "adjustment_applied": f"Collapsed the multi-sample input list to the single reference sample `/data/in/{canonical}`.",
             "author_fix": "Include a single-sample invocation example in README.md alongside multi-sample syntax.",
         })
-        return one_rw["command"], adjustments
+        return one_rw["command"], eff_regions, adjustments
 
-    # Case 5b: single positional read-file token (`tool sample.bam ...`) without a preceding input flag
     base_cmd = one_rw["command"]
-    try:
-        toks = fidelity.tokens(base_cmd)
-    except ValueError:
-        return base_cmd, adjustments
 
     def _read_kind(p: str) -> str:
         if re.search(r"\.f(?:ast)?q(?:\.gz)?$", p, re.I):
@@ -149,7 +214,112 @@ def _assisted_rewrite_command(raw_cmd: str, input_type: str | None, regions: str
             return "cram"
         return "bam"
 
-    positional_matches: list[tuple[int, int, str]] = []
+    # Case 5b-equals: `key=file` / `--flag=file` (`=`-joined) read, reference, or regions file parameters
+    try:
+        _eq_toks = fidelity.tokens(base_cmd)
+    except ValueError:
+        return base_cmd, eff_regions, adjustments
+
+    eq_changes: list[tuple[int, int, str]] = []
+    has_read_bound = f"/data/in/{canonical}" in base_cmd
+    has_ref_bound = "/data/ref/" in base_cmd
+    has_reg_bound = "/data/in/regions" in base_cmd
+    ref_mount = ((ds or {}).get("reference_genome") or {}).get("mount_path")
+
+    for idx, m in enumerate(fidelity.TOKEN.finditer(base_cmd)):
+        if idx == 0:
+            continue
+        raw_tok = m.group()
+        if (m.start() and not base_cmd[m.start() - 1].isspace()) or (
+            m.end() < len(base_cmd) and not base_cmd[m.end()].isspace()
+        ):
+            continue
+        oq = raw_tok[0] if len(raw_tok) > 1 and raw_tok[0] == raw_tok[-1] and raw_tok[0] in "'\"" else ""
+        val = raw_tok[1:-1] if oq else raw_tok
+        if "=" not in val:
+            continue
+        lhs, rhs = val.split("=", 1)
+        rq = rhs[0] if len(rhs) > 1 and rhs[0] == rhs[-1] and rhs[0] in "'\"" else ""
+        rval = rhs[1:-1] if rq else rhs
+        if not lhs or not rval or rval.startswith("/data/") or re.search(r"\bpath/to/", rval, re.I):
+            continue
+        if re.search(r"(?:^|[-_])out(?:put|dir|_dir|-dir|_prefix|-prefix)?$", lhs, re.I):
+            continue
+
+        new_rval: str | None = None
+        if (
+            not has_read_bound
+            and fidelity.READ_PATH.fullmatch(rval)
+            and _read_kind(rval) == _read_kind(canonical)
+            and rval.endswith(".gz") == canonical.endswith(".gz")
+        ):
+            new_rval = f"/data/in/{canonical}"
+            has_read_bound = True
+            adjustments.append({
+                "rule_id": "equals_file_arg",
+                "category": "cli_invocation",
+                "what_failed_strict": f"Parameter `{raw_tok}` uses `=`-joined syntax outside the literal flag table.",
+                "adjustment_applied": f"Bound `{lhs}` to reference sample `{new_rval}`.",
+                "author_fix": "Include a space-separated CLI flag example or small sample file in README.md.",
+            })
+        elif (
+            not has_ref_bound
+            and ref_mount
+            and fidelity.REFERENCE_PATH.fullmatch(rval)
+            and not (
+                (ds or {}).get("reference") == "hg38"
+                and re.search(r"(?:hg19|grch37|b37|hs37d5)(?![a-z0-9])", rval, re.I)
+            )
+        ):
+            new_rval = ref_mount
+            has_ref_bound = True
+            adjustments.append({
+                "rule_id": "equals_file_arg",
+                "category": "cli_invocation",
+                "what_failed_strict": f"Reference parameter `{raw_tok}` uses `=`-joined syntax outside the literal flag table.",
+                "adjustment_applied": f"Bound `{lhs}` to the public GRCh38 reference genome.",
+                "author_fix": "Document standard reference flags (e.g. `--fasta hg38.fa`) in README.md.",
+            })
+        elif (
+            not has_reg_bound
+            and re.fullmatch(r"[\w./-]+\.bed", rval, re.I)
+            and rval not in (tree_paths or set())
+        ):
+            cand_reg = eff_regions or ("bed4" if "bed4" in ((ds or {}).get("regions") or {}) else None)
+            reg_src = ((ds or {}).get("regions") or {}).get(cand_reg or "")
+            if reg_src and cand_reg:
+                new_rval = "/data/in/regions" + pathlib.PurePosixPath(reg_src).suffix
+                eff_regions = cand_reg
+                has_reg_bound = True
+                adjustments.append({
+                    "rule_id": "equals_file_arg",
+                    "category": "cli_invocation",
+                    "what_failed_strict": (
+                        f"Parameter `{raw_tok}` references an external `.bed` file `{rval}` not shipped in the commit."
+                    ),
+                    "adjustment_applied": f"Bound `{lhs}` to STRhub's public reference panel `{new_rval}`.",
+                    "author_fix": f"Ship a small example `.bed` file in the repository or document standard `--regions` flags.",
+                })
+
+        if new_rval is not None:
+            rebuilt = f"{lhs}={rq}{new_rval}{rq}" if rq else f"{lhs}={new_rval}"
+            repl = f"{oq}{rebuilt}{oq}" if oq else rebuilt
+            eq_changes.append((m.start(), m.end(), repl))
+
+    if eq_changes:
+        for st_i, en_i, repl in reversed(eq_changes):
+            base_cmd = base_cmd[:st_i] + repl + base_cmd[en_i:]
+
+    if f"/data/in/{canonical}" in base_cmd:
+        return base_cmd, eff_regions, adjustments
+
+    # Case 5b-positional: 1 or 2+ homogeneous positional read-file tokens (`tool sample.bam` or `tool s1.bam s2.bam`)
+    try:
+        toks = fidelity.tokens(base_cmd)
+    except ValueError:
+        return base_cmd, eff_regions, adjustments
+
+    positional_matches: list[tuple[int, int, str, str]] = []
     for idx, m in enumerate(fidelity.TOKEN.finditer(base_cmd)):
         if idx == 0:
             continue
@@ -163,10 +333,10 @@ def _assisted_rewrite_command(raw_cmd: str, input_type: str | None, regions: str
         if prev in fidelity.OUTPUT_FLAGS or val.startswith("/data/"):
             continue
         if fidelity.READ_PATH.fullmatch(val) and _read_kind(val) == _read_kind(canonical) and val.endswith(".gz") == canonical.endswith(".gz"):
-            positional_matches.append((m.start(), m.end(), raw_tok))
+            positional_matches.append((m.start(), m.end(), raw_tok, val))
 
     if len(positional_matches) == 1:
-        start, end, orig_tok = positional_matches[0]
+        start, end, orig_tok, _ = positional_matches[0]
         target = f"/data/in/{canonical}"
         repl = orig_tok[0] + target + orig_tok[-1] if orig_tok[0] in "'\"" else target
         rewritten = base_cmd[:start] + repl + base_cmd[end:]
@@ -183,9 +353,38 @@ def _assisted_rewrite_command(raw_cmd: str, input_type: str | None, regions: str
                 f"example file at `{orig_tok}` in the repository so the documented command runs verbatim."
             ),
         })
-        return rewritten, adjustments
+        return rewritten, eff_regions, adjustments
 
-    return base_cmd, adjustments
+    if len(positional_matches) >= 2:
+        is_paired_mates = _read_kind(canonical) == "fastq" and any(
+            re.search(r"(?:_R?[12])\.(?:f(?:ast)?q)(?:\.gz)?$", v, re.I)
+            for _, _, _, v in positional_matches
+        )
+        if not is_paired_mates:
+            target = f"/data/in/{canonical}"
+            rewritten = base_cmd
+            for st_i, en_i, _, _ in reversed(positional_matches[1:]):
+                cut_start = st_i - 1 if st_i > 0 and rewritten[st_i - 1] == " " else st_i
+                rewritten = rewritten[:cut_start] + rewritten[en_i:]
+            start0, end0, orig0, _ = positional_matches[0]
+            repl0 = orig0[0] + target + orig0[-1] if orig0[0] in "'\"" else target
+            rewritten = rewritten[:start0] + repl0 + rewritten[end0:]
+            orig_list = " ".join(t for _, _, t, _ in positional_matches)
+            adjustments.append({
+                "rule_id": "positional_reads_arg",
+                "category": "cli_invocation",
+                "what_failed_strict": (
+                    f"The documented command lists multiple positional sample files (`{orig_list}`), "
+                    "which cannot map directly to one single-sample reference slice."
+                ),
+                "adjustment_applied": (
+                    f"Collapsed multi-sample positional arguments (`{orig_list}`) to `{target}`."
+                ),
+                "author_fix": "Include a single-sample invocation example in README.md alongside multi-sample syntax.",
+            })
+            return rewritten, eff_regions, adjustments
+
+    return base_cmd, eff_regions, adjustments
 
 
 def _output_parent_dirs(unwrapped_cmd: str) -> list[str]:
@@ -226,7 +425,11 @@ def needs_reference_genome(proposal: dict | None, manifest: dict | None) -> dict
     if not ds:
         return None
     raw_cmd, _ = unwrap_example((manifest.get("run") or {}).get("cmd") or "")
-    candidate_cmd, _ = _assisted_rewrite_command(raw_cmd, input_type, inputs.get("regions"))
+    tree_paths = set((proposal or {}).get("tree_paths") or [])
+    repo_url = (manifest.get("source") or {}).get("repo") or (proposal or {}).get("repo") or ""
+    candidate_cmd, _, _ = _assisted_rewrite_command(
+        raw_cmd, input_type, inputs.get("regions"), tree_paths=tree_paths, repo_url=repo_url
+    )
     return input_provenance.reference_for(ds, candidate_cmd)
 
 
@@ -315,7 +518,7 @@ def _build_assisted_dockerfile(
         lines.append("RUN " + json.dumps(["bash", "-c", f"echo 'conda activate {conda_env}' > /etc/profile.d/zz-strhub-env.sh"]))
     if venv_activate:
         lines.append("RUN " + json.dumps(["bash", "-c", f"echo 'source {venv_activate}' >> /etc/profile.d/zz-strhub-env.sh"]))
-    lines.append('RUN ["bash", "-c", "echo \'export PATH=\\"$PATH:/opt/tool\\"\' >> /etc/profile.d/zz-strhub-path.sh"]')
+    lines.append('RUN ["bash", "-c", "echo \'export PATH=\\"$PATH:/opt/tool:/opt/tool/bin:/opt/tool/build\\"\' >> /etc/profile.d/zz-strhub-path.sh"]')
     lines.append('ENTRYPOINT ["/bin/bash", "-lc"]')
     return "\n".join(lines) + "\n"
 
@@ -413,10 +616,62 @@ def plan_assisted_run(
     git_https_rewrite = False
     ssh_files = [str(f) for f in ((proposal.get("build") or {}).get("ssh_urls_in") or []) if f]
 
+    repo_url = (manifest.get("source") or {}).get("repo") or proposal.get("repo") or ""
+    assisted_cmd, effective_regions, cli_adjs = _assisted_rewrite_command(
+        raw_run_cmd, input_type, regions, tree_paths=tree_paths, repo_url=repo_url
+    )
+    try:
+        pre_toks = fidelity.tokens(assisted_cmd)
+    except ValueError:
+        pre_toks = []
+    first_exe = pre_toks[0] if pre_toks else ""
+
     # --- Installation remediation (Rules 1, 2, 3, 4) -------------------------
     if not review.get("install_ready"):
-        # Rule 4: standard root packaging manifest when README install block is missing/unusable
-        if "environment.yml" in tree_paths or "environment.yaml" in tree_paths:
+        other_root_manifests = {
+            "environment.yml", "environment.yaml", "pyproject.toml",
+            "setup.py", "Makefile", "CMakeLists.txt",
+        } & tree_paths
+        needs_repo_script_build = (
+            first_exe.startswith("./")
+            and "/" in first_exe[2:]
+            and first_exe[2:] not in tree_paths
+        )
+        # Rule 4: standard root packaging manifest or bootstrap script when README install block is missing/unusable
+        if "install.sh" in tree_paths and (not other_root_manifests or needs_repo_script_build):
+            install_commands = ["bash install.sh"]
+            uses_conda = bool("environment.yml" in tree_paths or "environment.yaml" in tree_paths)
+            extra_apt = _dedupe([
+                *_STANDARD_NATIVE_CPP_APT,
+                "wget", "unzip", "bzip2", "default-jre-headless", "libncurses5-dev",
+            ])
+            adjustments.append({
+                "rule_id": "standard_manifest_in_root",
+                "category": "environment",
+                "what_failed_strict": "No literally copyable installation code block was admitted from README.md.",
+                "adjustment_applied": (
+                    "Executed root `install.sh` script shipped in the commit with standard Ubuntu 22.04 build packages."
+                ),
+                "author_fix": "Add a copyable installation block directly to README.md.",
+            })
+            if ssh_files:
+                git_https_rewrite = True
+                adjustments.append({
+                    "rule_id": "ssh_git_url_in_build",
+                    "category": "environment",
+                    "what_failed_strict": (
+                        f"Build file(s) (`{', '.join(ssh_files)}`) clone public GitHub dependencies via "
+                        "`git@github.com:` SSH URLs, which fail without a configured SSH key."
+                    ),
+                    "adjustment_applied": (
+                        'Configured Git HTTPS URL rewrite (`git config --global url."https://github.com/".insteadOf "git@github.com:"`).'
+                    ),
+                    "author_fix": (
+                        f"Replace `git@github.com:` with `https://github.com/` in `{', '.join(ssh_files)}` "
+                        "so clean checkouts build without SSH keys."
+                    ),
+                })
+        elif "environment.yml" in tree_paths or "environment.yaml" in tree_paths:
             env_file = "environment.yml" if "environment.yml" in tree_paths else "environment.yaml"
             install_commands = [
                 f"conda env create --name strhub_assisted --file={env_file}",
@@ -459,6 +714,36 @@ def plan_assisted_run(
                     "the root `Makefile` shipped in the commit."
                 ),
                 "author_fix": "Add a copyable `make` installation block (plus required `apt` libraries) to README.md.",
+            })
+            if ssh_files:
+                git_https_rewrite = True
+                adjustments.append({
+                    "rule_id": "ssh_git_url_in_build",
+                    "category": "environment",
+                    "what_failed_strict": (
+                        f"Build file(s) (`{', '.join(ssh_files)}`) clone public GitHub dependencies via "
+                        "`git@github.com:` SSH URLs, which fail without a configured SSH key."
+                    ),
+                    "adjustment_applied": (
+                        'Configured Git HTTPS URL rewrite (`git config --global url."https://github.com/".insteadOf "git@github.com:"`).'
+                    ),
+                    "author_fix": (
+                        f"Replace `git@github.com:` with `https://github.com/` in `{', '.join(ssh_files)}` "
+                        "so clean checkouts build without SSH keys."
+                    ),
+                })
+        elif "CMakeLists.txt" in tree_paths:
+            install_commands = ["cmake -B build -DCMAKE_BUILD_TYPE=Release", "cmake --build build -j2"]
+            extra_apt = list(_STANDARD_NATIVE_CPP_APT)
+            adjustments.append({
+                "rule_id": "standard_manifest_in_root",
+                "category": "environment",
+                "what_failed_strict": "No literally copyable installation code block was admitted from README.md.",
+                "adjustment_applied": (
+                    "Installed standard Ubuntu 22.04 C/C++ build packages and ran CMake against "
+                    "the root `CMakeLists.txt` shipped in the commit."
+                ),
+                "author_fix": "Add a copyable CMake installation block (`cmake -B build && cmake --build build`) to README.md.",
             })
             if ssh_files:
                 git_https_rewrite = True
@@ -570,8 +855,8 @@ def plan_assisted_run(
         })
 
     # --- CLI & Runtime remediation (Rules 5 & 6) -----------------------------
-    assisted_cmd, cli_adjs = _assisted_rewrite_command(raw_run_cmd, input_type, regions)
     adjustments.extend(cli_adjs)
+    regions = effective_regions
 
     # Rule 5c: bare `.py` script in repository root invoked without `python` or `./`
     # when no root Python packaging manifest installed it onto `$PATH`.
@@ -647,7 +932,6 @@ def plan_assisted_run(
         git_https_rewrite=git_https_rewrite,
     )
     ref_genome = input_provenance.reference_for(ds, assisted_cmd)
-    repo_url = (manifest.get("source") or {}).get("repo") or proposal.get("repo") or ""
 
     needs_rebuild = bool(not installs_passed or any(a["category"] == "environment" for a in adjustments))
 
@@ -674,6 +958,127 @@ def plan_assisted_run(
             repo_url, init_submodules, extra_apt, git_https_rewrite,
             install_commands, mkdir_dirs, raw_run_cmd,
         ),
+    }
+
+
+def explain_unassisted_reason(
+    proposal: dict | None,
+    manifest: dict | None,
+    review: dict | None,
+    *,
+    installs_passed: bool,
+    installs_attempted: bool,
+    build_log_text: str = "",
+) -> tuple[str, str]:
+    """Explain deterministically why Track 2 could not launch an automated container
+    without inventing commands, custom configs, or modifying repository files."""
+    compat = ((manifest or {}).get("compatibility") or {}) if isinstance(manifest, dict) else {}
+    if any(compat.values()):
+        return (
+            "hardware_or_license",
+            "Automated Run 2 was evaluated and skipped because special hardware, a graphical display, "
+            "or proprietary licensing is required outside the CPU-only container runner.",
+        )
+    if build_log_text:
+        log_ids = {i.get("id") for i in diagnose_log.diagnose(build_log_text)}
+        if log_ids & diagnose_log.HARNESS_INCOMPATIBLE:
+            return (
+                "hardware_or_license",
+                "Automated Run 2 was evaluated and skipped because Run 1 hit a hardware, memory, "
+                "or licensing boundary of the automated CPU-only runner.",
+            )
+
+    tree_paths = set((proposal or {}).get("tree_paths") or []) if isinstance(proposal, dict) else set()
+    if ".dockerignore" in tree_paths:
+        return (
+            "dockerignore_present",
+            "Automated Run 2 was evaluated and skipped because `.dockerignore` excludes files "
+            "from the container build context.",
+        )
+
+    raw_run_cmd, _ = unwrap_example(((manifest or {}).get("run") or {}).get("cmd") or "") if isinstance(manifest, dict) else ("", "")
+    if not raw_run_cmd or raw_run_cmd.strip().startswith("true"):
+        return (
+            "no_run_command",
+            "Automated Run 2 was evaluated, and no concrete command-line invocation was found in "
+            "the public documentation to execute without inventing commands.",
+        )
+
+    inputs = ((manifest or {}).get("inputs") or {}) if isinstance(manifest, dict) else {}
+    input_type = inputs.get("type")
+    ds = datasets_lib.resolve(input_type) if input_type else None
+    if not input_type or not ds:
+        return (
+            "unsupported_input_type",
+            "Automated Run 2 was evaluated, and no public reference sample is registered for the "
+            "input format expected by this procedure.",
+        )
+
+    std_manifests = {
+        "install.sh", "environment.yml", "environment.yaml",
+        "pyproject.toml", "setup.py", "Makefile", "CMakeLists.txt",
+    }
+    if isinstance(review, dict) and not review.get("install_ready") and not (std_manifests & tree_paths):
+        return (
+            "no_standard_installer",
+            "Automated Run 2 was evaluated, and neither a copyable installation block nor a standard "
+            "root build manifest was found to build the environment automatically.",
+        )
+
+    if installs_attempted and not installs_passed:
+        return (
+            "unrecognized_build_failure",
+            "Automated Run 2 inspected the Run 1 build log, and the compilation failure did not match "
+            "a standard system package, submodule, or Python version adjustment.",
+        )
+
+    repo_url = (((manifest or {}).get("source") or {}).get("repo") or (proposal or {}).get("repo") or "")
+    assisted_cmd, _, _ = _assisted_rewrite_command(
+        raw_run_cmd, input_type, inputs.get("regions"), tree_paths=tree_paths, repo_url=repo_url
+    )
+    if re.search(r"\bpath/to/", assisted_cmd, re.I) or re.search(r"<[^<>]+>", assisted_cmd):
+        return (
+            "unresolved_placeholders",
+            "Automated Run 2 was evaluated, and the documented command contains unresolved template "
+            "placeholders (such as `path/to/...` or `<...>`) that cannot be filled without inventing paths.",
+        )
+    if re.search(r"(?:hg19|grch37|b37|hs37d5)(?![a-z0-9])", assisted_cmd, re.I) and ds.get("reference") == "hg38":
+        return (
+            "assembly_mismatch",
+            "Automated Run 2 was evaluated, and the documented command targets GRCh37/hg19 files "
+            "while the staged reference sample is aligned to GRCh38/hg38.",
+        )
+    canonical = ds.get("canonical_input") or ""
+    if not canonical or f"/data/in/{canonical}" not in assisted_cmd:
+        return (
+            "custom_input_layout",
+            "Automated Run 2 was evaluated, and the documented command expects an input directory "
+            "or custom configuration file rather than a single sample file.",
+        )
+    return (
+        "no_applicable_adjustment",
+        "Automated Run 2 evaluated the repository and Run 1 logs, and no safe documentation-only "
+        "adjustment applied without modifying files or inventing parameters.",
+    )
+
+
+def _unassisted_record(code: str, reason: str, *, installs_passed: bool) -> dict:
+    return {
+        "schema": SCHEMA,
+        "attempted": False,
+        "evaluated": True,
+        "passed": False,
+        "level": "installs" if installs_passed else "available",
+        "skip_reason_code": code,
+        "skip_reason": reason,
+        "gates": {
+            "available": True,
+            "installs": bool(installs_passed),
+            "runs": False,
+            "io": False,
+            "content": False,
+        },
+        "adjustments": [],
     }
 
 
@@ -713,7 +1118,15 @@ def execute_assisted_run(
         build_log_text=build_log_text,
     )
     if plan is None:
-        return None
+        code, reason = explain_unassisted_reason(
+            proposal,
+            manifest,
+            review,
+            installs_passed=installs_passed,
+            installs_attempted=installs_attempted,
+            build_log_text=build_log_text,
+        )
+        return _unassisted_record(code, reason, installs_passed=installs_passed)
 
     assisted_rel = ctx.work / "assisted"
     assisted_abs = ctx.work_abs / "assisted"
@@ -748,7 +1161,11 @@ def execute_assisted_run(
             ["git", "-C", str(src_rel), "checkout", "-q", ref],
         ):
             if ctx.exe.run(argv, log=log_build_abs, cwd=ctx.root) != 0:
-                return None
+                return _unassisted_record(
+                    "no_applicable_adjustment",
+                    "Automated Run 2 could not fetch the pinned commit for isolated execution.",
+                    installs_passed=installs_passed,
+                )
 
         if plan["init_submodules"] and (src_abs / ".gitmodules").exists():
             git_cmd = (
@@ -791,14 +1208,22 @@ def execute_assisted_run(
             with opener(source, "rb") as s_fh, (in_abs / fname).open("xb") as d_fh:
                 shutil.copyfileobj(s_fh, d_fh)
     except Exception:  # noqa: BLE001
-        return None
+        return _unassisted_record(
+            "unsupported_input_type",
+            "Automated Run 2 could not stage the reference input files for this procedure.",
+            installs_passed=installs_passed,
+        )
 
     ref_dir_abs: pathlib.Path | None = None
     if plan["needs_reference"]:
         cand_ref = ctx.work_abs / "ref"
         genome = (dataset or {}).get("reference_genome") or {}
         if not genome.get("filename") or not (cand_ref / genome["filename"]).is_file():
-            return None
+            return _unassisted_record(
+                "no_applicable_adjustment",
+                "Automated Run 2 required the GRCh38 reference genome, which was not staged in the workspace.",
+                installs_passed=installs_passed,
+            )
         ref_dir_abs = cand_ref
 
     log_ext_rel = assisted_rel / "log_external.txt"
@@ -879,6 +1304,7 @@ def _assemble_record(
     return {
         "schema": SCHEMA,
         "attempted": True,
+        "evaluated": True,
         "passed": bool(runs_ok and io_ok),
         "level": level,
         "content_verified": ct_ok,
