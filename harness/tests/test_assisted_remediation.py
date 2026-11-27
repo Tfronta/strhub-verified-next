@@ -415,7 +415,6 @@ def test_generic_multi_sample_equals_bed_repo_prefix_and_install_sh_plan():
             "install.sh",
             "environment.yml",
             "pipelines/wgs_bam_pipeline.groovy",
-            "tools/runner-src/build.gradle",
         ],
         "build": {"file": "install.sh", "ssh_urls_in": []},
         "commands": [],

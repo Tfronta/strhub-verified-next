@@ -166,7 +166,7 @@ def _assisted_rewrite_command(
                     val = raw_t[1:-1] if q else raw_t
                     if val.startswith(f"{repo_dir}/"):
                         rest = val[len(repo_dir) + 1:]
-                        if rest and rest.split("/", 1)[0] in top_entries:
+                        if rest and ".." not in rest.split("/"):
                             new_val = f"./{rest}" if idx == 0 else rest
                             repl = f"{q}{new_val}{q}" if q else new_val
                             prefix_changes.append((m.start(), m.end(), raw_t, repl))
