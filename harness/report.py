@@ -1688,7 +1688,7 @@ def main() -> int:
         # file the documentation names, and it was STRhub that supplied it.
         report.setdefault("needed_beyond_repo", []).append(
             f"A reference genome ({mounted_reference.get('assembly') or 'as documented'}): the command "
-            f"names one, and STRhub mounted the public copy at {mounted_reference['mount_path']}.")
+            "names one, and STRhub supplied the public reference copy.")
     regions_layout = (m.get("inputs") or {}).get("regions")
     if regions_layout and env_source != "prepared":
         report.setdefault("needed_beyond_repo", []).append(
@@ -1873,10 +1873,9 @@ def main() -> int:
                 ds_info = datasets_lib.resolve((m.get("inputs") or {}).get("type") or "") or {}
                 ref_g = ds_info.get("reference_genome") or {}
                 assembly = ref_g.get("assembly") or ds_info.get("reference") or "GRCh38 / hg38"
-                mount_p = f"/data/ref/{ref_g.get('filename') or 'hg38.fa'}"
                 updated_needed.append(
-                    f"A reference genome ({assembly}): the command names one, and STRhub mounted "
-                    f"the public copy at {mount_p}."
+                    f"A reference genome ({assembly}): the command names one, and STRhub supplied "
+                    "the public reference copy."
                 )
             report["needed_beyond_repo"] = updated_needed
 

@@ -353,7 +353,7 @@ def test_end_to_end_assisted_report_preserves_authorization_and_renders_pdf(tmp_
         needed_joined = " ".join(written.get("needed_beyond_repo") or [])
         assert "no sample from the repository was used, so a public reference sample stood in" in needed_joined
         assert "Base environment and assisted adjustments:" in needed_joined
-        assert "/data/ref/hg38.fa" in needed_joined
+        assert "A reference genome (" in needed_joined and "/data/ref/hg38.fa" not in needed_joined
 
         # 3. build_index surfaces assisted_runs & assisted_level
         site_tmp = tmp_path / "site"
@@ -368,7 +368,21 @@ def test_end_to_end_assisted_report_preserves_authorization_and_renders_pdf(tmp_
         # 4. PDF renders cleanly with ReportLab when installed and carries Run 2 stats + Technical Annex
         pytest.importorskip("reportlab")
         import generate_pdf
-        pdf_cfg = generate_pdf.load_config(str(mf_path), str(ROOT / "datasets" / "index.json"), publishable=False)
+        pdf_cfg = generate_pdf.load_config(
+            str(mf_path), str(ROOT / "datasets" / "index.json"), publishable=False, dispatch_id="tr_mwxpxk5x_qesyod",
+        )
+        assert pdf_cfg["trial_url"] == "https://strhub.app/verified/trial/tr_mwxpxk5x_qesyod"
+        assert pdf_cfg["web_url"] == "https://strhub.app/verified/trial/tr_mwxpxk5x_qesyod"
+        # Error-aware terminal extractor preserves early error lines when followed by long trailing output
+        long_err_log = "\n".join(
+            [f"info line {i}" for i in range(10)]
+            + ["Traceback (most recent call last):", "  File 'run.py', line 4", "ValueError: invalid BED column"]
+            + [f"cleanup line {i}" for i in range(60)]
+            + ["[exit 1]"]
+        )
+        extracted = generate_pdf._clean_terminal_lines(long_err_log, limit=34)
+        assert any("Traceback" in ln or "ValueError" in ln for ln in extracted)
+        assert any("[exit 1]" in ln for ln in extracted)
         assert pdf_cfg["effective_stats"].get("distinct_str_loci", 0) >= 1
         assert pdf_cfg["loci_with_depth"], "Expected loci_with_depth populated from assisted_run"
         annex_els = generate_pdf.build_technical_annex(pdf_cfg)

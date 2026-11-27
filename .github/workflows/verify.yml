@@ -239,10 +239,12 @@ jobs:
           # The PDF marks a result that will not be published and links one
           # that will: the publish gate's decision, not the run's mode.
           PUBLISHABLE: ${{ steps.attest.outputs.publishable || 'false' }}
+          DISPATCH_ID: ${{ inputs.dispatch_id }}
         run: |
           python harness/generate_pdf.py \
             --manifest "$MANIFEST" \
-            --publishable "$PUBLISHABLE"
+            --publishable "$PUBLISHABLE" \
+            --dispatch-id "$DISPATCH_ID"
 
       # What the web reads (docs/WEB-CONTRACT.md §2): the report and its files
       # under reports/, and every stage's command, exit status and log.

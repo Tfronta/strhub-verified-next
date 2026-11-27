@@ -409,9 +409,17 @@ def build_cover(cfg):
             ))
     if cfg.get("ci_run"):
         meta_rows.append(("CI workflow run", link(cfg["ci_run"])))
+    if cfg.get("permalink"):
+        permalink_val = link(cfg["permalink"])
+    elif cfg.get("trial_url"):
+        permalink_val = (
+            f'Not published (test run)  ·  {link(cfg["trial_url"], esc(cfg["trial_url"]))} '
+            '<font color="#6b7280" size="7.5">(30-day link)</font>'
+        )
+    else:
+        permalink_val = "Not published (test run)"
     meta_rows += [
-        ("Permalink",          link(cfg["permalink"]) if cfg.get("permalink")
-                               else "Not published (test run)"),
+        ("Permalink",          permalink_val),
         ("STRhub",             link("https://strhub.app")),
     ]
     tdata = [[Paragraph(k, ST["meta_label"]),
@@ -525,6 +533,14 @@ def _to_local_user_cmd(raw_cmd: str) -> str:
     return s
 
 
+_TERM_ERR_RE = re.compile(
+    r"(?:\berror\b|traceback \(most recent|exception:|valueerror:|typeerror:|keyerror:|"
+    r"runtimeerror:|filenotfounderror:|segmentation fault|not found|failed to|cannot open|"
+    r"no such file|permission denied|killed)",
+    re.I,
+)
+
+
 def _clean_terminal_lines(raw_text: str, *, limit: int = 34) -> list[str]:
     if not raw_text:
         return []
@@ -540,6 +556,27 @@ def _clean_terminal_lines(raw_text: str, *, limit: int = 34) -> list[str]:
             s = s[:115] + "..."
         out.append(s)
     if len(out) > limit:
+        tail_start = len(out) - limit
+        err_idx = next(
+            (idx for idx in range(tail_start) if _TERM_ERR_RE.search(out[idx])),
+            None,
+        )
+        if err_idx is not None:
+            win_start = max(0, err_idx - 2)
+            win_end = min(len(out), win_start + 12)
+            tail_len = max(12, limit - (win_end - win_start) - 2)
+            t_start = max(win_end, len(out) - tail_len)
+            prefix = (
+                [f"... ({win_start} earlier lines omitted)"]
+                if win_start > 0
+                else []
+            )
+            mid = (
+                [f"... ({t_start - win_end} intermediate lines omitted)"]
+                if t_start > win_end
+                else []
+            )
+            return prefix + out[win_start:win_end] + mid + out[t_start:]
         return [f"... (showing last {limit} lines of {len(out)} recorded lines)"] + out[-limit:]
     return out
 
@@ -831,11 +868,11 @@ def build_body(cfg):
         els.append(boxed(s1_els))
         els.append(vspace(3))
 
-    els.append(_gates_table(
+    els.append(KeepTogether([_gates_table(
         gates_dict,
         exec_established=cfg.get("execution_finding_established", True),
         log_fname=cfg.get("log_filename", ""),
-    ))
+    )]))
 
     if not all(gates_dict.get(key, False) for key, _, _ in GATE_DISPLAY):
         els.append(vspace(2.5))
@@ -849,7 +886,7 @@ def build_body(cfg):
 
     inst = cfg.get("install_detail") or {}
     if inst.get("diagnostics"):
-        els.append(_subsection("Build diagnostics observed in Run 1"))
+        inst_sub = _subsection("Build diagnostics observed in Run 1")
         ihead = [Paragraph(f"<b>{h}</b>", ST["tbl_cell"])
                  for h in ("What happened", "What the build log establishes")]
         irows = [ihead]
@@ -860,7 +897,7 @@ def build_body(cfg):
                           S("ifix", fontSize=8, textColor=GRAY, leading=12)),
             ])
         IC = CW * 0.38
-        it = Table(irows, colWidths=[IC, CW - IC])
+        it = Table(irows, colWidths=[IC, CW - IC], repeatRows=1)
         it.setStyle(TableStyle([
             ("VALIGN",        (0,0),(-1,-1), "TOP"),
             ("LEFTPADDING",   (0,0),(-1,-1), 10),
@@ -871,12 +908,15 @@ def build_body(cfg):
             ("LINEBELOW",     (0,0),(-1,0), 0.5, BORDER),
             ("BOX",           (0,0),(-1,-1), 0.5, BORDER),
         ]))
-        els.append(it)
+        if len(irows) <= 6:
+            els.append(KeepTogether([inst_sub, it]))
+        else:
+            els.extend([inst_sub, it])
 
     errs = diagnose_log.summarize(cfg.get("diagnostics") or {})
     if errs:
         n_items = sum(len(e["items"]) for e in errs) or len(errs)
-        els.append(_subsection(f"Messages reported during Run 1 ({n_items} item(s))"))
+        err_sub = _subsection(f"Messages reported during Run 1 ({n_items} item(s))")
         head = [Paragraph(f"<b>{h}</b>", ST["tbl_cell"])
                 for h in ("What happened", "Times", "Affected")]
         erows = [head]
@@ -889,7 +929,7 @@ def build_body(cfg):
             ])
         C1 = CW * 0.34
         C2 = CW * 0.10
-        et_diag = Table(erows, colWidths=[C1, C2, CW - C1 - C2])
+        et_diag = Table(erows, colWidths=[C1, C2, CW - C1 - C2], repeatRows=1)
         et_diag.setStyle(TableStyle([
             ("VALIGN",        (0,0),(-1,-1), "TOP"),
             ("LEFTPADDING",   (0,0),(-1,-1), 10),
@@ -900,7 +940,10 @@ def build_body(cfg):
             ("LINEBELOW",     (0,0),(-1,0), 0.5, BORDER),
             ("BOX",           (0,0),(-1,-1), 0.5, BORDER),
         ]))
-        els.append(et_diag)
+        if len(erows) <= 6:
+            els.append(KeepTogether([err_sub, et_diag]))
+        else:
+            els.extend([err_sub, et_diag])
         for note in diagnose_log.external_leg_notes(cfg.get("diagnostics") or {}):
             els.append(vspace(2))
             els.append(Paragraph(esc(note), ST["body"]))
@@ -995,11 +1038,11 @@ def build_body(cfg):
 
         adjs = assisted.get("adjustments") or []
         if adjs:
-            els.append(_subsection(
+            adj_sub = _subsection(
                 "Documentation / invocation adjustments applied"
                 if assisted.get("passed")
                 else "Documentation / invocation adjustments tried"
-            ))
+            )
             ahead = [
                 Paragraph(f"<b>{h}</b>", ST["tbl_cell"])
                 for h in (
@@ -1020,7 +1063,7 @@ def build_body(cfg):
                     Paragraph(_fmt_bt(a.get("author_fix", "-")), cell_st),
                 ])
             c_w = CW / 3.0
-            atbl = Table(arows, colWidths=[c_w, c_w, c_w])
+            atbl = Table(arows, colWidths=[c_w, c_w, c_w], repeatRows=1)
             atbl.setStyle(TableStyle([
                 ("VALIGN",        (0,0),(-1,-1), "TOP"),
                 ("LEFTPADDING",   (0,0),(-1,-1), 8),
@@ -1033,7 +1076,10 @@ def build_body(cfg):
                 ("LINEBELOW",     (0,1),(-1,-2), 0.3, BORDER),
                 ("BOX",           (0,0),(-1,-1), 0.5, BORDER),
             ]))
-            els.append(atbl)
+            if len(arows) <= 6:
+                els.append(KeepTogether([adj_sub, atbl]))
+            else:
+                els.extend([adj_sub, atbl])
 
         recs_extra = cfg.get("recommendations") or []
         if recs_extra:
@@ -1095,10 +1141,12 @@ def build_body(cfg):
                 ]
                 els.append(_mono_rows_table(clean_readme_lines))
 
-        els.append(_subsection("Verification gates (Run 2 with suggested adjustments)"))
         a_log_fname = ((assisted.get("logs") or {}).get("assisted-external")
                        or (assisted.get("logs") or {}).get("assisted-build") or "")
-        els.append(_gates_table(assisted.get("gates") or {}, exec_established=True, log_fname=a_log_fname))
+        els.append(KeepTogether([
+            _subsection("Verification gates (Run 2 with suggested adjustments)"),
+            _gates_table(assisted.get("gates") or {}, exec_established=True, log_fname=a_log_fname),
+        ]))
 
         out_els_2 = _output_evidence_elements(
             cfg,
@@ -1171,7 +1219,7 @@ def build_body(cfg):
         ("LINEBELOW",     (0,0),(-1,-2), 0.3, BORDER),
         ("BOX",           (0,0),(-1,-1), 0.5, BORDER),
     ]))
-    els.append(dst)
+    els.append(KeepTogether([dst]))
 
     needed = cfg.get("needed_beyond_repo") or []
     if needed:
@@ -1210,15 +1258,10 @@ def build_body(cfg):
     els.append(boxed(lim))
 
     # ── Section 5: Plain-Language Conclusion (right before Technical Annex) ───
-    els.append(section_num(str(sec), "Conclusion"))
+    con_hdr = section_num(str(sec), "Conclusion")
     sec += 1
     plain_items = plain_conclusion_items_for(cfg)
-    con_content = [
-        Paragraph(
-            "<i>Plain-language summary for quick review (no programming background required):</i>",
-            S("cl_lead", fontSize=8.3, textColor=GRAY, leading=12.5, spaceAfter=6),
-        )
-    ]
+    con_content = []
     for idx_item, (title, body) in enumerate(plain_items):
         is_last = idx_item == len(plain_items) - 1
         con_content.append(Paragraph(
@@ -1237,7 +1280,26 @@ def build_body(cfg):
         ("LEFTPADDING",   (0,0),(-1,-1), 15),
         ("RIGHTPADDING",  (0,0),(-1,-1), 15),
     ]))
-    els.append(con_box)
+    con_group: list = [con_hdr, con_box]
+    web_url = cfg.get("web_url") or ""
+    if web_url:
+        shortcuts = []
+        if assisted.get("passed"):
+            shortcuts.append(link(f"{web_url}#verified-assisted-run", "Copy step-by-step commands (Section 2)"))
+        shortcuts.append(link(f"{web_url}#verified-technical-annex", "Open full recorded terminals and Technical Annex"))
+        con_group.append(vspace(2.5))
+        con_group.append(boxed([
+            Paragraph(
+                f"<b>Interactive web report:</b> {link(web_url, esc(web_url))}",
+                ST["body"],
+            ),
+            vspace(1),
+            Paragraph(
+                "Direct shortcuts:  " + "  ·  ".join(shortcuts),
+                S("wsc", fontSize=8.2, textColor=GRAY, leading=12.5),
+            ),
+        ]))
+    els.append(KeepTogether(con_group))
     return els
 
 
@@ -1507,7 +1569,7 @@ def _format_cmd(raw_cmd: str) -> list[str]:
 
 
 def load_config(manifest_path: str, datasets_path: str | None = None,
-                publishable: bool | None = None) -> dict:
+                publishable: bool | None = None, dispatch_id: str = "") -> dict:
     mpath = pathlib.Path(manifest_path)
     m = yaml.safe_load(mpath.read_text())
 
@@ -1720,17 +1782,32 @@ def load_config(manifest_path: str, datasets_path: str | None = None,
         if "/data/ref/" in str(vc_doc.get("run") or "") and not any("reference genome" in x.lower() for x in norm_needed):
             ref_g = dataset.get("reference_genome") or {}
             asm = ref_g.get("assembly") or dataset.get("reference") or "GRCh38 / hg38"
-            mp = f"/data/ref/{ref_g.get('filename') or 'hg38.fa'}"
             norm_needed.append(
-                f"A reference genome ({asm}): the command names one, and STRhub mounted the public copy at {mp}."
+                f"A reference genome ({asm}): the command names one, and STRhub supplied the public reference copy."
             )
         needed_list = norm_needed
+    needed_list = [
+        re.sub(
+            r"^A reference genome \((.+)\): the command names one, and STRhub mounted the public copy at .+\.$",
+            r"A reference genome (\1): the command names one, and STRhub supplied the public reference copy.",
+            item,
+        )
+        for item in needed_list
+    ]
 
     # Whether this result is published is the deploy gate's decision on the
     # verdict, handed in by the workflow. Without it, the old rule holds: a
     # trial publishes nothing.
     _published = (publishable if publishable is not None
                   else report.get("mode") != "trial")
+    permalink = f"https://strhub.app/verified/{slug}" if _published else ""
+    clean_dispatch = (dispatch_id or "").strip()
+    trial_url = (
+        f"https://strhub.app/verified/trial/{clean_dispatch}"
+        if (not _published and re.match(r"^tr_[a-z0-9]+_[a-z0-9]+$", clean_dispatch))
+        else ""
+    )
+    web_url = permalink or trial_url
 
     return {
         "slug":           slug,
@@ -1744,7 +1821,9 @@ def load_config(manifest_path: str, datasets_path: str | None = None,
         "commit":         commit,
         "commit_url":     commit_url,
         "upstream_note":  upstream_note,
-        "permalink":      f"https://strhub.app/verified/{slug}" if _published else "",
+        "permalink":      permalink,
+        "trial_url":      trial_url,
+        "web_url":        web_url,
         "ci_run":         report.get("ci_run", ""),
         "gates":          gates,
         "level":          level,
@@ -1806,10 +1885,12 @@ def main() -> int:
     ap.add_argument("--publishable", choices=["true", "false"], default=None,
                     help="whether the deploy gate will publish this result; "
                          "sets the permalink and the not-published mark")
+    ap.add_argument("--dispatch-id", default="",
+                    help="trial dispatch id (tr_...) to build the interactive web report URL")
     args = ap.parse_args()
 
     publishable = None if args.publishable is None else args.publishable == "true"
-    cfg = load_config(args.manifest, args.datasets, publishable)
+    cfg = load_config(args.manifest, args.datasets, publishable, dispatch_id=args.dispatch_id)
 
     out_path = args.out or f"reports/{cfg['slug']}.pdf"
     pathlib.Path(out_path).parent.mkdir(parents=True, exist_ok=True)

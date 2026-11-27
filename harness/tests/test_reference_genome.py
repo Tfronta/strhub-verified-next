@@ -213,4 +213,4 @@ def test_the_report_says_strhub_supplied_the_reference(tmp_path, monkeypatch, ca
     result = json.loads(capsys.readouterr().out)
     assert result["verdict"]["code"] == "runs"
     assert result["mounted_inputs"]["reference"]["mount_path"] == MOUNT
-    assert any("reference genome" in n and MOUNT in n for n in result["needed_beyond_repo"])
+    assert any("reference genome" in n and "STRhub supplied the public reference copy" in n for n in result["needed_beyond_repo"])
