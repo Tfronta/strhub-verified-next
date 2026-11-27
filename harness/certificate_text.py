@@ -636,6 +636,8 @@ def plain_conclusion_items_for(cfg: dict) -> list[tuple[str, str]]:
     code = verdict.get("code")
     strict_runs = code == "runs" or bool(gates.get("runs") and gates.get("io"))
     a_passed = assisted.get("passed") is True
+    a_attempted = assisted.get("attempted") is True
+    a_installs = bool((assisted.get("gates") or {}).get("installs"))
     ours = (
         step1.get("code") == "ours"
         or code == "out_of_scope"
@@ -662,6 +664,26 @@ def plain_conclusion_items_for(cfg: dict) -> list[tuple[str, str]]:
         t2 = (
             "Not quite as written today, because minor setup details are missing. Following the "
             "step-by-step guide in Section 2, anyone can install and run it today."
+        )
+    elif a_attempted and a_installs:
+        t1 = (
+            "In our second automated check with standard setup adjustments (Section 2), the software "
+            "installed properly, then stopped with an error while running. This does not prove the software "
+            "is broken; it shows an extra reference file or manual setting is still required."
+        )
+        t2 = (
+            "Not yet. Essential steps are missing or incomplete in the public instructions, and even with "
+            "standard setup adjustments (without changing source code) the analysis stopped before finishing "
+            "(see the terminal error in Section 2)."
+        )
+    elif a_attempted:
+        t1 = (
+            "Not tested on data yet. In our second automated check with standard setup adjustments "
+            "(Section 2), initial installation still stopped with an error on a clean computer."
+        )
+        t2 = (
+            "Not yet. Even after adding standard build packages without changing source code, installation "
+            "stopped before finishing (see the terminal error in Section 2)."
         )
     elif ours:
         t1 = (
@@ -701,7 +723,7 @@ def plain_conclusion_items_for(cfg: dict) -> list[tuple[str, str]]:
         t3 = "Tested on the example data provided directly by the authors."
     elif strict_runs or a_passed:
         t3 = "Tested on an independent public reference sample not chosen by the authors."
-    elif gates.get("installs") and code == "fails":
+    elif (gates.get("installs") and code == "fails") or (a_attempted and a_installs):
         t3 = "Attempted on an independent public reference sample, stopping before a final result file was produced."
     else:
         t3 = "No biological samples were processed during this automated check."

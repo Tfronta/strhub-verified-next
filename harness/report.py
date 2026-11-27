@@ -1794,7 +1794,7 @@ def main() -> int:
                 for f in o.get("files") or []:
                     if isinstance(f, dict) and f.get("resolved"):
                         a_pref.append(str(f["resolved"]))
-        a_preview = build_output_preview(a_out_dir, a_pref, leg="assisted")
+        a_preview = build_output_preview(a_out_dir, a_pref, leg="assisted") if assisted_raw.get("passed") else None
         a_diags: dict[str, list[dict]] = {}
         for d_key, raw_p in (("build", a_paths.get("log_build", "")), ("external", a_paths.get("log_external", ""))):
             if not raw_p:

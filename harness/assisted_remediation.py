@@ -1249,19 +1249,22 @@ def execute_assisted_run(
     rc_run = ctx.exe.run(argv_run, timeout=int(ctx.plan["step_timeout"]) * 60, cwd=ctx.root)
     runs_ok = rc_run == 0
 
-    io_json_abs = assisted_abs / "io_external.json"
-    ct_json_abs = assisted_abs / "content_external.json"
-    ctx.exe.run(
-        [ctx.python, ctx.harness("check_io.py"), ctx.manifest, str(out_rel), "--json", str(io_json_abs)],
-        cwd=ctx.root,
-    )
-    ctx.exe.run(
-        [ctx.python, ctx.harness("check_content.py"), ctx.manifest, str(out_rel),
-         "--json", str(ct_json_abs), "--panel", dataset.get("supported_loci", "")],
-        cwd=ctx.root,
-    )
-    io_doc = stages._load(io_json_abs)
-    ct_doc = stages._load(ct_json_abs)
+    io_doc = None
+    ct_doc = None
+    if runs_ok:
+        io_json_abs = assisted_abs / "io_external.json"
+        ct_json_abs = assisted_abs / "content_external.json"
+        ctx.exe.run(
+            [ctx.python, ctx.harness("check_io.py"), ctx.manifest, str(out_rel), "--json", str(io_json_abs)],
+            cwd=ctx.root,
+        )
+        ctx.exe.run(
+            [ctx.python, ctx.harness("check_content.py"), ctx.manifest, str(out_rel),
+             "--json", str(ct_json_abs), "--panel", dataset.get("supported_loci", "")],
+            cwd=ctx.root,
+        )
+        io_doc = stages._load(io_json_abs)
+        ct_doc = stages._load(ct_json_abs)
     return _assemble_record(
         plan,
         installs_ok=True,

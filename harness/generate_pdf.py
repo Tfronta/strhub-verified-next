@@ -396,6 +396,11 @@ def build_cover(cfg):
         a_lvl = LEVEL_LABEL.get(assisted_cover.get("level", "none"), "Not run")
         a_gates = assisted_cover.get("gates") or {}
         a_n = sum(1 for k, _, _ in GATE_DISPLAY if a_gates.get(k))
+        stop_stage = (
+            "End-to-End Execution" if a_gates.get("installs") and not a_gates.get("runs")
+            else "Expected Output" if a_gates.get("runs") and not a_gates.get("io")
+            else "Installation"
+        )
         if assisted_cover.get("passed"):
             meta_rows.append((
                 "2. With adjustments",
@@ -405,7 +410,7 @@ def build_cover(cfg):
         else:
             meta_rows.append((
                 "2. With adjustments",
-                f'Stopped at {esc(a_lvl)} ({a_n}/5 gates; {n_adj} adjustment(s) tried; 0 source-code files modified)',
+                f'Executed ({n_adj} adjustment(s)) · stopped at <b>{stop_stage}</b> ({a_n}/5 gates passed; 0 source-code files modified)',
             ))
     elif assisted_cover.get("evaluated"):
         meta_rows.append((
@@ -1035,11 +1040,17 @@ def build_body(cfg):
                 "files in the repository</b>. <b>Run 2 succeeded end-to-end and produced structurally valid output.</b>"
             )
         else:
+            a_gates_s2 = assisted.get("gates") or {}
+            stop_where = (
+                "installed cleanly, then stopped with an error during <b>End-to-End Execution</b>"
+                if a_gates_s2.get("installs") and not a_gates_s2.get("runs")
+                else "ran, then stopped at <b>Expected Output</b>"
+                if a_gates_s2.get("runs") and not a_gates_s2.get("io")
+                else "stopped during <b>Installation</b>"
+            )
             lead_txt = (
                 "STRhub automatically executed one isolated second pass on the same pinned commit applying "
-                "standard environment or CLI adjustments (zero source-code files modified), which stopped at "
-                f"<b>{esc(LEVEL_LABEL.get(assisted.get('level', 'none'), 'Not run'))}</b>. "
-                "See the recorded terminal output in the <b>Technical Annex</b>."
+                f"standard environment or CLI adjustments (zero source-code files modified), which {stop_where}."
             )
         els.append(boxed(
             [Paragraph(lead_txt, ST["body"])],
@@ -1159,16 +1170,22 @@ def build_body(cfg):
             _gates_table(assisted.get("gates") or {}, exec_established=True, log_fname=a_log_fname),
         ]))
 
-        out_els_2 = _output_evidence_elements(
-            cfg,
-            cfg.get("effective_stats") or {},
-            cfg.get("effective_io_detail") or {},
-            cfg.get("effective_content_detail") or {},
-            cfg.get("effective_output_preview"),
-        )
-        if out_els_2:
-            els.append(_subsection("Generated and verified output (Run 2)"))
-            els.extend(out_els_2)
+        if assisted.get("passed"):
+            out_els_2 = _output_evidence_elements(
+                cfg,
+                cfg.get("effective_stats") or {},
+                cfg.get("effective_io_detail") or {},
+                cfg.get("effective_content_detail") or {},
+                cfg.get("effective_output_preview"),
+            )
+            if out_els_2:
+                els.append(_subsection("Generated and verified output (Run 2)"))
+                els.extend(out_els_2)
+        else:
+            ass_term_inline = cfg.get("assisted_terminal_lines") or []
+            if ass_term_inline:
+                els.append(_subsection("Recorded terminal where Run 2 stopped"))
+                els.append(_mono_rows_table(ass_term_inline, dark=True))
     elif assisted.get("evaluated"):
         els.append(section_num(str(sec), "Automated Run with Suggested Documentation Adjustments"))
         sec += 1
