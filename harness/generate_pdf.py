@@ -27,7 +27,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import diagnose_log  # noqa: E402
 from command_record import presentation as command_presentation  # noqa: E402
 from certificate_text import (  # noqa: E402
-    conclusion_items_for, plain_conclusion_items_for, step1_says, install_meaning, headline, execution_finding_established,
+    conclusion_items_for, interpret_result_items_for, plain_conclusion_items_for, step1_says, install_meaning, headline, execution_finding_established,
     stage_states, limitations_for,
     AS_IS_HEADING, NOT_DOCUMENTED, display_name,
     PURPOSE, EXEC_SCOPE, NOT_EVALUATED, SCOPE_STATEMENT, SCOPE_NOT, DISCLAIMER, OUT_OF_SCOPE, LIMITATIONS,
@@ -1292,31 +1292,29 @@ def build_body(cfg):
               leftIndent=10, spaceAfter=1)) for item in needed]
         els.append(boxed(need_els))
 
-    # ── Section 4: How to Interpret This Result and Scope ─────────────────────
-    els.append(section_num(str(sec), "How to Interpret This Result and Scope"))
+    # ── Section 4: How to Interpret This Result (plain-language terminal guide)
+    interp_hdr = section_num(str(sec), "How to Interpret This Result")
     sec += 1
-    cert = cfg.get("certificate") or {}
-    raw_lims = cert.get("limitations") or []
-    if assisted.get("passed") and any("did not complete" in str(x) for x in raw_lims):
-        lim_items = limitations_for(cfg.get("dataset"), input_type=cfg.get("input_type"), executed=True)
-    else:
-        lim_items = raw_lims or limitations_for(
-            cfg.get("dataset"),
-            input_type=cfg.get("input_type"),
-            executed=executed_any,
-        )
-    lim = [Paragraph(
-        "Concerns reproducible execution only; no claim of genotype accuracy, "
-        "concordance, forensic casework suitability, or regulatory validation.",
-        ST["body"]), vspace(2)]
-    lim += [Paragraph(
-        f'<font color="#9ca3af">–</font>  {esc(item)}',
-        S("li", fontSize=8.5, textColor=GRAY, leading=14,
-          leftIndent=10, spaceAfter=1)) for item in lim_items]
-    lim += [vspace(2), Paragraph(DISCLAIMER, ST["body"])]
-    els.append(boxed(lim))
+    active_term = (
+        cfg.get("assisted_terminal_lines")
+        if assisted.get("attempted")
+        else cfg.get("strict_terminal_lines")
+    ) or []
+    interp_items = interpret_result_items_for(cfg, active_term)
+    interp_ps = []
+    for idx_i, (i_title, i_body) in enumerate(interp_items):
+        is_last_i = idx_i == len(interp_items) - 1
+        interp_ps.append(Paragraph(
+            f"<b>{esc(i_title)}</b>",
+            S(f"it_{idx_i}", fontSize=8.8, textColor=INK, leading=13, fontName="Helvetica-Bold", spaceAfter=1),
+        ))
+        interp_ps.append(Paragraph(
+            esc(i_body),
+            S(f"ib_{idx_i}", fontSize=8.4, textColor=GRAY, leading=13, spaceAfter=0 if is_last_i else 5.5),
+        ))
+    els.append(KeepTogether([interp_hdr, boxed(interp_ps)]))
 
-    # ── Section 5: Plain-Language Conclusion (right before Technical Annex) ───
+    # ── Section 5: Plain-Language Conclusion ──────────────────────────────────
     con_hdr = section_num(str(sec), "Conclusion")
     sec += 1
     plain_items = plain_conclusion_items_for(cfg)
@@ -1359,6 +1357,30 @@ def build_body(cfg):
             ),
         ]))
     els.append(KeepTogether(con_group))
+
+    # ── Section 6: STRhub Scope and Methodological Disclaimer (below Conclusion)
+    disc_hdr = section_num(str(sec), "STRhub Scope and Methodological Disclaimer")
+    sec += 1
+    cert = cfg.get("certificate") or {}
+    raw_lims = cert.get("limitations") or []
+    if assisted.get("passed") and any("did not complete" in str(x) for x in raw_lims):
+        lim_items = limitations_for(cfg.get("dataset"), input_type=cfg.get("input_type"), executed=True)
+    else:
+        lim_items = raw_lims or limitations_for(
+            cfg.get("dataset"),
+            input_type=cfg.get("input_type"),
+            executed=executed_any,
+        )
+    lim = [Paragraph(
+        "Concerns reproducible execution only; no claim of genotype accuracy, "
+        "concordance, forensic casework suitability, or regulatory validation.",
+        ST["body"]), vspace(2)]
+    lim += [Paragraph(
+        f'<font color="#9ca3af">–</font>  {esc(item)}',
+        S("li", fontSize=8.5, textColor=GRAY, leading=14,
+          leftIndent=10, spaceAfter=1)) for item in lim_items]
+    lim += [vspace(2), Paragraph(DISCLAIMER, ST["body"])]
+    els.append(KeepTogether([disc_hdr, boxed(lim)]))
     return els
 
 

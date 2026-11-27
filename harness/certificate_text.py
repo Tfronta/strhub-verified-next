@@ -741,6 +741,162 @@ def plain_conclusion_items_for(cfg: dict) -> list[tuple[str, str]]:
     ]
 
 
+def interpret_result_items_for(cfg: dict, terminal_lines: list[str] | None = None) -> list[tuple[str, str]]:
+    """Plain-language translation of what the terminal / exit code / gate outcome
+    means for a reader with no programming background (kept separate from the
+    methodological disclaimer)."""
+    import re as _re
+    gates = dict(cfg.get("gates") or {})
+    verdict = cfg.get("verdict") or {}
+    assisted = cfg.get("assisted_run") or {}
+    step1 = cfg.get("step1") or {}
+    code = verdict.get("code")
+    strict_runs = code == "runs" or bool(gates.get("runs") and gates.get("io"))
+    a_passed = assisted.get("passed") is True
+    a_attempted = assisted.get("attempted") is True
+    eff_gates = (assisted.get("gates") or {}) if a_attempted else gates
+    eff_installs = bool(eff_gates.get("installs"))
+    eff_runs = bool(eff_gates.get("runs"))
+    eff_io = bool(eff_gates.get("io"))
+
+    term_blob = "\n".join(terminal_lines or [])
+    m_exits = list(_re.finditer(r"\[exit\s+(\d+)\]", term_blob))
+    exit_code = int(m_exits[-1].group(1)) if m_exits else None
+
+    if strict_runs or a_passed:
+        return [
+            (
+                "What does a clean terminal finish (exit 0) mean?",
+                "In console programs, exit 0 is the standard signal that the analysis ran from start to finish without crashing.",
+            ),
+            (
+                "What specifically happened in this check?",
+                (
+                    "The software installed from its published instructions, processed the reference sample, and wrote a valid result file."
+                    if strict_runs
+                    else "Minor setup details were missing from the literal guide; once the standard adjustments in Section 2 were applied without changing source code, the software installed, ran end to end, and wrote a valid result file."
+                ),
+            ),
+            (
+                "What does this mean for a reviewer or new user?",
+                (
+                    "An independent person can install and run the software today by following its public guide."
+                    if strict_runs
+                    else "The software works properly on real data today using the step-by-step commands in Section 2."
+                ),
+            ),
+        ]
+
+    if exit_code == 137:
+        return [
+            (
+                "What does [exit 137] at the end of the terminal mean?",
+                "Code exit 137 means the program requested more RAM than the automated test machine provides (6 GB), so the operating system stopped it.",
+            ),
+            (
+                "What does this mean for a reviewer?",
+                "This is a physical memory limit of the free automated test runner rather than a defect in the software; manual verification can test it on a larger machine.",
+            ),
+        ]
+
+    if exit_code == 124:
+        return [
+            (
+                "What does [exit 124] at the end of the terminal mean?",
+                "Code exit 124 means the analysis exceeded the maximum allowed run time, so the automated system stopped it.",
+            ),
+            (
+                "What does this mean for a reviewer?",
+                "This reflects a run-time ceiling on the test runner rather than proof of a scientific flaw.",
+            ),
+        ]
+
+    if a_attempted or code == "fails":
+        shown = str(exit_code) if (exit_code is not None and exit_code != 0) else "1"
+        m_missing = _re.search(
+            r"([^\s:'\"`]+\.(?:fasta|fa|fna|bed|bam|cram|vcf|tsv|csv|json|txt|gz|groovy|py|jar|sh|config|yaml|yml))\s+could not be found",
+            term_blob,
+            _re.I,
+        ) or _re.search(
+            r"(?:No such file or directory|cannot open(?:\s+file)?|FileNotFoundError)[^:\n]*:\s*['\"`]?([^\s'\"`\n]+)",
+            term_blob,
+            _re.I,
+        )
+        missing_file = None
+        if m_missing and not m_missing.group(1).startswith("/etc/ssl/"):
+            missing_file = _re.sub(r"^/(?:opt/tool|app)/", "", m_missing.group(1).strip("'\"`(),.;:"))
+
+        if missing_file:
+            cause = (
+                f"The software started running, then aborted because it looked for a required file ({missing_file}) "
+                "that automated setup did not leave downloaded or configured."
+            )
+        elif not eff_installs:
+            cause = (
+                "The stop happened during initial installation: a system package, active download URL, or prerequisite "
+                "step was missing to finish building on a clean computer."
+            )
+        elif eff_runs and not eff_io:
+            cause = "Although the command finished running, no valid final result file was written in the expected format."
+        else:
+            cause = (
+                "The software installed and started running, then reported an error in the console before completing "
+                "the analysis (shown in the recorded terminal)."
+            )
+
+        first = (
+            (
+                "Why did validation stop after the command ran?",
+                "The process finished in the console without producing a valid result file.",
+            )
+            if (eff_runs and not eff_io)
+            else (
+                f"What does [exit {shown}] at the end of the terminal mean?",
+                f"In console programs, exit 0 means normal completion, whereas exit {shown} means an error occurred and execution stopped early.",
+            )
+        )
+        return [
+            first,
+            ("What specifically caused it to stop here?", cause),
+            (
+                "What does this mean if you are reviewing a paper or planning to use it?",
+                "This does NOT prove the scientific method in the paper is wrong. It confirms that on a clean computer "
+                "today, an outside user hits that stop and needs manual setup or updated instructions to reach final results.",
+            ),
+        ]
+
+    ours = (
+        step1.get("code") == "ours"
+        or code == "out_of_scope"
+        or verdict.get("basis") in ("strhub_infra", "scope", "strhub")
+    )
+    if ours:
+        return [
+            (
+                "Why is there no execution error terminal?",
+                "Our automated system did not run the software because special resources outside this standard server "
+                "(such as a GPU, graphical interface, license, or distinct sample format) are needed.",
+            ),
+            (
+                "What does this mean for a reviewer?",
+                "This is a technical boundary of the automated runner, not a fault in the software.",
+            ),
+        ]
+
+    return [
+        (
+            "Why was no full execution terminal recorded?",
+            "Concrete commands or custom folder configurations are missing from the current public instructions, "
+            "and the automated runner never invents parameters.",
+        ),
+        (
+            "What does this mean for a reviewer?",
+            "This does not mean the software is broken; it means the current public guide needs additional setup steps "
+            "before an independent person can run it from start to finish.",
+        ),
+    ]
+
+
 def install_meaning(faults: list[str]) -> list[tuple[str, str]]:
     """What a failed build means for each reader, in their own terms."""
     run = ("A build from source at this commit stopped in a clean environment; the "
